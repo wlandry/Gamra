@@ -10,7 +10,6 @@
 
 SAMRAI	      = ../AMR/SAMRAI-v3.1.0-beta
 SRCDIR        = .
-SUBDIR        = source/test/FAC_nonadaptive
 VPATH         = 
 TESTTOOLS     = ../testtools
 OBJECT        = ../AMR/SAMRAI-v3.1.0-beta-build
