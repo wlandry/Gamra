@@ -79,7 +79,7 @@ CartesianGridGeometry {
   //                        domain is periodic.  Zero indicates not
   //                        periodic, non-zero value indicates periodicity.
   //                        [0]
-  domain_boxes = [(0,0), (31,31)]
+  domain_boxes = [(0,0), (7,7)]
   x_lo         = 0, 0
   x_up         = 1, 1
 }
@@ -87,9 +87,9 @@ CartesianGridGeometry {
 StandardTagAndInitialize {
   tagging_method = "REFINE_BOXES"
   RefineBoxes {
-    level_0 = [(0,0),(31,15)]
-    level_1 = [(0,0),(63,15)]
-    level_2 = [(0,0),(16,16)]
+    level_0 = [(0,0),(7,7)]
+    level_1 = [(0,0),(15,15)]
+    level_2 = [(0,0),(31,31)]
     //etc.
   }
 }
