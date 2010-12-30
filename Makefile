@@ -15,7 +15,7 @@ VPATH         =
 TESTTOOLS     = ../testtools
 OBJECT        = ../AMR/SAMRAI-v3.1.0-beta-build
 
-default:      check
+default:      main
 
 include $(OBJECT)/config/Makefile.config
 
@@ -76,7 +76,7 @@ clean-check:
 	$(SAMCLEAN)
 
 clean:		clean-check
-	$(RM) main
+	$(RM) main *.f *.o
 
 redo:
 	$(RM) core main
