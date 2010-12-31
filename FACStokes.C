@@ -16,7 +16,7 @@
 #include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/math/HierarchyCellDataOpsReal.h"
 #include "SAMRAI/pdat/SideData.h"
-#include "SAMRAI/solv/PoissonSpecifications.h"
+#include "StokesSpecifications.h"
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/hier/Variable.h"
 #include "SAMRAI/hier/VariableDatabase.h"
@@ -59,7 +59,7 @@ FACStokes::FACStokes(
    d_dim(dim),
    d_hierarchy(NULL),
    d_stokes_fac_solver((d_dim),
-                        object_name + "::poisson_hypre",
+                        object_name + "::stokes_hypre",
                         (!database.isNull() &&
                          database->isDatabase("fac_solver")) ?
                         database->getDatabase("fac_solver"):

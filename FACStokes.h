@@ -10,7 +10,7 @@
 #ifndef included_FACStokes
 #define included_FACStokes
 
-#include "SAMRAI/solv/CellPoissonFACSolver.h"
+#include "CellStokesFACSolver.h"
 #include "SAMRAI/pdat/CellVariable.h"
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/hier/Box.h"
@@ -175,7 +175,7 @@ private:
    /*!
     * @brief FAC stokes solver.
     */
-   solv::CellPoissonFACSolver d_stokes_fac_solver;
+   solv::CellStokesFACSolver d_stokes_fac_solver;
 
    /*!
     * @brief Boundary condition coefficient implementation.

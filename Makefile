@@ -24,7 +24,8 @@ NUM_TESTS = 2
 
 TEST_NPROCS = 0,2
 
-CXX_OBJS      = main.o FACStokes.o
+CXX_OBJS      = main.o FACStokes.o CellStokesFACOps.o \
+	CellStokesHypreSolver.o StokesSpecifications.o CellStokesFACSolver.o
 F_OBJS      = facpoisson2d.o facpoisson3d.o
 
 main:	$(CXX_OBJS) $(F_OBJS) $(LIBSAMRAIDEPEND)
