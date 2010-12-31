@@ -4,11 +4,11 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Numerical routines for example FAC Poisson solver 
+ * Description:   Numerical routines for example FAC Stokes solver 
  *
  ************************************************************************/
-#ifndef included_FACPoisson
-#define included_FACPoisson
+#ifndef included_FACStokes
+#define included_FACStokes
 
 #include "SAMRAI/solv/CellPoissonFACSolver.h"
 #include "SAMRAI/pdat/CellVariable.h"
@@ -28,10 +28,10 @@
 namespace SAMRAI {
 
 /*!
- * @brief Class to solve a sample Poisson equation on a SAMR grid.
+ * @brief Class to solve a sample Stokes equation on a SAMR grid.
  *
- * This class demonstrates how use the FAC Poisson solver
- * class to solve Poisson's equation on a single level
+ * This class demonstrates how use the FAC Stokes solver
+ * class to solve Stokes's equation on a single level
  * within a hierarchy.
  *
  * We set up and solve the following problem:
@@ -53,11 +53,11 @@ namespace SAMRAI {
  *   in a vis file, such as the error of the solution.
  *
  * Inputs:  The only input parameter for this class is
- * "fac_poisson", the input database for the solv::CellPoissonFACSolver
- * object.  See the documentation for solv::CellPoissonFACSolver
+ * "fac_stokes", the input database for the solv::CellStokesFACSolver
+ * object.  See the documentation for solv::CellStokesFACSolver
  * for its input parameters.
  */
-class FACPoisson:
+class FACStokes:
    public mesh::StandardTagAndInitStrategy,
    public appu::VisDerivedDataStrategy
 {
@@ -72,13 +72,13 @@ public:
     * @param object_name Ojbect name
     * @param database Input database (may be NULL)
     */
-   FACPoisson(
+   FACStokes(
       const std::string& object_name,
       const tbox::Dimension& dim,
       tbox::Pointer<tbox::Database> database =
          tbox::Pointer<tbox::Database>(NULL));
 
-   virtual ~FACPoisson();
+   virtual ~FACStokes();
 
    //@{ @name mesh::StandardTagAndInitStrategy virtuals
 
@@ -126,17 +126,17 @@ public:
    //@}
 
    /*!
-    * @brief Solve using HYPRE Poisson solver
+    * @brief Solve using HYPRE Stokes solver
     *
     * Set up the linear algebra problem and use a
-    * solv::CellPoissonFACSolver object to solve it.
+    * solv::CellStokesFACSolver object to solve it.
     * -# Set initial guess
     * -# Set boundary conditions
-    * -# Specify Poisson equation parameters
+    * -# Specify Stokes equation parameters
     * -# Call solver
     */
    int
-   solvePoisson();
+   solveStokes();
 
 #ifdef HAVE_HDF5
    /*!
@@ -173,9 +173,9 @@ private:
     */
 
    /*!
-    * @brief FAC poisson solver.
+    * @brief FAC stokes solver.
     */
-   solv::CellPoissonFACSolver d_poisson_fac_solver;
+   solv::CellPoissonFACSolver d_stokes_fac_solver;
 
    /*!
     * @brief Boundary condition coefficient implementation.
@@ -208,4 +208,4 @@ private:
 
 }
 
-#endif  // included_FACPoisson
+#endif  // included_FACStokes

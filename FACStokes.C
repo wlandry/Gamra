@@ -4,10 +4,10 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Numerical routines for example FAC Poisson solver 
+ * Description:   Numerical routines for example FAC Stokes solver 
  *
  ************************************************************************/
-#include "FACPoisson.h"
+#include "FACStokes.h"
 
 #include "SAMRAI/hier/IntVector.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
@@ -51,14 +51,14 @@ namespace SAMRAI {
  * all its internal variables with the variable database.                *
  *************************************************************************
  */
-FACPoisson::FACPoisson(
+FACStokes::FACStokes(
    const std::string& object_name,
    const tbox::Dimension& dim,
    tbox::Pointer<tbox::Database> database):
    d_object_name(object_name),
    d_dim(dim),
    d_hierarchy(NULL),
-   d_poisson_fac_solver((d_dim),
+   d_stokes_fac_solver((d_dim),
                         object_name + "::poisson_hypre",
                         (!database.isNull() &&
                          database->isDatabase("fac_solver")) ?
@@ -118,7 +118,7 @@ FACPoisson::FACPoisson(
     * We use the implementation solv::LocationIndexRobinBcCoefs, but other
     * implementations are possible, including user-implemented.
     */
-   d_poisson_fac_solver.setBcObject(&d_bc_coefs);
+   d_stokes_fac_solver.setBcObject(&d_bc_coefs);
 }
 
 /*
@@ -126,7 +126,7 @@ FACPoisson::FACPoisson(
  * Destructor does nothing interesting                                   *
  *************************************************************************
  */
-FACPoisson::~FACPoisson()
+FACStokes::~FACStokes()
 {
 }
 
@@ -138,7 +138,7 @@ FACPoisson::~FACPoisson()
  * Fill the rhs and exact solution.                                      *
  *************************************************************************
  */
-void FACPoisson::initializeLevelData(
+void FACStokes::initializeLevelData(
    const tbox::Pointer<hier::BasePatchHierarchy> patch_hierarchy,
    const int level_number,
    const double init_data_time,
@@ -221,7 +221,7 @@ void FACPoisson::initializeLevelData(
  * Reset the hierarchy-dependent internal information.                   *
  *************************************************************************
  */
-void FACPoisson::resetHierarchyConfiguration(
+void FACStokes::resetHierarchyConfiguration(
    tbox::Pointer<hier::BasePatchHierarchy> new_hierarchy,
    int coarsest_level,
    int finest_level)
@@ -235,11 +235,11 @@ void FACPoisson::resetHierarchyConfiguration(
 /*
  *************************************************************************
  * Set up the initial guess and problem parameters                       *
- * and solve the Poisson problem.  We explicitly initialize and          *
+ * and solve the Stokes problem.  We explicitly initialize and          *
  * deallocate the solver state in this example.                          *
  *************************************************************************
  */
-int FACPoisson::solvePoisson()
+int FACStokes::solveStokes()
 {
 
    if (d_hierarchy.isNull()) {
@@ -263,16 +263,16 @@ int FACPoisson::solvePoisson()
    }
 
    /*
-    * Set the parameters for the Poisson equation.
-    * See classes solv::CellPoissonFACSolver or
-    * solv::PoissonSpecifications.
+    * Set the parameters for the Stokes equation.
+    * See classes solv::CellStokesFACSolver or
+    * solv::StokesSpecifications.
     * (D is the diffusion coefficient.
     * C is the source term which is not used in this example.)
     */
-   d_poisson_fac_solver.setDConstant(1.0);
-   d_poisson_fac_solver.setCConstant(0.0);
+   d_stokes_fac_solver.setDConstant(1.0);
+   d_stokes_fac_solver.setCConstant(0.0);
 
-   d_poisson_fac_solver.initializeSolverState(
+   d_stokes_fac_solver.initializeSolverState(
       d_comp_soln_id,
       d_rhs_id,
       d_hierarchy,
@@ -281,23 +281,23 @@ int FACPoisson::solvePoisson()
 
    tbox::plog << "solving..." << std::endl;
    int solver_ret;
-   solver_ret = d_poisson_fac_solver.solveSystem(d_comp_soln_id,
+   solver_ret = d_stokes_fac_solver.solveSystem(d_comp_soln_id,
          d_rhs_id);
    /*
     * Present data on the solve.
     */
    double avg_factor, final_factor;
-   d_poisson_fac_solver.getConvergenceFactors(avg_factor, final_factor);
+   d_stokes_fac_solver.getConvergenceFactors(avg_factor, final_factor);
    tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
               << "	iterations: "
-              << d_poisson_fac_solver.getNumberOfIterations() << "\n"
-              << "	residual: "<< d_poisson_fac_solver.getResidualNorm()
+              << d_stokes_fac_solver.getNumberOfIterations() << "\n"
+              << "	residual: "<< d_stokes_fac_solver.getResidualNorm()
               << "\n"
               << "	average convergence: "<< avg_factor << "\n"
               << "	final convergence: "<< final_factor << "\n"
               << std::flush;
 
-   d_poisson_fac_solver.deallocateSolverState();
+   d_stokes_fac_solver.deallocateSolverState();
 
    return 0;
 }
@@ -309,11 +309,11 @@ int FACPoisson::solvePoisson()
  * Register variables appropriate for plotting.                          *
  *************************************************************************
  */
-int FACPoisson::setupPlotter(
+int FACStokes::setupPlotter(
    appu::VisItDataWriter& plotter) const {
    if (d_hierarchy.isNull()) {
       TBOX_ERROR(d_object_name << ": No hierarchy in\n"
-                               << " FACPoisson::setupPlotter\n"
+                               << " FACStokes::setupPlotter\n"
                                << "The hierarchy must be set before calling\n"
                                << "this function.\n");
    }
@@ -326,7 +326,7 @@ int FACPoisson::setupPlotter(
    plotter.registerPlotQuantity("Exact solution",
       "SCALAR",
       d_exact_id);
-   plotter.registerPlotQuantity("Poisson source",
+   plotter.registerPlotQuantity("Stokes source",
       "SCALAR",
       d_rhs_id);
 
@@ -339,7 +339,7 @@ int FACPoisson::setupPlotter(
  * Write derived data to the given stream.                               *
  *************************************************************************
  */
-bool FACPoisson::packDerivedDataIntoDoubleBuffer(
+bool FACStokes::packDerivedDataIntoDoubleBuffer(
    double* buffer,
    const hier::Patch& patch,
    const hier::Box& region,
@@ -367,7 +367,7 @@ bool FACPoisson::packDerivedDataIntoDoubleBuffer(
       TBOX_ERROR(
          "Unregistered variable name '" << variable_name << "' in\n"
          <<
-         "FACPoissonX::packDerivedDataIntoDoubleBuffer");
+         "FACStokesX::packDerivedDataIntoDoubleBuffer");
 
    }
    // Return true if this patch has derived data on it.

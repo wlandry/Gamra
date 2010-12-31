@@ -4,7 +4,7 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Main program for FAC Poisson example 
+ * Description:   Main program for FAC Stokes example 
  *
  ************************************************************************/
 #include "SAMRAI/SAMRAI_config.h"
@@ -29,7 +29,7 @@ using namespace std;
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/appu/VisItDataWriter.h"
 
-#include "FACPoisson.h"
+#include "FACStokes.h"
 
 using namespace SAMRAI;
 
@@ -37,20 +37,20 @@ using namespace SAMRAI;
  ************************************************************************
  *                                                                      *
  * This is the driver program to demonstrate                            *
- * how to use the FAC Poisson solver.                                   *
+ * how to use the FAC Stokes solver.                                   *
  *                                                                      *
  * We set up the simple problem                                         *
  *          u + div(grad(u)) = sin(x)*sin(y)                            *
  * in the domain [0:1]x[0:1], with u=0 on the                           *
  * boundary.                                                            *
  *                                                                      *
- * FACPoisson is the primary object used to                             *
+ * FACStokes is the primary object used to                             *
  * set up and solve the system.  It maintains                           *
  * the data for the computed solution u, the                            *
  * exact solution, and the right hand side.                             *
  *                                                                      *
  * The hierarchy created to solve this problem                          *
- * has only one level.  (The FAC Poisson solver                         *
+ * has only one level.  (The FAC Stokes solver                         *
  * is a single-level solver.)                                           *
  *                                                                      *
  *************************************************************************
@@ -152,16 +152,16 @@ int main(
             input_db->getDatabase("PatchHierarchy")));
 
       /*
-       * The FACPoisson object is the main user object specific to the
+       * The FACStokes object is the main user object specific to the
        * problem being solved.  It provides the implementations for setting
        * up the grid and plotting data.  It also wraps up the solve
        * process that includes making the initial guess, specifying the
        * boundary conditions and call the solver.
        */
-      FACPoisson fac_poisson(base_name + "::FACPoisson",
+      FACStokes fac_stokes(base_name + "::FACStokes",
                              dim,
-                             input_db->isDatabase("FACPoisson") ?
-                             input_db->getDatabase("FACPoisson") :
+                             input_db->isDatabase("FACStokes") ?
+                             input_db->getDatabase("FACStokes") :
                              tbox::Pointer<tbox::Database>(NULL));
 
       /*
@@ -172,7 +172,7 @@ int main(
          new mesh::StandardTagAndInitialize(
             dim,
             "CellTaggingMethod",
-            tbox::Pointer<mesh::StandardTagAndInitStrategy>(&fac_poisson, false),
+            tbox::Pointer<mesh::StandardTagAndInitStrategy>(&fac_stokes, false),
             input_db->getDatabase("StandardTagAndInitialize")
             ));
       tbox::Pointer<mesh::BergerRigoutsos> box_generator(
@@ -218,7 +218,7 @@ int main(
 
       /*
        * Set up the plotter for the hierarchy just created.
-       * The FACPoisson object handles the data and has the
+       * The FACStokes object handles the data and has the
        * function setupExternalPlotter to register its data
        * with the plotter.
        */
@@ -239,7 +239,7 @@ int main(
          visit_writer = new appu::VisItDataWriter(dim,
                "Visit Writer",
                vis_filename + ".visit");
-         fac_poisson.setupPlotter(*visit_writer);
+         fac_stokes.setupPlotter(*visit_writer);
       }
 #endif
 
@@ -256,7 +256,7 @@ int main(
       /*
        * Solve.
        */
-      fac_poisson.solvePoisson();
+      fac_stokes.solveStokes();
 
 #ifdef HAVE_HDF5
       /*

@@ -4,7 +4,7 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Input file for example FAC Poisson solver 
+ * Description:   Input file for example FAC Stokes solver 
  *
  ************************************************************************/
 // This is the input file for the 2D FAC example
@@ -23,13 +23,13 @@ Main {
   vis_writer = "Vizamrai", "VisIt"
 }
 
-FACPoisson {
-  // The FACPoisson class is the "user class" in this example.
+FACStokes {
+  // The FACStokes class is the "user class" in this example.
   // It owns the solver and contains the code to set up the solver.
-  // The inputs for FACPoisson is simply the inputs for the individual
-  // parts owned by the FACPoisson class.
+  // The inputs for FACStokes is simply the inputs for the individual
+  // parts owned by the FACStokes class.
   fac_solver {
-    // This is the input for the cell-centered Poisson FAC solver
+    // This is the input for the cell-centered Stokes FAC solver
     // class in the SAMRAI library.
     enable_logging = TRUE   // Bool flag to switch logging on/off
     max_cycles = 20         // Max number of FAC cycles to use

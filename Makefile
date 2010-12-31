@@ -4,7 +4,7 @@
 ## information, see COPYRIGHT and COPYING.LESSER. 
 ##
 ## Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
-## Description:   makefile for SAMRAI FAC Poisson solver example 
+## Description:   makefile for SAMRAI FAC Stokes
 ##
 #########################################################################
 
@@ -24,7 +24,7 @@ NUM_TESTS = 2
 
 TEST_NPROCS = 0,2
 
-CXX_OBJS      = main.o FACPoisson.o
+CXX_OBJS      = main.o FACStokes.o
 F_OBJS      = facpoisson2d.o facpoisson3d.o
 
 main:	$(CXX_OBJS) $(F_OBJS) $(LIBSAMRAIDEPEND)
