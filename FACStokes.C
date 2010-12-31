@@ -88,7 +88,7 @@ FACStokes::FACStokes(
 
    tbox::Pointer<pdat::CellVariable<double> > comp_soln(
       new pdat::CellVariable<double>(dim, object_name + ":computed solution", 1));
-   d_comp_soln_id =
+   p_id =
       vdb->registerVariableAndContext(
          comp_soln,
          d_context,
@@ -96,7 +96,7 @@ FACStokes::FACStokes(
 
    tbox::Pointer<pdat::CellVariable<double> > exact_solution(
       new pdat::CellVariable<double>(dim, object_name + ":exact solution"));
-   d_exact_id =
+   p_exact_id =
       vdb->registerVariableAndContext(
          exact_solution,
          d_context,
@@ -107,7 +107,7 @@ FACStokes::FACStokes(
          dim,
          object_name
          + ":linear system right hand side"));
-   d_rhs_id =
+   p_rhs_id =
       vdb->registerVariableAndContext(
          rhs_variable,
          d_context,
@@ -161,9 +161,9 @@ void FACStokes::initializeLevelData(
       hierarchy->getPatchLevel(level_number);
 
    if (allocate_data) {
-      level->allocatePatchData(d_comp_soln_id);
-      level->allocatePatchData(d_rhs_id);
-      level->allocatePatchData(d_exact_id);
+      level->allocatePatchData(p_id);
+      level->allocatePatchData(p_rhs_id);
+      level->allocatePatchData(p_exact_id);
    }
 
    /*
@@ -182,9 +182,9 @@ void FACStokes::initializeLevelData(
          patch->getPatchGeometry();
 
       tbox::Pointer<pdat::CellData<double> > exact_data =
-         patch->getPatchData(d_exact_id);
+         patch->getPatchData(p_exact_id);
       tbox::Pointer<pdat::CellData<double> > rhs_data =
-         patch->getPatchData(d_rhs_id);
+         patch->getPatchData(p_rhs_id);
 
       /*
        * Set source function and exact solution.
@@ -257,7 +257,7 @@ int FACStokes::solveStokes()
       for ( ; ip; ip++) {
          tbox::Pointer<hier::Patch> patch = *ip;
          tbox::Pointer<pdat::CellData<double> > data = patch->getPatchData(
-               d_comp_soln_id);
+               p_id);
          data->fill(0.0);
       }
    }
@@ -273,16 +273,16 @@ int FACStokes::solveStokes()
    d_stokes_fac_solver.setCConstant(0.0);
 
    d_stokes_fac_solver.initializeSolverState(
-      d_comp_soln_id,
-      d_rhs_id,
+      p_id,
+      p_rhs_id,
       d_hierarchy,
       0,
       d_hierarchy->getFinestLevelNumber());
 
    tbox::plog << "solving..." << std::endl;
    int solver_ret;
-   solver_ret = d_stokes_fac_solver.solveSystem(d_comp_soln_id,
-         d_rhs_id);
+   solver_ret = d_stokes_fac_solver.solveSystem(p_id,
+         p_rhs_id);
    /*
     * Present data on the solve.
     */
@@ -319,16 +319,16 @@ int FACStokes::setupPlotter(
    }
    plotter.registerPlotQuantity("Computed solution",
       "SCALAR",
-      d_comp_soln_id);
+      p_id);
    plotter.registerDerivedPlotQuantity("Error",
       "SCALAR",
       (appu::VisDerivedDataStrategy *)this);
    plotter.registerPlotQuantity("Exact solution",
       "SCALAR",
-      d_exact_id);
+      p_exact_id);
    plotter.registerPlotQuantity("Stokes source",
       "SCALAR",
-      d_rhs_id);
+      p_rhs_id);
 
    return 0;
 }
@@ -352,9 +352,9 @@ bool FACStokes::packDerivedDataIntoDoubleBuffer(
 
    if (variable_name == "Error") {
       tbox::Pointer<pdat::CellData<double> > current_solution_ =
-         patch.getPatchData(d_comp_soln_id);
+         patch.getPatchData(p_id);
       tbox::Pointer<pdat::CellData<double> > exact_solution_ =
-         patch.getPatchData(d_exact_id);
+         patch.getPatchData(p_exact_id);
       pdat::CellData<double>& current_solution = *current_solution_;
       pdat::CellData<double>& exact_solution = *exact_solution_;
       for ( ; icell; icell++) {
