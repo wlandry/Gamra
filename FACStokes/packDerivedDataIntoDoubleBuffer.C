@@ -32,7 +32,8 @@ namespace SAMRAI {
                                                   double* buffer,
                                                   const hier::Patch& patch,
                                                   const hier::Box& region,
-                                                  const std::string& variable_name,
+                                                  const std::string&
+                                                  variable_name,
                                                   int depth_id) const
   {
     (void)depth_id;

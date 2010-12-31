@@ -42,14 +42,14 @@ namespace SAMRAI {
 * Fill the rhs and exact solution.                                      *
 *************************************************************************
 */
-  void FACStokes::initializeLevelData(
-                                      const tbox::Pointer<hier::BasePatchHierarchy> patch_hierarchy,
-                                      const int level_number,
-                                      const double init_data_time,
-                                      const bool can_be_refined,
-                                      const bool initial_time,
-                                      const tbox::Pointer<hier::BasePatchLevel> old_level,
-                                      const bool allocate_data)
+  void FACStokes::initializeLevelData
+  (const tbox::Pointer<hier::BasePatchHierarchy> patch_hierarchy,
+   const int level_number,
+   const double init_data_time,
+   const bool can_be_refined,
+   const bool initial_time,
+   const tbox::Pointer<hier::BasePatchLevel> old_level,
+   const bool allocate_data)
   {
 
     (void)init_data_time;

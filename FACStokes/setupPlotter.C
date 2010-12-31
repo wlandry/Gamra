@@ -30,8 +30,7 @@ namespace SAMRAI {
 * Register variables appropriate for plotting.                          *
 *************************************************************************
 */
-  int FACStokes::setupPlotter(
-                              appu::VisItDataWriter& plotter) const {
+  int FACStokes::setupPlotter(appu::VisItDataWriter& plotter) const {
     if (d_hierarchy.isNull()) {
       TBOX_ERROR(d_object_name << ": No hierarchy in\n"
                  << " FACStokes::setupPlotter\n"
