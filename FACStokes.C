@@ -198,6 +198,18 @@ void FACStokes::initializeLevelData(
             patch_geom->getDx(),
             patch_geom->getXLower());
 
+      tbox::Pointer<pdat::SideData<double> > v_rhs_data =
+         patch->getPatchData(v_rhs_id);
+      for(pdat::SideIterator si(pbox,0); si; si++)
+        {
+          pdat::SideIndex s=si();
+          (*v_rhs_data)(s)=0;
+        }
+      for(pdat::SideIterator si(pbox,1); si; si++)
+        {
+          pdat::SideIndex s=si();
+          (*v_rhs_data)(s)=1;
+        }
    }    // End patch loop.
 }
 
