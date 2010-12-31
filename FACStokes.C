@@ -86,37 +86,45 @@ FACStokes::FACStokes(
     * and get the descriptor indices for those variables.
     */
 
-   tbox::Pointer<pdat::CellVariable<double> > comp_soln(
-      new pdat::CellVariable<double>(dim, object_name + ":computed solution", 1));
-   p_id =
-      vdb->registerVariableAndContext(
-         comp_soln,
-         d_context,
-         hier::IntVector(dim, 1) /* ghost cell width is 1 for stencil widths */);
+   tbox::Pointer<pdat::CellVariable<double> >
+     p(new pdat::CellVariable<double>(dim, object_name + ":p", 1));
+   p_id = vdb->registerVariableAndContext(p, d_context, hier::IntVector(dim, 1)
+                                          /* ghost cell width is 1 for
+                                             stencil widths */);
 
-   tbox::Pointer<pdat::CellVariable<double> > exact_solution(
-      new pdat::CellVariable<double>(dim, object_name + ":exact solution"));
-   p_exact_id =
-      vdb->registerVariableAndContext(
-         exact_solution,
-         d_context,
-         hier::IntVector(dim, 1) /* ghost cell width is 1 in case needed */);
+   tbox::Pointer<pdat::CellVariable<double> >
+     p_exact(new pdat::CellVariable<double>(dim, object_name + ":p exact"));
+   p_exact_id = vdb->registerVariableAndContext(p_exact,d_context,
+                                                hier::IntVector(dim, 1)
+                                                /* ghost cell width is
+                                                   1 in case needed */);
 
-   tbox::Pointer<pdat::CellVariable<double> > rhs_variable(
-      new pdat::CellVariable<double>(
-         dim,
-         object_name
-         + ":linear system right hand side"));
-   p_rhs_id =
-      vdb->registerVariableAndContext(
-         rhs_variable,
-         d_context,
-         hier::IntVector(dim, 0) /* ghost cell width is 0 */);
+   tbox::Pointer<pdat::CellVariable<double> >
+     p_rhs(new pdat::CellVariable<double>(dim,object_name
+                                          + ":p right hand side"));
+                                          
+   p_rhs_id = vdb->registerVariableAndContext(p_rhs,d_context,
+                                              hier::IntVector(dim, 0)
+                                              /* ghost cell width is 0 */);
+
+   tbox::Pointer<pdat::FaceVariable<double> >
+     v(new pdat::FaceVariable<double>(dim, object_name + ":v", 1));
+   v_id = vdb->registerVariableAndContext(v, d_context, hier::IntVector(dim, 1)
+                                          /* ghost cell width is 1 for
+                                             stencil widths */);
+
+   tbox::Pointer<pdat::FaceVariable<double> >
+     v_rhs(new pdat::FaceVariable<double>(dim,object_name
+                                          + ":v right hand side"));
+   v_rhs_id = vdb->registerVariableAndContext(v_rhs,d_context,
+                                              hier::IntVector(dim, 0)
+                                              /* ghost cell width is 0 */);
 
    /*
-    * Specify an implementation of solv::RobinBcCoefStrategy for the solver to use.
-    * We use the implementation solv::LocationIndexRobinBcCoefs, but other
-    * implementations are possible, including user-implemented.
+    * Specify an implementation of solv::RobinBcCoefStrategy for the
+    * solver to use.  We use the implementation
+    * solv::LocationIndexRobinBcCoefs, but other implementations are
+    * possible, including user-implemented.
     */
    d_stokes_fac_solver.setBcObject(&d_bc_coefs);
 }
@@ -164,6 +172,8 @@ void FACStokes::initializeLevelData(
       level->allocatePatchData(p_id);
       level->allocatePatchData(p_rhs_id);
       level->allocatePatchData(p_exact_id);
+      level->allocatePatchData(v_id);
+      level->allocatePatchData(v_rhs_id);
    }
 
    /*
@@ -259,6 +269,9 @@ int FACStokes::solveStokes()
          tbox::Pointer<pdat::CellData<double> > data = patch->getPatchData(
                p_id);
          data->fill(0.0);
+         tbox::Pointer<pdat::FaceData<double> > vdata = patch->getPatchData(
+               v_id);
+         vdata->fill(0.0);
       }
    }
 
