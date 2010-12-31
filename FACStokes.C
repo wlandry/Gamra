@@ -30,17 +30,6 @@ void F77_FUNC(setexactandrhs2d, SETEXACTANDRHS2D) (const int & ifirst0,
    double* rhs,
    const double* dx,
    const double* xlower);
-
-void F77_FUNC(setexactandrhs3d, SETEXACTANDRHS3D) (const int & ifirst0,
-   const int & ilast0,
-   const int & ifirst1,
-   const int & ilast1,
-   const int & ifirst2,
-   const int & ilast2,
-   double* exact,
-   double* rhs,
-   const double* dx,
-   const double* xlower);
 }
 
 namespace SAMRAI {
@@ -107,14 +96,14 @@ FACStokes::FACStokes(
                                               hier::IntVector(dim, 0)
                                               /* ghost cell width is 0 */);
 
-   tbox::Pointer<pdat::FaceVariable<double> >
-     v(new pdat::FaceVariable<double>(dim, object_name + ":v", 1));
+   tbox::Pointer<pdat::SideVariable<double> >
+     v(new pdat::SideVariable<double>(dim, object_name + ":v", 1));
    v_id = vdb->registerVariableAndContext(v, d_context, hier::IntVector(dim, 1)
                                           /* ghost cell width is 1 for
                                              stencil widths */);
 
-   tbox::Pointer<pdat::FaceVariable<double> >
-     v_rhs(new pdat::FaceVariable<double>(dim,object_name
+   tbox::Pointer<pdat::SideVariable<double> >
+     v_rhs(new pdat::SideVariable<double>(dim,object_name
                                           + ":v right hand side"));
    v_rhs_id = vdb->registerVariableAndContext(v_rhs,d_context,
                                               hier::IntVector(dim, 0)
@@ -191,37 +180,23 @@ void FACStokes::initializeLevelData(
       tbox::Pointer<geom::CartesianPatchGeometry> patch_geom =
          patch->getPatchGeometry();
 
-      tbox::Pointer<pdat::CellData<double> > exact_data =
+      tbox::Pointer<pdat::CellData<double> > p_exact_data =
          patch->getPatchData(p_exact_id);
-      tbox::Pointer<pdat::CellData<double> > rhs_data =
+      tbox::Pointer<pdat::CellData<double> > p_rhs_data =
          patch->getPatchData(p_rhs_id);
 
       /*
        * Set source function and exact solution.
        */
-      if (d_dim == tbox::Dimension(2)) {
-         F77_FUNC(setexactandrhs2d, SETEXACTANDRHS2D) (
+      F77_FUNC(setexactandrhs2d, SETEXACTANDRHS2D) (
             pbox.lower()[0],
             pbox.upper()[0],
             pbox.lower()[1],
             pbox.upper()[1],
-            exact_data->getPointer(),
-            rhs_data->getPointer(),
+            p_exact_data->getPointer(),
+            p_rhs_data->getPointer(),
             patch_geom->getDx(),
             patch_geom->getXLower());
-      } else if (d_dim == tbox::Dimension(3)) {
-         F77_FUNC(setexactandrhs3d, SETEXACTANDRHS3D) (
-            pbox.lower()[0],
-            pbox.upper()[0],
-            pbox.lower()[1],
-            pbox.upper()[1],
-            pbox.lower()[2],
-            pbox.upper()[2],
-            exact_data->getPointer(),
-            rhs_data->getPointer(),
-            patch_geom->getDx(),
-            patch_geom->getXLower());
-      }
 
    }    // End patch loop.
 }
@@ -269,7 +244,7 @@ int FACStokes::solveStokes()
          tbox::Pointer<pdat::CellData<double> > data = patch->getPatchData(
                p_id);
          data->fill(0.0);
-         tbox::Pointer<pdat::FaceData<double> > vdata = patch->getPatchData(
+         tbox::Pointer<pdat::SideData<double> > vdata = patch->getPatchData(
                v_id);
          vdata->fill(0.0);
       }
