@@ -7,10 +7,10 @@
  * Description:   Hypre solver interface for diffusion-like elliptic problems. 
  *
  ************************************************************************/
-#ifndef included_solv_CellStokesHypreSolver_C
-#define included_solv_CellStokesHypreSolver_C
+#ifndef included_solv_StokesHypreSolver_C
+#define included_solv_StokesHypreSolver_C
 
-#include "CellStokesHypreSolver.h"
+#include "StokesHypreSolver.h"
 
 #ifdef HAVE_HYPRE
 
@@ -41,7 +41,7 @@
 #include <cstdlib>
 
 #ifndef SAMRAI_INLINE
-#include "CellStokesHypreSolver.I"
+#include "StokesHypreSolver.I"
 #endif
 
 extern "C" {

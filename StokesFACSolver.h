@@ -7,13 +7,13 @@
  * Description:   High-level solver (wrapper) for scalar stokes equation. 
  *
  ************************************************************************/
-#ifndef included_solv_CellStokesFACSolver
-#define included_solv_CellStokesFACSolver
+#ifndef included_solv_StokesFACSolver
+#define included_solv_StokesFACSolver
 
 #include "SAMRAI/SAMRAI_config.h"
 
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "CellStokesFACOps.h"
+#include "StokesFACOps.h"
 #include "StokesSpecifications.h"
 #include "SAMRAI/solv/SimpleCellRobinBcCoefs.h"
 #include "SAMRAI/tbox/Database.h"
@@ -654,7 +654,7 @@ private:
 }
 
 #ifdef SAMRAI_INLINE
-#include "CellStokesFACSolver.I"
+#include "StokesFACSolver.I"
 #endif
 
 #endif  // included_solv_CellStokesFACSolver

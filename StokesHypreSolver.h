@@ -7,8 +7,8 @@
  * Description:   Hypre solver interface for diffusion-like elliptic problems. 
  *
  ************************************************************************/
-#ifndef included_solv_CellStokesHypreSolver
-#define included_solv_CellStokesHypreSolver
+#ifndef included_solv_StokesHypreSolver
+#define included_solv_StokesHypreSolver
 
 #include "SAMRAI/SAMRAI_config.h"
 
@@ -609,7 +609,7 @@ private:
 } // namespace SAMRAI
 
 #ifdef SAMRAI_INLINE
-#include "CellStokesHypreSolver.I"
+#include "StokesHypreSolver.I"
 #endif
 
 #endif

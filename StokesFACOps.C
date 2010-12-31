@@ -7,10 +7,10 @@
  * Description:   Operator class for cell-centered scalar Stokes using FAC 
  *
  ************************************************************************/
-#ifndef included_solv_CellStokesFACOps_C
-#define included_solv_CellStokesFACOps_C
+#ifndef included_solv_StokesFACOps_C
+#define included_solv_StokesFACOps_C
 
-#include "CellStokesFACOps.h"
+#include "StokesFACOps.h"
 
 #include IOMANIP_HEADER_FILE
 
@@ -27,7 +27,7 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "CellStokesHypreSolver.h"
+#include "StokesHypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -44,7 +44,7 @@
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
 #ifndef SAMRAI_INLINE
-#include "CellStokesFACOps.I"
+#include "StokesFACOps.I"
 #endif
 
 namespace SAMRAI {

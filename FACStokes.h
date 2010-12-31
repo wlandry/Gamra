@@ -10,7 +10,7 @@
 #ifndef included_FACStokes
 #define included_FACStokes
 
-#include "CellStokesFACSolver.h"
+#include "StokesFACSolver.h"
 #include "SAMRAI/pdat/CellVariable.h"
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/hier/Box.h"

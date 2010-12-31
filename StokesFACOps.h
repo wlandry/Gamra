@@ -7,8 +7,8 @@
  * Description:   Operator class for cell-centered scalar Stokes using FAC 
  *
  ************************************************************************/
-#ifndef included_solv_CellStokesFACOps
-#define included_solv_CellStokesFACOps
+#ifndef included_solv_StokesFACOps
+#define included_solv_StokesFACOps
 
 #include "SAMRAI/SAMRAI_config.h"
 
@@ -16,7 +16,7 @@
 #include "SAMRAI/solv/FACPreconditioner.h"
 #include "SAMRAI/solv/FACOperatorStrategy.h"
 #include "SAMRAI/solv/RobinBcCoefStrategy.h"
-#include "CellStokesHypreSolver.h"
+#include "StokesHypreSolver.h"
 #include "SAMRAI/solv/SAMRAIVectorReal.h"
 #include "StokesSpecifications.h"
 #include "SAMRAI/math/HierarchyCellDataOpsReal.h"

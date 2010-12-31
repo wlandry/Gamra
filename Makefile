@@ -29,8 +29,8 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	FACStokes/packDerivedDataIntoDoubleBuffer.o \
 	FACStokes/resetHierarchyConfiguration.o \
 	FACStokes/setupPlotter.o \
-	FACStokes/solveStokes.o CellStokesFACOps.o \
-	CellStokesHypreSolver.o StokesSpecifications.o CellStokesFACSolver.o
+	FACStokes/solveStokes.o StokesFACOps.o \
+	StokesHypreSolver.o StokesSpecifications.o StokesFACSolver.o
 F_OBJS      = facpoisson2d.o facpoisson3d.o
 
 main:	$(CXX_OBJS) $(F_OBJS) $(LIBSAMRAIDEPEND)
