@@ -51,7 +51,7 @@ namespace SAMRAI {
               tbox::Pointer<tbox::Database> database =
               tbox::Pointer<tbox::Database>(NULL));
 
-    virtual ~FACStokes();
+    virtual ~FACStokes() {}
 
     //@{ @name mesh::StandardTagAndInitStrategy virtuals
 

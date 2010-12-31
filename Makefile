@@ -24,7 +24,12 @@ NUM_TESTS = 2
 
 TEST_NPROCS = 0,2
 
-CXX_OBJS      = main.o FACStokes.o CellStokesFACOps.o \
+CXX_OBJS      = main.o FACStokes/FACStokes.o \
+	FACStokes/initializeLevelData.o \
+	FACStokes/packDerivedDataIntoDoubleBuffer.o \
+	FACStokes/resetHierarchyConfiguration.o \
+	FACStokes/setupPlotter.o \
+	FACStokes/solveStokes.o CellStokesFACOps.o \
 	CellStokesHypreSolver.o StokesSpecifications.o CellStokesFACSolver.o
 F_OBJS      = facpoisson2d.o facpoisson3d.o
 
@@ -76,7 +81,7 @@ clean-check:
 	$(SAMCLEAN)
 
 clean:		clean-check
-	$(RM) main *.f *.o
+	$(RM) main *.f *.o */*.o
 
 redo:
 	$(RM) core main
