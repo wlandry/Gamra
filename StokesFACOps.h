@@ -113,7 +113,7 @@ namespace solv {
  * hypre_solver = { ... }            // tbox::Database for initializing Hypre solver
  * @endverbatim
  */
-class CellStokesFACOps:
+class StokesFACOps:
    public FACOperatorStrategy
 {
 
@@ -126,7 +126,7 @@ public:
     * @param object_name Ojbect name
     * @param database Input database
     */
-   CellStokesFACOps(
+   StokesFACOps(
       const tbox::Dimension& dim,
       const std::string& object_name = std::string(),
       tbox::Pointer<tbox::Database> database =
@@ -137,7 +137,7 @@ public:
     *
     * Deallocate internal data.
     */
-   ~CellStokesFACOps(
+   ~StokesFACOps(
       void);
 
    /*!
@@ -870,7 +870,7 @@ private:
    /*!
     * @brief HYPRE coarse-level solver object.
     */
-   CellStokesHypreSolver d_hypre_solver;
+   StokesHypreSolver d_hypre_solver;
 #endif
 
    /*!
@@ -1038,7 +1038,7 @@ private:
 }
 
 #ifdef SAMRAI_INLINE
-#include "CellStokesFACOps.I"
+#include "StokesFACOps.I"
 #endif
 
-#endif // included_solv_CellStokesFACOps
+#endif // included_solv_StokesFACOps

@@ -52,7 +52,7 @@ namespace solv {
  * @brief Use the HYPRE preconditioner library to solve (the cell-centered)
  * Stokes's equation on a single level in a hierarchy.
  *
- * Class CellStokesHypreSolver uses the HYPRE preconditioner library
+ * Class StokesHypreSolver uses the HYPRE preconditioner library
  * to solve linear equations of the form
  * @f$ \nabla ( D \nabla u ) + C u = f @f$, where
  * C is a cell-centered array, D is a face-centered array,
@@ -66,9 +66,9 @@ namespace solv {
  * Periodic boundary conditions are not supported yet.
  *
  * The user must perform the following steps to use
- * CellStokesHypreSolver:
- * - Create a CellStokesHypreSolver object.
- * - Initialize CellStokesHypreSolver object with a patch hierarchy,
+ * StokesHypreSolver:
+ * - Create a StokesHypreSolver object.
+ * - Initialize StokesHypreSolver object with a patch hierarchy,
  *   using the function initializeSolverState().
  * - Use the functions setPhysicalBcCoefObject()
  *   to provide implementations of RobinBcCoefStrategy.
@@ -95,7 +95,7 @@ namespace solv {
  * @endverbatim
  */
 
-class CellStokesHypreSolver
+class StokesHypreSolver
 {
 public:
    /*!
@@ -104,7 +104,7 @@ public:
     * @param object_name Name of object.
     * @param database tbox::Database for input.
     */
-   CellStokesHypreSolver(
+   StokesHypreSolver(
       const tbox::Dimension& dim,
       const std::string& object_name,
       tbox::Pointer<tbox::Database> database =
@@ -113,7 +113,7 @@ public:
    /*!
     * The Stokes destructor releases all internally managed data.
     */
-   ~CellStokesHypreSolver();
+   ~StokesHypreSolver();
 
    /*!
     * @brief Initialize to a given hierarchy.

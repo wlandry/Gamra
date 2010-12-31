@@ -11,19 +11,19 @@ namespace SAMRAI {
 namespace solv {
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setSolnIdDepth(
+void StokesHypreSolver::setSolnIdDepth(
    const int depth) {
    d_soln_depth = depth;
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setRhsIdDepth(
+void StokesHypreSolver::setRhsIdDepth(
    const int depth) {
    d_rhs_depth = depth;
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setUseSMG(
+void StokesHypreSolver::setUseSMG(
    bool use_smg) {
    d_use_smg = use_smg;
 }
@@ -36,7 +36,7 @@ void CellStokesHypreSolver::setUseSMG(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setBoundaries(
+void StokesHypreSolver::setBoundaries(
    const std::string& boundary_type,
    const int fluxes,
    const int flags,
@@ -57,7 +57,7 @@ void CellStokesHypreSolver::setBoundaries(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setPhysicalBcCoefObject(
+void StokesHypreSolver::setPhysicalBcCoefObject(
    const RobinBcCoefStrategy* physical_bc_coef_strategy,
    const tbox::Pointer<hier::Variable> variable)
 {
@@ -66,19 +66,19 @@ void CellStokesHypreSolver::setPhysicalBcCoefObject(
 }
 
 SAMRAI_INLINE_KEYWORD
-int CellStokesHypreSolver::getNumberOfIterations() const
+int StokesHypreSolver::getNumberOfIterations() const
 {
    return d_number_iterations;
 }
 
 SAMRAI_INLINE_KEYWORD
-double CellStokesHypreSolver::getRelativeResidualNorm() const
+double StokesHypreSolver::getRelativeResidualNorm() const
 {
    return d_relative_residual_norm;
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setNumPreRelaxSteps(
+void StokesHypreSolver::setNumPreRelaxSteps(
    const int steps)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -88,7 +88,7 @@ void CellStokesHypreSolver::setNumPreRelaxSteps(
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setNumPostRelaxSteps(
+void StokesHypreSolver::setNumPostRelaxSteps(
    const int steps)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -98,14 +98,14 @@ void CellStokesHypreSolver::setNumPostRelaxSteps(
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setPrintSolverInfo(
+void StokesHypreSolver::setPrintSolverInfo(
    const bool print)
 {
    d_print_solver_info = print;
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesHypreSolver::setStoppingCriteria(
+void StokesHypreSolver::setStoppingCriteria(
    const int max_iterations,
    const double residual_tol)
 {

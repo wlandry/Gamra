@@ -102,7 +102,7 @@ namespace SAMRAI {
      * @brief Solve using HYPRE Stokes solver
      *
      * Set up the linear algebra problem and use a
-     * solv::CellStokesFACSolver object to solve it.
+     * solv::StokesFACSolver object to solve it.
      * -# Set initial guess
      * -# Set boundary conditions
      * -# Specify Stokes equation parameters
@@ -148,7 +148,7 @@ namespace SAMRAI {
     /*!
      * @brief FAC stokes solver.
      */
-    solv::CellStokesFACSolver d_stokes_fac_solver;
+    solv::StokesFACSolver d_stokes_fac_solver;
 
     /*!
      * @brief Boundary condition coefficient implementation.

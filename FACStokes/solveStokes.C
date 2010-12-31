@@ -58,7 +58,7 @@ namespace SAMRAI {
 
     /*
      * Set the parameters for the Stokes equation.
-     * See classes solv::CellStokesFACSolver or
+     * See classes solv::StokesFACSolver or
      * solv::StokesSpecifications.
      * (D is the diffusion coefficient.
      * C is the source term which is not used in this example.)

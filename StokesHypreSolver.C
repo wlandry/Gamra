@@ -262,13 +262,13 @@ namespace SAMRAI {
 namespace solv {
 
 tbox::Pointer<pdat::OutersideVariable<double> >
-CellStokesHypreSolver::s_Ak0_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+StokesHypreSolver::s_Ak0_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
-tbox::StartupShutdownManager::Handler CellStokesHypreSolver::s_finalize_handler(
+tbox::StartupShutdownManager::Handler StokesHypreSolver::s_finalize_handler(
    0,
    0,
    0,
-   CellStokesHypreSolver::finalizeCallback,
+   StokesHypreSolver::finalizeCallback,
    tbox::StartupShutdownManager::priorityVariables);
 
 /*
@@ -277,7 +277,7 @@ tbox::StartupShutdownManager::Handler CellStokesHypreSolver::s_finalize_handler(
  *************************************************************************
  */
 
-CellStokesHypreSolver::CellStokesHypreSolver(
+StokesHypreSolver::StokesHypreSolver(
    const tbox::Dimension& dim,
    const std::string& object_name,
    tbox::Pointer<tbox::Database> database):
@@ -312,13 +312,13 @@ CellStokesHypreSolver::CellStokesHypreSolver(
    d_print_solver_info(false)
 {
    if (d_dim == tbox::Dimension(1) || d_dim > tbox::Dimension(3)) {
-      TBOX_ERROR(" CellStokesHypreSolver : DIM == 1 or > 3 not implemented");
+      TBOX_ERROR(" StokesHypreSolver : DIM == 1 or > 3 not implemented");
    }
 
    t_solve_system = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesHypreSolver::solveSystem()");
+      getTimer("solv::StokesHypreSolver::solveSystem()");
    t_set_matrix_coefficients = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesHypreSolver::setMatrixCoefficients()");
+      getTimer("solv::StokesHypreSolver::setMatrixCoefficients()");
 
    hier::VariableDatabase* vdb = hier::VariableDatabase::getDatabase();
    if (s_Ak0_var[d_dim.getValue() - 1].isNull()) {
@@ -340,7 +340,7 @@ CellStokesHypreSolver::CellStokesHypreSolver(
  ********************************************************************
  */
 
-void CellStokesHypreSolver::getFromInput(
+void StokesHypreSolver::getFromInput(
    tbox::Pointer<tbox::Database> database)
 {
    if (database) {
@@ -352,7 +352,7 @@ void CellStokesHypreSolver::getFromInput(
             "relative_residual_tol",
             d_relative_residual_tol);
       if (database->isDouble("residual_tol")) {
-         TBOX_ERROR("CellStokesHypreSolver input error.\n"
+         TBOX_ERROR("StokesHypreSolver input error.\n"
             << "The parameter 'residual_tol' has been replaced\n"
             << "by 'relative_residual_tol' to be more descriptive.\n"
             << "Please change the parameter name in the input database.");
@@ -390,7 +390,7 @@ void CellStokesHypreSolver::getFromInput(
  ********************************************************************
  */
 
-void CellStokesHypreSolver::initializeSolverState(
+void StokesHypreSolver::initializeSolverState(
    tbox::Pointer<hier::PatchHierarchy> hierarchy,
    int ln)
 {
@@ -421,7 +421,7 @@ void CellStokesHypreSolver::initializeSolverState(
  ********************************************************************
  */
 
-void CellStokesHypreSolver::deallocateSolverState()
+void StokesHypreSolver::deallocateSolverState()
 {
    if (d_hierarchy.isNull()) return;
 
@@ -441,7 +441,7 @@ void CellStokesHypreSolver::deallocateSolverState()
  *                                                                       *
  *************************************************************************
  */
-void CellStokesHypreSolver::allocateHypreData()
+void StokesHypreSolver::allocateHypreData()
 {
    tbox::SAMRAI_MPI::Comm communicator = d_hierarchy->getDomainMappedBoxLevel().getMPI().getCommunicator();
 
@@ -581,7 +581,7 @@ void CellStokesHypreSolver::allocateHypreData()
          no_ghosts = no_ghosts3;
       } else {
          TBOX_ERROR(
-            "CellStokesHypreSolver does not yet support dimension " << d_dim);
+            "StokesHypreSolver does not yet support dimension " << d_dim);
       }
 
       HYPRE_StructMatrixCreate(communicator,
@@ -614,7 +614,7 @@ void CellStokesHypreSolver::allocateHypreData()
  *************************************************************************
  */
 
-CellStokesHypreSolver::~CellStokesHypreSolver()
+StokesHypreSolver::~StokesHypreSolver()
 {
    deallocateHypreData();
 
@@ -638,7 +638,7 @@ CellStokesHypreSolver::~CellStokesHypreSolver()
  *************************************************************************
  */
 
-void CellStokesHypreSolver::deallocateHypreData()
+void StokesHypreSolver::deallocateHypreData()
 {
    if (d_stencil) {
       HYPRE_StructStencilDestroy(d_stencil);
@@ -671,7 +671,7 @@ void CellStokesHypreSolver::deallocateHypreData()
  *************************************************************************
  */
 
-void CellStokesHypreSolver::copyToHypre(
+void StokesHypreSolver::copyToHypre(
    HYPRE_StructVector vector,
    pdat::CellData<double>& src,
    int depth,
@@ -693,7 +693,7 @@ void CellStokesHypreSolver::copyToHypre(
  *************************************************************************
  */
 
-void CellStokesHypreSolver::copyFromHypre(
+void StokesHypreSolver::copyFromHypre(
    pdat::CellData<double>& dst,
    int depth,
    HYPRE_StructVector vector,
@@ -720,7 +720,7 @@ void CellStokesHypreSolver::copyFromHypre(
  *************************************************************************
  */
 
-void CellStokesHypreSolver::setMatrixCoefficients(
+void StokesHypreSolver::setMatrixCoefficients(
    const StokesSpecifications& spec)
 {
    if (d_physical_bc_coef_strategy == NULL) {
@@ -888,7 +888,7 @@ void CellStokesHypreSolver::setMatrixCoefficients(
                TBOX_ERROR(
                   d_object_name << ": Illegal boundary type in "
                   <<
-                  "CellStokesHypreSolver::setMatrixCoefficients\n");
+                  "StokesHypreSolver::setMatrixCoefficients\n");
             }
             const hier::BoundaryBoxUtils bbu(boundary_box);
             const int location_index = boundary_box.getLocationIndex();
@@ -950,7 +950,7 @@ void CellStokesHypreSolver::setMatrixCoefficients(
                TBOX_ERROR(
                   d_object_name << ": Illegal boundary type in "
                   <<
-                  "CellStokesHypreSolver::setMatrixCoefficients\n");
+                  "StokesHypreSolver::setMatrixCoefficients\n");
             }
             const int location_index = boundary_box.getLocationIndex();
             const hier::BoundaryBoxUtils bbu(boundary_box);
@@ -1065,7 +1065,7 @@ void CellStokesHypreSolver::setMatrixCoefficients(
  **********************************************************************
  */
 
-void CellStokesHypreSolver::add_gAk0_toRhs(
+void StokesHypreSolver::add_gAk0_toRhs(
    const hier::Patch& patch,
    const tbox::Array<hier::BoundaryBox>& bdry_boxes,
    const RobinBcCoefStrategy* robin_bc_coef,
@@ -1094,7 +1094,7 @@ void CellStokesHypreSolver::add_gAk0_toRhs(
 #ifdef DEBUG_CHECK_ASSERTIONS
       if (boundary_box.getBoundaryType() != 1) {
          TBOX_ERROR(d_object_name << ": Illegal boundary type in "
-                                  << "CellStokesHypreSolver::add_gAk0_toRhs\n");
+                                  << "StokesHypreSolver::add_gAk0_toRhs\n");
       }
 #endif
       const int location_index = boundary_box.getLocationIndex();
@@ -1176,7 +1176,7 @@ void CellStokesHypreSolver::add_gAk0_toRhs(
  * Create the hypre solver and set it according to the current state.    *
  *************************************************************************
  */
-void CellStokesHypreSolver::setupHypreSolver()
+void StokesHypreSolver::setupHypreSolver()
 {
    TBOX_ASSERT(d_mg_data == NULL);
 
@@ -1212,7 +1212,7 @@ void CellStokesHypreSolver::setupHypreSolver()
    }
 }
 
-void CellStokesHypreSolver::destroyHypreSolver()
+void StokesHypreSolver::destroyHypreSolver()
 {
    if (d_mg_data != NULL) {
       if (d_use_smg) {
@@ -1233,7 +1233,7 @@ void CellStokesHypreSolver::destroyHypreSolver()
  *************************************************************************
  */
 
-int CellStokesHypreSolver::solveSystem(
+int StokesHypreSolver::solveSystem(
    const int u,
    const int f,
    bool homogeneous_bc)
@@ -1247,7 +1247,7 @@ int CellStokesHypreSolver::solveSystem(
          "to specify the boundary conidition.  Do it before\n"
          << "calling solveSystem.");
    }
-   // Tracer t("CellStokesHypreSolver::solveSystem");
+   // Tracer t("StokesHypreSolver::solveSystem");
 
    t_solve_system->start();
 
@@ -1401,7 +1401,7 @@ int CellStokesHypreSolver::solveSystem(
    return d_relative_residual_norm <= d_relative_residual_tol;
 }
 
-void CellStokesHypreSolver::computeDiagonalEntries(
+void StokesHypreSolver::computeDiagonalEntries(
    pdat::CellData<double>& diagonal,
    const pdat::CellData<double>& C_data,
    const pdat::SideData<double>& off_diagonal,
@@ -1437,7 +1437,7 @@ void CellStokesHypreSolver::computeDiagonalEntries(
    }
 }
 
-void CellStokesHypreSolver::computeDiagonalEntries(
+void StokesHypreSolver::computeDiagonalEntries(
    pdat::CellData<double>& diagonal,
    const double C,
    const pdat::SideData<double>& off_diagonal,
@@ -1467,12 +1467,12 @@ void CellStokesHypreSolver::computeDiagonalEntries(
          &patch_lo[2], &patch_up[2],
          &c, &d);
    } else {
-      TBOX_ERROR("CellStokesHypreSolver error...\n"
+      TBOX_ERROR("StokesHypreSolver error...\n"
          << "DIM > 3 not supported." << std::endl);
    }
 }
 
-void CellStokesHypreSolver::computeDiagonalEntries(
+void StokesHypreSolver::computeDiagonalEntries(
    pdat::CellData<double>& diagonal,
    const pdat::SideData<double>& off_diagonal,
    const hier::Box& patch_box)
@@ -1499,12 +1499,12 @@ void CellStokesHypreSolver::computeDiagonalEntries(
          &patch_lo[2], &patch_up[2],
          &c, &d);
    } else {
-      TBOX_ERROR("CellStokesHypreSolver error...\n"
+      TBOX_ERROR("StokesHypreSolver error...\n"
          << "DIM > 3 not supported." << std::endl);
    }
 }
 
-void CellStokesHypreSolver::adjustBoundaryEntries(
+void StokesHypreSolver::adjustBoundaryEntries(
    pdat::CellData<double>& diagonal,
    const pdat::SideData<double>& off_diagonal,
    const hier::Box& patch_box,
@@ -1570,13 +1570,13 @@ void CellStokesHypreSolver::adjustBoundaryEntries(
          &lower[0], &upper[0],
          &location_index, h);
    } else {
-      TBOX_ERROR("CellStokesHypreSolver error...\n"
+      TBOX_ERROR("StokesHypreSolver error...\n"
          << "DIM > 3 not supported." << std::endl);
    }
 }
 
 void
-CellStokesHypreSolver::finalizeCallback()
+StokesHypreSolver::finalizeCallback()
 {
    for (int d = 0; d < tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
       s_Ak0_var[d].setNull();

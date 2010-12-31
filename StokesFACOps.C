@@ -51,20 +51,20 @@ namespace SAMRAI {
 namespace solv {
 
 tbox::Pointer<pdat::CellVariable<double> >
-CellStokesFACOps::s_cell_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+StokesFACOps::s_cell_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
 tbox::Pointer<pdat::SideVariable<double> >
-CellStokesFACOps::s_flux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+StokesFACOps::s_flux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
 tbox::Pointer<pdat::OutersideVariable<double> >
-CellStokesFACOps::s_oflux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+StokesFACOps::s_oflux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
 tbox::StartupShutdownManager::Handler
-CellStokesFACOps::s_finalize_handler(
+StokesFACOps::s_finalize_handler(
    0,
    0,
    0,
-   CellStokesFACOps::finalizeCallback,
+   StokesFACOps::finalizeCallback,
    tbox::StartupShutdownManager::priorityVariables);
 
 extern "C" {
@@ -555,7 +555,7 @@ void F77_FUNC(ewingfixfluxcondc3d, EWINGFIXFLUXCONDC3D) (
  * Constructor.                                                     *
  ********************************************************************
  */
-CellStokesFACOps::CellStokesFACOps(
+StokesFACOps::StokesFACOps(
    const tbox::Dimension& dim,
    const std::string& object_name,
    tbox::Pointer<tbox::Database> database):
@@ -621,22 +621,22 @@ CellStokesFACOps::CellStokesFACOps(
 {
 
    t_restrict_solution = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesFACOps::restrictSolution()");
+      getTimer("solv::StokesFACOps::restrictSolution()");
    t_restrict_residual = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesFACOps::restrictResidual()");
+      getTimer("solv::StokesFACOps::restrictResidual()");
    t_prolong = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesFACOps::prolongErrorAndCorrect()");
+      getTimer("solv::StokesFACOps::prolongErrorAndCorrect()");
    t_smooth_error = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesFACOps::smoothError()");
+      getTimer("solv::StokesFACOps::smoothError()");
    t_solve_coarsest = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesFACOps::solveCoarsestLevel()");
+      getTimer("solv::StokesFACOps::solveCoarsestLevel()");
    t_compute_composite_residual = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesFACOps::computeCompositeResidualOnLevel()");
+      getTimer("solv::StokesFACOps::computeCompositeResidualOnLevel()");
    t_compute_residual_norm = tbox::TimerManager::getManager()->
-      getTimer("solv::CellStokesFACOps::computeResidualNorm()");
+      getTimer("solv::StokesFACOps::computeResidualNorm()");
 
    if (d_dim == tbox::Dimension(1) || d_dim > tbox::Dimension(3)) {
-      TBOX_ERROR("CellStokesFACOps : DIM == 1 or > 3 not implemented yet.\n");
+      TBOX_ERROR("StokesFACOps : DIM == 1 or > 3 not implemented yet.\n");
    }
 
    if (s_cell_scratch_var[dim.getValue() - 1].isNull()) {
@@ -644,15 +644,15 @@ CellStokesFACOps::CellStokesFACOps(
       TBOX_ASSERT(s_cell_scratch_var[dim.getValue() - 1].isNull());
 
       std::ostringstream ss;
-      ss << "CellStokesFACOps::private_cell_scratch" << dim.getValue();
+      ss << "StokesFACOps::private_cell_scratch" << dim.getValue();
       s_cell_scratch_var[dim.getValue() - 1] = new pdat::CellVariable<double>
             (dim, ss.str());
       ss.str("");
-      ss << "CellStokesFACOps::private_flux_scratch" << dim.getValue();
+      ss << "StokesFACOps::private_flux_scratch" << dim.getValue();
       s_flux_scratch_var[dim.getValue() - 1] = new pdat::SideVariable<double>
             (dim, ss.str());
       ss.str("");
-      ss << "CellStokesFACOps::private_oflux_scratch" << dim.getValue();
+      ss << "StokesFACOps::private_oflux_scratch" << dim.getValue();
       s_oflux_scratch_var[dim.getValue() - 1] = new pdat::OutersideVariable<double>
             (dim, ss.str());
    }
@@ -710,7 +710,7 @@ CellStokesFACOps::CellStokesFACOps(
 
 }
 
-CellStokesFACOps::~CellStokesFACOps(
+StokesFACOps::~StokesFACOps(
    void)
 {
 }
@@ -724,7 +724,7 @@ CellStokesFACOps::~CellStokesFACOps(
  ************************************************************************
  */
 
-void CellStokesFACOps::initializeOperatorState(
+void StokesFACOps::initializeOperatorState(
    const SAMRAIVectorReal<double>& solution,
    const SAMRAIVectorReal<double>& rhs)
 {
@@ -753,10 +753,10 @@ void CellStokesFACOps::initializeOperatorState(
       TBOX_ERROR(
          d_object_name << ": No physical bc object in\n"
          <<
-         "CellStokesFACOps::initializeOperatorState\n"
+         "StokesFACOps::initializeOperatorState\n"
          << "You must use "
          <<
-         "CellStokesFACOps::setPhysicalBcCoefObject\n"
+         "StokesFACOps::setPhysicalBcCoefObject\n"
          <<
          "to set one before calling initializeOperatorState\n");
    }
@@ -1092,7 +1092,7 @@ void CellStokesFACOps::initializeOperatorState(
  ********************************************************************
  */
 
-void CellStokesFACOps::deallocateOperatorState()
+void StokesFACOps::deallocateOperatorState()
 {
    if (d_hierarchy) {
       int ln;
@@ -1135,7 +1135,7 @@ void CellStokesFACOps::deallocateOperatorState()
  ********************************************************************
  */
 
-void CellStokesFACOps::postprocessOneCycle(
+void StokesFACOps::postprocessOneCycle(
    int fac_cycle_num,
    const SAMRAIVectorReal<double>& current_soln,
    const SAMRAIVectorReal<double>& residual)
@@ -1170,7 +1170,7 @@ void CellStokesFACOps::postprocessOneCycle(
  ********************************************************************
  */
 
-void CellStokesFACOps::restrictSolution(
+void StokesFACOps::restrictSolution(
    const SAMRAIVectorReal<double>& s,
    SAMRAIVectorReal<double>& d,
    int dest_ln) {
@@ -1201,7 +1201,7 @@ void CellStokesFACOps::restrictSolution(
  ********************************************************************
  */
 
-void CellStokesFACOps::restrictResidual(
+void StokesFACOps::restrictResidual(
    const SAMRAIVectorReal<double>& s,
    SAMRAIVectorReal<double>& d,
    int dest_ln) {
@@ -1224,7 +1224,7 @@ void CellStokesFACOps::restrictResidual(
  ***********************************************************************
  */
 
-void CellStokesFACOps::prolongErrorAndCorrect(
+void StokesFACOps::prolongErrorAndCorrect(
    const SAMRAIVectorReal<double>& s,
    SAMRAIVectorReal<double>& d,
    int dest_ln) {
@@ -1283,7 +1283,7 @@ void CellStokesFACOps::prolongErrorAndCorrect(
  ********************************************************************
  */
 
-void CellStokesFACOps::smoothError(
+void StokesFACOps::smoothError(
    SAMRAIVectorReal<double>& data,
    const SAMRAIVectorReal<double>& residual,
    int ln,
@@ -1302,7 +1302,7 @@ void CellStokesFACOps::smoothError(
    } else {
       TBOX_ERROR(d_object_name << ": Bad smoothing choice '"
                                << d_smoothing_choice
-                               << "' in CellStokesFACOps.");
+                               << "' in StokesFACOps.");
    }
 
    t_smooth_error->stop();
@@ -1315,7 +1315,7 @@ void CellStokesFACOps::smoothError(
  ********************************************************************
  */
 
-void CellStokesFACOps::smoothErrorByRedBlack(
+void StokesFACOps::smoothErrorByRedBlack(
    SAMRAIVectorReal<double>& data,
    const SAMRAIVectorReal<double>& residual,
    int ln,
@@ -1491,7 +1491,7 @@ void CellStokesFACOps::smoothErrorByRedBlack(
  ********************************************************************
  */
 
-void CellStokesFACOps::ewingFixFlux(
+void StokesFACOps::ewingFixFlux(
    const hier::Patch& patch,
    const pdat::CellData<double>& soln_data,
    pdat::SideData<double>& flux_data,
@@ -1569,7 +1569,7 @@ void CellStokesFACOps::ewingFixFlux(
                &blower[0], &bupper[0],
                dx);
          } else {
-            TBOX_ERROR("CellStokesFACOps : DIM > 3 not supported" << std::endl);
+            TBOX_ERROR("StokesFACOps : DIM > 3 not supported" << std::endl);
          }
 
       }
@@ -1633,7 +1633,7 @@ void CellStokesFACOps::ewingFixFlux(
  ********************************************************************
  */
 
-int CellStokesFACOps::solveCoarsestLevel(
+int StokesFACOps::solveCoarsestLevel(
    SAMRAIVectorReal<double>& data,
    const SAMRAIVectorReal<double>& residual,
    int coarsest_ln) {
@@ -1663,7 +1663,7 @@ int CellStokesFACOps::solveCoarsestLevel(
       TBOX_ERROR(d_object_name << ": Coarse level solver choice '"
                                << d_coarse_solver_choice
                                << "' unavailable in "
-                               << "scapCellStokesOps::solveCoarsestLevel.");
+                               << "scapStokesOps::solveCoarsestLevel.");
 #else
       return_value = solveCoarsestLevel_HYPRE(data, residual, coarsest_ln);
 #endif
@@ -1672,7 +1672,7 @@ int CellStokesFACOps::solveCoarsestLevel(
          d_object_name << ": Bad coarse level solver choice '"
          << d_coarse_solver_choice
          <<
-         "' in scapCellStokesOps::solveCoarsestLevel.");
+         "' in scapStokesOps::solveCoarsestLevel.");
    }
 
    xeqScheduleGhostFillNoCoarse(data.getComponentDescriptorIndex(0),
@@ -1691,7 +1691,7 @@ int CellStokesFACOps::solveCoarsestLevel(
  ********************************************************************
  */
 
-int CellStokesFACOps::solveCoarsestLevel_HYPRE(
+int StokesFACOps::solveCoarsestLevel_HYPRE(
    SAMRAIVectorReal<double>& data,
    const SAMRAIVectorReal<double>& residual,
    int coarsest_ln) {
@@ -1702,7 +1702,7 @@ int CellStokesFACOps::solveCoarsestLevel_HYPRE(
    TBOX_ERROR(d_object_name << ": Coarse level solver choice '"
                             << d_coarse_solver_choice
                             << "' unavailable in "
-                            << "CellStokesFACOps::solveCoarsestLevel.");
+                            << "StokesFACOps::solveCoarsestLevel.");
 
    return 0;
 
@@ -1740,7 +1740,7 @@ int CellStokesFACOps::solveCoarsestLevel_HYPRE(
  ********************************************************************
  */
 
-void CellStokesFACOps::computeCompositeResidualOnLevel(
+void StokesFACOps::computeCompositeResidualOnLevel(
    SAMRAIVectorReal<double>& residual,
    const SAMRAIVectorReal<double>& solution,
    const SAMRAIVectorReal<double>& rhs,
@@ -1899,7 +1899,7 @@ void CellStokesFACOps::computeCompositeResidualOnLevel(
  ********************************************************************
  */
 
-double CellStokesFACOps::computeResidualNorm(
+double StokesFACOps::computeResidualNorm(
    const SAMRAIVectorReal<double>& residual,
    int fine_ln,
    int coarse_ln)
@@ -1907,7 +1907,7 @@ double CellStokesFACOps::computeResidualNorm(
 
    if (coarse_ln != residual.getCoarsestLevelNumber() ||
        fine_ln != residual.getFinestLevelNumber()) {
-      TBOX_ERROR("CellStokesFACOps::computeResidualNorm() is not\n"
+      TBOX_ERROR("StokesFACOps::computeResidualNorm() is not\n"
          << "set up to compute residual except on the range of\n"
          << "levels defining the vector.\n");
    }
@@ -1937,7 +1937,7 @@ double CellStokesFACOps::computeResidualNorm(
  ********************************************************************
  */
 
-void CellStokesFACOps::computeVectorWeights(
+void StokesFACOps::computeVectorWeights(
    tbox::Pointer<hier::PatchHierarchy> hierarchy,
    int weight_id,
    int coarsest_ln,
@@ -2036,7 +2036,7 @@ void CellStokesFACOps::computeVectorWeights(
  ********************************************************************
  */
 
-void CellStokesFACOps::checkInputPatchDataIndices() const {
+void StokesFACOps::checkInputPatchDataIndices() const {
    /*
     * Check input validity and correctness.
     */
@@ -2080,7 +2080,7 @@ void CellStokesFACOps::checkInputPatchDataIndices() const {
  *******************************************************************
  */
 
-void CellStokesFACOps::computeFluxOnPatch(
+void StokesFACOps::computeFluxOnPatch(
    const hier::Patch& patch,
    const hier::IntVector& ratio_to_coarser_level,
    const pdat::CellData<double>& w_data,
@@ -2193,7 +2193,7 @@ void CellStokesFACOps::computeFluxOnPatch(
 
 }
 
-void CellStokesFACOps::computeResidualOnPatch(
+void StokesFACOps::computeResidualOnPatch(
    const hier::Patch& patch,
    const pdat::SideData<double>& flux_data,
    const pdat::CellData<double>& soln_data,
@@ -2353,7 +2353,7 @@ void CellStokesFACOps::computeResidualOnPatch(
    }
 }
 
-void CellStokesFACOps::redOrBlackSmoothingOnPatch(
+void StokesFACOps::redOrBlackSmoothingOnPatch(
    const hier::Patch& patch,
    const pdat::SideData<double>& flux_data,
    const pdat::CellData<double>& rhs_data,
@@ -2690,7 +2690,7 @@ void CellStokesFACOps::redOrBlackSmoothingOnPatch(
 }
 
 void
-CellStokesFACOps::xeqScheduleProlongation(
+StokesFACOps::xeqScheduleProlongation(
    int dst_id,
    int src_id,
    int scr_id,
@@ -2713,7 +2713,7 @@ CellStokesFACOps::xeqScheduleProlongation(
 }
 
 void
-CellStokesFACOps::xeqScheduleURestriction(
+StokesFACOps::xeqScheduleURestriction(
    int dst_id,
    int src_id,
    int dest_ln)
@@ -2733,7 +2733,7 @@ CellStokesFACOps::xeqScheduleURestriction(
 }
 
 void
-CellStokesFACOps::xeqScheduleRRestriction(
+StokesFACOps::xeqScheduleRRestriction(
    int dst_id,
    int src_id,
    int dest_ln)
@@ -2753,7 +2753,7 @@ CellStokesFACOps::xeqScheduleRRestriction(
 }
 
 void
-CellStokesFACOps::xeqScheduleFluxCoarsen(
+StokesFACOps::xeqScheduleFluxCoarsen(
    int dst_id,
    int src_id,
    int dest_ln)
@@ -2774,7 +2774,7 @@ CellStokesFACOps::xeqScheduleFluxCoarsen(
 }
 
 void
-CellStokesFACOps::xeqScheduleGhostFill(
+StokesFACOps::xeqScheduleGhostFill(
    int dst_id,
    int dest_ln)
 {
@@ -2795,7 +2795,7 @@ CellStokesFACOps::xeqScheduleGhostFill(
 }
 
 void
-CellStokesFACOps::xeqScheduleGhostFillNoCoarse(
+StokesFACOps::xeqScheduleGhostFillNoCoarse(
    int dst_id,
    int dest_ln)
 {
@@ -2816,7 +2816,7 @@ CellStokesFACOps::xeqScheduleGhostFillNoCoarse(
 }
 
 void
-CellStokesFACOps::finalizeCallback()
+StokesFACOps::finalizeCallback()
 {
    for (int d = 0; d < tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
       s_cell_scratch_var[d].setNull();

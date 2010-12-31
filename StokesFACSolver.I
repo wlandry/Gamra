@@ -11,25 +11,25 @@ namespace SAMRAI {
 namespace solv {
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setDPatchDataId(
+void StokesFACSolver::setDPatchDataId(
    int id) {
    d_stokes_spec.setDPatchDataId(id);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setDConstant(
+void StokesFACSolver::setDConstant(
    double scalar) {
    d_stokes_spec.setDConstant(scalar);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setCPatchDataId(
+void StokesFACSolver::setCPatchDataId(
    int id) {
    d_stokes_spec.setCPatchDataId(id);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setCConstant(
+void StokesFACSolver::setCConstant(
    double scalar) {
 // Disable Intel warning on real comparison
 #ifdef __INTEL_COMPILER
@@ -43,35 +43,35 @@ void CellStokesFACSolver::setCConstant(
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setProlongationMethod(
+void StokesFACSolver::setProlongationMethod(
    const std::string& prolongation_method)
 {
    d_fac_ops.setProlongationMethod(prolongation_method);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setCoarsestLevelSolverChoice(
+void StokesFACSolver::setCoarsestLevelSolverChoice(
    const std::string& choice)
 {
    d_fac_ops.setCoarsestLevelSolverChoice(choice);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setCoarsestLevelSolverTolerance(
+void StokesFACSolver::setCoarsestLevelSolverTolerance(
    double tol)
 {
    d_fac_ops.setCoarsestLevelSolverTolerance(tol);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setCoarsestLevelSolverMaxIterations(
+void StokesFACSolver::setCoarsestLevelSolverMaxIterations(
    int max_iterations)
 {
    d_fac_ops.setCoarsestLevelSolverMaxIterations(max_iterations);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setCoarseFineDiscretization(
+void StokesFACSolver::setCoarseFineDiscretization(
    const std::string& coarsefine_method)
 {
    d_fac_ops.setCoarseFineDiscretization(coarsefine_method);
@@ -79,7 +79,7 @@ void CellStokesFACSolver::setCoarseFineDiscretization(
 
 #ifdef HAVE_HYPRE
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setUseSMG(
+void StokesFACSolver::setUseSMG(
    bool use_smg)
 {
    if (d_solver_is_initialized) {
@@ -94,43 +94,43 @@ void CellStokesFACSolver::setUseSMG(
 #endif
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setPresmoothingSweeps(
+void StokesFACSolver::setPresmoothingSweeps(
    int num_pre_sweeps) {
    d_fac_precond.setPresmoothingSweeps(num_pre_sweeps);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setPostsmoothingSweeps(
+void StokesFACSolver::setPostsmoothingSweeps(
    int num_post_sweeps) {
    d_fac_precond.setPostsmoothingSweeps(num_post_sweeps);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setMaxCycles(
+void StokesFACSolver::setMaxCycles(
    int max_cycles) {
    d_fac_precond.setMaxCycles(max_cycles);
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::setResidualTolerance(
+void StokesFACSolver::setResidualTolerance(
    double residual_tol) {
    d_fac_precond.setResidualTolerance(residual_tol);
 }
 
 SAMRAI_INLINE_KEYWORD
-int CellStokesFACSolver::getNumberOfIterations() const
+int StokesFACSolver::getNumberOfIterations() const
 {
    return d_fac_precond.getNumberOfIterations();
 }
 
 SAMRAI_INLINE_KEYWORD
-double CellStokesFACSolver::getResidualNorm() const
+double StokesFACSolver::getResidualNorm() const
 {
    return d_fac_precond.getResidualNorm();
 }
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACSolver::getConvergenceFactors(
+void StokesFACSolver::getConvergenceFactors(
    double& avg_factor,
    double& final_factor)
 const

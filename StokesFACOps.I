@@ -11,14 +11,14 @@ namespace SAMRAI {
 namespace solv {
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setPreconditioner(
+void StokesFACOps::setPreconditioner(
    const FACPreconditioner* preconditioner) {
    d_preconditioner = preconditioner;
 }
 
 #ifdef HAVE_HYPRE
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setUseSMG(
+void StokesFACOps::setUseSMG(
    bool use_smg)
 {
    if (d_hierarchy) {
@@ -39,7 +39,7 @@ void CellStokesFACOps::setUseSMG(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setPhysicalBcCoefObject(
+void StokesFACOps::setPhysicalBcCoefObject(
    const RobinBcCoefStrategy* physical_bc_coef)
 {
    d_physical_bc_coef = physical_bc_coef;
@@ -56,7 +56,7 @@ void CellStokesFACOps::setPhysicalBcCoefObject(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setStokesSpecifications(
+void StokesFACOps::setStokesSpecifications(
    const StokesSpecifications& spec)
 {
    d_stokes_spec = spec;
@@ -68,7 +68,7 @@ void CellStokesFACOps::setStokesSpecifications(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::enableLogging(
+void StokesFACOps::enableLogging(
    bool enable_logging)
 {
    d_enable_logging = enable_logging;
@@ -81,7 +81,7 @@ void CellStokesFACOps::enableLogging(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setFluxId(
+void StokesFACOps::setFluxId(
    int flux_id) {
    d_flux_id = flux_id;
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -96,14 +96,14 @@ void CellStokesFACOps::setFluxId(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setSmoothingChoice(
+void StokesFACOps::setSmoothingChoice(
    const std::string& smoothing_choice)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
    if (smoothing_choice != "redblack") {
       TBOX_ERROR(d_object_name << ": Bad smoothing choice '"
                                << smoothing_choice
-                               << "' in CellStokesFACOps::setSmoothingChoice.");
+                               << "' in StokesFACOps::setSmoothingChoice.");
    }
 #endif
    d_smoothing_choice = smoothing_choice;
@@ -116,7 +116,7 @@ void CellStokesFACOps::setSmoothingChoice(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setCoarsestLevelSolverChoice(
+void StokesFACOps::setCoarsestLevelSolverChoice(
    const std::string& choice) {
 #ifdef DEBUG_CHECK_ASSERTIONS
 #ifndef HAVE_HYPRE
@@ -133,7 +133,7 @@ void CellStokesFACOps::setCoarsestLevelSolverChoice(
          d_object_name << ": Bad coarse level solver choice '"
          << choice
          <<
-         "' in scapCellStokesOpsX::setCoarseLevelSolver.");
+         "' in scapStokesOpsX::setCoarseLevelSolver.");
    }
 }
 
@@ -144,7 +144,7 @@ void CellStokesFACOps::setCoarsestLevelSolverChoice(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setCoarsestLevelSolverTolerance(
+void StokesFACOps::setCoarsestLevelSolverTolerance(
    double tol) {
    d_coarse_solver_tolerance = tol;
 }
@@ -156,7 +156,7 @@ void CellStokesFACOps::setCoarsestLevelSolverTolerance(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setCoarsestLevelSolverMaxIterations(
+void StokesFACOps::setCoarsestLevelSolverMaxIterations(
    int max_iterations) {
 #ifdef DEBUG_CHECK_ASSERTIONS
    if (max_iterations < 0) {
@@ -173,7 +173,7 @@ void CellStokesFACOps::setCoarsestLevelSolverMaxIterations(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setCoarseFineDiscretization(
+void StokesFACOps::setCoarseFineDiscretization(
    const std::string& coarsefine_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
    if (d_hierarchy) {
@@ -195,7 +195,7 @@ void CellStokesFACOps::setCoarseFineDiscretization(
  */
 
 SAMRAI_INLINE_KEYWORD
-void CellStokesFACOps::setProlongationMethod(
+void StokesFACOps::setProlongationMethod(
    const std::string& prolongation_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
    if (d_hierarchy) {

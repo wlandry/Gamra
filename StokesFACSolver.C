@@ -33,10 +33,10 @@ namespace solv {
  *************************************************************************
  */
 
-bool CellStokesFACSolver::s_initialized = 0;
-int CellStokesFACSolver::s_weight_id[SAMRAI::tbox::Dimension::
+bool StokesFACSolver::s_initialized = 0;
+int StokesFACSolver::s_weight_id[SAMRAI::tbox::Dimension::
                                       MAXIMUM_DIMENSION_VALUE];
-int CellStokesFACSolver::s_instance_counter[SAMRAI::tbox::Dimension::
+int StokesFACSolver::s_instance_counter[SAMRAI::tbox::Dimension::
                                              MAXIMUM_DIMENSION_VALUE];
 
 /*
@@ -54,7 +54,7 @@ int CellStokesFACSolver::s_instance_counter[SAMRAI::tbox::Dimension::
  *************************************************************************
  */
 
-CellStokesFACSolver::CellStokesFACSolver(
+StokesFACSolver::StokesFACSolver(
    const tbox::Dimension& dim,
    const std::string& object_name,
    tbox::Pointer<tbox::Database> database):
@@ -106,7 +106,7 @@ CellStokesFACSolver::CellStokesFACSolver(
     */
    hier::VariableDatabase* var_db = hier::VariableDatabase::getDatabase();
 
-   static std::string weight_variable_name("CellStokesFACSolver_weight");
+   static std::string weight_variable_name("StokesFACSolver_weight");
 
    tbox::Pointer<pdat::CellVariable<double> > weight = var_db->getVariable(
          weight_variable_name);
@@ -144,13 +144,13 @@ CellStokesFACSolver::CellStokesFACSolver(
 /*
  *************************************************************************
  *                                                                       *
- * Destructor for CellStokesFACSolver.                            *
+ * Destructor for StokesFACSolver.                            *
  * Deallocate internal data.                                             *
  *                                                                       *
  *************************************************************************
  */
 
-CellStokesFACSolver::~CellStokesFACSolver()
+StokesFACSolver::~StokesFACSolver()
 {
    s_instance_counter[d_dim.getValue() - 1]--;
 
@@ -177,7 +177,7 @@ CellStokesFACSolver::~CellStokesFACSolver()
  ********************************************************************
  */
 
-void CellStokesFACSolver::getFromInput(
+void StokesFACSolver::getFromInput(
    tbox::Pointer<tbox::Database> database)
 {
    if (database) {
@@ -243,7 +243,7 @@ void CellStokesFACSolver::getFromInput(
  *************************************************************************
  */
 
-void CellStokesFACSolver::initializeSolverState(
+void StokesFACSolver::initializeSolverState(
    const int solution,
    const int rhs,
    tbox::Pointer<hier::PatchHierarchy> hierarchy,
@@ -321,7 +321,7 @@ void CellStokesFACSolver::initializeSolverState(
    d_solver_is_initialized = true;
 }
 
-void CellStokesFACSolver::deallocateSolverState()
+void StokesFACSolver::deallocateSolverState()
 {
    if (d_hierarchy) {
 
@@ -352,7 +352,7 @@ void CellStokesFACSolver::deallocateSolverState()
  *************************************************************************
  */
 
-void CellStokesFACSolver::enableLogging(
+void StokesFACSolver::enableLogging(
    bool logging)
 {
    d_enable_logging = logging;
@@ -360,7 +360,7 @@ void CellStokesFACSolver::enableLogging(
    d_fac_ops.enableLogging(d_enable_logging);
 }
 
-void CellStokesFACSolver::setBoundaries(
+void StokesFACSolver::setBoundaries(
    const std::string& boundary_type,
    const int fluxes,
    const int flags,
@@ -382,7 +382,7 @@ void CellStokesFACSolver::setBoundaries(
    d_fac_ops.setPhysicalBcCoefObject(d_bc_object);
 }
 
-void CellStokesFACSolver::setBcObject(
+void StokesFACSolver::setBcObject(
    const RobinBcCoefStrategy* bc_object)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -408,7 +408,7 @@ void CellStokesFACSolver::setBcObject(
  *************************************************************************
  */
 
-bool CellStokesFACSolver::solveSystem(
+bool StokesFACSolver::solveSystem(
    const int u,
    const int f)
 {
@@ -468,7 +468,7 @@ bool CellStokesFACSolver::solveSystem(
  *************************************************************************
  */
 
-bool CellStokesFACSolver::solveSystem(
+bool StokesFACSolver::solveSystem(
    const int u,
    const int f,
    tbox::Pointer<hier::PatchHierarchy> hierarchy,
@@ -479,7 +479,7 @@ bool CellStokesFACSolver::solveSystem(
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
    if (d_enable_logging) {
-      tbox::plog << "CellStokesFACSolver::solveSystem (" << d_object_name
+      tbox::plog << "StokesFACSolver::solveSystem (" << d_object_name
                  << ")\n";
       d_stokes_spec.printClassData(tbox::plog);
    }
@@ -509,7 +509,7 @@ bool CellStokesFACSolver::solveSystem(
    return solver_rval;
 }
 
-void CellStokesFACSolver::createVectorWrappers(
+void StokesFACSolver::createVectorWrappers(
    int u,
    int f) {
 
@@ -565,12 +565,12 @@ void CellStokesFACSolver::createVectorWrappers(
  * we do not control their data allocation.  The user does that.       *
  ***********************************************************************
  */
-void CellStokesFACSolver::destroyVectorWrappers() {
+void StokesFACSolver::destroyVectorWrappers() {
    d_uv.setNull();
    d_fv.setNull();
 }
 
-void CellStokesFACSolver::initializeStatics() {
+void StokesFACSolver::initializeStatics() {
 
    for (int d = 0; d < SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
       s_weight_id[d] = -1;

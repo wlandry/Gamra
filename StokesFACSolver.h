@@ -56,7 +56,7 @@ namespace solv {
  * Computation, Vol. 56, No. 194, April 1991, pp. 437-461).
  *
  * Typical use of this class is:
- * -# Construct a CellStokesFACSolver object, providing it
+ * -# Construct a StokesFACSolver object, providing it
  *    the hierarchy and range of levels participating in the solve.
  * -# Set the parameters C and D using the functions named @c setC...
  *    and @c setD...  By default, D=1 and C=0 everywhere.
@@ -110,7 +110,7 @@ namespace solv {
  * @endverbatim
  *
  */
-class CellStokesFACSolver
+class StokesFACSolver
 {
 
 public:
@@ -125,7 +125,7 @@ public:
     * @param object_name Name of object used in outputs
     * @param database tbox::Database for initialization (may be NULL)
     */
-   CellStokesFACSolver(
+   StokesFACSolver(
       const tbox::Dimension& dim,
       const std::string& object_name,
       tbox::Pointer<tbox::Database> database =
@@ -134,7 +134,7 @@ public:
    /*!
     * @brief Destructor.
     */
-   ~CellStokesFACSolver(
+   ~StokesFACSolver(
       void);
 
    /*!
@@ -606,7 +606,7 @@ private:
     * @brief FAC operator implementation corresponding to cell-centered
     * Stokes discretization.
     */
-   CellStokesFACOps d_fac_ops;
+   StokesFACOps d_fac_ops;
 
    /*!
     * @brief FAC preconditioner algorithm.
@@ -657,4 +657,4 @@ private:
 #include "StokesFACSolver.I"
 #endif
 
-#endif  // included_solv_CellStokesFACSolver
+#endif  // included_solv_StokesFACSolver
