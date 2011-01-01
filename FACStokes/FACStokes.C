@@ -29,8 +29,7 @@ namespace SAMRAI {
 * all its internal variables with the variable database.                *
 *************************************************************************
 */
-  FACStokes::FACStokes(
-                       const std::string& object_name,
+  FACStokes::FACStokes(const std::string& object_name,
                        const tbox::Dimension& dim,
                        tbox::Pointer<tbox::Database> database):
     d_object_name(object_name),
