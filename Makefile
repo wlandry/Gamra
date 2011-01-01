@@ -30,7 +30,19 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	FACStokes/resetHierarchyConfiguration.o \
 	FACStokes/setupPlotter.o \
 	FACStokes/solveStokes.o StokesFACOps.o \
-	StokesHypreSolver.o StokesSpecifications.o StokesFACSolver.o
+	StokesFACSolver/StokesFACSolver.o \
+	StokesFACSolver/StokesFACSolver_Destructor.o \
+	StokesFACSolver/createVectorWrappers.o \
+	StokesFACSolver/deallocateSolverState.o \
+	StokesFACSolver/destroyVectorWrappers.o \
+	StokesFACSolver/enableLogging.o \
+	StokesFACSolver/getFromInput.o \
+	StokesFACSolver/initializeSolverState.o \
+	StokesFACSolver/initializeStatics.o \
+	StokesFACSolver/setBcObject.o \
+	StokesFACSolver/setBoundaries.o \
+	StokesFACSolver/solveSystem.o \
+	StokesHypreSolver.o StokesSpecifications.o
 F_OBJS      = facpoisson2d.o facpoisson3d.o
 
 main:	$(CXX_OBJS) $(F_OBJS) $(LIBSAMRAIDEPEND)
