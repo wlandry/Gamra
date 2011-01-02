@@ -33,9 +33,8 @@ namespace SAMRAI {
 *************************************************************************
 */
 
-    bool StokesFACSolver::solveSystem(
-                                      const int u,
-                                      const int f)
+    bool StokesFACSolver::solveSystem(const int p, const int p_rhs,
+                                      const int v, const int v_rhs)
     {
 #ifdef DEBUG_CHECK_ASSERTIONS
       if (!d_solver_is_initialized) {
@@ -49,7 +48,7 @@ namespace SAMRAI {
                    "solveSystem(int,int,...) to initialize the solver,\n"
                    << "solve and deallocate the solver.\n");
       }
-      if (u < 0 || f < 0) {
+      if (p < 0 || p_rhs < 0 || v < 0 || v_rhs < 0) {
         TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
       }
 #endif
@@ -61,10 +60,10 @@ namespace SAMRAI {
          * The solver overwrites it, but SimpleCellRobinBcCoefs
          * needs to get to access it repeatedly.
          */
-        d_simple_bc.cacheDirichletData(u);
+        d_simple_bc.cacheDirichletData(p);
       }
 
-      createVectorWrappers(u, f);
+      createVectorWrappers(p, p_rhs);
       bool solver_rval;
       solver_rval = d_fac_precond.solveSystem(*d_uv, *d_fv);
 
@@ -74,7 +73,7 @@ namespace SAMRAI {
          * solve process.  We do this to be backward compatible with the
          * user code.
          */
-        d_simple_bc.restoreDirichletData(u);
+        d_simple_bc.restoreDirichletData(p);
       }
 
       return solver_rval;
@@ -93,10 +92,12 @@ namespace SAMRAI {
 *************************************************************************
 */
 
-    bool StokesFACSolver::solveSystem(
-                                      const int u,
-                                      const int f,
-                                      tbox::Pointer<hier::PatchHierarchy> hierarchy,
+    bool StokesFACSolver::solveSystem(const int p,
+                                      const int p_rhs,
+                                      const int v,
+                                      const int v_rhs,
+                                      tbox::Pointer<hier::PatchHierarchy>
+                                      hierarchy,
                                       int coarse_ln,
                                       int fine_ln)
     {
@@ -124,10 +125,10 @@ namespace SAMRAI {
                    << "specified.\n");
       }
 #endif
-      initializeSolverState(u, f, hierarchy, coarse_ln, fine_ln);
+      initializeSolverState(p, p_rhs, hierarchy, coarse_ln, fine_ln);
 
       bool solver_rval;
-      solver_rval = solveSystem(u, f);
+      solver_rval = solveSystem(p, p_rhs, v, v_rhs);
 
       deallocateSolverState();
 

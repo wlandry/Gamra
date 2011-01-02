@@ -8,11 +8,11 @@
 ##
 #########################################################################
 
-SAMRAI	      = ../AMR/SAMRAI-v3.1.0-beta
+SAMRAI	      = ../SAMRAI-hg
 SRCDIR        = .
 VPATH         = 
 TESTTOOLS     = ../testtools
-OBJECT        = ../AMR/SAMRAI-v3.1.0-beta-build
+OBJECT        = ../SAMRAI-hg-build
 
 default:      main
 

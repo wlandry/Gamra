@@ -179,8 +179,10 @@ public:
     */
    bool
    solveSystem(
-      const int solution,
-      const int rhs,
+      const int p,
+      const int p_rhs,
+      const int v,
+      const int v_rhs,
       tbox::Pointer<hier::PatchHierarchy> hierarchy,
       int coarse_ln = -1,
       int fine_ln = -1);
@@ -206,9 +208,7 @@ public:
     * @see solveSystem( const int, const int, tbox::Pointer< hier::PatchHierarchy >, int, int);
     */
    bool
-   solveSystem(
-      const int solution,
-      const int rhs);
+   solveSystem(const int p, const int p_rhs, const int v, const int v_rhs);
 
    /*!
     * @brief Specify the boundary conditions that are to be used at the

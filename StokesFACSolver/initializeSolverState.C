@@ -31,8 +31,7 @@ namespace SAMRAI {
 *************************************************************************
 */
 
-    void StokesFACSolver::initializeSolverState(
-                                                const int solution,
+    void StokesFACSolver::initializeSolverState(const int solution,
                                                 const int rhs,
                                                 tbox::Pointer<hier::PatchHierarchy> hierarchy,
                                                 const int coarse_level,

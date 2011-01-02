@@ -18,8 +18,6 @@
 
 namespace SAMRAI {
   namespace solv {
-
-
     /*
 *************************************************************************
 *                                                                       *
@@ -28,13 +26,10 @@ namespace SAMRAI {
 *                                                                       *
 *************************************************************************
 */
-
     StokesFACSolver::~StokesFACSolver()
     {
       s_instance_counter[d_dim.getValue() - 1]--;
-
       deallocateSolverState();
-
       if (s_instance_counter[d_dim.getValue() - 1] == 0) {
         hier::VariableDatabase::getDatabase()->
           removeInternalSAMRAIVariablePatchDataIndex(s_weight_id[d_dim.getValue() - 1]);
