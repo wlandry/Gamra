@@ -29,7 +29,33 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	FACStokes/packDerivedDataIntoDoubleBuffer.o \
 	FACStokes/resetHierarchyConfiguration.o \
 	FACStokes/setupPlotter.o \
-	FACStokes/solveStokes.o StokesFACOps.o \
+	FACStokes/solveStokes.o \
+	StokesFACOps/StokesFACOps.o \
+	StokesFACOps/checkInputPatchDataIndices.o \
+	StokesFACOps/computeCompositeResidualOnLevel.o \
+	StokesFACOps/computeFluxOnPatch.o \
+	StokesFACOps/computeResidualNorm.o \
+	StokesFACOps/computeResidualOnPatch.o \
+	StokesFACOps/computeVectorWeights.o \
+	StokesFACOps/deallocateOperatorState.o \
+	StokesFACOps/ewingFixFlux.o \
+	StokesFACOps/finalizeCallback.o \
+	StokesFACOps/initializeOperatorState.o \
+	StokesFACOps/postprocessOneCycle.o \
+	StokesFACOps/prolongErrorAndCorrect.o \
+	StokesFACOps/redOrBlackSmoothingOnPatch.o \
+	StokesFACOps/restrictResidual.o \
+	StokesFACOps/restrictSolution.o \
+	StokesFACOps/smoothError.o \
+	StokesFACOps/smoothErrorByRedBlack.o \
+	StokesFACOps/solveCoarsestLevel.o \
+	StokesFACOps/solveCoarsestLevel_HYPRE.o \
+	StokesFACOps/xeqScheduleFluxCoarsen.o \
+	StokesFACOps/xeqScheduleGhostFill.o \
+	StokesFACOps/xeqScheduleGhostFillNoCoarse.o \
+	StokesFACOps/xeqScheduleProlongation.o \
+	StokesFACOps/xeqScheduleRRestriction.o \
+	StokesFACOps/xeqScheduleURestriction.o \
 	StokesFACSolver/StokesFACSolver.o \
 	StokesFACSolver/StokesFACSolver_Destructor.o \
 	StokesFACSolver/createVectorWrappers.o \

@@ -137,8 +137,7 @@ public:
     *
     * Deallocate internal data.
     */
-   ~StokesFACOps(
-      void);
+   ~StokesFACOps(void) {}
 
    /*!
     * @brief Set the scalar Stokes equation specifications.

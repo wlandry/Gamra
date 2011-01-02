@@ -1,0 +1,96 @@
+/*************************************************************************
+ *
+ * This file is part of the SAMRAI distribution.  For full copyright 
+ * information, see COPYRIGHT and COPYING.LESSER. 
+ *
+ * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
+ * Description:   Operator class for cell-centered scalar Stokes using FAC 
+ *
+ ************************************************************************/
+#ifndef included_solv_StokesFACOps_C
+#define included_solv_StokesFACOps_C
+
+#include "StokesFACOps.h"
+
+#include IOMANIP_HEADER_FILE
+
+#include "SAMRAI/hier/BoundaryBoxUtils.h"
+#include "SAMRAI/geom/CartesianGridGeometry.h"
+#include "SAMRAI/geom/CartesianPatchGeometry.h"
+#include "SAMRAI/hier/Index.h"
+#include "SAMRAI/hier/Variable.h"
+#include "SAMRAI/hier/VariableDatabase.h"
+#include "SAMRAI/pdat/CellDoubleConstantRefine.h"
+#include "SAMRAI/pdat/CellVariable.h"
+#include "SAMRAI/pdat/OutersideData.h"
+#include "SAMRAI/pdat/OutersideVariable.h"
+#include "SAMRAI/hier/PatchData.h"
+#include "SAMRAI/pdat/SideVariable.h"
+#include "SAMRAI/solv/FACPreconditioner.h"
+#include "StokesHypreSolver.h"
+#include "SAMRAI/tbox/Array.h"
+#include "SAMRAI/tbox/MathUtilities.h"
+#include "SAMRAI/tbox/StartupShutdownManager.h"
+#include "SAMRAI/tbox/Timer.h"
+#include "SAMRAI/tbox/TimerManager.h"
+#include "SAMRAI/tbox/Utilities.h"
+#include "SAMRAI/tbox/MathUtilities.h"
+#include "SAMRAI/xfer/CoarsenAlgorithm.h"
+#include "SAMRAI/xfer/CoarsenOperator.h"
+#include "SAMRAI/xfer/CoarsenSchedule.h"
+#include "SAMRAI/xfer/RefineAlgorithm.h"
+#include "SAMRAI/xfer/RefineOperator.h"
+#include "SAMRAI/xfer/RefineSchedule.h"
+#include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
+
+namespace SAMRAI {
+  namespace solv {
+
+    /*
+********************************************************************
+* FACOperatorStrategy virtual deallocateOperatorState        *
+* function.  Deallocate internal hierarchy-dependent data.         *
+* State is allocated iff hierarchy is set.                         *
+********************************************************************
+*/
+
+    void StokesFACOps::deallocateOperatorState()
+    {
+      if (d_hierarchy) {
+        int ln;
+        for (ln = d_ln_min + 1; ln <= d_ln_max; ++ln) {
+          d_hierarchy->getPatchLevel(ln)->
+            deallocatePatchData(d_oflux_scratch_id);
+        }
+        d_cf_boundary.resizeArray(0);
+#ifdef HAVE_HYPRE
+        d_hypre_solver.deallocateSolverState();
+#endif
+        d_hierarchy.setNull();
+        d_ln_min = -1;
+        d_ln_max = -1;
+
+        d_prolongation_refine_algorithm.setNull();
+        d_prolongation_refine_schedules.setNull();
+
+        d_urestriction_coarsen_algorithm.setNull();
+        d_urestriction_coarsen_schedules.setNull();
+
+        d_rrestriction_coarsen_algorithm.setNull();
+        d_rrestriction_coarsen_schedules.setNull();
+
+        d_flux_coarsen_algorithm.setNull();
+        d_flux_coarsen_schedules.setNull();
+
+        d_ghostfill_refine_algorithm.setNull();
+        d_ghostfill_refine_schedules.setNull();
+
+        d_ghostfill_nocoarse_refine_algorithm.setNull();
+        d_ghostfill_nocoarse_refine_schedules.setNull();
+
+      }
+    }
+
+  }
+}
+#endif
