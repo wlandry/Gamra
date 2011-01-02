@@ -7,9 +7,6 @@
  * Description:   Operator class for cell-centered scalar Stokes using FAC 
  *
  ************************************************************************/
-#ifndef included_solv_StokesFACOps_C
-#define included_solv_StokesFACOps_C
-
 #include "StokesFACOps.h"
 
 #include IOMANIP_HEADER_FILE
@@ -71,4 +68,3 @@ namespace SAMRAI {
 
   }
 }
-#endif
