@@ -54,8 +54,7 @@ namespace SAMRAI {
 *************************************************************************
 */
 
-    StokesFACSolver::StokesFACSolver(
-                                     const tbox::Dimension& dim,
+    StokesFACSolver::StokesFACSolver(const tbox::Dimension& dim,
                                      const std::string& object_name,
                                      tbox::Pointer<tbox::Database> database):
       d_dim(dim),
@@ -108,16 +107,16 @@ namespace SAMRAI {
 
       static std::string weight_variable_name("StokesFACSolver_weight");
 
-      tbox::Pointer<pdat::CellVariable<double> > weight = var_db->getVariable(
-                                                                              weight_variable_name);
+      tbox::Pointer<pdat::CellVariable<double> >
+        weight = var_db->getVariable(weight_variable_name);
       if (weight.isNull()) {
         weight = new pdat::CellVariable<double>(d_dim, weight_variable_name, 1);
       }
 
       if (s_weight_id[d_dim.getValue() - 1] < 0) {
-        s_weight_id[d_dim.getValue() - 1] = var_db->registerInternalSAMRAIVariable(
-                                                                                   weight,
-                                                                                   hier::IntVector::getZero(d_dim));
+        s_weight_id[d_dim.getValue() - 1] =
+          var_db->registerInternalSAMRAIVariable
+          (weight,hier::IntVector::getZero(d_dim));
       }
 
       /*
