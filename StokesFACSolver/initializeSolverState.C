@@ -31,8 +31,10 @@ namespace SAMRAI {
 *************************************************************************
 */
 
-    void StokesFACSolver::initializeSolverState(const int solution,
-                                                const int rhs,
+    void StokesFACSolver::initializeSolverState(const int p,
+                                                const int p_rhs,
+                                                const int v,
+                                                const int v_rhs,
                                                 tbox::Pointer<hier::PatchHierarchy> hierarchy,
                                                 const int coarse_level,
                                                 const int fine_level)
@@ -49,7 +51,7 @@ namespace SAMRAI {
       }
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-      if (solution < 0 || rhs < 0) {
+      if (p < 0 || p_rhs < 0) {
         TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
       }
 #endif
@@ -101,7 +103,7 @@ namespace SAMRAI {
 
       d_fac_ops.setStokesSpecifications(d_stokes_spec);
 
-      createVectorWrappers(solution, rhs);
+      createVectorWrappers(p, p_rhs, v, v_rhs);
 
       d_fac_precond.initializeSolverState(*d_uv, *d_fv);
 

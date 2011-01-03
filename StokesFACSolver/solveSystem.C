@@ -63,22 +63,13 @@ namespace SAMRAI {
         d_simple_bc.cacheDirichletData(p);
       }
 
-      createVectorWrappers(p, p_rhs);
+      createVectorWrappers(p, p_rhs, v, v_rhs);
       bool solver_rval;
 
       // d_fac_ops.relax(*d_uv, *d_fv, 0, 5, 1.0, p, p_rhs, v, v_rhs);
       // d_fac_ops.relax(*d_uv, *d_fv, 1, 5, 1.0, p, p_rhs, v, v_rhs);
       d_fac_ops.relax(*d_uv, *d_fv, 2, 10, 1.0, p, p_rhs, v, v_rhs);
       // solver_rval = d_fac_precond.solveSystem(*d_uv, *d_fv);
-
-      // if (d_bc_object == &d_simple_bc) {
-      //   /*
-      //    * Restore the Dirichlet cell data that were overwritten by the
-      //    * solve process.  We do this to be backward compatible with the
-      //    * user code.
-      //    */
-      //   d_simple_bc.restoreDirichletData(p);
-      // }
 
       return solver_rval;
     }
@@ -129,7 +120,7 @@ namespace SAMRAI {
                    << "specified.\n");
       }
 #endif
-      initializeSolverState(p, p_rhs, hierarchy, coarse_ln, fine_ln);
+      initializeSolverState(p, p_rhs, v, v_rhs, hierarchy, coarse_ln, fine_ln);
 
       bool solver_rval;
       solver_rval = solveSystem(p, p_rhs, v, v_rhs);

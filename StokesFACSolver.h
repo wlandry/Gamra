@@ -500,12 +500,13 @@ public:
     * @param fine_level The finest level in the solve
     */
    void
-   initializeSolverState(
-      const int solution,
-      const int rhs,
-      tbox::Pointer<hier::PatchHierarchy> hierarchy,
-      const int coarse_level = -1,
-      const int fine_level = -1);
+   initializeSolverState(const int p,
+                         const int p_rhs,
+                         const int v,
+                         const int v_rhs,
+                         tbox::Pointer<hier::PatchHierarchy> hierarchy,
+                         const int coarse_level = -1,
+                         const int fine_level = -1);
 
    /*!
     * @brief Remove the solver's internal state data
@@ -574,9 +575,7 @@ private:
     * specified by patch data indices u and f.
     */
    void
-   createVectorWrappers(
-      int u,
-      int f);
+   createVectorWrappers(int p, int p_rhs, int v, int v_rhs);
 
    /*
     * @brief Destroy vector wrappers referenced to by @c d_uv and @c d_fv.

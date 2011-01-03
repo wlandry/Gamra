@@ -67,7 +67,7 @@ namespace SAMRAI {
     d_stokes_fac_solver.setCConstant(0.0);
 
     d_stokes_fac_solver.initializeSolverState
-      (p_id,p_rhs_id,d_hierarchy,0,
+      (p_id,p_rhs_id,v_id,v_rhs_id,d_hierarchy,0,
        d_hierarchy->getFinestLevelNumber());
 
     tbox::plog << "solving..." << std::endl;

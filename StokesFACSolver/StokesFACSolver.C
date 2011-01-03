@@ -84,16 +84,16 @@ namespace SAMRAI {
       setPresmoothingSweeps(1);
       setPostsmoothingSweeps(1);
       setCoarseFineDiscretization("Ewing");
-#ifdef HAVE_HYPRE
-      setCoarsestLevelSolverChoice("hypre");
-      setCoarsestLevelSolverTolerance(1e-10);
-      setCoarsestLevelSolverMaxIterations(20);
-      setUseSMG(true);
-#else
+// #ifdef HAVE_HYPRE
+//       setCoarsestLevelSolverChoice("hypre");
+//       setCoarsestLevelSolverTolerance(1e-10);
+//       setCoarsestLevelSolverMaxIterations(20);
+//       setUseSMG(true);
+// #else
       setCoarsestLevelSolverChoice("redblack");
       setCoarsestLevelSolverTolerance(1e-8);
       setCoarsestLevelSolverMaxIterations(500);
-#endif
+// #endif
 
       /*
        * Construct integer tag variables and add to variable database.  Note that
@@ -105,18 +105,36 @@ namespace SAMRAI {
        */
       hier::VariableDatabase* var_db = hier::VariableDatabase::getDatabase();
 
-      static std::string weight_variable_name("StokesFACSolver_weight");
+      {
+        static std::string cell_weight_name("StokesFACSolver_cell_weight");
 
-      tbox::Pointer<pdat::CellVariable<double> >
-        weight = var_db->getVariable(weight_variable_name);
-      if (weight.isNull()) {
-        weight = new pdat::CellVariable<double>(d_dim, weight_variable_name, 1);
+        tbox::Pointer<pdat::CellVariable<double> >
+          weight = var_db->getVariable(cell_weight_name);
+        if (weight.isNull()) {
+          weight = new pdat::CellVariable<double>(d_dim, cell_weight_name, 1);
+        }
+
+        if (s_weight_id[d_dim.getValue() - 1] < 0) {
+          s_weight_id[d_dim.getValue() - 1] =
+            var_db->registerInternalSAMRAIVariable
+            (weight,hier::IntVector::getZero(d_dim));
+        }
       }
 
-      if (s_weight_id[d_dim.getValue() - 1] < 0) {
-        s_weight_id[d_dim.getValue() - 1] =
-          var_db->registerInternalSAMRAIVariable
-          (weight,hier::IntVector::getZero(d_dim));
+      {
+        static std::string side_weight_name("StokesFACSolver_side_weight");
+
+        tbox::Pointer<pdat::SideVariable<double> >
+          weight = var_db->getVariable(side_weight_name);
+        if (weight.isNull()) {
+          weight = new pdat::SideVariable<double>(d_dim, side_weight_name, 1);
+        }
+
+        if (s_weight_id[d_dim.getValue() - 2] < 0) {
+          s_weight_id[d_dim.getValue() - 2] =
+            var_db->registerInternalSAMRAIVariable
+            (weight,hier::IntVector::getZero(d_dim));
+        }
       }
 
       /*
