@@ -95,6 +95,7 @@ namespace SAMRAI {
       /*
        * Set source function and exact solution.
        */
+
       F77_FUNC(setexactandrhs2d, SETEXACTANDRHS2D) (
                                                     pbox.lower()[0],
                                                     pbox.upper()[0],
@@ -104,6 +105,12 @@ namespace SAMRAI {
                                                     p_rhs_data->getPointer(),
                                                     patch_geom->getDx(),
                                                     patch_geom->getXLower());
+
+      for(pdat::CellIterator ci(pbox); ci; ci++)
+        {
+          pdat::CellIndex c=ci();
+          (*p_rhs_data)(c)=0;
+        }
 
       tbox::Pointer<pdat::SideData<double> > v_rhs_data =
         patch->getPatchData(v_rhs_id);
@@ -116,7 +123,7 @@ namespace SAMRAI {
       for(pdat::SideIterator si(pbox,1); si; si++)
         {
           pdat::SideIndex s=si();
-          (*v_rhs_data)(s)=1;
+          (*v_rhs_data)(s)=10;
         }
     }    // End patch loop.
   }

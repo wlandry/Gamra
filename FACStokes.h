@@ -45,8 +45,7 @@ namespace SAMRAI {
      * @param object_name Ojbect name
      * @param database Input database (may be NULL)
      */
-    FACStokes(
-              const std::string& object_name,
+    FACStokes(const std::string& object_name,
               const tbox::Dimension& dim,
               tbox::Pointer<tbox::Database> database =
               tbox::Pointer<tbox::Database>(NULL));
@@ -66,8 +65,7 @@ namespace SAMRAI {
      * @see mesh::StandardTagAndInitStrategy::initializeLevelData()
      */
     virtual void
-    initializeLevelData(
-                        const tbox::Pointer<hier::BasePatchHierarchy> hierarchy,
+    initializeLevelData(const tbox::Pointer<hier::BasePatchHierarchy> hierarchy,
                         const int level_number,
                         const double init_data_time,
                         const bool can_be_refined,
@@ -79,8 +77,7 @@ namespace SAMRAI {
      * @brief Reset any internal hierarchy-dependent information.
      */
     virtual void
-    resetHierarchyConfiguration(
-                                tbox::Pointer<hier::BasePatchHierarchy> new_hierarchy,
+    resetHierarchyConfiguration(tbox::Pointer<hier::BasePatchHierarchy> new_hierarchy,
                                 int coarsest_level,
                                 int finest_level);
 
@@ -89,8 +86,7 @@ namespace SAMRAI {
     //@{ @name appu::VisDerivedDataStrategy virtuals
 
     virtual bool
-    packDerivedDataIntoDoubleBuffer(
-                                    double* buffer,
+    packDerivedDataIntoDoubleBuffer(double* buffer,
                                     const hier::Patch& patch,
                                     const hier::Box& region,
                                     const std::string& variable_name,
@@ -129,8 +125,7 @@ namespace SAMRAI {
      * @param viz_writer VisIt writer
      */
     int
-    setupPlotter(
-                 appu::VisItDataWriter& plotter) const;
+    setupPlotter(appu::VisItDataWriter& plotter) const;
 #endif
 
   private:

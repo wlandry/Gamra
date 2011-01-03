@@ -77,15 +77,15 @@ namespace SAMRAI {
      * Present data on the solve.
      */
     double avg_factor, final_factor;
-    d_stokes_fac_solver.getConvergenceFactors(avg_factor, final_factor);
-    tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
-               << "	iterations: "
-               << d_stokes_fac_solver.getNumberOfIterations() << "\n"
-               << "	residual: "<< d_stokes_fac_solver.getResidualNorm()
-               << "\n"
-               << "	average convergence: "<< avg_factor << "\n"
-               << "	final convergence: "<< final_factor << "\n"
-               << std::flush;
+    // d_stokes_fac_solver.getConvergenceFactors(avg_factor, final_factor);
+    // tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
+    //            << "	iterations: "
+    //            << d_stokes_fac_solver.getNumberOfIterations() << "\n"
+    //            << "	residual: "<< d_stokes_fac_solver.getResidualNorm()
+    //            << "\n"
+    //            << "	average convergence: "<< avg_factor << "\n"
+    //            << "	final convergence: "<< final_factor << "\n"
+    //            << std::flush;
 
     d_stokes_fac_solver.deallocateSolverState();
 
