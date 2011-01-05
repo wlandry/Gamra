@@ -102,7 +102,7 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
     for(int rb=0;rb<2;++rb)
       {
         // Need to sync
-        // xeqScheduleGhostFillNoCoarse(data_id, ln);
+        xeqScheduleGhostFillNoCoarse(p_id,v_id,ln);
         for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
           tbox::Pointer<hier::Patch> patch = *pi;
 

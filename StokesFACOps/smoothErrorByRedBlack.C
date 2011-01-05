@@ -72,7 +72,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack(SAMRAIVectorReal<double>&
 
   d_bc_helper.setTargetDataId(data_id);
   d_bc_helper.setHomogeneousBc(true);
-  xeqScheduleGhostFillNoCoarse(data_id, ln);
+  // xeqScheduleGhostFillNoCoarse(data_id, ln);
+  abort();
 
   if (ln > d_ln_min) {
     /*
@@ -101,7 +102,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack(SAMRAIVectorReal<double>&
     red_maxres = blk_maxres = 0;
 
     // Red sweep.
-    xeqScheduleGhostFillNoCoarse(data_id, ln);
+    // xeqScheduleGhostFillNoCoarse(data_id, ln);
+    abort();
     for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
       tbox::Pointer<hier::Patch> patch = *pi;
 
@@ -147,8 +149,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack(SAMRAIVectorReal<double>&
         patch->deallocatePatchData(flux_id);
       }
     }        // End patch number *pi
-    xeqScheduleGhostFillNoCoarse(data_id, ln);
-
+    // xeqScheduleGhostFillNoCoarse(data_id, ln);
+    abort();
     // Black sweep.
     for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
       tbox::Pointer<hier::Patch> patch = *pi;
@@ -195,7 +197,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack(SAMRAIVectorReal<double>&
         patch->deallocatePatchData(flux_id);
       }
     }        // End patch number *pi
-    xeqScheduleGhostFillNoCoarse(data_id, ln);
+    // xeqScheduleGhostFillNoCoarse(data_id, ln);
+    abort();
     if (residual_tolerance >= 0.0) {
       /*
        * Check for early end of sweeps due to convergence

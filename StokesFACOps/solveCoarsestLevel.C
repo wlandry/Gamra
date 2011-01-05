@@ -92,9 +92,9 @@ namespace SAMRAI {
                    "' in scapStokesOps::solveCoarsestLevel.");
       }
 
-      xeqScheduleGhostFillNoCoarse(data.getComponentDescriptorIndex(0),
-                                   coarsest_ln);
-
+      // xeqScheduleGhostFillNoCoarse(data.getComponentDescriptorIndex(0),
+      //                              coarsest_ln);
+      abort();
       t_solve_coarsest->stop();
 
       return return_value;

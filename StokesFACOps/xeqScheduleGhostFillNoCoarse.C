@@ -40,29 +40,33 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    void
-    StokesFACOps::xeqScheduleGhostFillNoCoarse(
-                                               int dst_id,
-                                               int dest_ln)
-    {
-      if (!d_ghostfill_nocoarse_refine_schedules[dest_ln]) {
-        TBOX_ERROR("Expected schedule not found.");
-      }
-      xfer::RefineAlgorithm refiner(d_dim);
-      refiner.
-        registerRefine(dst_id,
-                       dst_id,
-                       dst_id,
-                       d_ghostfill_nocoarse_refine_operator);
-      refiner.
-        resetSchedule(d_ghostfill_nocoarse_refine_schedules[dest_ln]);
-      d_ghostfill_nocoarse_refine_schedules[dest_ln]->fillData(0.0);
-      d_ghostfill_nocoarse_refine_algorithm->
-        resetSchedule(d_ghostfill_nocoarse_refine_schedules[dest_ln]);
+void SAMRAI::solv::StokesFACOps::xeqScheduleGhostFillNoCoarse(int p_id,
+                                                              int v_id,
+                                                              int dest_ln)
+{
+  /* p */
+  {
+    if (!p_nocoarse_refine_schedules[dest_ln]) {
+      TBOX_ERROR("Expected cell schedule not found.");
     }
+    xfer::RefineAlgorithm refiner(d_dim);
+    refiner.registerRefine(p_id,p_id,p_id,p_nocoarse_refine_operator);
+    refiner.resetSchedule(p_nocoarse_refine_schedules[dest_ln]);
+    p_nocoarse_refine_schedules[dest_ln]->fillData(0.0,false);
+    p_nocoarse_refine_algorithm->
+      resetSchedule(p_nocoarse_refine_schedules[dest_ln]);
+  }
 
+  /* v */
+  {
+    if (!v_nocoarse_refine_schedules[dest_ln]) {
+      TBOX_ERROR("Expected side schedule not found.");
+    }
+    xfer::RefineAlgorithm refiner(d_dim);
+    refiner.registerRefine(v_id,v_id,v_id,v_nocoarse_refine_operator);
+    refiner.resetSchedule(v_nocoarse_refine_schedules[dest_ln]);
+    v_nocoarse_refine_schedules[dest_ln]->fillData(0.0,false);
+    v_nocoarse_refine_algorithm->resetSchedule(v_nocoarse_refine_schedules[dest_ln]);
+      
   }
 }

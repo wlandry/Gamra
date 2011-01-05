@@ -53,6 +53,9 @@ namespace SAMRAI {
     tbox::Pointer<pdat::SideVariable<double> >
     StokesFACOps::s_flux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
+    tbox::Pointer<pdat::SideVariable<double> >
+    StokesFACOps::s_side_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+
     tbox::Pointer<pdat::OutersideVariable<double> >
     StokesFACOps::s_oflux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
@@ -95,6 +98,8 @@ namespace SAMRAI {
       d_coarse_solver_max_iterations(10),
       d_residual_tolerance_during_smoothing(-1.0),
       d_flux_id(-1),
+      p_id(-1),
+      v_id(-1),
 #ifdef HAVE_HYPRE
       d_hypre_solver(dim,
                      object_name + "::hypre_solver",
@@ -107,6 +112,7 @@ namespace SAMRAI {
                 ->getContext(object_name + "::PRIVATE_CONTEXT")),
       d_cell_scratch_id(-1),
       d_flux_scratch_id(-1),
+      d_side_scratch_id(-1),
       d_oflux_scratch_id(-1),
       d_prolongation_refine_operator(),
       d_prolongation_refine_algorithm(),
@@ -126,6 +132,12 @@ namespace SAMRAI {
       d_ghostfill_nocoarse_refine_operator(),
       d_ghostfill_nocoarse_refine_algorithm(),
       d_ghostfill_nocoarse_refine_schedules(),
+      p_nocoarse_refine_operator(),
+      p_nocoarse_refine_algorithm(),
+      p_nocoarse_refine_schedules(),
+      v_nocoarse_refine_operator(),
+      v_nocoarse_refine_algorithm(),
+      v_nocoarse_refine_schedules(),
       d_bc_helper(dim,
                   d_object_name + "::bc helper"),
       d_enable_logging(false),
@@ -166,6 +178,10 @@ namespace SAMRAI {
         s_flux_scratch_var[dim.getValue() - 1] = new pdat::SideVariable<double>
           (dim, ss.str());
         ss.str("");
+        ss << "StokesFACOps::private_side_scratch" << dim.getValue();
+        s_side_scratch_var[dim.getValue() - 1] = new pdat::SideVariable<double>
+          (dim, ss.str());
+        ss.str("");
         ss << "StokesFACOps::private_oflux_scratch" << dim.getValue();
         s_oflux_scratch_var[dim.getValue() - 1] = new pdat::OutersideVariable<double>
           (dim, ss.str());
@@ -180,6 +196,10 @@ namespace SAMRAI {
         registerVariableAndContext(s_flux_scratch_var[dim.getValue() - 1],
                                    d_context,
                                    hier::IntVector::getZero(d_dim));
+      d_side_scratch_id = vdb->
+        registerVariableAndContext(s_side_scratch_var[dim.getValue() - 1],
+                                   d_context,
+                                   hier::IntVector::getOne(d_dim));
       d_oflux_scratch_id = vdb->
         registerVariableAndContext(s_oflux_scratch_var[dim.getValue() - 1],
                                    d_context,

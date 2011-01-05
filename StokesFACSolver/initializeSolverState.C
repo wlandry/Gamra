@@ -89,6 +89,8 @@ namespace SAMRAI {
                                      s_weight_id[d_dim.getValue() - 1],
                                      d_ln_min,
                                      d_ln_max);
+      d_fac_ops.set_p_v(p,v);
+
 
       if (d_bc_object == &d_simple_bc) {
         d_simple_bc.setHierarchy(d_hierarchy,

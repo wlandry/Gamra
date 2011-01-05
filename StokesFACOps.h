@@ -295,6 +295,9 @@ public:
    setFluxId(
       int flux_id);
 
+   void
+   set_p_v(int p_id, int v_id);
+
    //@}
 
    /*!
@@ -723,9 +726,8 @@ private:
     * and physical bc.
     */
    void
-   xeqScheduleGhostFillNoCoarse(
-      int dst_id,
-      int dest_ln);
+   xeqScheduleGhostFillNoCoarse(int p_id, int v_id,
+                                int dest_ln);
 
    //@}
 
@@ -873,6 +875,8 @@ private:
     */
    int d_flux_id;
 
+  int p_id, v_id;
+
 #ifdef HAVE_HYPRE
    /*!
     * @brief HYPRE coarse-level solver object.
@@ -896,6 +900,9 @@ private:
 
    static tbox::Pointer<pdat::SideVariable<double> >
    s_flux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+
+   static tbox::Pointer<pdat::SideVariable<double> >
+   s_side_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
    static tbox::Pointer<pdat::OutersideVariable<double> >
    s_oflux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
@@ -927,6 +934,7 @@ private:
     * immediately after use.
     */
    int d_flux_scratch_id;
+   int d_side_scratch_id;
 
    /*!
     * @brief ID of the outerside-centered scratch data.
@@ -979,6 +987,16 @@ private:
    tbox::Pointer<xfer::RefineAlgorithm> d_ghostfill_nocoarse_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
    d_ghostfill_nocoarse_refine_schedules;
+
+   tbox::Pointer<xfer::RefineOperator> p_nocoarse_refine_operator;
+   tbox::Pointer<xfer::RefineAlgorithm> p_nocoarse_refine_algorithm;
+   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   p_nocoarse_refine_schedules;
+
+   tbox::Pointer<xfer::RefineOperator> v_nocoarse_refine_operator;
+   tbox::Pointer<xfer::RefineAlgorithm> v_nocoarse_refine_algorithm;
+   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   v_nocoarse_refine_schedules;
 
    //@}
 

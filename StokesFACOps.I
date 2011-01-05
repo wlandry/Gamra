@@ -91,6 +91,22 @@ void StokesFACOps::setFluxId(
 
 /*
  ********************************************************************
+ * Set the patch data id for p and v.                               *
+ ********************************************************************
+ */
+
+SAMRAI_INLINE_KEYWORD
+void StokesFACOps::set_p_v(
+   int p, int v) {
+   p_id = p;
+   v_id = v;
+#ifdef DEBUG_CHECK_ASSERTIONS
+   checkInputPatchDataIndices();
+#endif
+}
+
+/*
+ ********************************************************************
  * Set the choice for smoothing algorithm.                          *
  ********************************************************************
  */

@@ -83,6 +83,22 @@ namespace SAMRAI {
         TBOX_ASSERT(flux_var);
       }
 
+      if (p_id != -1) {
+        tbox::Pointer<hier::Variable> var;
+        vdb.mapIndexToVariable(p_id, var);
+        tbox::Pointer<pdat::CellVariable<double> > p_var = var;
+
+        TBOX_ASSERT(p_var);
+      }
+
+      if (v_id != -1) {
+        tbox::Pointer<hier::Variable> var;
+        vdb.mapIndexToVariable(v_id, var);
+        tbox::Pointer<pdat::SideVariable<double> > v_var = var;
+
+        TBOX_ASSERT(v_var);
+      }
+
     }
 
   }

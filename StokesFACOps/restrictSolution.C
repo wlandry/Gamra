@@ -66,8 +66,9 @@ namespace SAMRAI {
       d_bc_helper.setTargetDataId(d.getComponentDescriptorIndex(0));
 
       if (dest_ln == d_ln_min) {
-        xeqScheduleGhostFillNoCoarse(d.getComponentDescriptorIndex(0),
-                                     dest_ln);
+        // xeqScheduleGhostFillNoCoarse(d.getComponentDescriptorIndex(0),
+        //                              dest_ln);
+        abort();
       } else {
         xeqScheduleGhostFill(d.getComponentDescriptorIndex(0),
                              dest_ln);
