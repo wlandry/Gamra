@@ -120,7 +120,6 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
             geom = patch->getPatchGeometry();
           double dx = *(geom->getDx());
           double dy = *(geom->getDx());
-          const int nx(pbox.numberCells(0)), ny(pbox.numberCells(1));
 
           for (pdat::CellIterator ic(pbox); ic; ic++)
             {
@@ -147,11 +146,15 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
               /* Update p */
 
               double dvx_dx=
-                ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,pdat::SideIndex::Upper))
-                 - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,pdat::SideIndex::Lower)))/dx;
+                ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                      pdat::SideIndex::Upper))
+                 - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                        pdat::SideIndex::Lower)))/dx;
               double dvy_dy=
-                ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,pdat::SideIndex::Upper))
-                 - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,pdat::SideIndex::Lower)))/dy;
+                ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                      pdat::SideIndex::Upper))
+                 - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                        pdat::SideIndex::Lower)))/dy;
 
               double delta_R_continuity=(*p_rhs)(center) - dvx_dx - dvy_dy;
 
@@ -159,32 +162,36 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
 
               /* Update vx */
               /* If x==0 */
-              if(center[0]==0 && geom->getTouchesRegularBoundary(0,0))
+              if(center[0]==pbox.lower(0)
+                 && geom->getTouchesRegularBoundary(0,0))
                 {
-                  (*v)(pdat::SideIndex(center,pdat::SideIndex::X,pdat::SideIndex::Lower))=0;
+                  (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                       pdat::SideIndex::Lower))=0;
                 }
               else
                 {
                   double dp_dx, d2vx_dxx, d2vx_dyy, C_vx;
                   /* If y==0 */
-                  if(center[1]==0 && geom->getTouchesRegularBoundary(1,0))
+                  if(center[1]==pbox.lower(1)
+                     && geom->getTouchesRegularBoundary(1,0))
                     {
                       d2vx_dyy=
-                        ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,pdat::SideIndex::Lower))
+                        ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
+                                              pdat::SideIndex::Lower))
                          - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                             pdat::SideIndex::Lower)))
+                                                pdat::SideIndex::Lower)))
                         /(dy*dy);
                       C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
                     }
                   /* If y==max_y */
-                  else if(center[1]==ny-1
+                  else if(center[1]==pbox.upper(1)
                           && geom->getTouchesRegularBoundary(1,1))
                     {
                       d2vx_dyy=
                         (-(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                            pdat::SideIndex::Lower))
+                                               pdat::SideIndex::Lower))
                          + (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
-                                             pdat::SideIndex::Lower)))
+                                                pdat::SideIndex::Lower)))
                         /(dy*dy);
                       C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
                     }
@@ -192,11 +199,11 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
                     {
                       d2vx_dyy=
                         ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
-                                            pdat::SideIndex::Lower))
+                                              pdat::SideIndex::Lower))
                          - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                               pdat::SideIndex::Lower))
+                                                  pdat::SideIndex::Lower))
                          + (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
-                                             pdat::SideIndex::Lower)))
+                                                pdat::SideIndex::Lower)))
                         /(dy*dy);
 
                       C_vx=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
@@ -218,14 +225,16 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
                     delta_Rx*theta_momentum/C_vx;
                 }
               /* If x==max_x */
-              if(center[0]==nx-1 && geom->getTouchesRegularBoundary(0,1))
+              if(center[0]==pbox.upper(0)
+                 && geom->getTouchesRegularBoundary(0,1))
                 {
                   (*v)(pdat::SideIndex(center,pdat::SideIndex::X,pdat::SideIndex::Upper))=0;
                 }
 
               /* Update vy */
               /* If y==0 */
-              if(center[1]==0 && geom->getTouchesRegularBoundary(1,0))
+              if(center[1]==pbox.lower(1)
+                 && geom->getTouchesRegularBoundary(1,0))
                 {
                   (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
                                        pdat::SideIndex::Lower))=0;
@@ -234,7 +243,8 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
                 {
                   double dp_dy, d2vy_dxx, d2vy_dyy, C_vy;
                   /* If x==0 */
-                  if(center[0]==0 && geom->getTouchesRegularBoundary(0,0))
+                  if(center[0]==pbox.lower(0)
+                     && geom->getTouchesRegularBoundary(0,0))
                     {
                       d2vy_dxx=
                         ((*v)(pdat::SideIndex(right,pdat::SideIndex::Y,
@@ -245,7 +255,7 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
                       C_vy=-viscosity*(1/(dx*dx) + 2/(dy*dy));
                     }
                   /* If x==max_x */
-                  else if(center[0]==nx-1
+                  else if(center[0]==pbox.upper(0)
                           && geom->getTouchesRegularBoundary(0,1))
                     {
                       d2vy_dxx=
@@ -288,7 +298,8 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
                     delta_Ry*theta_momentum/C_vy;
                 }
               /* If y==max_y */
-              if(center[1]==ny-1 && geom->getTouchesRegularBoundary(1,1))
+              if(center[1]==pbox.upper(1)
+                 && geom->getTouchesRegularBoundary(1,1))
                 {
                   (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
                                        pdat::SideIndex::Upper))=0;
