@@ -423,9 +423,7 @@ public:
              const SAMRAIVectorReal<double>& residual,
              int ln,
              int num_sweeps,
-             double residual_tolerance,
-             const int p_id, const int p_rhs_id,
-             const int v_id, const int v_rhs_id);
+             double residual_tolerance);
 
    //@{ @name FACOperatorStrategy virtuals
 

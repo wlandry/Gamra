@@ -68,7 +68,7 @@ namespace SAMRAI {
 
       // d_fac_ops.relax(*d_uv, *d_fv, 0, 5, 1.0, p, p_rhs, v, v_rhs);
       // d_fac_ops.relax(*d_uv, *d_fv, 1, 5, 1.0, p, p_rhs, v, v_rhs);
-      d_fac_ops.relax(*d_uv, *d_fv, 2, 10, 1.0, p, p_rhs, v, v_rhs);
+      d_fac_ops.relax(*d_uv, *d_fv, 2, 100, 1.0);
       // solver_rval = d_fac_precond.solveSystem(*d_uv, *d_fv);
 
       return solver_rval;

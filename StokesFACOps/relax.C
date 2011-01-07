@@ -49,18 +49,21 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& data,
+void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                                        const SAMRAIVectorReal<double>& residual,
                                        int ln,
                                        int num_sweeps,
-                                       double residual_tolerance,
-                                       const int p_id, const int p_rhs_id,
-                                       const int v_id, const int v_rhs_id)
+                                       double residual_tolerance)
 {
+  const int p_id(solution.getComponentDescriptorIndex(0)),
+    p_rhs_id(residual.getComponentDescriptorIndex(0)),
+    v_id(solution.getComponentDescriptorIndex(1)),
+    v_rhs_id(residual.getComponentDescriptorIndex(1));
+
   checkInputPatchDataIndices();
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-  if (data.getPatchHierarchy() != d_hierarchy
+  if (solution.getPatchHierarchy() != d_hierarchy
       || residual.getPatchHierarchy() != d_hierarchy) {
     TBOX_ERROR(d_object_name << ": Vector hierarchy does not match\n"
                "internal hierarchy.");
