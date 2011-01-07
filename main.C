@@ -90,6 +90,8 @@ int main(
       input_filename = argv[1];
     }
 
+    tbox::SAMRAI_MPI::setCallAbortInSerialInsteadOfExit(true);
+
     /*
      * Create input database and parse all data in input file.
      */
