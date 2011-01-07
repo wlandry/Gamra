@@ -18,7 +18,7 @@ Main {
   // Base name for output files.
   base_name = "constantrefine2"
   // Whether to log all nodes in a parallel run.
-  log_all_nodes = FALSE
+  log_all_nodes = TRUE
   // Visualization writers to write files for.
   vis_writer = "Vizamrai", "VisIt"
 }
@@ -126,8 +126,8 @@ PatchHierarchy {
       level_2            = 2, 2
    }
    largest_patch_size {
-      //level_0 = 32, 32
-      level_0 = 8, 8
+      level_0 = 32, 32
+      //level_0 = 8, 8
       // all finer levels will use same values as level_0...
    }
 }
