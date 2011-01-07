@@ -40,8 +40,6 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-#include <unistd.h>
-
 /*
 ********************************************************************
 * Workhorse function to smooth error using red-black               *
