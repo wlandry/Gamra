@@ -43,7 +43,6 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	StokesFACOps/initializeOperatorState.o \
 	StokesFACOps/postprocessOneCycle.o \
 	StokesFACOps/prolongErrorAndCorrect.o \
-	StokesFACOps/redOrBlackSmoothingOnPatch.o \
 	StokesFACOps/relax.o \
 	StokesFACOps/restrictResidual.o \
 	StokesFACOps/restrictSolution.o \

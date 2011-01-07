@@ -295,9 +295,6 @@ public:
    setFluxId(
       int flux_id);
 
-   void
-   set_p_v(int p_id, int v_id);
-
    //@}
 
    /*!
@@ -874,8 +871,6 @@ private:
     * @see setFluxId
     */
    int d_flux_id;
-
-  int p_id, v_id;
 
 #ifdef HAVE_HYPRE
    /*!

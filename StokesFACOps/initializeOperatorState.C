@@ -356,9 +356,15 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                    solution.getComponentDescriptorIndex(0),
                    d_ghostfill_nocoarse_refine_operator);
   p_nocoarse_refine_algorithm->
-    registerRefine(p_id,p_id,p_id,p_nocoarse_refine_operator);
+    registerRefine(solution.getComponentDescriptorIndex(0),
+                   solution.getComponentDescriptorIndex(0),
+                   solution.getComponentDescriptorIndex(0),
+                   p_nocoarse_refine_operator);
   v_nocoarse_refine_algorithm->
-    registerRefine(v_id,v_id,v_id,v_nocoarse_refine_operator);
+    registerRefine(solution.getComponentDescriptorIndex(1),
+                   solution.getComponentDescriptorIndex(1),
+                   solution.getComponentDescriptorIndex(1),
+                   v_nocoarse_refine_operator);
 
   for (int dest_ln = d_ln_min + 1; dest_ln <= d_ln_max; ++dest_ln) {
 
