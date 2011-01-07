@@ -142,52 +142,7 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                   ++right[0];
                   --left[0];
 
-
-                  // if(pbox.lower(1)>15)
-                  //   {
-                  //     pdat::SideIndex
-                  //       ttmp(pdat::SideIndex(center,pdat::SideIndex::X,
-                  //                            pdat::SideIndex::Lower));
-                  //     ttmp[0]=16;
-                  //     ttmp[1]=17;
-                  //     tbox::plog << "relax "
-                  //                << isweep << " "
-                  //                << rb << " "
-                  //                << center[0] << " "
-                  //                << center[1] << " "
-                  //                << pbox.lower(0) << " "
-                  //                << pbox.lower(1) << " "
-                  //                << pbox.upper(0) << " "
-                  //                << pbox.upper(1) << " "
-                  //                << (*v)(ttmp) << " "
-                  //                << &((*v)(ttmp)) << " "
-                  //                << "\n";
-                  //   }
-
-
-
-                  // tbox::plog << "relax "
-                  //            << isweep << " "
-                  //            << rb << " "
-                  //            << center[0] << " "
-                  //            << center[1] << " "
-                  //            << pbox.lower(0) << " "
-                  //            << pbox.lower(1) << " "
-                  //            << pbox.upper(0) << " "
-                  //            << pbox.upper(1) << " "
-                  //            << (*p)(center) << " "
-                  //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                  //                                    pdat::SideIndex::Lower)) << " "
-                  //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                  //                                    pdat::SideIndex::Upper)) << " "
-                  //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                  //                                    pdat::SideIndex::Lower)) << " "
-                  //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                  //                                    pdat::SideIndex::Upper))
-                  //            << " ";
-
                   /* Update p */
-
                   if(i!=pbox.upper(0)+1 && j!=pbox.upper(1)+1)
                     {
                       double dvx_dx=
@@ -232,20 +187,22 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                               d2vx_dyy=
                                 ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
                                                       pdat::SideIndex::Lower))
-                                 - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                 - (*v)(pdat::SideIndex(center,
+                                                        pdat::SideIndex::X,
                                                         pdat::SideIndex::Lower)))
                                 /(dy*dy);
                               C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
-                              // tbox::plog << "vx y0 boundary ";
                             }
                           /* If y==max_y */
                           else if(center[1]==pbox.upper(1)
                                   && geom->getTouchesRegularBoundary(1,1))
                             {
                               d2vx_dyy=
-                                (-(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                (-(*v)(pdat::SideIndex(center,
+                                                       pdat::SideIndex::X,
                                                        pdat::SideIndex::Lower))
-                                 + (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
+                                 + (*v)(pdat::SideIndex(down,
+                                                        pdat::SideIndex::X,
                                                         pdat::SideIndex::Lower)))
                                 /(dy*dy);
                               C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
@@ -256,55 +213,37 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                               d2vx_dyy=
                                 ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
                                                       pdat::SideIndex::Lower))
-                                 - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                 - 2*(*v)(pdat::SideIndex(center,
+                                                          pdat::SideIndex::X,
                                                           pdat::SideIndex::Lower))
-                                 + (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
+                                 + (*v)(pdat::SideIndex(down,
+                                                        pdat::SideIndex::X,
                                                         pdat::SideIndex::Lower)))
                                 /(dy*dy);
 
                               C_vx=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
-                              // tbox::plog << "vx "
-                              //            << (pdat::SideIndex(up,pdat::SideIndex::X,
-                              //                                pdat::SideIndex::Lower))[0] << " "
-                              //            << (pdat::SideIndex(up,pdat::SideIndex::X,
-                              //                                pdat::SideIndex::Lower))[1] << " "
-                              //            << (pdat::SideIndex(center,pdat::SideIndex::X,
-                              //                                pdat::SideIndex::Lower))[0] << " "
-                              //            << (pdat::SideIndex(center,pdat::SideIndex::X,
-                              //                                pdat::SideIndex::Lower))[1] << " "
-                              //            << (pdat::SideIndex(down,pdat::SideIndex::X,
-                              //                                pdat::SideIndex::Lower))[0] << " "
-                              //            << (pdat::SideIndex(down,pdat::SideIndex::X,
-                              //                                pdat::SideIndex::Lower))[1] << " "
-
-                              //            << (*v)(pdat::SideIndex(up,pdat::SideIndex::X,
-                              //                                    pdat::SideIndex::Lower)) << " "
-                              //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                              //                                    pdat::SideIndex::Lower)) << " "
-                              //            << (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
-                              //                                    pdat::SideIndex::Lower)) << " ";
-
                             }
-                          d2vx_dxx=((*v)(pdat::SideIndex(left,pdat::SideIndex::X,
+                          d2vx_dxx=((*v)(pdat::SideIndex(left,
+                                                         pdat::SideIndex::X,
                                                          pdat::SideIndex::Lower))
-                                    - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                    - 2*(*v)(pdat::SideIndex(center,
+                                                             pdat::SideIndex::X,
                                                              pdat::SideIndex::Lower))
-                                    + (*v)(pdat::SideIndex(right,pdat::SideIndex::X,
+                                    + (*v)(pdat::SideIndex(right,
+                                                           pdat::SideIndex::X,
                                                            pdat::SideIndex::Lower)))
                             /(dx*dx);
 
                           dp_dx=((*p)(center)-(*p)(left))/dx;
                               
                           double delta_Rx=
-                            (*v_rhs)(pdat::SideIndex(center,pdat::SideIndex::X,pdat::SideIndex::Lower))
+                            (*v_rhs)(pdat::SideIndex(center,
+                                                     pdat::SideIndex::X,
+                                                     pdat::SideIndex::Lower))
                             - viscosity*(d2vx_dxx + d2vx_dyy) + dp_dx;
-                          (*v)(pdat::SideIndex(center,pdat::SideIndex::X,pdat::SideIndex::Lower))+=
+                          (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                               pdat::SideIndex::Lower))+=
                             delta_Rx*theta_momentum/C_vx;
-
-                          // tbox::plog << d2vx_dxx << " "
-                          //            << d2vx_dyy << " "
-                          //            << dp_dx << " "
-                          //            << delta_Rx << " ";
                         }
                     }
 
@@ -330,7 +269,8 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                               d2vy_dxx=
                                 ((*v)(pdat::SideIndex(right,pdat::SideIndex::Y,
                                                       pdat::SideIndex::Lower))
-                                 - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                 - (*v)(pdat::SideIndex(center,
+                                                        pdat::SideIndex::Y,
                                                         pdat::SideIndex::Lower)))
                                 /(dx*dx);
                               C_vy=-viscosity*(1/(dx*dx) + 2/(dy*dy));
@@ -342,7 +282,8 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                               d2vy_dxx=
                                 ((*v)(pdat::SideIndex(left,pdat::SideIndex::Y,
                                                       pdat::SideIndex::Lower))
-                                 - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                 - (*v)(pdat::SideIndex(center,
+                                                        pdat::SideIndex::Y,
                                                         pdat::SideIndex::Lower)))
                                 /(dx*dx);
                               C_vy=-viscosity*(1/(dx*dx) + 2/(dy*dy));
@@ -352,9 +293,11 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                               d2vy_dxx=
                                 ((*v)(pdat::SideIndex(left,pdat::SideIndex::Y,
                                                       pdat::SideIndex::Lower))
-                                 - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                 - 2*(*v)(pdat::SideIndex(center,
+                                                          pdat::SideIndex::Y,
                                                           pdat::SideIndex::Lower))
-                                 + (*v)(pdat::SideIndex(right,pdat::SideIndex::Y,
+                                 + (*v)(pdat::SideIndex(right,
+                                                        pdat::SideIndex::Y,
                                                         pdat::SideIndex::Lower)))
                                 /(dx*dx);
 
@@ -362,9 +305,11 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                             }
                           d2vy_dyy=((*v)(pdat::SideIndex(up,pdat::SideIndex::Y,
                                                          pdat::SideIndex::Lower))
-                                    - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                    - 2*(*v)(pdat::SideIndex(center,
+                                                             pdat::SideIndex::Y,
                                                              pdat::SideIndex::Lower))
-                                    + (*v)(pdat::SideIndex(down,pdat::SideIndex::Y,
+                                    + (*v)(pdat::SideIndex(down,
+                                                           pdat::SideIndex::Y,
                                                            pdat::SideIndex::Lower)))
                             /(dy*dy);
 
@@ -378,18 +323,6 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                                                pdat::SideIndex::Lower))+=
                             delta_Ry*theta_momentum/C_vy;
                         }
-
-                      // tbox::plog << (*p)(center) << " "
-                      //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                      //                                    pdat::SideIndex::Lower)) << " "
-                      //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                      //                                    pdat::SideIndex::Upper)) << " "
-                      //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                      //                                    pdat::SideIndex::Lower)) << " "
-                      //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                      //                                    pdat::SideIndex::Upper)) << " "
-                      //            << "\n";
-
                     }
                 }
             }
