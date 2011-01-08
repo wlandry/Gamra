@@ -40,45 +40,39 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 * FACOperatorStrategy virtual computeResidualNorm             *
 * function                                                         *
 ********************************************************************
 */
 
-    double StokesFACOps::computeResidualNorm(const SAMRAIVectorReal<double>& residual,
-                                             int fine_ln,
-                                             int coarse_ln)
-    {
-
-      if (coarse_ln != residual.getCoarsestLevelNumber() ||
-          fine_ln != residual.getFinestLevelNumber()) {
-        TBOX_ERROR("StokesFACOps::computeResidualNorm() is not\n"
-                   << "set up to compute residual except on the range of\n"
-                   << "levels defining the vector.\n");
-      }
-      t_compute_residual_norm->start();
-      /*
-       * The residual vector was cloned from vectors that has
-       * the proper weights associated with them, so we do not
-       * have to explicitly weight the residuals.
-       *
-       * maxNorm: not good to use because Hypre's norm does not
-       *   correspond to it.  Also maybe too sensitive to spikes.
-       * L2Norm: maybe good.  But does not correspond to the
-       *   scale of the quantity.
-       * L1Norm: maybe good.  Correspond to scale of quantity,
-       *   but may be too insensitive to spikes.
-       * RMSNorm: maybe good.
-       */
-      double norm = residual.RMSNorm();
-      t_compute_residual_norm->stop();
-      return norm;
-    }
-
+double SAMRAI::solv::StokesFACOps::computeResidualNorm
+(const SAMRAIVectorReal<double>& residual,
+ int fine_ln,
+ int coarse_ln)
+{
+  if (coarse_ln != residual.getCoarsestLevelNumber() ||
+      fine_ln != residual.getFinestLevelNumber()) {
+    TBOX_ERROR("StokesFACOps::computeResidualNorm() is not\n"
+               << "set up to compute residual except on the range of\n"
+               << "levels defining the vector.\n");
   }
+  t_compute_residual_norm->start();
+  /*
+   * The residual vector was cloned from vectors that has
+   * the proper weights associated with them, so we do not
+   * have to explicitly weight the residuals.
+   *
+   * maxNorm: not good to use because Hypre's norm does not
+   *   correspond to it.  Also maybe too sensitive to spikes.
+   * L2Norm: maybe good.  But does not correspond to the
+   *   scale of the quantity.
+   * L1Norm: maybe good.  Correspond to scale of quantity,
+   *   but may be too insensitive to spikes.
+   * RMSNorm: maybe good.
+   */
+  double norm = residual.RMSNorm();
+  t_compute_residual_norm->stop();
+  return norm;
 }
