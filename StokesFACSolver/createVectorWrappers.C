@@ -55,7 +55,7 @@ void SAMRAI::solv::StokesFACSolver::createVectorWrappers(int p, int p_rhs,
                  << " is not a side-double variable.\n");
     }
 #endif
-    d_uv->addComponent(variable, v, s_weight_id[d_dim.getValue() - 2]);
+    d_uv->addComponent(variable, v);
   }
 
   if (!d_fv || d_fv->getComponentDescriptorIndex(0) != p_rhs) {
@@ -92,6 +92,6 @@ void SAMRAI::solv::StokesFACSolver::createVectorWrappers(int p, int p_rhs,
                  << " is not a cell-double variable.\n");
     }
 #endif
-    d_fv->addComponent(variable, v_rhs, s_weight_id[d_dim.getValue() - 2]);
+    d_fv->addComponent(variable, v_rhs);
   }
 }
