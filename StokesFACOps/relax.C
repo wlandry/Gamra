@@ -173,7 +173,6 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                           (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
                                                pdat::SideIndex::Lower))=0;
 
-                          // tbox::plog << "vx x0 boundary ";
                         }
                       else
                         {
@@ -204,7 +203,6 @@ void SAMRAI::solv::StokesFACOps::relax(SAMRAIVectorReal<double>& solution,
                                                         pdat::SideIndex::Lower)))
                                 /(dy*dy);
                               C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
-                              // tbox::plog << "vx y1 boundary ";
                             }
                           else
                             {
