@@ -40,38 +40,31 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 ********************************************************************
 */
 
-    void StokesFACOps::smoothError(
-                                   SAMRAIVectorReal<double>& data,
-                                   const SAMRAIVectorReal<double>& residual,
-                                   int ln,
-                                   int num_sweeps)
-    {
+void SAMRAI::solv::StokesFACOps::smoothError
+(SAMRAIVectorReal<double>& data,
+ const SAMRAIVectorReal<double>& residual,
+ int ln,
+ int num_sweeps)
+{
+  t_smooth_error->start();
 
-      t_smooth_error->start();
-
-      checkInputPatchDataIndices();
-      if (d_smoothing_choice == "redblack") {
-        smoothErrorByRedBlack(data,
-                              residual,
-                              ln,
-                              num_sweeps,
-                              d_residual_tolerance_during_smoothing);
-      } else {
-        TBOX_ERROR(d_object_name << ": Bad smoothing choice '"
-                   << d_smoothing_choice
-                   << "' in StokesFACOps.");
-      }
-
-      t_smooth_error->stop();
-    }
-
+  checkInputPatchDataIndices();
+  if (d_smoothing_choice == "redblack") {
+    smoothErrorByRedBlack(data,
+                          residual,
+                          ln,
+                          num_sweeps,
+                          d_residual_tolerance_during_smoothing);
+  } else {
+    TBOX_ERROR(d_object_name << ": Bad smoothing choice '"
+               << d_smoothing_choice
+               << "' in StokesFACOps.");
   }
+
+  t_smooth_error->stop();
 }

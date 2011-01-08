@@ -419,12 +419,6 @@ public:
       const pdat::CellData<double>& w_data,
       pdat::SideData<double>& Dgradw_data) const;
 
-  void relax(SAMRAIVectorReal<double>& data,
-             const SAMRAIVectorReal<double>& residual,
-             int ln,
-             int num_sweeps,
-             double residual_tolerance);
-
    //@{ @name FACOperatorStrategy virtuals
 
    virtual void
