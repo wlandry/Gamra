@@ -40,65 +40,52 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 * FACOperatorStrategy virtual solveCoarsestLevel             *
 * function                                                         *
 ********************************************************************
 */
 
-    int StokesFACOps::solveCoarsestLevel(
-                                         SAMRAIVectorReal<double>& data,
-                                         const SAMRAIVectorReal<double>& residual,
-                                         int coarsest_ln) {
+int SAMRAI::solv::StokesFACOps::solveCoarsestLevel
+(SAMRAIVectorReal<double>& data,
+ const SAMRAIVectorReal<double>& residual,
+ int coarsest_ln)
+{
+  t_solve_coarsest->start();
 
-      t_solve_coarsest->start();
+  checkInputPatchDataIndices();
 
-      checkInputPatchDataIndices();
+  int return_value = 0;
 
-      int return_value = 0;
-
-      if (d_coarse_solver_choice == "jacobi") {
-        d_residual_tolerance_during_smoothing = d_coarse_solver_tolerance;
-        smoothError(data,
-                    residual,
-                    coarsest_ln,
-                    d_coarse_solver_max_iterations);
-        d_residual_tolerance_during_smoothing = -1.0;
-      } else if (d_coarse_solver_choice == "redblack") {
-        d_residual_tolerance_during_smoothing = d_coarse_solver_tolerance;
-        smoothError(data,
-                    residual,
-                    coarsest_ln,
-                    d_coarse_solver_max_iterations);
-        d_residual_tolerance_during_smoothing = -1.0;
-      } else if (d_coarse_solver_choice == "hypre") {
+  if (d_coarse_solver_choice == "redblack") {
+    d_residual_tolerance_during_smoothing = d_coarse_solver_tolerance;
+    smoothError(data,
+                residual,
+                coarsest_ln,
+                d_coarse_solver_max_iterations);
+    d_residual_tolerance_during_smoothing = -1.0;
+  } else if (d_coarse_solver_choice == "hypre") {
 #ifndef HAVE_HYPRE
-        TBOX_ERROR(d_object_name << ": Coarse level solver choice '"
-                   << d_coarse_solver_choice
-                   << "' unavailable in "
-                   << "scapStokesOps::solveCoarsestLevel.");
+    TBOX_ERROR(d_object_name << ": Coarse level solver choice '"
+               << d_coarse_solver_choice
+               << "' unavailable in "
+               << "scapStokesOps::solveCoarsestLevel.");
 #else
-        return_value = solveCoarsestLevel_HYPRE(data, residual, coarsest_ln);
+    return_value = solveCoarsestLevel_HYPRE(data, residual, coarsest_ln);
 #endif
-      } else {
-        TBOX_ERROR(
-                   d_object_name << ": Bad coarse level solver choice '"
-                   << d_coarse_solver_choice
-                   <<
-                   "' in scapStokesOps::solveCoarsestLevel.");
-      }
-
-      // xeqScheduleGhostFillNoCoarse(data.getComponentDescriptorIndex(0),
-      //                              coarsest_ln);
-      abort();
-      t_solve_coarsest->stop();
-
-      return return_value;
-    }
-
+  } else {
+    TBOX_ERROR(
+               d_object_name << ": Bad coarse level solver choice '"
+               << d_coarse_solver_choice
+               <<
+               "' in scapStokesOps::solveCoarsestLevel.");
   }
+
+  xeqScheduleGhostFillNoCoarse(data.getComponentDescriptorIndex(0),
+                               data.getComponentDescriptorIndex(1),
+                               coarsest_ln);
+  t_solve_coarsest->stop();
+
+  return return_value;
 }
