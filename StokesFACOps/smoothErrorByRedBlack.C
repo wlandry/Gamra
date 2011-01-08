@@ -103,7 +103,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
     for(int rb=0;rb<2;++rb)
       {
         // Need to sync
-        tbox::plog << "syncing\n";
         xeqScheduleGhostFillNoCoarse(p_id,v_id,ln);
         for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
           tbox::Pointer<hier::Patch> patch = *pi;
