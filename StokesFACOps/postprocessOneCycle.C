@@ -40,41 +40,35 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 * FACOperatorStrategy virtual postprocessOneCycle function.  *
 ********************************************************************
 */
 
-    void StokesFACOps::postprocessOneCycle(
-                                           int fac_cycle_num,
-                                           const SAMRAIVectorReal<double>& current_soln,
-                                           const SAMRAIVectorReal<double>& residual)
-    {
-      NULL_USE(current_soln);
-      NULL_USE(residual);
+void SAMRAI::solv::StokesFACOps::postprocessOneCycle
+(int fac_cycle_num,
+ const SAMRAIVectorReal<double>& current_soln,
+ const SAMRAIVectorReal<double>& residual)
+{
+  NULL_USE(current_soln);
+  NULL_USE(residual);
 
-      if (d_enable_logging) {
-        if (d_preconditioner) {
-          /*
-           * Output convergence progress.  This is probably only appropriate
-           * if the solver is NOT being used as a preconditioner.
-           */
-          double avg_factor, final_factor;
-          d_preconditioner->getConvergenceFactors(avg_factor, final_factor);
-          tbox::plog
-            << "iter=" << std::setw(4) << fac_cycle_num
-            << " resid=" << d_preconditioner->getResidualNorm()
-            << " net conv=" << d_preconditioner->getNetConvergenceFactor()
-            << " final conv=" << d_preconditioner->getNetConvergenceFactor()
-            << " avg conv=" << d_preconditioner->getAvgConvergenceFactor()
-            << std::endl;
-        }
-      }
+  if (d_enable_logging) {
+    if (d_preconditioner) {
+      /*
+       * Output convergence progress.  This is probably only appropriate
+       * if the solver is NOT being used as a preconditioner.
+       */
+      double avg_factor, final_factor;
+      d_preconditioner->getConvergenceFactors(avg_factor, final_factor);
+      tbox::plog
+        << "iter=" << std::setw(4) << fac_cycle_num
+        << " resid=" << d_preconditioner->getResidualNorm()
+        << " net conv=" << d_preconditioner->getNetConvergenceFactor()
+        << " final conv=" << d_preconditioner->getNetConvergenceFactor()
+        << " avg conv=" << d_preconditioner->getAvgConvergenceFactor()
+        << std::endl;
     }
-
   }
 }
