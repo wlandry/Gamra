@@ -229,9 +229,14 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   tbox::Pointer<hier::Variable> variable;
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
-  d_prolongation_refine_operator =
+  p_prolongation_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   d_prolongation_method);
+                                   p_prolongation_method);
+
+  vdb->mapIndexToVariable(d_side_scratch_id, variable);
+  v_prolongation_refine_operator =
+    geometry->lookupRefineOperator(variable,
+                                   v_prolongation_method);
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_urestriction_coarsen_operator =
@@ -273,9 +278,13 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                                    "CONSTANT_REFINE");
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-  if (!d_prolongation_refine_operator) {
+  if (!p_prolongation_refine_operator) {
     TBOX_ERROR(d_object_name
-               << ": Cannot find prolongation refine operator");
+               << ": Cannot find p prolongation refine operator");
+  }
+  if (!v_prolongation_refine_operator) {
+    TBOX_ERROR(d_object_name
+               << ": Cannot find v prolongation refine operator");
   }
   if (!p_urestriction_coarsen_operator) {
     TBOX_ERROR(d_object_name
@@ -325,7 +334,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
    * There is no need to delete the old schedules first
    * because we have deallocated the solver state above.
    */
-  d_prolongation_refine_schedules.resizeArray(d_ln_max + 1);
+  p_prolongation_refine_schedules.resizeArray(d_ln_max + 1);
+  v_prolongation_refine_schedules.resizeArray(d_ln_max + 1);
   p_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
   v_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
   p_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
@@ -336,7 +346,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   v_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   d_flux_coarsen_schedules.resizeArray(d_ln_max + 1);
 
-  d_prolongation_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
+  p_prolongation_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
+  v_prolongation_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
   p_urestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   p_rrestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   v_urestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
@@ -347,11 +358,16 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   p_nocoarse_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
   v_nocoarse_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
 
-  d_prolongation_refine_algorithm->
+  p_prolongation_refine_algorithm->
     registerRefine(d_cell_scratch_id,
                    solution.getComponentDescriptorIndex(0),
                    d_cell_scratch_id,
-                   d_prolongation_refine_operator);
+                   p_prolongation_refine_operator);
+  v_prolongation_refine_algorithm->
+    registerRefine(d_side_scratch_id,
+                   solution.getComponentDescriptorIndex(1),
+                   d_side_scratch_id,
+                   v_prolongation_refine_operator);
   p_urestriction_coarsen_algorithm->
     registerCoarsen(solution.getComponentDescriptorIndex(0),
                     solution.getComponentDescriptorIndex(0),
@@ -395,19 +411,31 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
 
   for (int dest_ln = d_ln_min + 1; dest_ln <= d_ln_max; ++dest_ln) {
 
-    tbox::Pointer<xfer::PatchLevelFullFillPattern> fill_pattern(
-                                                                new xfer::PatchLevelFullFillPattern());
-    d_prolongation_refine_schedules[dest_ln] =
-      d_prolongation_refine_algorithm->
+    tbox::Pointer<xfer::PatchLevelFullFillPattern>
+      fill_pattern(new xfer::PatchLevelFullFillPattern());
+    p_prolongation_refine_schedules[dest_ln] =
+      p_prolongation_refine_algorithm->
       createSchedule(fill_pattern,
                      d_hierarchy->getPatchLevel(dest_ln),
                      tbox::Pointer<hier::PatchLevel>(),
                      dest_ln - 1,
                      d_hierarchy,
                      &d_bc_helper);
-    if (!d_prolongation_refine_schedules[dest_ln]) {
+    if (!p_prolongation_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
-                 << ": Cannot create a refine schedule for prolongation!\n");
+                 << ": Cannot create a refine schedule for p prolongation!\n");
+    }
+    v_prolongation_refine_schedules[dest_ln] =
+      v_prolongation_refine_algorithm->
+      createSchedule(fill_pattern,
+                     d_hierarchy->getPatchLevel(dest_ln),
+                     tbox::Pointer<hier::PatchLevel>(),
+                     dest_ln - 1,
+                     d_hierarchy,
+                     &d_bc_helper);
+    if (!v_prolongation_refine_schedules[dest_ln]) {
+      TBOX_ERROR(d_object_name
+                 << ": Cannot create a refine schedule for v prolongation!\n");
     }
     p_ghostfill_refine_schedules[dest_ln] =
       p_ghostfill_refine_algorithm->

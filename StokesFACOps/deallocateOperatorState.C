@@ -67,8 +67,11 @@ namespace SAMRAI {
         d_ln_min = -1;
         d_ln_max = -1;
 
-        d_prolongation_refine_algorithm.setNull();
-        d_prolongation_refine_schedules.setNull();
+        p_prolongation_refine_algorithm.setNull();
+        p_prolongation_refine_schedules.setNull();
+
+        v_prolongation_refine_algorithm.setNull();
+        v_prolongation_refine_schedules.setNull();
 
         p_urestriction_coarsen_algorithm.setNull();
         p_urestriction_coarsen_schedules.setNull();

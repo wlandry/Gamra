@@ -72,8 +72,7 @@ namespace SAMRAI {
 * Constructor.                                                     *
 ********************************************************************
 */
-    StokesFACOps::StokesFACOps(
-                               const tbox::Dimension& dim,
+    StokesFACOps::StokesFACOps(const tbox::Dimension& dim,
                                const std::string& object_name,
                                tbox::Pointer<tbox::Database> database):
       d_dim(dim),
@@ -93,7 +92,8 @@ namespace SAMRAI {
 
                              ),
       d_cf_discretization("Ewing"),
-      d_prolongation_method("CONSTANT_REFINE"),
+      p_prolongation_method("CONSTANT_REFINE"),
+      v_prolongation_method("CONSTANT_REFINE"),
       d_coarse_solver_tolerance(1.e-8),
       d_coarse_solver_max_iterations(10),
       d_residual_tolerance_during_smoothing(-1.0),
@@ -109,12 +109,15 @@ namespace SAMRAI {
       d_context(hier::VariableDatabase::getDatabase()
                 ->getContext(object_name + "::PRIVATE_CONTEXT")),
       d_cell_scratch_id(-1),
-      d_flux_scratch_id(-1),
       d_side_scratch_id(-1),
+      d_flux_scratch_id(-1),
       d_oflux_scratch_id(-1),
-      d_prolongation_refine_operator(),
-      d_prolongation_refine_algorithm(),
-      d_prolongation_refine_schedules(),
+      p_prolongation_refine_operator(),
+      p_prolongation_refine_algorithm(),
+      p_prolongation_refine_schedules(),
+      v_prolongation_refine_operator(),
+      v_prolongation_refine_algorithm(),
+      v_prolongation_refine_schedules(),
       p_urestriction_coarsen_operator(),
       p_urestriction_coarsen_algorithm(),
       p_urestriction_coarsen_schedules(),
@@ -231,9 +234,13 @@ namespace SAMRAI {
           database->getStringWithDefault("cf_discretization",
                                          d_cf_discretization);
 
-        d_prolongation_method =
+        p_prolongation_method =
           database->getStringWithDefault("prolongation_method",
-                                         d_prolongation_method);
+                                         p_prolongation_method);
+
+        v_prolongation_method =
+          database->getStringWithDefault("prolongation_method",
+                                         v_prolongation_method);
 
         d_enable_logging =
           database->getBoolWithDefault("enable_logging",

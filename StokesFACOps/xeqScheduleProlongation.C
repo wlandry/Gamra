@@ -40,31 +40,33 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    void
-    StokesFACOps::xeqScheduleProlongation(
-                                          int dst_id,
-                                          int src_id,
-                                          int scr_id,
-                                          int dest_ln)
-    {
-      if (!d_prolongation_refine_schedules[dest_ln]) {
-        TBOX_ERROR("Expected schedule not found.");
-      }
-      xfer::RefineAlgorithm refiner(d_dim);
-      refiner.
-        registerRefine(dst_id,
-                       src_id,
-                       scr_id,
-                       d_prolongation_refine_operator);
-      refiner.
-        resetSchedule(d_prolongation_refine_schedules[dest_ln]);
-      d_prolongation_refine_schedules[dest_ln]->fillData(0.0);
-      d_prolongation_refine_algorithm->
-        resetSchedule(d_prolongation_refine_schedules[dest_ln]);
+void SAMRAI::solv::StokesFACOps::xeqScheduleProlongation
+(int p_dst, int p_src, int p_scr, int v_dst, int v_src, int v_scr,
+ int dest_ln)
+{
+  /* p */
+  {
+    if (!p_prolongation_refine_schedules[dest_ln]) {
+      TBOX_ERROR("Expected schedule not found.");
     }
+    xfer::RefineAlgorithm refiner(d_dim);
+    refiner.registerRefine(p_dst, p_src, p_scr, p_prolongation_refine_operator);
+    refiner.resetSchedule(p_prolongation_refine_schedules[dest_ln]);
+    p_prolongation_refine_schedules[dest_ln]->fillData(0.0);
+    p_prolongation_refine_algorithm->
+      resetSchedule(p_prolongation_refine_schedules[dest_ln]);
+  }
 
+  /* v */
+  {
+    if (!v_prolongation_refine_schedules[dest_ln]) {
+      TBOX_ERROR("Expected schedule not found.");
+    }
+    xfer::RefineAlgorithm refiner(d_dim);
+    refiner.registerRefine(v_dst, v_src, v_scr, v_prolongation_refine_operator);
+    refiner.resetSchedule(v_prolongation_refine_schedules[dest_ln]);
+    v_prolongation_refine_schedules[dest_ln]->fillData(0.0);
+    v_prolongation_refine_algorithm->
+      resetSchedule(v_prolongation_refine_schedules[dest_ln]);
   }
 }

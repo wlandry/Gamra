@@ -603,8 +603,8 @@ private:
     * they manipulate are as follows:
     * <ol>
     *   <li> xeqScheduleProlongation():
-    *        d_prolongation_refine_operator
-    *        d_prolongation_refine_schedules
+    *        prolongation_refine_operator
+    *        prolongation_refine_schedules
     *   <li> xeqScheduleURestriction():
     *        d_restriction_coarsen_operator,
     *        urestriction_coarsen_schedules.
@@ -625,11 +625,9 @@ private:
     * @return refinement schedule for prolongation
     */
    void
-   xeqScheduleProlongation(
-      int dst_id,
-      int src_id,
-      int scr_id,
-      int dest_ln);
+   xeqScheduleProlongation(int p_dst, int p_src, int p_scr,
+                           int v_dst, int v_src, int v_scr,
+                           int dest_ln);
 
    /*!
     * @brief Execute schedule for restricting solution to the specified
@@ -806,7 +804,8 @@ private:
     *
     * @see setProlongationMethod()
     */
-   std::string d_prolongation_method;
+   std::string p_prolongation_method;
+   std::string v_prolongation_method;
 
    /*!
     * @brief Tolerance specified to coarse solver
@@ -889,7 +888,7 @@ private:
     * Scratch data is allocated and removed as needed
     * to reduce memory usage.
     */
-   int d_cell_scratch_id;
+  int d_cell_scratch_id, d_side_scratch_id;
 
    /*!
     * @brief ID of the side-centered scratch data.
@@ -902,7 +901,6 @@ private:
     * immediately after use.
     */
    int d_flux_scratch_id;
-   int d_side_scratch_id;
 
    /*!
     * @brief ID of the outerside-centered scratch data.
@@ -921,10 +919,15 @@ private:
     */
 
    //! @brief Error prolongation (refinement) operator.
-   tbox::Pointer<xfer::RefineOperator> d_prolongation_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> d_prolongation_refine_algorithm;
+   tbox::Pointer<xfer::RefineOperator> p_prolongation_refine_operator;
+   tbox::Pointer<xfer::RefineAlgorithm> p_prolongation_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
-   d_prolongation_refine_schedules;
+   p_prolongation_refine_schedules;
+
+   tbox::Pointer<xfer::RefineOperator> v_prolongation_refine_operator;
+   tbox::Pointer<xfer::RefineAlgorithm> v_prolongation_refine_algorithm;
+   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   v_prolongation_refine_schedules;
 
    //! @brief Solution restriction (coarsening) operator.
    tbox::Pointer<xfer::CoarsenOperator> p_urestriction_coarsen_operator;

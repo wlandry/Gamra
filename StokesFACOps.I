@@ -206,7 +206,8 @@ void StokesFACOps::setProlongationMethod(
          << "causes a corruption in the state.\n");
    }
 #endif
-   d_prolongation_method = prolongation_method;
+   p_prolongation_method = prolongation_method;
+   v_prolongation_method = prolongation_method;
 }
 
 }

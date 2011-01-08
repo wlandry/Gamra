@@ -40,10 +40,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ***********************************************************************
 * FACOperatorStrategy virtual prolongErrorAndCorrect function.  *
 * After the prolongation, we set the physical boundary condition      *
@@ -52,59 +49,61 @@ namespace SAMRAI {
 ***********************************************************************
 */
 
-    void StokesFACOps::prolongErrorAndCorrect(
-                                              const SAMRAIVectorReal<double>& s,
-                                              SAMRAIVectorReal<double>& d,
-                                              int dest_ln) {
-
-      t_prolong->start();
+void SAMRAI::solv::StokesFACOps::prolongErrorAndCorrect
+(const SAMRAIVectorReal<double>& s,
+ SAMRAIVectorReal<double>& d,
+ int dest_ln)
+{
+  t_prolong->start();
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-      if (s.getPatchHierarchy() != d_hierarchy
-          || d.getPatchHierarchy() != d_hierarchy) {
-        TBOX_ERROR(d_object_name << ": Vector hierarchy does not match\n"
-                   "internal state hierarchy.");
-      }
+  if (s.getPatchHierarchy() != d_hierarchy
+      || d.getPatchHierarchy() != d_hierarchy) {
+    TBOX_ERROR(d_object_name << ": Vector hierarchy does not match\n"
+               "internal state hierarchy.");
+  }
 #endif
 
-      tbox::Pointer<hier::PatchLevel> coarse_level =
-        d_hierarchy->getPatchLevel(dest_ln - 1);
-      tbox::Pointer<hier::PatchLevel> fine_level =
-        d_hierarchy->getPatchLevel(dest_ln);
+  tbox::Pointer<hier::PatchLevel> coarse_level =
+    d_hierarchy->getPatchLevel(dest_ln - 1);
+  tbox::Pointer<hier::PatchLevel> fine_level =
+    d_hierarchy->getPatchLevel(dest_ln);
 
-      /*
-       * Data is prolonged into the scratch space corresponding
-       * to index d_cell_scratch_id and allocated here.
-       */
-      fine_level->allocatePatchData(d_cell_scratch_id);
+  /*
+   * Data is prolonged into the scratch space corresponding
+   * to index d_cell_scratch_id and allocated here.
+   */
+  fine_level->allocatePatchData(d_cell_scratch_id);
+  fine_level->allocatePatchData(d_side_scratch_id);
 
-      /*
-       * Refine solution into scratch space to fill the fine level
-       * interior in the scratch space, then use that refined data
-       * to correct the fine level error.
-       */
-      d_bc_helper.setTargetDataId(d_cell_scratch_id);
-      d_bc_helper.setHomogeneousBc(true);
-      const int src_index = s.getComponentDescriptorIndex(0);
-      xeqScheduleProlongation(d_cell_scratch_id,
-                              src_index,
-                              d_cell_scratch_id,
-                              dest_ln);
+  /*
+   * Refine solution into scratch space to fill the fine level
+   * interior in the scratch space, then use that refined data
+   * to correct the fine level error.
+   */
+  // d_bc_helper.setTargetDataId(d_cell_scratch_id);
+  // d_bc_helper.setHomogeneousBc(true);
+  xeqScheduleProlongation(d_cell_scratch_id,
+                          s.getComponentDescriptorIndex(0),
+                          d_cell_scratch_id,
+                          d_side_scratch_id,
+                          s.getComponentDescriptorIndex(1),
+                          d_side_scratch_id,
+                          dest_ln);
 
-      /*
-       * Add the refined error in the scratch space
-       * to the error currently residing in the destination level.
-       */
-      math::HierarchyCellDataOpsReal<double>
-        hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
-      const int dst_index = d.getComponentDescriptorIndex(0);
-      hierarchy_math_ops.add(dst_index, dst_index, d_cell_scratch_id);
+  /*
+   * Add the refined error in the scratch space to the error currently
+   * residing in the destination level.
+   */
+  math::HierarchyCellDataOpsReal<double>
+    hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
+  const int p_dst = d.getComponentDescriptorIndex(0);
+  hierarchy_math_ops.add(p_dst, p_dst, d_cell_scratch_id);
+  const int v_dst = d.getComponentDescriptorIndex(1);
+  hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);
 
-      fine_level->deallocatePatchData(d_cell_scratch_id);
+  fine_level->deallocatePatchData(d_cell_scratch_id);
+  fine_level->deallocatePatchData(d_side_scratch_id);
 
-      t_prolong->stop();
-
-    }
-
-  }
+  t_prolong->stop();
 }
