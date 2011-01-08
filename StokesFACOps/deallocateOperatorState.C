@@ -70,11 +70,17 @@ namespace SAMRAI {
         d_prolongation_refine_algorithm.setNull();
         d_prolongation_refine_schedules.setNull();
 
-        d_urestriction_coarsen_algorithm.setNull();
-        d_urestriction_coarsen_schedules.setNull();
+        p_urestriction_coarsen_algorithm.setNull();
+        p_urestriction_coarsen_schedules.setNull();
 
-        d_rrestriction_coarsen_algorithm.setNull();
-        d_rrestriction_coarsen_schedules.setNull();
+        v_urestriction_coarsen_algorithm.setNull();
+        v_urestriction_coarsen_schedules.setNull();
+
+        p_rrestriction_coarsen_algorithm.setNull();
+        p_rrestriction_coarsen_schedules.setNull();
+
+        v_rrestriction_coarsen_algorithm.setNull();
+        v_rrestriction_coarsen_schedules.setNull();
 
         d_flux_coarsen_algorithm.setNull();
         d_flux_coarsen_schedules.setNull();

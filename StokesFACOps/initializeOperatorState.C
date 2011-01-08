@@ -234,8 +234,14 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                                    d_prolongation_method);
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
-  d_urestriction_coarsen_operator =
-    d_rrestriction_coarsen_operator =
+  p_urestriction_coarsen_operator =
+    p_rrestriction_coarsen_operator =
+    geometry->lookupCoarsenOperator(variable,
+                                    "CONSERVATIVE_COARSEN");
+
+  vdb->mapIndexToVariable(d_side_scratch_id, variable);
+  v_urestriction_coarsen_operator =
+    v_rrestriction_coarsen_operator =
     geometry->lookupCoarsenOperator(variable,
                                     "CONSERVATIVE_COARSEN");
 
@@ -271,13 +277,21 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     TBOX_ERROR(d_object_name
                << ": Cannot find prolongation refine operator");
   }
-  if (!d_urestriction_coarsen_operator) {
+  if (!p_urestriction_coarsen_operator) {
     TBOX_ERROR(d_object_name
-               << ": Cannot find restriction coarsening operator");
+               << ": Cannot find p restriction coarsening operator");
   }
-  if (!d_rrestriction_coarsen_operator) {
+  if (!v_urestriction_coarsen_operator) {
     TBOX_ERROR(d_object_name
-               << ": Cannot find restriction coarsening operator");
+               << ": Cannot find v restriction coarsening operator");
+  }
+  if (!p_rrestriction_coarsen_operator) {
+    TBOX_ERROR(d_object_name
+               << ": Cannot find p restriction coarsening operator");
+  }
+  if (!v_rrestriction_coarsen_operator) {
+    TBOX_ERROR(d_object_name
+               << ": Cannot find v restriction coarsening operator");
   }
   if (!d_flux_coarsen_operator) {
     TBOX_ERROR(d_object_name
@@ -316,13 +330,17 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   v_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
   p_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
   v_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
-  d_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
-  d_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
+  p_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
+  p_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
+  v_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
+  v_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   d_flux_coarsen_schedules.resizeArray(d_ln_max + 1);
 
   d_prolongation_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
-  d_urestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
-  d_rrestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
+  p_urestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
+  p_rrestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
+  v_urestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
+  v_rrestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   d_flux_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   p_ghostfill_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
   v_ghostfill_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
@@ -334,14 +352,22 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                    solution.getComponentDescriptorIndex(0),
                    d_cell_scratch_id,
                    d_prolongation_refine_operator);
-  d_urestriction_coarsen_algorithm->
+  p_urestriction_coarsen_algorithm->
     registerCoarsen(solution.getComponentDescriptorIndex(0),
                     solution.getComponentDescriptorIndex(0),
-                    d_urestriction_coarsen_operator);
-  d_rrestriction_coarsen_algorithm->
+                    p_urestriction_coarsen_operator);
+  p_rrestriction_coarsen_algorithm->
     registerCoarsen(rhs.getComponentDescriptorIndex(0),
                     rhs.getComponentDescriptorIndex(0),
-                    d_rrestriction_coarsen_operator);
+                    p_rrestriction_coarsen_operator);
+  v_urestriction_coarsen_algorithm->
+    registerCoarsen(solution.getComponentDescriptorIndex(1),
+                    solution.getComponentDescriptorIndex(1),
+                    v_urestriction_coarsen_operator);
+  v_rrestriction_coarsen_algorithm->
+    registerCoarsen(rhs.getComponentDescriptorIndex(1),
+                    rhs.getComponentDescriptorIndex(1),
+                    v_rrestriction_coarsen_operator);
   p_ghostfill_refine_algorithm->
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
@@ -425,21 +451,38 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     }
   }
   for (int dest_ln = d_ln_min; dest_ln < d_ln_max; ++dest_ln) {
-    d_urestriction_coarsen_schedules[dest_ln] =
-      d_urestriction_coarsen_algorithm->
+    p_urestriction_coarsen_schedules[dest_ln] =
+      p_urestriction_coarsen_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      d_hierarchy->getPatchLevel(dest_ln + 1));
-    if (!d_urestriction_coarsen_schedules[dest_ln]) {
+    if (!p_urestriction_coarsen_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
-                 << ": Cannot create a coarsen schedule for U restriction!\n");
+                 << ": Cannot create a coarsen schedule for U p restriction!\n");
     }
-    d_rrestriction_coarsen_schedules[dest_ln] =
-      d_rrestriction_coarsen_algorithm->
+    p_rrestriction_coarsen_schedules[dest_ln] =
+      p_rrestriction_coarsen_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      d_hierarchy->getPatchLevel(dest_ln + 1));
-    if (!d_rrestriction_coarsen_schedules[dest_ln]) {
+    if (!p_rrestriction_coarsen_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
-                 << ": Cannot create a coarsen schedule for R restriction!\n");
+                 << ": Cannot create a coarsen schedule for R p restriction!\n");
+    }
+
+    v_urestriction_coarsen_schedules[dest_ln] =
+      v_urestriction_coarsen_algorithm->
+      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
+                     d_hierarchy->getPatchLevel(dest_ln + 1));
+    if (!v_urestriction_coarsen_schedules[dest_ln]) {
+      TBOX_ERROR(d_object_name
+                 << ": Cannot create a coarsen schedule for U v restriction!\n");
+    }
+    v_rrestriction_coarsen_schedules[dest_ln] =
+      v_rrestriction_coarsen_algorithm->
+      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
+                     d_hierarchy->getPatchLevel(dest_ln + 1));
+    if (!v_rrestriction_coarsen_schedules[dest_ln]) {
+      TBOX_ERROR(d_object_name
+                 << ": Cannot create a coarsen schedule for R v restriction!\n");
     }
     d_flux_coarsen_schedules[dest_ln] =
       d_flux_coarsen_algorithm->

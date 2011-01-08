@@ -40,28 +40,24 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 * FACOperatorStrategy virtual restrictresidual function.     *
 ********************************************************************
 */
 
-    void StokesFACOps::restrictResidual(
-                                        const SAMRAIVectorReal<double>& s,
-                                        SAMRAIVectorReal<double>& d,
-                                        int dest_ln) {
+void SAMRAI::solv::StokesFACOps::restrictResidual
+(const SAMRAIVectorReal<double>& s,
+ SAMRAIVectorReal<double>& d,
+ int dest_ln)
+{
+  t_restrict_residual->start();
 
-      t_restrict_residual->start();
+  xeqScheduleRRestriction(d.getComponentDescriptorIndex(0),
+                          s.getComponentDescriptorIndex(0),
+                          d.getComponentDescriptorIndex(1),
+                          s.getComponentDescriptorIndex(1),
+                          dest_ln);
 
-      xeqScheduleRRestriction(d.getComponentDescriptorIndex(0),
-                              s.getComponentDescriptorIndex(0),
-                              dest_ln);
-
-      t_restrict_residual->stop();
-    }
-
-  }
+  t_restrict_residual->stop();
 }

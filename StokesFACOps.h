@@ -607,10 +607,10 @@ private:
     *        d_prolongation_refine_schedules
     *   <li> xeqScheduleURestriction():
     *        d_restriction_coarsen_operator,
-    *        d_urestriction_coarsen_schedules.
+    *        urestriction_coarsen_schedules.
     *   <li> xeqScheduleRRestriction():
-    *        d_restriction_coarsen_operator,
-    *        d_rrestriction_coarsen_schedules.
+    *        restriction_coarsen_operator,
+    *        rrestriction_coarsen_schedules.
     *   <li> xeqScheduleFluxCoarsen():
     *        d_flux_coarsen_operator,
     *        d_flux_coarsen_schedules.
@@ -640,10 +640,8 @@ private:
     * @return coarsening schedule for restriction
     */
    void
-   xeqScheduleURestriction(
-      int dst_id,
-      int src_id,
-      int dest_ln);
+   xeqScheduleURestriction(int p_dst, int p_src, int v_dst, int v_src,
+                           int dest_ln);
 
    /*!
     * @brief Execute schedule for restricting residual to the specified
@@ -654,10 +652,8 @@ private:
     * @return coarsening schedule for restriction
     */
    void
-   xeqScheduleRRestriction(
-      int dst_id,
-      int src_id,
-      int dest_ln);
+   xeqScheduleRRestriction(int p_dst, int p_src, int v_dst, int v_src,
+                           int dest_ln);
 
    /*!
     * @brief Execute schedule for coarsening flux to the specified
@@ -931,16 +927,26 @@ private:
    d_prolongation_refine_schedules;
 
    //! @brief Solution restriction (coarsening) operator.
-   tbox::Pointer<xfer::CoarsenOperator> d_urestriction_coarsen_operator;
-   tbox::Pointer<xfer::CoarsenAlgorithm> d_urestriction_coarsen_algorithm;
+   tbox::Pointer<xfer::CoarsenOperator> p_urestriction_coarsen_operator;
+   tbox::Pointer<xfer::CoarsenAlgorithm> p_urestriction_coarsen_algorithm;
    tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
-   d_urestriction_coarsen_schedules;
+   p_urestriction_coarsen_schedules;
+
+   tbox::Pointer<xfer::CoarsenOperator> v_urestriction_coarsen_operator;
+   tbox::Pointer<xfer::CoarsenAlgorithm> v_urestriction_coarsen_algorithm;
+   tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
+   v_urestriction_coarsen_schedules;
 
    //! @brief Residual restriction (coarsening) operator.
-   tbox::Pointer<xfer::CoarsenOperator> d_rrestriction_coarsen_operator;
-   tbox::Pointer<xfer::CoarsenAlgorithm> d_rrestriction_coarsen_algorithm;
+   tbox::Pointer<xfer::CoarsenOperator> p_rrestriction_coarsen_operator;
+   tbox::Pointer<xfer::CoarsenAlgorithm> p_rrestriction_coarsen_algorithm;
    tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
-   d_rrestriction_coarsen_schedules;
+   p_rrestriction_coarsen_schedules;
+
+   tbox::Pointer<xfer::CoarsenOperator> v_rrestriction_coarsen_operator;
+   tbox::Pointer<xfer::CoarsenAlgorithm> v_rrestriction_coarsen_algorithm;
+   tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
+   v_rrestriction_coarsen_schedules;
 
    //! @brief Coarsen operator for outerflux-to-flux
    tbox::Pointer<xfer::CoarsenOperator> d_flux_coarsen_operator;

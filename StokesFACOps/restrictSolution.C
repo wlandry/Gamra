@@ -40,10 +40,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 * FACOperatorStrategy virtual restrictSolution function.     *
 * After restricting solution, update ghost cells of the affected   *
@@ -51,32 +48,29 @@ namespace SAMRAI {
 ********************************************************************
 */
 
-    void StokesFACOps::restrictSolution(
-                                        const SAMRAIVectorReal<double>& s,
-                                        SAMRAIVectorReal<double>& d,
-                                        int dest_ln) {
+void SAMRAI::solv::StokesFACOps::restrictSolution
+(const SAMRAIVectorReal<double>& s,
+ SAMRAIVectorReal<double>& d,
+ int dest_ln)
+{
+  t_restrict_solution->start();
 
-      t_restrict_solution->start();
+  xeqScheduleURestriction(d.getComponentDescriptorIndex(0),
+                          s.getComponentDescriptorIndex(0),
+                          d.getComponentDescriptorIndex(1),
+                          s.getComponentDescriptorIndex(1),
+                          dest_ln);
 
-      xeqScheduleURestriction(d.getComponentDescriptorIndex(0),
-                              s.getComponentDescriptorIndex(0),
-                              dest_ln);
+  // d_bc_helper.setHomogeneousBc(false);
+  // d_bc_helper.setTargetDataId(d.getComponentDescriptorIndex(0));
 
-      d_bc_helper.setHomogeneousBc(false);
-      d_bc_helper.setTargetDataId(d.getComponentDescriptorIndex(0));
-
-      if (dest_ln == d_ln_min) {
-        // xeqScheduleGhostFillNoCoarse(d.getComponentDescriptorIndex(0),
-        //                              dest_ln);
-        abort();
-      } else {
-        // xeqScheduleGhostFill(d.getComponentDescriptorIndex(0),
-        //                      dest_ln);
-        abort();
-      }
-
-      t_restrict_solution->stop();
-    }
-
+  if (dest_ln == d_ln_min) {
+    xeqScheduleGhostFillNoCoarse(d.getComponentDescriptorIndex(0),
+                                 d.getComponentDescriptorIndex(1), dest_ln);
+  } else {
+    xeqScheduleGhostFill(d.getComponentDescriptorIndex(0),
+                         d.getComponentDescriptorIndex(1), dest_ln);
   }
+
+  t_restrict_solution->stop();
 }
