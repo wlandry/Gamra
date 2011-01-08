@@ -40,21 +40,43 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-void SAMRAI::solv::StokesFACOps::xeqScheduleGhostFill(int dst_id,
+void SAMRAI::solv::StokesFACOps::xeqScheduleGhostFill(int p_id, int v_id,
                                                       int dest_ln)
 {
-  if (!d_ghostfill_refine_schedules[dest_ln]) {
-    TBOX_ERROR("Expected schedule not found.");
+  /* p */
+  {
+    if (!p_ghostfill_refine_schedules[dest_ln]) {
+      TBOX_ERROR("Expected schedule not found.");
+    }
+    xfer::RefineAlgorithm refiner(d_dim);
+    refiner.
+      registerRefine(p_id,
+                     p_id,
+                     p_id,
+                     p_ghostfill_refine_operator);
+    refiner.
+      resetSchedule(p_ghostfill_refine_schedules[dest_ln]);
+    p_ghostfill_refine_schedules[dest_ln]->fillData(0.0);
+    p_ghostfill_refine_algorithm->
+      resetSchedule(p_ghostfill_refine_schedules[dest_ln]);
   }
-  xfer::RefineAlgorithm refiner(d_dim);
-  refiner.
-    registerRefine(dst_id,
-                   dst_id,
-                   dst_id,
-                   d_ghostfill_refine_operator);
-  refiner.
-    resetSchedule(d_ghostfill_refine_schedules[dest_ln]);
-  d_ghostfill_refine_schedules[dest_ln]->fillData(0.0);
-  d_ghostfill_refine_algorithm->
-    resetSchedule(d_ghostfill_refine_schedules[dest_ln]);
+
+  /* v */
+  {
+    if (!v_ghostfill_refine_schedules[dest_ln]) {
+      TBOX_ERROR("Expected schedule not found.");
+    }
+    xfer::RefineAlgorithm refiner(d_dim);
+    refiner.
+      registerRefine(v_id,
+                     v_id,
+                     v_id,
+                     v_ghostfill_refine_operator);
+    refiner.
+      resetSchedule(v_ghostfill_refine_schedules[dest_ln]);
+    v_ghostfill_refine_schedules[dest_ln]->fillData(0.0);
+    v_ghostfill_refine_algorithm->
+      resetSchedule(v_ghostfill_refine_schedules[dest_ln]);
+  }
 }
+

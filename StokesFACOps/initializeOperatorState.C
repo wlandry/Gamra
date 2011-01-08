@@ -245,15 +245,16 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                                     "CONSERVATIVE_COARSEN");
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
-  d_ghostfill_refine_operator =
+  p_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,
                                    d_cf_discretization == "Ewing" ?
                                    "CONSTANT_REFINE" : d_cf_discretization);
 
-  vdb->mapIndexToVariable(d_cell_scratch_id, variable);
-  d_ghostfill_nocoarse_refine_operator =
+  vdb->mapIndexToVariable(d_side_scratch_id, variable);
+  v_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   "CONSTANT_REFINE");
+                                   d_cf_discretization == "Ewing" ?
+                                   "CONSTANT_REFINE" : d_cf_discretization);
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_nocoarse_refine_operator =
@@ -282,11 +283,11 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     TBOX_ERROR(d_object_name
                << ": Cannot find flux coarsening operator");
   }
-  if (!d_ghostfill_refine_operator) {
+  if (!p_ghostfill_refine_operator) {
     TBOX_ERROR(d_object_name
                << ": Cannot find ghost filling refinement operator");
   }
-  if (!d_ghostfill_nocoarse_refine_operator) {
+  if (!v_ghostfill_refine_operator) {
     TBOX_ERROR(d_object_name
                << ": Cannot find ghost filling refinement operator");
   }
@@ -311,8 +312,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
    * because we have deallocated the solver state above.
    */
   d_prolongation_refine_schedules.resizeArray(d_ln_max + 1);
-  d_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
-  d_ghostfill_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
+  p_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
+  v_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
   p_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
   v_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
   d_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
@@ -323,8 +324,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   d_urestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   d_rrestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   d_flux_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
-  d_ghostfill_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
-  d_ghostfill_nocoarse_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
+  p_ghostfill_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
+  v_ghostfill_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
   p_nocoarse_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
   v_nocoarse_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
 
@@ -341,20 +342,20 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     registerCoarsen(rhs.getComponentDescriptorIndex(0),
                     rhs.getComponentDescriptorIndex(0),
                     d_rrestriction_coarsen_operator);
-  d_ghostfill_refine_algorithm->
+  p_ghostfill_refine_algorithm->
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
-                   d_ghostfill_refine_operator);
+                   p_ghostfill_refine_operator);
+  v_ghostfill_refine_algorithm->
+    registerRefine(solution.getComponentDescriptorIndex(1),
+                   solution.getComponentDescriptorIndex(1),
+                   solution.getComponentDescriptorIndex(1),
+                   v_ghostfill_refine_operator);
   d_flux_coarsen_algorithm->
     registerCoarsen(((d_flux_id != -1) ? d_flux_id : d_flux_scratch_id),
                     d_oflux_scratch_id,
                     d_flux_coarsen_operator);
-  d_ghostfill_nocoarse_refine_algorithm->
-    registerRefine(solution.getComponentDescriptorIndex(0),
-                   solution.getComponentDescriptorIndex(0),
-                   solution.getComponentDescriptorIndex(0),
-                   d_ghostfill_nocoarse_refine_operator);
   p_nocoarse_refine_algorithm->
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
@@ -382,25 +383,25 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for prolongation!\n");
     }
-    d_ghostfill_refine_schedules[dest_ln] =
-      d_ghostfill_refine_algorithm->
+    p_ghostfill_refine_schedules[dest_ln] =
+      p_ghostfill_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      dest_ln - 1,
                      d_hierarchy,
                      &d_bc_helper);
-    if (!d_ghostfill_refine_schedules[dest_ln]) {
+    if (!p_ghostfill_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
     }
-    d_ghostfill_nocoarse_refine_schedules[dest_ln] =
-      d_ghostfill_nocoarse_refine_algorithm->
+    v_ghostfill_refine_schedules[dest_ln] =
+      v_ghostfill_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
+                     dest_ln - 1,
+                     d_hierarchy,
                      &d_bc_helper);
-    if (!d_ghostfill_nocoarse_refine_schedules[dest_ln]) {
-      TBOX_ERROR(
-                 d_object_name
-                 <<
-                 ": Cannot create a refine schedule for ghost filling on bottom level!\n");
+    if (!v_ghostfill_refine_schedules[dest_ln]) {
+      TBOX_ERROR(d_object_name
+                 << ": Cannot create a refine schedule for ghost filling!\n");
     }
     p_nocoarse_refine_schedules[dest_ln] =
       p_nocoarse_refine_algorithm->
@@ -448,16 +449,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
       TBOX_ERROR(d_object_name
                  << ": Cannot create a coarsen schedule for flux transfer!\n");
     }
-  }
-  d_ghostfill_nocoarse_refine_schedules[d_ln_min] =
-    d_ghostfill_nocoarse_refine_algorithm->
-    createSchedule(d_hierarchy->getPatchLevel(d_ln_min),
-                   &d_bc_helper);
-  if (!d_ghostfill_nocoarse_refine_schedules[d_ln_min]) {
-    TBOX_ERROR(
-               d_object_name
-               <<
-               ": Cannot create a refine schedule for ghost filling on bottom level!\n");
   }
   p_nocoarse_refine_schedules[d_ln_min] =
     p_nocoarse_refine_algorithm->

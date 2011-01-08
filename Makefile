@@ -35,7 +35,6 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	StokesFACOps/computeCompositeResidualOnLevel.o \
 	StokesFACOps/computeFluxOnPatch.o \
 	StokesFACOps/computeResidualNorm.o \
-	StokesFACOps/computeResidualOnPatch.o \
 	StokesFACOps/computeVectorWeights.o \
 	StokesFACOps/deallocateOperatorState.o \
 	StokesFACOps/ewingFixFlux.o \

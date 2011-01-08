@@ -81,7 +81,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack(SAMRAIVectorReal<double>&
      * to fill ghost boundaries that will not change through
      * the smoothing loop.
      */
-    xeqScheduleGhostFill(data_id, ln);
+    // xeqScheduleGhostFill(data_id, ln);
+    abort();
   }
 
   /*

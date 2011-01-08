@@ -550,24 +550,6 @@ private:
       const hier::IntVector& ratio_to_coarser) const;
 
    /*!
-    * @brief AMR-unaware function to compute residual on a single patch,
-    * with variable scalar field.
-    *
-    * @param patch patch
-    * @param flux_data side-centered flux data
-    * @param soln_data cell-centered solution data
-    * @param rhs_data cell-centered rhs data
-    * @param residual_data cell-centered residual data
-    */
-   void
-   computeResidualOnPatch(
-      const hier::Patch& patch,
-      const pdat::SideData<double>& flux_data,
-      const pdat::CellData<double>& soln_data,
-      const pdat::CellData<double>& rhs_data,
-      pdat::CellData<double>& residual_data) const;
-
-   /*!
     * @brief AMR-unaware function to red or black smoothing on a single patch,
     * for variable diffusion coefficient and variable scalar field.
     *
@@ -633,11 +615,11 @@ private:
     *        d_flux_coarsen_operator,
     *        d_flux_coarsen_schedules.
     *   <li> xeqScheduleGhostFill():
-    *        d_ghostfill_refine_operator,
-    *        d_ghostfill_refine_schedules.
+    *        ghostfill_refine_operator,
+    *        ghostfill_refine_schedules.
     *   <li> xeqScheduleGhostFillNoCoarse():
-    *        d_ghostfill_nocoarse_refine_operator,
-    *        d_ghostfill_nocoarse_refine_schedules.
+    *        ghostfill_nocoarse_refine_operator,
+    *        ghostfill_nocoarse_refine_schedules.
     * </ol>
     *
     * @return refinement schedule for prolongation
@@ -702,9 +684,7 @@ private:
     * and physical bc.
     */
    void
-   xeqScheduleGhostFill(
-      int dst_id,
-      int dest_ln);
+   xeqScheduleGhostFill(int p_id, int v_id, int dest_ln);
 
    /*!
     * @brief Execute schedule for filling ghosts on the specified
@@ -721,8 +701,7 @@ private:
     * and physical bc.
     */
    void
-   xeqScheduleGhostFillNoCoarse(int p_id, int v_id,
-                                int dest_ln);
+   xeqScheduleGhostFillNoCoarse(int p_id, int v_id, int dest_ln);
 
    //@}
 
@@ -969,18 +948,18 @@ private:
    tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
    d_flux_coarsen_schedules;
 
-   //! @brief Refine operator for cell-like data from coarser level.
-   tbox::Pointer<xfer::RefineOperator> d_ghostfill_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> d_ghostfill_refine_algorithm;
+   //! @brief Refine operator for data from coarser level.
+   tbox::Pointer<xfer::RefineOperator> p_ghostfill_refine_operator;
+   tbox::Pointer<xfer::RefineAlgorithm> p_ghostfill_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
-   d_ghostfill_refine_schedules;
+   p_ghostfill_refine_schedules;
 
-   //! @brief Refine operator for cell-like data from same level.
-   tbox::Pointer<xfer::RefineOperator> d_ghostfill_nocoarse_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> d_ghostfill_nocoarse_refine_algorithm;
+   tbox::Pointer<xfer::RefineOperator> v_ghostfill_refine_operator;
+   tbox::Pointer<xfer::RefineAlgorithm> v_ghostfill_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
-   d_ghostfill_nocoarse_refine_schedules;
+   v_ghostfill_refine_schedules;
 
+   //! @brief Refine operator for data from same level.
    tbox::Pointer<xfer::RefineOperator> p_nocoarse_refine_operator;
    tbox::Pointer<xfer::RefineAlgorithm> p_nocoarse_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >

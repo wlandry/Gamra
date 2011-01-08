@@ -79,11 +79,11 @@ namespace SAMRAI {
         d_flux_coarsen_algorithm.setNull();
         d_flux_coarsen_schedules.setNull();
 
-        d_ghostfill_refine_algorithm.setNull();
-        d_ghostfill_refine_schedules.setNull();
+        p_ghostfill_refine_algorithm.setNull();
+        p_ghostfill_refine_schedules.setNull();
 
-        d_ghostfill_nocoarse_refine_algorithm.setNull();
-        d_ghostfill_nocoarse_refine_schedules.setNull();
+        v_ghostfill_refine_algorithm.setNull();
+        v_ghostfill_refine_schedules.setNull();
 
         p_nocoarse_refine_algorithm.setNull();
         p_nocoarse_refine_schedules.setNull();

@@ -70,8 +70,9 @@ namespace SAMRAI {
         //                              dest_ln);
         abort();
       } else {
-        xeqScheduleGhostFill(d.getComponentDescriptorIndex(0),
-                             dest_ln);
+        // xeqScheduleGhostFill(d.getComponentDescriptorIndex(0),
+        //                      dest_ln);
+        abort();
       }
 
       t_restrict_solution->stop();
