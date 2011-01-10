@@ -52,7 +52,7 @@ void SAMRAI::solv::StokesFACOps::xeqScheduleProlongation
     xfer::RefineAlgorithm refiner(d_dim);
     refiner.registerRefine(p_dst, p_src, p_scr, p_prolongation_refine_operator);
     refiner.resetSchedule(p_prolongation_refine_schedules[dest_ln]);
-    p_prolongation_refine_schedules[dest_ln]->fillData(0.0);
+    p_prolongation_refine_schedules[dest_ln]->fillData(0.0,false);
     p_prolongation_refine_algorithm->
       resetSchedule(p_prolongation_refine_schedules[dest_ln]);
   }
@@ -65,7 +65,7 @@ void SAMRAI::solv::StokesFACOps::xeqScheduleProlongation
     xfer::RefineAlgorithm refiner(d_dim);
     refiner.registerRefine(v_dst, v_src, v_scr, v_prolongation_refine_operator);
     refiner.resetSchedule(v_prolongation_refine_schedules[dest_ln]);
-    v_prolongation_refine_schedules[dest_ln]->fillData(0.0);
+    v_prolongation_refine_schedules[dest_ln]->fillData(0.0,false);
     v_prolongation_refine_algorithm->
       resetSchedule(v_prolongation_refine_schedules[dest_ln]);
   }

@@ -95,13 +95,18 @@ void SAMRAI::solv::StokesFACOps::prolongErrorAndCorrect
    * Add the refined error in the scratch space to the error currently
    * residing in the destination level.
    */
-  math::HierarchyCellDataOpsReal<double>
-    hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
-  const int p_dst = d.getComponentDescriptorIndex(0);
-  hierarchy_math_ops.add(p_dst, p_dst, d_cell_scratch_id);
-  const int v_dst = d.getComponentDescriptorIndex(1);
-  hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);
-
+  {
+    math::HierarchyCellDataOpsReal<double>
+      hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
+    const int p_dst = d.getComponentDescriptorIndex(0);
+    hierarchy_math_ops.add(p_dst, p_dst, d_cell_scratch_id);
+  }
+  {
+    math::HierarchySideDataOpsReal<double>
+      hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
+    const int v_dst = d.getComponentDescriptorIndex(1);
+    hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);
+  }
   fine_level->deallocatePatchData(d_cell_scratch_id);
   fine_level->deallocatePatchData(d_side_scratch_id);
 

@@ -258,24 +258,22 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   d_cf_discretization == "Ewing" ?
-                                   "CONSTANT_REFINE" : d_cf_discretization);
+                                   "CONSERVATIVE_LINEAR_REFINE");
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   d_cf_discretization == "Ewing" ?
-                                   "CONSTANT_REFINE" : d_cf_discretization);
+                                   "CONSERVATIVE_LINEAR_REFINE");
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_nocoarse_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   "CONSTANT_REFINE");
+                                   "CONSERVATIVE_LINEAR_REFINE");
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_nocoarse_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   "CONSTANT_REFINE");
+                                   "CONSERVATIVE_LINEAR_REFINE");
 
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (!p_prolongation_refine_operator) {

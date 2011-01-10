@@ -88,8 +88,8 @@ StandardTagAndInitialize {
   tagging_method = "REFINE_BOXES"
   RefineBoxes {
     level_0 = [(0,0),(7,7)]
-    //level_1 = [(0,0),(15,15)]
-    //level_2 = [(0,0),(31,31)]
+    level_1 = [(0,0),(15,15)]
+    level_2 = [(0,0),(31,31)]
     //etc.
   }
 }
@@ -120,7 +120,7 @@ PatchHierarchy {
    //              [level 0 entry]
    //   etc....                       
    // }
-   max_levels = 1
+   max_levels = 3
    ratio_to_coarser {
       level_1            = 2, 2
       level_2            = 2, 2
