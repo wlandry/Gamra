@@ -30,6 +30,7 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	FACStokes/resetHierarchyConfiguration.o \
 	FACStokes/setupPlotter.o \
 	FACStokes/solveStokes.o \
+	P_Refine.o \
 	StokesFACOps/StokesFACOps.o \
 	StokesFACOps/checkInputPatchDataIndices.o \
 	StokesFACOps/computeCompositeResidualOnLevel.o \

@@ -137,13 +137,13 @@ namespace SAMRAI {
         }
       }
 
-      /*
-       * The default RobinBcCoefStrategy used,
-       * SimpleCellRobinBcCoefs only works with constant refine
-       * for prolongation.  So we use constant refinement
-       * for prolongation by default.
-       */
-      setProlongationMethod("CONSTANT_REFINE");
+      // /*
+      //  * The default RobinBcCoefStrategy used,
+      //  * SimpleCellRobinBcCoefs only works with constant refine
+      //  * for prolongation.  So we use constant refinement
+      //  * for prolongation by default.
+      //  */
+      // setProlongationMethod("CONSTANT_REFINE");
 
       /*
        * The FAC operator optionally uses the preconditioner

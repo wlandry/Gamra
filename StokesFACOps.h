@@ -990,7 +990,7 @@ private:
     * to set and whether we are setting data with homogeneous
     * boundary condition.
     */
-   CartesianRobinBcHelper d_bc_helper;
+   // CartesianRobinBcHelper d_bc_helper;
 
    //@{
    /*!

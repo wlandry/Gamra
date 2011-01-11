@@ -258,7 +258,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   "CONSERVATIVE_LINEAR_REFINE");
+                                   "LINEAR_REFINE");
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_ghostfill_refine_operator =
@@ -268,7 +268,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_nocoarse_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   "CONSERVATIVE_LINEAR_REFINE");
+                                   "LINEAR_REFINE");
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_nocoarse_refine_operator =
@@ -417,8 +417,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                      d_hierarchy->getPatchLevel(dest_ln),
                      tbox::Pointer<hier::PatchLevel>(),
                      dest_ln - 1,
-                     d_hierarchy,
-                     &d_bc_helper);
+                     d_hierarchy);
+                     // &d_bc_helper);
     if (!p_prolongation_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for p prolongation!\n");
@@ -429,8 +429,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                      d_hierarchy->getPatchLevel(dest_ln),
                      tbox::Pointer<hier::PatchLevel>(),
                      dest_ln - 1,
-                     d_hierarchy,
-                     &d_bc_helper);
+                     d_hierarchy);
+                     // &d_bc_helper);
     if (!v_prolongation_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for v prolongation!\n");
@@ -439,8 +439,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
       p_ghostfill_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      dest_ln - 1,
-                     d_hierarchy,
-                     &d_bc_helper);
+                     d_hierarchy);
+                     // &d_bc_helper);
     if (!p_ghostfill_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
@@ -449,16 +449,16 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
       v_ghostfill_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      dest_ln - 1,
-                     d_hierarchy,
-                     &d_bc_helper);
+                     d_hierarchy);
+                     // &d_bc_helper);
     if (!v_ghostfill_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
     }
     p_nocoarse_refine_schedules[dest_ln] =
       p_nocoarse_refine_algorithm->
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     &d_bc_helper);
+      createSchedule(d_hierarchy->getPatchLevel(dest_ln));
+                     // &d_bc_helper);
     if (!p_nocoarse_refine_schedules[dest_ln]) {
       TBOX_ERROR(
                  d_object_name
@@ -467,8 +467,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     }
     v_nocoarse_refine_schedules[dest_ln] =
       v_nocoarse_refine_algorithm->
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     &d_bc_helper);
+      createSchedule(d_hierarchy->getPatchLevel(dest_ln));
+                     // &d_bc_helper);
     if (!v_nocoarse_refine_schedules[dest_ln]) {
       TBOX_ERROR(
                  d_object_name
@@ -521,8 +521,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   }
   p_nocoarse_refine_schedules[d_ln_min] =
     p_nocoarse_refine_algorithm->
-    createSchedule(d_hierarchy->getPatchLevel(d_ln_min),
-                   &d_bc_helper);
+    createSchedule(d_hierarchy->getPatchLevel(d_ln_min));
+                   // &d_bc_helper);
   if (!p_nocoarse_refine_schedules[d_ln_min]) {
     TBOX_ERROR(
                d_object_name
@@ -531,8 +531,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   }
   v_nocoarse_refine_schedules[d_ln_min] =
     v_nocoarse_refine_algorithm->
-    createSchedule(d_hierarchy->getPatchLevel(d_ln_min),
-                   &d_bc_helper);
+    createSchedule(d_hierarchy->getPatchLevel(d_ln_min));
+                   // &d_bc_helper);
   if (!v_nocoarse_refine_schedules[d_ln_min]) {
     TBOX_ERROR(
                d_object_name

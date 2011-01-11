@@ -34,9 +34,14 @@ FACStokes {
     enable_logging = TRUE   // Bool flag to switch logging on/off
     max_cycles = 20         // Max number of FAC cycles to use
     residual_tol = 1e-8     // Residual tolerance to solve for
-    num_pre_sweeps = 1      // Number of presmoothing sweeps to use
-    num_post_sweeps = 3     // Number of postsmoothing sweeps to use
-    prolongation_method = "CONSTANT_REFINE" // Type of refinement
+    num_pre_sweeps = 0      // Number of presmoothing sweeps to use
+    num_post_sweeps = 5     // Number of postsmoothing sweeps to use
+    p_prolongation_method = "P_REFINE" // Type of refinement
+      					  // used in prolongation.
+                                          // Suggested values are
+                                          // "LINEAR_REFINE"
+                                          // "CONSTANT_REFINE"
+    v_prolongation_method = "CONSERVATIVE_LINEAR_REFINE" // Type of refinement
       					  // used in prolongation.
                                           // Suggested values are
                                           // "LINEAR_REFINE"

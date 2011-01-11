@@ -92,8 +92,8 @@ namespace SAMRAI {
 
                              ),
       d_cf_discretization("Ewing"),
-      p_prolongation_method("CONSTANT_REFINE"),
-      v_prolongation_method("CONSTANT_REFINE"),
+      p_prolongation_method("P_REFINE"),
+      v_prolongation_method("CONSERVATIVE_LINEAR_REFINE"),
       d_coarse_solver_tolerance(1.e-8),
       d_coarse_solver_max_iterations(10),
       d_residual_tolerance_during_smoothing(-1.0),
@@ -145,8 +145,8 @@ namespace SAMRAI {
       v_nocoarse_refine_operator(),
       v_nocoarse_refine_algorithm(),
       v_nocoarse_refine_schedules(),
-      d_bc_helper(dim,
-                  d_object_name + "::bc helper"),
+      // d_bc_helper(dim,
+      //             d_object_name + "::bc helper"),
       d_enable_logging(false),
       d_preconditioner(NULL),
       d_hopscell(),
@@ -235,11 +235,11 @@ namespace SAMRAI {
                                          d_cf_discretization);
 
         p_prolongation_method =
-          database->getStringWithDefault("prolongation_method",
+          database->getStringWithDefault("p_prolongation_method",
                                          p_prolongation_method);
 
         v_prolongation_method =
-          database->getStringWithDefault("prolongation_method",
+          database->getStringWithDefault("v_prolongation_method",
                                          v_prolongation_method);
 
         d_enable_logging =
