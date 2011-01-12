@@ -93,7 +93,7 @@ namespace SAMRAI {
                              ),
       d_cf_discretization("Ewing"),
       p_prolongation_method("P_REFINE"),
-      v_prolongation_method("CONSERVATIVE_LINEAR_REFINE"),
+      v_prolongation_method("V_REFINE"),
       d_coarse_solver_tolerance(1.e-8),
       d_coarse_solver_max_iterations(10),
       d_residual_tolerance_during_smoothing(-1.0),
