@@ -109,7 +109,7 @@ namespace solv {
  * coarse_solver_max_iterations = 10 // see setCoarsestLevelSolverMaxIterations()
  * smoothing_choice = "redblack"     // see setSmoothingChoice()
  * cf_discretization = "Ewing"       // see setCoarseFineDiscretization()
- * prolongation_method = "LINEAR_REFINE" // see setProlongationMethod()
+ * prolongation_method = "P_REFINE" // see setProlongationMethod()
  * hypre_solver = { ... }            // tbox::Database for initializing Hypre solver
  * @endverbatim
  */
@@ -247,7 +247,11 @@ public:
     *        discretization method.
     */
    void
-   setProlongationMethod(
+   set_P_ProlongationMethod(
+      const std::string& prolongation_method);
+
+   void
+   set_V_ProlongationMethod(
       const std::string& prolongation_method);
 
 #ifdef HAVE_HYPRE

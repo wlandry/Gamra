@@ -34,14 +34,14 @@ FACStokes {
     enable_logging = TRUE   // Bool flag to switch logging on/off
     max_cycles = 20         // Max number of FAC cycles to use
     residual_tol = 1e-8     // Residual tolerance to solve for
-    num_pre_sweeps = 0      // Number of presmoothing sweeps to use
+    num_pre_sweeps = 5      // Number of presmoothing sweeps to use
     num_post_sweeps = 5     // Number of postsmoothing sweeps to use
     p_prolongation_method = "P_REFINE" // Type of refinement
       					  // used in prolongation.
                                           // Suggested values are
                                           // "LINEAR_REFINE"
                                           // "CONSTANT_REFINE"
-    v_prolongation_method = "CONSERVATIVE_LINEAR_REFINE" // Type of refinement
+    v_prolongation_method = "V_REFINE" // Type of refinement
       					  // used in prolongation.
                                           // Suggested values are
                                           // "LINEAR_REFINE"
@@ -84,7 +84,7 @@ CartesianGridGeometry {
   //                        domain is periodic.  Zero indicates not
   //                        periodic, non-zero value indicates periodicity.
   //                        [0]
-  domain_boxes = [(0,0), (7,7)]
+  domain_boxes = [(0,0), (3,3)]
   x_lo         = 0, 0
   x_up         = 1, 1
 }
@@ -92,9 +92,10 @@ CartesianGridGeometry {
 StandardTagAndInitialize {
   tagging_method = "REFINE_BOXES"
   RefineBoxes {
-    level_0 = [(0,0),(7,7)]
-    level_1 = [(0,0),(15,15)]
-    level_2 = [(0,0),(31,31)]
+    level_0 = [(0,0),(3,3)]
+    level_1 = [(0,0),(7,7)]
+    level_2 = [(0,0),(15,15)]
+    level_3 = [(0,0),(31,31)]
     //etc.
   }
 }
@@ -125,7 +126,7 @@ PatchHierarchy {
    //              [level 0 entry]
    //   etc....                       
    // }
-   max_levels = 3
+   max_levels = 4
    ratio_to_coarser {
       level_1            = 2, 2
       level_2            = 2, 2

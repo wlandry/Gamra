@@ -43,10 +43,17 @@ void StokesFACSolver::setCConstant(
 }
 
 SAMRAI_INLINE_KEYWORD
-void StokesFACSolver::setProlongationMethod(
-   const std::string& prolongation_method)
+void StokesFACSolver::set_P_ProlongationMethod(
+   const std::string& p_prolongation_method)
 {
-   d_fac_ops.setProlongationMethod(prolongation_method);
+   d_fac_ops.set_P_ProlongationMethod(p_prolongation_method);
+}
+
+SAMRAI_INLINE_KEYWORD
+void StokesFACSolver::set_V_ProlongationMethod(
+   const std::string& v_prolongation_method)
+{
+   d_fac_ops.set_V_ProlongationMethod(v_prolongation_method);
 }
 
 SAMRAI_INLINE_KEYWORD

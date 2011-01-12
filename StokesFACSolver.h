@@ -422,7 +422,11 @@ public:
     * @param prolongation_method String selecting the coarse-fine discretization method.
     */
    void
-   setProlongationMethod(
+   set_P_ProlongationMethod(
+      const std::string& prolongation_method);
+
+   void
+   set_V_ProlongationMethod(
       const std::string& prolongation_method);
 
    /*!

@@ -62,9 +62,13 @@ namespace SAMRAI {
           std::string s = database->getString("coarse_fine_discretization");
           setCoarseFineDiscretization(s);
         }
-        if (database->isString("prolongation_method")) {
-          std::string s = database->getString("prolongation_method");
-          setProlongationMethod(s);
+        if (database->isString("p_prolongation_method")) {
+          std::string s = database->getString("p_prolongation_method");
+          set_P_ProlongationMethod(s);
+        }
+        if (database->isString("v_prolongation_method")) {
+          std::string s = database->getString("v_prolongation_method");
+          set_V_ProlongationMethod(s);
         }
         if (database->isString("coarse_solver_choice")) {
           std::string s = database->getString("coarse_solver_choice");

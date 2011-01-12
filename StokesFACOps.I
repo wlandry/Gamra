@@ -195,18 +195,32 @@ void StokesFACOps::setCoarseFineDiscretization(
  */
 
 SAMRAI_INLINE_KEYWORD
-void StokesFACOps::setProlongationMethod(
+void StokesFACOps::set_P_ProlongationMethod(
    const std::string& prolongation_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
    if (d_hierarchy) {
       TBOX_ERROR(
-         d_object_name << ": Cannot change prolongation method\n"
+         d_object_name << ": Cannot change p prolongation method\n"
          <<
          "while operator state is initialized because that\n"
          << "causes a corruption in the state.\n");
    }
 #endif
    p_prolongation_method = prolongation_method;
+}
+
+SAMRAI_INLINE_KEYWORD
+void StokesFACOps::set_V_ProlongationMethod(
+   const std::string& prolongation_method) {
+#ifdef DEBUG_CHECK_ASSERTIONS
+   if (d_hierarchy) {
+      TBOX_ERROR(
+         d_object_name << ": Cannot change v prolongation method\n"
+         <<
+         "while operator state is initialized because that\n"
+         << "causes a corruption in the state.\n");
+   }
+#endif
    v_prolongation_method = prolongation_method;
 }
 

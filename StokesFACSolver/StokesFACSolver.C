@@ -92,7 +92,7 @@ namespace SAMRAI {
 // #else
       setCoarsestLevelSolverChoice("redblack");
       setCoarsestLevelSolverTolerance(1e-8);
-      setCoarsestLevelSolverMaxIterations(500);
+      setCoarsestLevelSolverMaxIterations(10);
 // #endif
 
       /*
