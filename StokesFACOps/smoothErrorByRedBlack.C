@@ -54,11 +54,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
  int num_sweeps,
  double residual_tolerance)
 {
-  tbox::plog << "Smooth "
-             << ln << " "
-             << num_sweeps << " "
-             << "\n";
-
   const int p_id(solution.getComponentDescriptorIndex(0)),
     p_rhs_id(residual.getComponentDescriptorIndex(0)),
     v_id(solution.getComponentDescriptorIndex(1)),
@@ -144,33 +139,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                   --down[1];
                   ++right[0];
                   --left[0];
-
-
-                  if(i!=pbox.upper(0)+1 && j!=pbox.upper(1)+1)
-                  tbox::plog << "relax "
-                             << i << " "
-                             << j << " "
-                             << (*p)(center) << " "
-                             << &((*p)(center)) << " "
-                             << (*v)(pdat::SideIndex(center,
-                                                     pdat::SideIndex::X,
-                                                     pdat::SideIndex::Lower)) << " "
-
-                             << (*v)(pdat::SideIndex(center,
-                                                     pdat::SideIndex::Y,
-                                                     pdat::SideIndex::Lower)) << " "
-                             << (*p_rhs)(center) << " "
-                             << (*v_rhs)(pdat::SideIndex(center,
-                                                         pdat::SideIndex::X,
-                                                         pdat::SideIndex::Lower)) << " "
-
-                             << (*v_rhs)(pdat::SideIndex(center,
-                                                         pdat::SideIndex::Y,
-                                                         pdat::SideIndex::Lower)) << " "
-                             << "\n";
-
-
-
 
                   /* Update p */
                   if(i!=pbox.upper(0)+1 && j!=pbox.upper(1)+1)
