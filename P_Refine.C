@@ -22,14 +22,6 @@
 #include "SAMRAI/pdat/CellVariable.h"
 #include "SAMRAI/tbox/Utilities.h"
 
-/*
- *************************************************************************
- *                                                                       *
- * External declarations for FORTRAN  routines.                          *
- *                                                                       *
- *************************************************************************
- */
-
 void SAMRAI::geom::P_Refine::refine(
    hier::Patch& fine,
    const hier::Patch& coarse,
