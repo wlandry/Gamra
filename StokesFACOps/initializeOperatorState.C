@@ -248,7 +248,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   v_urestriction_coarsen_operator =
     v_rrestriction_coarsen_operator =
     geometry->lookupCoarsenOperator(variable,
-                                    "CONSERVATIVE_COARSEN");
+                                    "V_COARSEN");
 
   vdb->mapIndexToVariable(d_oflux_scratch_id, variable);
   d_flux_coarsen_operator =
