@@ -64,6 +64,7 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
    TBOX_ASSERT(!v.isNull());
    TBOX_ASSERT(!v_fine.isNull());
    TBOX_ASSERT(v->getDepth() == v_fine->getDepth());
+   TBOX_ASSERT(v->getDepth() == 1);
 #endif
 
    hier::Box coarse_box=coarse.getBox();
