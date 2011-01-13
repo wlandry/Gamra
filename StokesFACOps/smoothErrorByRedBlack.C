@@ -97,7 +97,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
    * leading to disagreement on whether to continue smoothing.
    */
   bool converged = false;
-  for (; isweep < num_sweeps && !converged; ++isweep) {
+  for (; isweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged; ++isweep) {
     red_maxres = blk_maxres = 0;
 
     for(int rb=0;rb<2;++rb)
@@ -172,7 +172,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                         {
                           (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
                                                pdat::SideIndex::Lower))=0;
-
                         }
                       else
                         {
