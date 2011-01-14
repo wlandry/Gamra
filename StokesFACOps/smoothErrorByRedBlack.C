@@ -150,25 +150,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       ++right[0];
                       --left[0];
 
-                      // tbox::plog << "smooth "
-                      //            << i << " "
-                      //            << j << " "
-                      //            << pbox.lower(0) << " "
-                      //            << pbox.upper(0) << " "
-                      //            << pbox.lower(1) << " "
-                      //            << pbox.upper(1) << " ";
-                      //            // << pgbox.lower(0) << " "
-                      //            // << pgbox.upper(0) << " "
-                      //            // << pgbox.lower(1) << " "
-                      //            // << pgbox.upper(1) << " "
-                      //            // << prgbox.lower(0) << " "
-                      //            // << prgbox.upper(0) << " "
-                      //            // << prgbox.lower(1) << " "
-                      //            // << prgbox.upper(1) << " "
-                      //            // << vgbox.lower(0) << " "
-                      //            // << vgbox.upper(0) << " "
-                      //            // << vgbox.lower(1) << " "
-                      //            // << vgbox.upper(1) << " ";
                       /* Update p */
                       if((!(i==pbox.upper(0)+1
                             && geom->getTouchesRegularBoundary(0,1))
@@ -194,12 +175,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 
                           (*p)(center)+=
                             viscosity*delta_R_continuity*theta_continuity;
-
-                          // tbox::plog << "p "
-                          //            << (*p)(center) << " "
-                          //            << (*p_rhs)(center) << " "
-                          //            << dvx_dx << " "
-                          //            << dvy_dy << " ";
                         }
 
                       /* Update vx */
@@ -285,9 +260,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                                    pdat::SideIndex::Lower))+=
                                 delta_Rx*theta_momentum/C_vx;
                             }
-                          // tbox::plog << "vx "
-                          //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //                          pdat::SideIndex::Lower)) << " ";
                         }
 
                       /* Update vy */
@@ -371,12 +343,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                                    pdat::SideIndex::Lower))+=
                                 delta_Ry*theta_momentum/C_vy;
                             }
-
-                          // tbox::plog << "vy "
-                          //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //                          pdat::SideIndex::Lower)) << " ";
                         }
-                      // tbox::plog << "\n";
                     }
                 }
             }
