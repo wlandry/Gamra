@@ -47,11 +47,11 @@ namespace SAMRAI {
       hier::PatchLevel::Iterator ip(*level);
       for ( ; ip; ip++) {
         tbox::Pointer<hier::Patch> patch = *ip;
-        tbox::Pointer<pdat::CellData<double> > data = patch->getPatchData(
-                                                                          p_id);
-        data->fill(0.0);
-        tbox::Pointer<pdat::SideData<double> > vdata = patch->getPatchData(
-                                                                           v_id);
+        tbox::Pointer<pdat::CellData<double> >
+          pdata = patch->getPatchData(p_id);
+        pdata->fill(0.0);
+        tbox::Pointer<pdat::SideData<double> >
+          vdata = patch->getPatchData(v_id);
         vdata->fill(0.0);
       }
     }
