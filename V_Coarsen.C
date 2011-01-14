@@ -49,13 +49,8 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
   TBOX_ASSERT(directions ==
               hier::IntVector::min(directions, v_fine->getDirectionVector()));
 
-  const tbox::Pointer<CartesianPatchGeometry> fgeom =
-    fine.getPatchGeometry();
   const tbox::Pointer<CartesianPatchGeometry> cgeom =
     coarse.getPatchGeometry();
-
-  const hier::Index ifirstc = coarse_box.lower();
-  const hier::Index ilastc = coarse_box.upper();
 
   /* Numbering of v nodes is
 
@@ -105,12 +100,12 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
              if(i==coarse_box.lower(0)
                 && cgeom->getTouchesRegularBoundary(0,0))
                {
-                 (*v)(coarse)=0;
+                 (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
                }
              else if(i==coarse_box.upper(0)+1
                      && cgeom->getTouchesRegularBoundary(0,1))
                {
-                 (*v)(coarse)=0;
+                 (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
                }
              else
                {
@@ -127,12 +122,12 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
              if(j==coarse_box.lower(1)
                 && cgeom->getTouchesRegularBoundary(1,0))
                {
-                 (*v)(coarse)=0;
+                   (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
                }
              else if(j==coarse_box.upper(1)+1
                      && cgeom->getTouchesRegularBoundary(1,1))
                {
-                 (*v)(coarse)=0;
+                 (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
                }
              else
                {
