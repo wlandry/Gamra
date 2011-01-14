@@ -59,6 +59,12 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
     v_id(solution.getComponentDescriptorIndex(1)),
     v_rhs_id(residual.getComponentDescriptorIndex(1));
 
+  /* Only need to sync the rhs once. This sync is needed because
+     calculating a new pressure update requires computing in the ghost
+     region so that the update for the velocity inside the box will be
+     correct. */
+  xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
+
   checkInputPatchDataIndices();
 
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -122,6 +128,10 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
               double dx = *(geom->getDx());
               double dy = *(geom->getDx());
 
+              hier::Box pgbox=p->getGhostBox();
+              hier::Box prgbox=p_rhs->getGhostBox();
+              hier::Box vgbox=v->getGhostBox();
+
               for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
                 {
                   /* Do the red-black skip */
@@ -140,8 +150,30 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       ++right[0];
                       --left[0];
 
+                      // tbox::plog << "smooth "
+                      //            << i << " "
+                      //            << j << " "
+                      //            << pbox.lower(0) << " "
+                      //            << pbox.upper(0) << " "
+                      //            << pbox.lower(1) << " "
+                      //            << pbox.upper(1) << " ";
+                      //            // << pgbox.lower(0) << " "
+                      //            // << pgbox.upper(0) << " "
+                      //            // << pgbox.lower(1) << " "
+                      //            // << pgbox.upper(1) << " "
+                      //            // << prgbox.lower(0) << " "
+                      //            // << prgbox.upper(0) << " "
+                      //            // << prgbox.lower(1) << " "
+                      //            // << prgbox.upper(1) << " "
+                      //            // << vgbox.lower(0) << " "
+                      //            // << vgbox.upper(0) << " "
+                      //            // << vgbox.lower(1) << " "
+                      //            // << vgbox.upper(1) << " ";
                       /* Update p */
-                      if(i!=pbox.upper(0)+1 && j!=pbox.upper(1)+1)
+                      if((!(i==pbox.upper(0)+1
+                            && geom->getTouchesRegularBoundary(0,1))
+                           && !(j==pbox.upper(1)+1
+                                && geom->getTouchesRegularBoundary(1,1))))
                         {
                           double dvx_dx=
                             ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
@@ -162,6 +194,12 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 
                           (*p)(center)+=
                             viscosity*delta_R_continuity*theta_continuity;
+
+                          // tbox::plog << "p "
+                          //            << (*p)(center) << " "
+                          //            << (*p_rhs)(center) << " "
+                          //            << dvx_dx << " "
+                          //            << dvy_dy << " ";
                         }
 
                       /* Update vx */
@@ -247,6 +285,9 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                                    pdat::SideIndex::Lower))+=
                                 delta_Rx*theta_momentum/C_vx;
                             }
+                          // tbox::plog << "vx "
+                          //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                          //                          pdat::SideIndex::Lower)) << " ";
                         }
 
                       /* Update vy */
@@ -330,7 +371,12 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                                    pdat::SideIndex::Lower))+=
                                 delta_Ry*theta_momentum/C_vy;
                             }
+
+                          // tbox::plog << "vy "
+                          //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                          //                          pdat::SideIndex::Lower)) << " ";
                         }
+                      // tbox::plog << "\n";
                     }
                 }
             }
