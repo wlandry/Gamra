@@ -80,7 +80,7 @@ namespace SAMRAI {
       p_rhs(new pdat::CellVariable<double>(dim,object_name
                                            + ":p right hand side"));
     p_rhs_id = vdb->registerVariableAndContext(p_rhs,d_context,
-                                               hier::IntVector(dim, 0));
+                                               hier::IntVector(dim, 1));
 
     tbox::Pointer<pdat::SideVariable<double> >
       v(new pdat::SideVariable<double>(dim, object_name + ":v", 1));
