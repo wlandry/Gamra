@@ -49,13 +49,8 @@ void SAMRAI::solv::StokesFACOps::xeqScheduleGhostFill(int p_id, int v_id,
       TBOX_ERROR("Expected schedule not found.");
     }
     xfer::RefineAlgorithm refiner(d_dim);
-    refiner.
-      registerRefine(p_id,
-                     p_id,
-                     p_id,
-                     p_ghostfill_refine_operator);
-    refiner.
-      resetSchedule(p_ghostfill_refine_schedules[dest_ln]);
+    refiner.registerRefine(p_id,p_id,p_id,p_ghostfill_refine_operator);
+    refiner.resetSchedule(p_ghostfill_refine_schedules[dest_ln]);
     p_ghostfill_refine_schedules[dest_ln]->fillData(0.0,false);
     p_ghostfill_refine_algorithm->
       resetSchedule(p_ghostfill_refine_schedules[dest_ln]);
@@ -67,13 +62,8 @@ void SAMRAI::solv::StokesFACOps::xeqScheduleGhostFill(int p_id, int v_id,
       TBOX_ERROR("Expected schedule not found.");
     }
     xfer::RefineAlgorithm refiner(d_dim);
-    refiner.
-      registerRefine(v_id,
-                     v_id,
-                     v_id,
-                     v_ghostfill_refine_operator);
-    refiner.
-      resetSchedule(v_ghostfill_refine_schedules[dest_ln]);
+    refiner.registerRefine(v_id,v_id,v_id,v_ghostfill_refine_operator);
+    refiner.resetSchedule(v_ghostfill_refine_schedules[dest_ln]);
     v_ghostfill_refine_schedules[dest_ln]->fillData(0.0,false);
     v_ghostfill_refine_algorithm->
       resetSchedule(v_ghostfill_refine_schedules[dest_ln]);
