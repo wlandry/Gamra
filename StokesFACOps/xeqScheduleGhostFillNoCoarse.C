@@ -45,6 +45,7 @@ void SAMRAI::solv::StokesFACOps::xeqScheduleGhostFillNoCoarse(int p_id,
                                                               int dest_ln)
 {
   /* p */
+  if(p_id!=-1)
   {
     if (!p_nocoarse_refine_schedules[dest_ln]) {
       TBOX_ERROR("Expected cell schedule not found.");

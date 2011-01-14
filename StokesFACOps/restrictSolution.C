@@ -55,21 +55,23 @@ void SAMRAI::solv::StokesFACOps::restrictSolution
 {
   t_restrict_solution->start();
 
-  xeqScheduleURestriction(d.getComponentDescriptorIndex(0),
-                          s.getComponentDescriptorIndex(0),
-                          d.getComponentDescriptorIndex(1),
-                          s.getComponentDescriptorIndex(1),
-                          dest_ln);
+  int p_src(s.getComponentDescriptorIndex(0)),
+    p_dst(d.getComponentDescriptorIndex(0)),
+    v_src(s.getComponentDescriptorIndex(1)),
+    v_dst(d.getComponentDescriptorIndex(1));
+
+  /* Need to do a sync because the coarsening for v uses ghost zones. */
+  xeqScheduleGhostFillNoCoarse(-1,v_src,dest_ln+1);
+
+  xeqScheduleURestriction(p_dst,p_src,v_dst,v_src,dest_ln);
 
   // d_bc_helper.setHomogeneousBc(false);
   // d_bc_helper.setTargetDataId(d.getComponentDescriptorIndex(0));
 
   if (dest_ln == d_ln_min) {
-    xeqScheduleGhostFillNoCoarse(d.getComponentDescriptorIndex(0),
-                                 d.getComponentDescriptorIndex(1), dest_ln);
+    xeqScheduleGhostFillNoCoarse(p_dst,v_dst,dest_ln);
   } else {
-    xeqScheduleGhostFill(d.getComponentDescriptorIndex(0),
-                         d.getComponentDescriptorIndex(1), dest_ln);
+    xeqScheduleGhostFill(p_dst,v_dst,dest_ln);
   }
 
   t_restrict_solution->stop();

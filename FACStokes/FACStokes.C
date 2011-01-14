@@ -79,10 +79,8 @@ namespace SAMRAI {
     tbox::Pointer<pdat::CellVariable<double> >
       p_rhs(new pdat::CellVariable<double>(dim,object_name
                                            + ":p right hand side"));
-                                          
     p_rhs_id = vdb->registerVariableAndContext(p_rhs,d_context,
-                                               hier::IntVector(dim, 0)
-                                               /* ghost cell width is 0 */);
+                                               hier::IntVector(dim, 0));
 
     tbox::Pointer<pdat::SideVariable<double> >
       v(new pdat::SideVariable<double>(dim, object_name + ":v", 1));
@@ -94,8 +92,10 @@ namespace SAMRAI {
       v_rhs(new pdat::SideVariable<double>(dim,object_name
                                            + ":v right hand side"));
     v_rhs_id = vdb->registerVariableAndContext(v_rhs,d_context,
-                                               hier::IntVector(dim, 0)
-                                               /* ghost cell width is 0 */);
+                                               hier::IntVector(dim, 1)
+                                               /* ghost cell width is
+                                                  1 for coarsening
+                                                  operator */);
 
     /*
      * Specify an implementation of solv::RobinBcCoefStrategy for the
