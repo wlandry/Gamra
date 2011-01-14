@@ -68,10 +68,9 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	StokesFACSolver/setBoundaries.o \
 	StokesFACSolver/solveSystem.o \
 	StokesHypreSolver.o StokesSpecifications.o
-F_OBJS      = facpoisson2d.o facpoisson3d.o
 
-main:	$(CXX_OBJS) $(F_OBJS) $(LIBSAMRAIDEPEND)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(CXX_OBJS) $(F_OBJS) \
+main:	$(CXX_OBJS) $(LIBSAMRAIDEPEND)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(CXX_OBJS) \
 	$(LIBSAMRAI3D) $(LIBSAMRAI3D) $(LIBSAMRAI) $(LDLIBS) -o main
 
 check:
@@ -125,13 +124,3 @@ redo:
 
 include $(SRCDIR)/Makefile.depend
 
-FORTRAN       = $(SRCDIR)/fortran
-M4DIRS          = -DFORTDIR=$(FORTRAN) $(SAMRAI_M4_FLAGS)
-
-facpoisson2d.o:	$(FORTRAN)/facpoisson2d.m4
-	$(M4) $(M4DIRS) $(FORTRAN)/facpoisson2d.m4 > facpoisson2d.f
-	$(F77) $(FFLAGS) -c facpoisson2d.f -o $@
-
-facpoisson3d.o:	$(FORTRAN)/facpoisson3d.m4
-	$(M4) $(M4DIRS) $(FORTRAN)/facpoisson3d.m4 > facpoisson3d.f
-	$(F77) $(FFLAGS) -c facpoisson3d.f -o $@

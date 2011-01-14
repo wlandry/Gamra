@@ -83,37 +83,15 @@ namespace SAMRAI {
         TBOX_ERROR(d_object_name
                    << ": Cannot find patch.  Null patch pointer.");
       }
-      hier::Box pbox = patch->getBox();
-      tbox::Pointer<geom::CartesianPatchGeometry> patch_geom =
-        patch->getPatchGeometry();
-
-      tbox::Pointer<pdat::CellData<double> > p_exact_data =
-        patch->getPatchData(p_exact_id);
       tbox::Pointer<pdat::CellData<double> > p_rhs_data =
         patch->getPatchData(p_rhs_id);
 
-      /*
-       * Set source function and exact solution.
-       */
-
-      F77_FUNC(setexactandrhs2d, SETEXACTANDRHS2D) (
-                                                    pbox.lower()[0],
-                                                    pbox.upper()[0],
-                                                    pbox.lower()[1],
-                                                    pbox.upper()[1],
-                                                    p_exact_data->getPointer(),
-                                                    p_rhs_data->getPointer(),
-                                                    patch_geom->getDx(),
-                                                    patch_geom->getXLower());
-
-      for(pdat::CellIterator ci(pbox); ci; ci++)
-        {
-          pdat::CellIndex c=ci();
-          (*p_rhs_data)(c)=0;
-        }
+      p_rhs_data->fill(0.0);
 
       tbox::Pointer<pdat::SideData<double> > v_rhs_data =
         patch->getPatchData(v_rhs_id);
+
+      hier::Box pbox = v_rhs_data->getBox();
 
       for(pdat::SideIterator si(pbox,0); si; si++)
         {
@@ -123,6 +101,7 @@ namespace SAMRAI {
       for(pdat::SideIterator si(pbox,1); si; si++)
         {
           pdat::SideIndex s=si();
+
           (*v_rhs_data)(s)=10;
         }
     }    // End patch loop.
