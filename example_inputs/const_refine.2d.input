@@ -132,8 +132,8 @@ PatchHierarchy {
       level_2            = 2, 2
    }
    largest_patch_size {
-      level_0 = 32, 32
-      //level_0 = 8, 8
+      //level_0 = 32, 32
+      level_0 = 8, 8
       // all finer levels will use same values as level_0...
    }
 }
