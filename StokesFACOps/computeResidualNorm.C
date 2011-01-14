@@ -72,7 +72,7 @@ double SAMRAI::solv::StokesFACOps::computeResidualNorm
    *   but may be too insensitive to spikes.
    * RMSNorm: maybe good.
    */
-  double norm = residual.RMSNorm();
+  double norm = residual.maxNorm();
   t_compute_residual_norm->stop();
   return norm;
 }
