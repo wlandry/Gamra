@@ -77,14 +77,15 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 #endif
   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
 
-  // if (ln > d_ln_min) {
-  //   /*
-  //    * Perform a one-time transfer of data from coarser level,
-  //    * to fill ghost boundaries that will not change through
-  //    * the smoothing loop.
-  //    */
-  //   xeqScheduleGhostFill(data_id, ln);
-  // }
+  if (ln > d_ln_min) {
+    /*
+     * Perform a one-time transfer of data from coarser level,
+     * to fill ghost boundaries that will not change through
+     * the smoothing loop.
+     */
+    std::cout << "smooth\n";
+    xeqScheduleGhostFill(p_id, v_id, ln);
+  }
 
   double viscosity=1;
   double theta_momentum=1.2;

@@ -31,6 +31,7 @@ using namespace std;
 #include "SAMRAI/xfer/RefineOperator.h"
 #include "P_Refine.h"
 #include "V_Refine.h"
+#include "V_Boundary_Refine.h"
 #include "V_Coarsen.h"
 
 #include "FACStokes.h"
@@ -152,11 +153,18 @@ int main(
                      input_db->getDatabase("CartesianGridGeometry")));
     tbox::plog << "Cartesian Geometry:" << endl;
     grid_geometry->printClassData(tbox::plog);
-    grid_geometry->addSpatialRefineOperator(tbox::Pointer<SAMRAI::xfer::RefineOperator>(new SAMRAI::geom::P_Refine(dim)));
-    grid_geometry->addSpatialRefineOperator(tbox::Pointer<SAMRAI::xfer::RefineOperator>(new SAMRAI::geom::V_Refine(dim)));
-    grid_geometry->addSpatialCoarsenOperator(tbox::Pointer<SAMRAI::xfer::CoarsenOperator>(new SAMRAI::geom::V_Coarsen(dim)));
-       
-
+    grid_geometry->addSpatialRefineOperator
+      (tbox::Pointer<SAMRAI::xfer::RefineOperator>
+       (new SAMRAI::geom::P_Refine(dim)));
+    grid_geometry->addSpatialRefineOperator
+      (tbox::Pointer<SAMRAI::xfer::RefineOperator>
+       (new SAMRAI::geom::V_Refine(dim)));
+    grid_geometry->addSpatialRefineOperator
+      (tbox::Pointer<SAMRAI::xfer::RefineOperator>
+       (new SAMRAI::geom::V_Boundary_Refine(dim)));
+    grid_geometry->addSpatialCoarsenOperator
+      (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+       (new SAMRAI::geom::V_Coarsen(dim)));
 
     tbox::Pointer<hier::PatchHierarchy>
       patch_hierarchy(new hier::PatchHierarchy
