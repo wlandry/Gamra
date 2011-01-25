@@ -72,6 +72,9 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
    tbox::Pointer<geom::CartesianPatchGeometry>
      geom = coarse.getPatchGeometry();
 
+   double dx = geom->getDx()[0];
+   double dy = geom->getDx()[1];
+
    std::cout << "VBR "
              << fine.getPatchLevelNumber() << " "
              << axis << " "
