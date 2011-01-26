@@ -47,11 +47,11 @@ void SAMRAI::geom::V_Boundary_Refine::refine(
 
 void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
                                              const hier::Patch& coarse,
-                                    const int dst_component,
-                                    const int src_component,
-                                    const hier::Box& overlap_box,
-                                    const hier::IntVector& ratio,
-                                    const int &axis) const
+                                             const int dst_component,
+                                             const int src_component,
+                                             const hier::Box& overlap_box,
+                                             const hier::IntVector& ratio,
+                                             const int &axis) const
 {
    const tbox::Dimension& dim(getDim());
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, fine, coarse, overlap_box, ratio);
@@ -147,6 +147,14 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
            j_min=std::max(j_min,fine_box.lower(1));
            j_max=std::min(j_max,fine_box.upper(1));
          }
+       /* We need to shrink the box because we do not want the edges.
+          Those are points that are either covered by other patches or
+          are ghost points that we do not care about.  */
+       else
+         {
+           --i_max;
+           ++i_min;
+         }
      }
    else if(axis==1)
      {
@@ -162,6 +170,11 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
              }
            i_min=std::max(i_min,fine_box.lower(0));
            i_max=std::min(i_max,fine_box.upper(0));
+         }
+       else
+         {
+           --j_max;
+           ++j_min;
          }
      }
 
