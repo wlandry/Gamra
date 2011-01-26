@@ -216,13 +216,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
 
   /*
    * Get the transfer operators.
-   * Flux coarsening is conservative.
    * Cell (solution, error, etc) coarsening is conservative.
-   * Cell refinement from same level is constant refinement.
-   * Cell refinement from coarser level is chosen by the
-   *   choice of coarse-fine discretization, d_cf_discretization,
-   *   which should be set to either "Ewing" or one of the
-   *   acceptable strings for looking up the refine operator.
    */
   tbox::Pointer<geom::CartesianGridGeometry> geometry =
     d_hierarchy->getGridGeometry();
