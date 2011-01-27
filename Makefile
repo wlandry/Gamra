@@ -30,7 +30,9 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	FACStokes/resetHierarchyConfiguration.o \
 	FACStokes/setupPlotter.o \
 	FACStokes/solveStokes.o \
-	P_Refine.o V_Refine.o V_Boundary_Refine.o V_Coarsen.o \
+	P_Refine.o V_Refine.o V_Coarsen.o \
+	V_Boundary_Refine/refine.o \
+	V_Boundary_Refine/Update_V.o \
 	StokesFACOps/StokesFACOps.o \
 	StokesFACOps/checkInputPatchDataIndices.o \
 	StokesFACOps/computeCompositeResidualOnLevel.o \
@@ -47,8 +49,10 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	StokesFACOps/restrictSolution.o \
 	StokesFACOps/smoothError.o \
 	StokesFACOps/smoothErrorByRedBlack.o \
+	StokesFACOps/set_boundaries.o \
 	StokesFACOps/solveCoarsestLevel.o \
 	StokesFACOps/solveCoarsestLevel_HYPRE.o \
+	StokesFACOps/Update_V.o \
 	StokesFACOps/xeqScheduleFluxCoarsen.o \
 	StokesFACOps/xeqScheduleGhostFill.o \
 	StokesFACOps/xeqScheduleGhostFillNoCoarse.o \

@@ -77,13 +77,14 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 #endif
   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
 
+  set_boundaries(v_id,level);
+
   if (ln > d_ln_min) {
     /*
      * Perform a one-time transfer of data from coarser level,
      * to fill ghost boundaries that will not change through
      * the smoothing loop.
      */
-    std::cout << "smooth\n";
     xeqScheduleGhostFill(p_id, v_id, ln);
   }
 
@@ -129,10 +130,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
               double dx = *(geom->getDx());
               double dy = *(geom->getDx());
 
-              hier::Box pgbox=p->getGhostBox();
-              hier::Box prgbox=p_rhs->getGhostBox();
-              hier::Box vgbox=v->getGhostBox();
-
               for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
                 {
                   /* Do the red-black skip */
@@ -152,199 +149,45 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       --left[0];
 
                       /* Update p */
-                      if((!(i==pbox.upper(0)+1
-                            && geom->getTouchesRegularBoundary(0,1))
-                           && !(j==pbox.upper(1)+1
-                                && geom->getTouchesRegularBoundary(1,1))))
-                        {
-                          double dvx_dx=
-                            ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                  pdat::SideIndex::Upper))
-                             - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                    pdat::SideIndex::Lower)))/dx;
-                          double dvy_dy=
-                            ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                  pdat::SideIndex::Upper))
-                             - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                    pdat::SideIndex::Lower)))/dy;
+                      double dvx_dx=
+                        ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                              pdat::SideIndex::Upper))
+                         - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                pdat::SideIndex::Lower)))/dx;
+                      double dvy_dy=
+                        ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                              pdat::SideIndex::Upper))
+                         - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                                pdat::SideIndex::Lower)))/dy;
 
-                          double delta_R_continuity=
-                            (*p_rhs)(center) - dvx_dx - dvy_dy;
+                      double delta_R_continuity=
+                        (*p_rhs)(center) - dvx_dx - dvy_dy;
 
-                          /* No scaling here, though there should be. */
-                          maxres=std::max(maxres,delta_R_continuity);
+                      /* No scaling here, though there should be. */
+                      maxres=std::max(maxres,delta_R_continuity);
 
-                          (*p)(center)+=
-                            viscosity*delta_R_continuity*theta_continuity;
-                        }
+                      (*p)(center)+=
+                        viscosity*delta_R_continuity*theta_continuity;
 
-                      /* Update vx */
-                      if(j!=pbox.upper(1)+1)
-                        {
-                          /* If x==0 */
-                          if((center[0]==pbox.lower(0)
-                              && geom->getTouchesRegularBoundary(0,0))
-                             || (center[0]==pbox.upper(0)+1
-                                 && geom->getTouchesRegularBoundary(0,1)))
-                            {
-                              (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                   pdat::SideIndex::Lower))=0;
-                            }
-                          else
-                            {
-                              double dp_dx, d2vx_dxx, d2vx_dyy, C_vx;
-                              /* If y==0 */
-                              if(center[1]==pbox.lower(1)
-                                 && geom->getTouchesRegularBoundary(1,0))
-                                {
-                                  d2vx_dyy=
-                                    ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
-                                                          pdat::SideIndex::Lower))
-                                     - (*v)(pdat::SideIndex
-                                            (center,pdat::SideIndex::X,
-                                             pdat::SideIndex::Lower)))
-                                    /(dy*dy);
-                                  C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
-                                }
-                              /* If y==max_y */
-                              else if(center[1]==pbox.upper(1)
-                                      && geom->getTouchesRegularBoundary(1,1))
-                                {
-                                  d2vx_dyy=
-                                    (-(*v)(pdat::SideIndex(center,
-                                                           pdat::SideIndex::X,
-                                                           pdat::SideIndex::Lower))
-                                     + (*v)(pdat::SideIndex
-                                            (down,pdat::SideIndex::X,
-                                             pdat::SideIndex::Lower)))
-                                    /(dy*dy);
-                                  C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
-                                }
-                              else
-                                {
-                                  d2vx_dyy=
-                                    ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
-                                                          pdat::SideIndex::Lower))
-                                     - 2*(*v)(pdat::SideIndex
-                                              (center,pdat::SideIndex::X,
-                                               pdat::SideIndex::Lower))
-                                     + (*v)(pdat::SideIndex
-                                            (down,pdat::SideIndex::X,
-                                             pdat::SideIndex::Lower)))
-                                    /(dy*dy);
+                      /* Update v */
+                      Update_V(0,j,pbox,center,left,right,down,up,p,v,v_rhs,
+                               maxres,dx,dy,viscosity,theta_momentum);
+                      Update_V(1,i,pbox,center,down,up,left,right,p,v,v_rhs,
+                               maxres,dy,dx,viscosity,theta_momentum);
 
-                                  C_vx=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
-                                }
-                              d2vx_dxx=((*v)(pdat::SideIndex
-                                             (left,pdat::SideIndex::X,
-                                              pdat::SideIndex::Lower))
-                                        - 2*(*v)(pdat::SideIndex
-                                                 (center,pdat::SideIndex::X,
-                                                  pdat::SideIndex::Lower))
-                                        + (*v)(pdat::SideIndex
-                                               (right,pdat::SideIndex::X,
-                                                pdat::SideIndex::Lower)))
-                                /(dx*dx);
-
-                              dp_dx=((*p)(center)-(*p)(left))/dx;
-                              
-                              double delta_Rx=
-                                (*v_rhs)(pdat::SideIndex(center,
-                                                         pdat::SideIndex::X,
-                                                         pdat::SideIndex::Lower))
-                                - viscosity*(d2vx_dxx + d2vx_dyy) + dp_dx;
-
-                              /* No scaling here, though there should be. */
-                              maxres=std::max(maxres,delta_Rx);
-
-                              (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                   pdat::SideIndex::Lower))+=
-                                delta_Rx*theta_momentum/C_vx;
-                            }
-                        }
-
-                      /* Update vy */
-                      if(i!=pbox.upper(0)+1)
-                        {
-                          /* If y==0 */
-                          if((center[1]==pbox.lower(1)
-                              && geom->getTouchesRegularBoundary(1,0))
-                             || (center[1]==pbox.upper(1)+1
-                                 && geom->getTouchesRegularBoundary(1,1)))
-                            {
-                              (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                   pdat::SideIndex::Lower))=0;
-                            }
-                          else
-                            {
-                              double dp_dy, d2vy_dxx, d2vy_dyy, C_vy;
-                              /* If x==0 */
-                              if(center[0]==pbox.lower(0)
-                                 && geom->getTouchesRegularBoundary(0,0))
-                                {
-                                  d2vy_dxx=
-                                    ((*v)(pdat::SideIndex(right,pdat::SideIndex::Y,
-                                                          pdat::SideIndex::Lower))
-                                     - (*v)(pdat::SideIndex
-                                            (center,pdat::SideIndex::Y,
-                                             pdat::SideIndex::Lower)))
-                                    /(dx*dx);
-                                  C_vy=-viscosity*(1/(dx*dx) + 2/(dy*dy));
-                                }
-                              /* If x==max_x */
-                              else if(center[0]==pbox.upper(0)
-                                      && geom->getTouchesRegularBoundary(0,1))
-                                {
-                                  d2vy_dxx=
-                                    ((*v)(pdat::SideIndex(left,pdat::SideIndex::Y,
-                                                          pdat::SideIndex::Lower))
-                                     - (*v)(pdat::SideIndex
-                                            (center,pdat::SideIndex::Y,
-                                             pdat::SideIndex::Lower)))
-                                    /(dx*dx);
-                                  C_vy=-viscosity*(1/(dx*dx) + 2/(dy*dy));
-                                }
-                              else
-                                {
-                                  d2vy_dxx=
-                                    ((*v)(pdat::SideIndex(left,pdat::SideIndex::Y,
-                                                          pdat::SideIndex::Lower))
-                                     - 2*(*v)(pdat::SideIndex
-                                              (center,pdat::SideIndex::Y,
-                                               pdat::SideIndex::Lower))
-                                     + (*v)(pdat::SideIndex(right,
-                                                            pdat::SideIndex::Y,
-                                                            pdat::SideIndex::Lower)))
-                                    /(dx*dx);
-
-                                  C_vy=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
-                                }
-                              d2vy_dyy=((*v)(pdat::SideIndex
-                                             (up,pdat::SideIndex::Y,
-                                              pdat::SideIndex::Lower))
-                                        - 2*(*v)(pdat::SideIndex
-                                                 (center,pdat::SideIndex::Y,
-                                                  pdat::SideIndex::Lower))
-                                        + (*v)(pdat::SideIndex
-                                               (down,pdat::SideIndex::Y,
-                                                pdat::SideIndex::Lower)))
-                                /(dy*dy);
-
-                              dp_dy=((*p)(center)-(*p)(down))/dy;
-                              
-                              double delta_Ry=
-                                (*v_rhs)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                         pdat::SideIndex::Lower))
-                                - viscosity*(d2vy_dxx + d2vy_dyy) + dp_dy;
-
-                              /* No scaling here, though there should be. */
-                              maxres=std::max(maxres,delta_Ry);
-
-                              (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                   pdat::SideIndex::Lower))+=
-                                delta_Ry*theta_momentum/C_vy;
-                            }
-                        }
+                      // tbox::plog << "smooth "
+                      //           << i << " "
+                      //           << j << " "
+                      //           << (*p)(center) << " "
+                      //           << (*v)(pdat::SideIndex
+                      //                   (center,
+                      //                    pdat::SideIndex::X,
+                      //                    pdat::SideIndex::Lower)) << " "
+                      //           << (*v)(pdat::SideIndex
+                      //                   (center,
+                      //                    pdat::SideIndex::Y,
+                      //                    pdat::SideIndex::Lower)) << " "
+                      //           << "\n";
                     }
                 }
             }

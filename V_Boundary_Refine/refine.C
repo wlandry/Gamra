@@ -9,9 +9,6 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_V_Boundary_Refine_C
-#define included_geom_V_Boundary_Refine_C
-
 #include "V_Boundary_Refine.h"
 
 #include <float.h>
@@ -69,11 +66,6 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
 
    hier::Box coarse_box=coarse.getBox();
    hier::Box fine_box=fine.getBox();
-   tbox::Pointer<geom::CartesianPatchGeometry>
-     geom = coarse.getPatchGeometry();
-
-   double dx = geom->getDx()[0];
-   double dy = geom->getDx()[1];
 
    std::cout << "VBR "
              << fine.getPatchLevelNumber() << " "
@@ -121,14 +113,6 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
      {
        abort();
      }
-   // hier::Index lower_offset(0,0), upper_offset(0,0);
-   // if(axis==boundary_direction)
-   //   {
-   //     if(boundary_sign==1)
-   //       upper_offset[axis]=-1;
-   //     else
-   //       lower_offset[axis]=1;
-   //   }
 
    int i_min(overlap_box.lower(0)), i_max(overlap_box.upper(0)),
      j_min(overlap_box.lower(1)), j_max(overlap_box.upper(1));
@@ -182,116 +166,17 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
      for(int i=i_min; i<=i_max; ++i)
        {
          pdat::SideIndex fine(hier::Index(i,j),axis,pdat::SideIndex::Lower);
-
          hier::Index ip(1,0), jp(0,1);
-         pdat::SideIndex center(fine);
-         center[0]/=2;
-         center[1]/=2;
 
-         /* Note that at boundaries that are not in the same direction
-            as the axis, we store the derivative in the variable */
          if(axis==0)
            {
-             if(boundary_direction==0)
-               {
-                 /* Interpolate in the y direction */
-                 double dv_plus, dv_minus;
-
-                 if(center[1]==coarse_box.lower(1)
-                    && geom->getTouchesRegularBoundary(1,0))
-                   {
-                     dv_plus=(*v)(center+jp)-(*v)(center);
-                     dv_minus=(*v)(center-jp)*dy;
-                   }
-                 else if(center[1]==coarse_box.upper(1)
-                         && geom->getTouchesRegularBoundary(1,1))
-                   {
-                     dv_plus=(*v)(center+jp)*dy;
-                     dv_minus=(*v)(center)-(*v)(center-jp);
-                   }
-                 else
-                   {
-                     dv_plus=(*v)(center+jp)-(*v)(center);
-                     dv_minus=(*v)(center)-(*v)(center-jp);
-                   }
-
-                 double v_plus=(*v)(center)
-                   + (5.0/32)*dv_plus - (3.0/32)*dv_minus;
-                 double v_minus=(*v)(center)
-                   + (5.0/32)*dv_minus - (3.0/32)*dv_plus;
-
-                 (*v_fine)(fine)=v_minus*(2*(*v)(center))/(v_plus + v_minus);
-                 (*v_fine)(fine+jp)=v_minus*(2*(*v)(center))/(v_plus + v_minus);
-                 ++j;
-               }
-             else
-               {
-                 /* We are computing derivatives here */
-                 if(i%2==0)
-                   {
-                     (*v_fine)(fine)=((*v)(center+jp) - (*v)(center))/dy;
-                   }
-                 else
-                   {
-                     (*v_fine)(fine)=
-                       0.5*((*v)(center+jp) - (*v)(center)
-                            + (*v)(center+jp+ip) - (*v)(center+ip))/dy;
-                   }
-               }
+             Update_V(axis,boundary_direction,boundary_positive,fine,
+                      ip,jp,j,v,v_fine);
            }
          else if(axis==1)
            {
-             if(boundary_direction==1)
-               {
-                 /* Interpolate in the x direction */
-                 double dv_plus, dv_minus;
-
-                 if(center[0]==coarse_box.lower(0)
-                    && geom->getTouchesRegularBoundary(0,0))
-                   {
-                     dv_plus=(*v)(center+ip)-(*v)(center);
-                     dv_minus=(*v)(center-ip)*dx;
-                   }
-                 else if(center[0]==coarse_box.upper(0)
-                         && geom->getTouchesRegularBoundary(0,1))
-                   {
-                     dv_plus=(*v)(center+ip)*dx;
-                     dv_minus=(*v)(center)-(*v)(center-ip);
-                   }
-                 else
-                   {
-                     dv_plus=(*v)(center+ip)-(*v)(center);
-                     dv_minus=(*v)(center)-(*v)(center-ip);
-                   }
-
-                 double v_plus=(*v)(center)
-                   + (5.0/32)*dv_plus - (3.0/32)*dv_minus;
-                 double v_minus=(*v)(center)
-                   + (5.0/32)*dv_minus - (3.0/32)*dv_plus;
-
-                 (*v_fine)(fine)=v_minus*(2*(*v)(center))/(v_plus + v_minus);
-                 (*v_fine)(fine+ip)=v_minus*(2*(*v)(center))/(v_plus + v_minus);
-                 ++i;
-               }
-             else
-               {
-                 /* We are computing derivatives here */
-                 if(j%2==0)
-                   {
-                     (*v_fine)(fine)=((*v)(center+ip) - (*v)(center))/dx;
-                   }
-                 else
-                   {
-                     (*v_fine)(fine)=
-                       0.5*((*v)(center+ip) - (*v)(center)
-                            + (*v)(center+ip+jp) - (*v)(center+jp))/dx;
-                   }
-               }
-           }
-         else
-           {
-             abort();
+             Update_V(axis,boundary_direction,boundary_positive,fine,
+                      jp,ip,i,v,v_fine);
            }
        }
 }
-#endif

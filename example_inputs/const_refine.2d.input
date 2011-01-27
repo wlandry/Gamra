@@ -34,8 +34,10 @@ FACStokes {
     enable_logging = TRUE   // Bool flag to switch logging on/off
     max_cycles = 20         // Max number of FAC cycles to use
     residual_tol = 1e-8     // Residual tolerance to solve for
-    num_pre_sweeps = 5      // Number of presmoothing sweeps to use
-    num_post_sweeps = 5     // Number of postsmoothing sweeps to use
+    num_pre_sweeps = 0      // Number of presmoothing sweeps to use
+    num_post_sweeps = 0     // Number of postsmoothing sweeps to use
+    coarse_solver_max_iterations = 200
+    coarse_solver_tolerance = 1e-10
     p_prolongation_method = "P_REFINE" // Type of refinement
       					  // used in prolongation.
                                           // Suggested values are
@@ -93,8 +95,10 @@ StandardTagAndInitialize {
   tagging_method = "REFINE_BOXES"
   RefineBoxes {
     level_0 = [(0,0),(3,3)]
-    level_1 = [(0,0),(1,1)]
-    level_2 = [(0,0),(1,1)]
+    level_1 = [(0,0),(7,7)]
+    level_2 = [(0,0),(15,15)]
+    // level_1 = [(0,0),(1,1)]
+    // level_2 = [(0,0),(1,1)]
     // level_3 = [(0,0),(1,1)]
     //etc.
   }
@@ -132,8 +136,8 @@ PatchHierarchy {
       level_2            = 2, 2
    }
    largest_patch_size {
-      //level_0 = 32, 32
-      level_0 = 8, 8
+      level_0 = 32, 32
+      // level_0 = 8, 8
       // all finer levels will use same values as level_0...
    }
 }

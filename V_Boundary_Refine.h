@@ -20,6 +20,7 @@
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/pdat/SideVariable.h"
+#include "SAMRAI/geom/CartesianPatchGeometry.h"
 
 #include <string>
 
@@ -131,6 +132,16 @@ public:
 
 private:
   std::string d_name_id;
+
+  void Update_V
+  (const int &axis,
+   const int &boundary_direction,
+   const bool &boundary_positive,
+   const pdat::SideIndex &fine,
+   const hier::Index &ip, const hier::Index &jp,
+   int &j,
+   tbox::Pointer<pdat::SideData<double> > &v,
+   tbox::Pointer<pdat::SideData<double> > &v_fine) const;
 
 };
 

@@ -46,24 +46,14 @@ int SAMRAI::FACStokes::solveStokes()
     for ( ; ip; ip++) {
       tbox::Pointer<hier::Patch> patch = *ip;
       tbox::Pointer<pdat::CellData<double> >
-        pdata = patch->getPatchData(p_id);
-      pdata->fill(0.0);
+        p = patch->getPatchData(p_id);
+      p->fill(0.0);
       tbox::Pointer<pdat::SideData<double> >
-        vdata = patch->getPatchData(v_id);
-      vdata->fill(0.0);
-      /* This implicitly sets boundary conditions for v as well */
+        v = patch->getPatchData(v_id);
+      v->fill(0.0);
     }
+    d_stokes_fac_solver.set_boundaries(v_id,level);
   }
-
-  /*
-   * Set the parameters for the Stokes equation.
-   * See classes solv::StokesFACSolver or
-   * solv::StokesSpecifications.
-   * (D is the diffusion coefficient.
-   * C is the source term which is not used in this example.)
-   */
-  d_stokes_fac_solver.setDConstant(1.0);
-  d_stokes_fac_solver.setCConstant(0.0);
 
   d_stokes_fac_solver.initializeSolverState
     (p_id,p_rhs_id,v_id,v_rhs_id,d_hierarchy,0,

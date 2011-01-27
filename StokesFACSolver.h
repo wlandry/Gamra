@@ -558,6 +558,12 @@ public:
    double
    getResidualNorm() const;
 
+  void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level)
+  {
+    d_fac_ops.set_boundaries(v_id,level);
+  }
+
+
    //@}
 
 private:

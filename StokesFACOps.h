@@ -483,6 +483,8 @@ public:
       const SAMRAIVectorReal<double>& current_soln,
       const SAMRAIVectorReal<double>& residual);
 
+  void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level);
+
    //@}
 
 private:
@@ -510,6 +512,22 @@ private:
       int ln,
       int num_sweeps,
       double residual_tolerance = -1.0);
+
+  void Update_V(const int &axis, const int j,
+                const hier::Box &pbox,
+                const pdat::CellIndex &center,
+                const pdat::CellIndex &left,
+                const pdat::CellIndex &right, 
+                const pdat::CellIndex &down,
+                const pdat::CellIndex &up,
+                tbox::Pointer<pdat::CellData<double> > &p,
+                tbox::Pointer<pdat::SideData<double> > &v,
+                tbox::Pointer<pdat::SideData<double> > &v_rhs,
+                double &maxres,
+                const double &dx,
+                const double &dy,
+                const double &viscosity,
+                const double &theta_momentum);
 
    /*!
     * @brief Solve the coarsest level using HYPRE
