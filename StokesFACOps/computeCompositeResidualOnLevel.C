@@ -40,6 +40,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
+#include "Boundary.h"
 /*
 ********************************************************************
 * FACOperatorStrategy virtual                                *
@@ -73,8 +74,8 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
    */
   const int p_id = solution.getComponentDescriptorIndex(0);
   const int v_id = solution.getComponentDescriptorIndex(1);
-  // d_bc_helper.setTargetDataId(soln_id);
-  // d_bc_helper.setHomogeneousBc(error_equation_indicator);
+  v_refine_patch_strategy.setTargetDataId(v_id);
+  // v_refine_patch_strategy.setHomogeneousBc(error_equation_indicator);
 
   /*
    * Assumptions:
@@ -114,6 +115,8 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
   //   }
 
   /* S1. Fill solution ghost data. */
+
+  set_boundaries(v_id,ln);
   if (ln > d_ln_min) {
     /* Fill from current, next coarser level and physical boundary */
     xeqScheduleGhostFill(p_id, v_id, ln);
@@ -214,9 +217,15 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
               {
                 /* If x==0 */
                 if((center[0]==pbox.lower(0)
-                    && geom->getTouchesRegularBoundary(0,0))
+                    && (*v)(pdat::SideIndex(left,
+                                            pdat::SideIndex::X,
+                                            pdat::SideIndex::Lower))
+                    ==boundary_value)
                    || (center[0]==pbox.upper(0)+1
-                       && geom->getTouchesRegularBoundary(0,1)))
+                       && (*v)(pdat::SideIndex(right,
+                                               pdat::SideIndex::X,
+                                               pdat::SideIndex::Lower))
+                       ==boundary_value))
                   {
                     (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
                                                pdat::SideIndex::Lower))=0;
@@ -224,44 +233,17 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                 else
                   {
                     double dp_dx, d2vx_dxx, d2vx_dyy, C_vx;
-                    /* If y==0 */
-                    if(center[1]==pbox.lower(1)
-                       && geom->getTouchesRegularBoundary(1,0))
-                      {
-                        d2vx_dyy=
-                          ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
+                    d2vx_dyy=
+                      ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
+                                            pdat::SideIndex::Lower))
+                       - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
                                                 pdat::SideIndex::Lower))
-                           - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                  pdat::SideIndex::Lower)))
-                          /(dy*dy);
-                        C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
-                      }
-                    /* If y==max_y */
-                    else if(center[1]==pbox.upper(1)
-                            && geom->getTouchesRegularBoundary(1,1))
-                      {
-                        d2vx_dyy=
-                          (-(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                 pdat::SideIndex::Lower))
-                           + (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
-                                                  pdat::SideIndex::Lower)))
-                          /(dy*dy);
-                        C_vx=-viscosity*(2/(dx*dx) + 1/(dy*dy));
-                        // tbox::plog << "vx y1 boundary ";
-                      }
-                    else
-                      {
-                        d2vx_dyy=
-                          ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
-                                                pdat::SideIndex::Lower))
-                           - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                    pdat::SideIndex::Lower))
-                           + (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
-                                                  pdat::SideIndex::Lower)))
-                          /(dy*dy);
+                       + (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
+                                              pdat::SideIndex::Lower)))
+                      /(dy*dy);
 
-                        C_vx=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
-                      }
+                    C_vx=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
+
                     d2vx_dxx=((*v)(pdat::SideIndex(left,pdat::SideIndex::X,
                                                    pdat::SideIndex::Lower))
                               - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
@@ -278,6 +260,30 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                                                pdat::SideIndex::Lower))
                       - viscosity*(d2vx_dxx + d2vx_dyy) + dp_dx;
                   }
+
+
+
+                tbox::plog << "resid "
+                           << i << " "
+                           << j << " "
+                           // << (*p_resid)(center) << " "
+                           // << (*p_rhs)(center) << " "
+                           // << dvx_dx << " "
+                           // << dvy_dy << " "
+                           << "vx "
+                           << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                   pdat::SideIndex::Lower))
+                           << " "
+                           // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                           //                         pdat::SideIndex::Upper))
+                           // << " "
+                           // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                           //                         pdat::SideIndex::Lower))
+                           // << " "
+                           // << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                           //                           pdat::SideIndex::Upper)))
+                           // << " "
+                           << "\n";
               }
 
             /* vy */
@@ -285,9 +291,15 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
               {
                 /* If y==0 */
                 if((center[1]==pbox.lower(1)
-                    && geom->getTouchesRegularBoundary(1,0))
+                    && (*v)(pdat::SideIndex(down,
+                                            pdat::SideIndex::Y,
+                                            pdat::SideIndex::Lower))
+                    ==boundary_value)
                    || (center[1]==pbox.upper(1)+1
-                       && geom->getTouchesRegularBoundary(1,1)))
+                    && (*v)(pdat::SideIndex(up,
+                                            pdat::SideIndex::Y,
+                                            pdat::SideIndex::Lower))
+                       ==boundary_value))
                   {
                     (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::Y,
                                                pdat::SideIndex::Lower))=0;
@@ -295,43 +307,16 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                 else
                   {
                     double dp_dy, d2vy_dxx, d2vy_dyy, C_vy;
-                    /* If x==0 */
-                    if(center[0]==pbox.lower(0)
-                       && geom->getTouchesRegularBoundary(0,0))
-                      {
-                        d2vy_dxx=
-                          ((*v)(pdat::SideIndex(right,pdat::SideIndex::Y,
+                    d2vy_dxx=
+                      ((*v)(pdat::SideIndex(left,pdat::SideIndex::Y,
+                                            pdat::SideIndex::Lower))
+                       - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
                                                 pdat::SideIndex::Lower))
-                           - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                  pdat::SideIndex::Lower)))
-                          /(dx*dx);
-                        C_vy=-viscosity*(1/(dx*dx) + 2/(dy*dy));
-                      }
-                    /* If x==max_x */
-                    else if(center[0]==pbox.upper(0)
-                            && geom->getTouchesRegularBoundary(0,1))
-                      {
-                        d2vy_dxx=
-                          ((*v)(pdat::SideIndex(left,pdat::SideIndex::Y,
-                                                pdat::SideIndex::Lower))
-                           - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                  pdat::SideIndex::Lower)))
-                          /(dx*dx);
-                        C_vy=-viscosity*(1/(dx*dx) + 2/(dy*dy));
-                      }
-                    else
-                      {
-                        d2vy_dxx=
-                          ((*v)(pdat::SideIndex(left,pdat::SideIndex::Y,
-                                                pdat::SideIndex::Lower))
-                           - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                    pdat::SideIndex::Lower))
-                           + (*v)(pdat::SideIndex(right,pdat::SideIndex::Y,
-                                                  pdat::SideIndex::Lower)))
-                          /(dx*dx);
+                       + (*v)(pdat::SideIndex(right,pdat::SideIndex::Y,
+                                              pdat::SideIndex::Lower)))
+                      /(dx*dx);
 
-                        C_vy=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
-                      }
+                    C_vy=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
                     d2vy_dyy=((*v)(pdat::SideIndex(up,pdat::SideIndex::Y,
                                                    pdat::SideIndex::Lower))
                               - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
@@ -368,6 +353,13 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
     //   oflux_data->copy(*flux_data);
     // }
   }
+
+  /* We also need to set the boundaries of the rhs so that coarsening
+     works correctly. */
+  const int v_rhs_id = rhs.getComponentDescriptorIndex(1);
+  set_boundaries(v_rhs_id,ln);
+  xeqScheduleGhostFillNoCoarse(invalid_id, v_rhs_id, ln);
+  
 
   // if (deallocate_flux_data_when_done) {
   //   level->deallocatePatchData(flux_id);

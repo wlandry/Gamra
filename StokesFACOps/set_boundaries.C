@@ -40,6 +40,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
+#include "Boundary.h"
 /*
 ********************************************************************
 * Workhorse function to smooth error using red-black               *
@@ -89,7 +90,7 @@ void SAMRAI::solv::StokesFACOps::set_boundaries
                   {
                     (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
                                          pdat::SideIndex::Lower))=
-                      std::numeric_limits<double>::max();
+                      boundary_value;
                   }
                 /* Set the value so the derivative=0 */
                 else if(j<pbox.lower(0))
@@ -106,6 +107,17 @@ void SAMRAI::solv::StokesFACOps::set_boundaries
                       (*v)(pdat::SideIndex(center-jp,pdat::SideIndex::X,
                                            pdat::SideIndex::Lower));
                   }
+                tbox::plog << "set boundary vx "
+                           << level->getLevelNumber() << " "
+                           << i << " "
+                           << j << " "
+                           << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                   pdat::SideIndex::Lower))
+                           << " "
+                           << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                     pdat::SideIndex::Lower)))
+                           << " "
+                           << "\n";
               }
             /* vy */
             if(i<=gbox.upper(0))
@@ -114,7 +126,7 @@ void SAMRAI::solv::StokesFACOps::set_boundaries
                   {
                     (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
                                          pdat::SideIndex::Lower))=
-                      std::numeric_limits<double>::max();
+                      boundary_value;
                   }
                 else if(i<pbox.lower(0))
                   {
@@ -130,6 +142,17 @@ void SAMRAI::solv::StokesFACOps::set_boundaries
                       (*v)(pdat::SideIndex(center-ip,pdat::SideIndex::Y,
                                            pdat::SideIndex::Lower));
                   }
+                tbox::plog << "set boundary vy "
+                           << level->getLevelNumber() << " "
+                           << i << " "
+                           << j << " "
+                           << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                                   pdat::SideIndex::Lower))
+                           << " "
+                           << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                                     pdat::SideIndex::Lower)))
+                           << " "
+                           << "\n";
               }
           }
     }

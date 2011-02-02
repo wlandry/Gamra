@@ -81,12 +81,22 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
          center[0]/=2;
          center[1]/=2;
 
+         /* This assumes that the levels are always properly nested,
+            so that we always have an extra grid space for
+            interpolation.  So we only have to have a special case for
+            physical boundaries, where we do not have an extra grid
+            space. */
+
          if(axis==0)
            {
              double dvx_dy;
 
              if(i%2==0)
                {
+                 /* Maybe this has to be fixed when dvx/dy != 0 on the
+                    outer boundary because the approximation to the
+                    derivative is not accurate enough? */
+
                  if(center[1]==coarse_box.lower(1)
                     && geom->getTouchesRegularBoundary(1,0))
                    {

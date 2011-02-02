@@ -37,7 +37,7 @@ namespace SAMRAI {
                                 flags,
                                 bdry_types);
       d_bc_object = &d_simple_bc;
-      d_fac_ops.setPhysicalBcCoefObject(d_bc_object);
+      // d_fac_ops.setPhysicalBcCoefObject(d_bc_object);
     }
 
 

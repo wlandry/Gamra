@@ -59,7 +59,8 @@ void SAMRAI::solv::StokesFACOps::restrictResidual
     v_dst(d.getComponentDescriptorIndex(1));
 
   /* Need to do a sync because the coarsening for v uses ghost zones */
-  xeqScheduleGhostFillNoCoarse(-1,v_src,dest_ln+1);
+  v_coarsen_patch_strategy.setSourceDataId(v_src);
+  xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_ln+1);
 
   xeqScheduleRRestriction(p_dst,p_src,v_dst,v_src,dest_ln);
 

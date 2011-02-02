@@ -76,13 +76,19 @@ void SAMRAI::solv::StokesFACOps::prolongErrorAndCorrect
   fine_level->allocatePatchData(d_cell_scratch_id);
   fine_level->allocatePatchData(d_side_scratch_id);
 
+  // int p_src(s.getComponentDescriptorIndex(0)),
+  //   v_src(s.getComponentDescriptorIndex(1)),
+  //   p_dst(d.getComponentDescriptorIndex(0)),
+  //   v_dst(d.getComponentDescriptorIndex(1));
+  // xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_ln+1);
+
   /*
    * Refine solution into scratch space to fill the fine level
    * interior in the scratch space, then use that refined data
    * to correct the fine level error.
    */
-  // d_bc_helper.setTargetDataId(d_cell_scratch_id);
-  // d_bc_helper.setHomogeneousBc(true);
+  v_refine_patch_strategy.setTargetDataId(d_side_scratch_id);
+  // v_refine_patch_strategy.setHomogeneousBc(true);
   xeqScheduleProlongation(d_cell_scratch_id,
                           s.getComponentDescriptorIndex(0),
                           d_cell_scratch_id,
@@ -91,6 +97,7 @@ void SAMRAI::solv::StokesFACOps::prolongErrorAndCorrect
                           d_side_scratch_id,
                           dest_ln);
 
+  set_boundaries(s.getComponentDescriptorIndex(1),fine_level);
   /*
    * Add the refined error in the scratch space to the error currently
    * residing in the destination level.

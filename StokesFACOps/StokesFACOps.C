@@ -105,13 +105,14 @@ namespace SAMRAI {
                      database->getDatabase("hypre_solver"):
                      tbox::Pointer<tbox::Database>(NULL)),
 #endif
-      d_physical_bc_coef(NULL),
+      // d_physical_bc_coef(NULL),
       d_context(hier::VariableDatabase::getDatabase()
                 ->getContext(object_name + "::PRIVATE_CONTEXT")),
       d_cell_scratch_id(-1),
       d_side_scratch_id(-1),
       d_flux_scratch_id(-1),
       d_oflux_scratch_id(-1),
+      invalid_id(-1),
       p_prolongation_refine_operator(),
       p_prolongation_refine_algorithm(),
       p_prolongation_refine_schedules(),
@@ -145,8 +146,10 @@ namespace SAMRAI {
       v_nocoarse_refine_operator(),
       v_nocoarse_refine_algorithm(),
       v_nocoarse_refine_schedules(),
-      // d_bc_helper(dim,
-      //             d_object_name + "::bc helper"),
+      v_refine_patch_strategy(dim,
+                              d_object_name + "::refine patch strategy"),
+      v_coarsen_patch_strategy(dim,
+                               d_object_name + "::coarsen patch strategy"),
       d_enable_logging(false),
       d_preconditioner(NULL),
       d_hopscell(),

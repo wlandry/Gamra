@@ -40,6 +40,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
+#include "Boundary.h"
 /*
 ********************************************************************
 * Workhorse function to smooth error using red-black               *
@@ -59,12 +60,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
     v_id(solution.getComponentDescriptorIndex(1)),
     v_rhs_id(residual.getComponentDescriptorIndex(1));
 
-  /* Only need to sync the rhs once. This sync is needed because
-     calculating a new pressure update requires computing in the ghost
-     region so that the update for the velocity inside the box will be
-     correct. */
-  xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
-
   checkInputPatchDataIndices();
 
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -77,6 +72,30 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 #endif
   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
 
+  {
+    hier::PatchLevel::Iterator pi(*level);
+    for (pi.initialize(*level); pi; pi++) {
+      tbox::Pointer<hier::Patch> patch = *pi;
+      tbox::Pointer<pdat::CellData<double> > p_rhs_data =
+        patch->getPatchData(p_rhs_id);
+      for(pdat::CellIterator ci(p_rhs_data->getBox()); ci; ci++)
+        {
+          pdat::CellIndex cc=ci();
+          tbox::plog << "p_rhs "
+                     << cc[0] << " "
+                     << cc[1] << " "
+                     << (*p_rhs_data)(cc) << " "
+                     // << (&(*p_rhs_data)(cc)) << " "
+                     << "\n";
+        }
+    }
+  }
+  /* Only need to sync the rhs once. This sync is needed because
+     calculating a new pressure update requires computing in the ghost
+     region so that the update for the velocity inside the box will be
+     correct. */
+  v_refine_patch_strategy.setTargetDataId(v_id);
+  xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
   set_boundaries(v_id,level);
 
   if (ln > d_ln_min) {
@@ -148,46 +167,71 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       ++right[0];
                       --left[0];
 
+                      tbox::plog << "smooth "
+                                 << ln << " "
+                                 << i << " "
+                                 << j << " "
+                                 << pbox.lower(0) << " "
+                                 << pbox.upper(0) << " "
+                                 << pbox.lower(1) << " "
+                                 << pbox.upper(1) << " ";
+
                       /* Update p */
-                      double dvx_dx=
-                        ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                              pdat::SideIndex::Upper))
-                         - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                pdat::SideIndex::Lower)))/dx;
-                      double dvy_dy=
-                        ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                              pdat::SideIndex::Upper))
-                         - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                pdat::SideIndex::Lower)))/dy;
+                      if(!((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                pdat::SideIndex::Lower))
+                           ==boundary_value
+                           || (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                   pdat::SideIndex::Upper))
+                           ==boundary_value
+                           || (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                                   pdat::SideIndex::Lower))
+                           ==boundary_value
+                           || (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                                   pdat::SideIndex::Upper))
+                           ==boundary_value))
+                        {
+                          double dvx_dx=
+                            ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                  pdat::SideIndex::Upper))
+                             - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                    pdat::SideIndex::Lower)))/dx;
+                          double dvy_dy=
+                            ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                                  pdat::SideIndex::Upper))
+                             - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                                    pdat::SideIndex::Lower)))/dy;
 
-                      double delta_R_continuity=
-                        (*p_rhs)(center) - dvx_dx - dvy_dy;
+                          double delta_R_continuity=
+                            (*p_rhs)(center) - dvx_dx - dvy_dy;
 
-                      /* No scaling here, though there should be. */
-                      maxres=std::max(maxres,delta_R_continuity);
+                          /* No scaling here, though there should be. */
+                          maxres=std::max(maxres,delta_R_continuity);
 
-                      (*p)(center)+=
-                        viscosity*delta_R_continuity*theta_continuity;
+                          (*p)(center)+=
+                            viscosity*delta_R_continuity*theta_continuity;
 
+                          tbox::plog << "p "
+                                     << (*p)(center) << " "
+                                     << (*p_rhs)(center) << " "
+                                     << dvx_dx << " "
+                                     << dvy_dy << " "
+                                     << delta_R_continuity << " ";
+                        }
                       /* Update v */
                       Update_V(0,j,pbox,center,left,right,down,up,p,v,v_rhs,
                                maxres,dx,dy,viscosity,theta_momentum);
                       Update_V(1,i,pbox,center,down,up,left,right,p,v,v_rhs,
                                maxres,dy,dx,viscosity,theta_momentum);
 
-                      // tbox::plog << "smooth "
-                      //           << i << " "
-                      //           << j << " "
-                      //           << (*p)(center) << " "
-                      //           << (*v)(pdat::SideIndex
-                      //                   (center,
-                      //                    pdat::SideIndex::X,
-                      //                    pdat::SideIndex::Lower)) << " "
-                      //           << (*v)(pdat::SideIndex
-                      //                   (center,
-                      //                    pdat::SideIndex::Y,
-                      //                    pdat::SideIndex::Lower)) << " "
-                      //           << "\n";
+                                // << (*v)(pdat::SideIndex
+                                //         (center,
+                                //          pdat::SideIndex::X,
+                                //          pdat::SideIndex::Lower)) << " "
+                                // << (*v)(pdat::SideIndex
+                                //         (center,
+                                //          pdat::SideIndex::Y,
+                                //          pdat::SideIndex::Lower)) << " "
+                      tbox::plog << "\n";
                     }
                 }
             }

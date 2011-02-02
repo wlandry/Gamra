@@ -61,12 +61,15 @@ void SAMRAI::solv::StokesFACOps::restrictSolution
     v_dst(d.getComponentDescriptorIndex(1));
 
   /* Need to do a sync because the coarsening for v uses ghost zones. */
-  xeqScheduleGhostFillNoCoarse(-1,v_src,dest_ln+1);
+  v_coarsen_patch_strategy.setSourceDataId(v_src);
+  xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_ln+1);
 
   xeqScheduleURestriction(p_dst,p_src,v_dst,v_src,dest_ln);
 
-  // d_bc_helper.setHomogeneousBc(false);
-  // d_bc_helper.setTargetDataId(d.getComponentDescriptorIndex(0));
+  tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(dest_ln);
+  set_boundaries(v_dst,level);
+  // v_refine_patch_strategy.setHomogeneousBc(false);
+  v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(1));
 
   if (dest_ln == d_ln_min) {
     xeqScheduleGhostFillNoCoarse(p_dst,v_dst,dest_ln);

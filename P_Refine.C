@@ -89,8 +89,11 @@ void SAMRAI::geom::P_Refine::refine(
          /* Pressure is cell-centered, so prolongation is a
             linear interpolation from nearby cells. */
 
-         /* This assumes that we never have coarse levels
-            that are only one grid wide. */
+         /* This assumes that the levels are always properly nested,
+            so that we always have an extra grid space for
+            interpolation.  So we only have to have a special case for
+            physical boundaries, where we do not have an extra grid
+            space. */
 
          if(center[0]==coarse_box.lower(0)
             && geom->getTouchesRegularBoundary(0,0))
@@ -125,6 +128,16 @@ void SAMRAI::geom::P_Refine::refine(
          (*p_fine)(fine)=(*p)(center)
            + ((i%2==0) ? (-dp_dx) : dp_dx)
            + ((j%2==0) ? (-dp_dy) : dp_dy);
+
+         // tbox::plog << "P_Refine "
+         //            << i << " "
+         //            << j << " "
+         //            << (*p_fine)(fine) << " "
+         //            << (*p)(center) << " "
+         //            << dp_dx << " "
+         //            << dp_dy << " "
+         //            << "\n";
+
        }
 }
 #endif

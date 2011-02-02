@@ -21,6 +21,7 @@
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/tbox/Utilities.h"
+#include "Boundary.h"
 
 
 void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
@@ -91,19 +92,21 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
    for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
      for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
        {
+         tbox::plog << "v coarsen "
+                    << coarse.getPatchLevelNumber() << " "
+                    << i << " "
+                    << j << " ";
+
          hier::Index ip(1,0), jp(0,1);
          if(directions(0) && j!=coarse_box.upper(1)+1)
            {
              pdat::SideIndex coarse(hier::Index(i,j),0,
                                     pdat::SideIndex::Lower);
              pdat::SideIndex center(coarse*2);
-             if(i==coarse_box.lower(0)
-                && cgeom->getTouchesRegularBoundary(0,0))
-               {
-                 (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
-               }
-             else if(i==coarse_box.upper(0)+1
-                     && cgeom->getTouchesRegularBoundary(0,1))
+             if((i==coarse_box.lower(0)
+                 && (*v_fine)(center-ip)==boundary_value)
+                || (i==coarse_box.upper(0)+1
+                    && (*v_fine)(center+ip)==boundary_value))
                {
                  (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
                }
@@ -113,19 +116,21 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
                    + ((*v_fine)(center-ip) + (*v_fine)(center-ip+jp)
                       + (*v_fine)(center+ip) + (*v_fine)(center+ip+jp))/8;
                }
+             tbox::plog << "vx "
+                        << (*v)(coarse) << " "
+                        << coarse_box.lower(0) << " "
+                        << (*v_fine)(center-ip) << " "
+                        << &((*v_fine)(center-ip)) << " ";
            }
          if(directions(1) && i!=coarse_box.upper(0)+1)
            {
              pdat::SideIndex coarse(hier::Index(i,j),1,
                                     pdat::SideIndex::Lower);
              pdat::SideIndex center(coarse*2);
-             if(j==coarse_box.lower(1)
-                && cgeom->getTouchesRegularBoundary(1,0))
-               {
-                   (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
-               }
-             else if(j==coarse_box.upper(1)+1
-                     && cgeom->getTouchesRegularBoundary(1,1))
+             if((j==coarse_box.lower(1)
+                 && (*v_fine)(center-jp)==boundary_value)
+                || (j==coarse_box.upper(1)+1
+                    && (*v_fine)(center+jp)==boundary_value))
                {
                  (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
                }
@@ -135,7 +140,10 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
                    + ((*v_fine)(center-jp) + (*v_fine)(center-jp+ip)
                       + (*v_fine)(center+jp) + (*v_fine)(center+ip+jp))/8;
                }
+             tbox::plog << "vy "
+                        << (*v)(coarse) << " ";
            }
+         tbox::plog << "\n";
        }
 }
 

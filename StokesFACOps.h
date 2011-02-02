@@ -12,10 +12,8 @@
 
 #include "SAMRAI/SAMRAI_config.h"
 
-#include "SAMRAI/solv/CartesianRobinBcHelper.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
 #include "SAMRAI/solv/FACOperatorStrategy.h"
-#include "SAMRAI/solv/RobinBcCoefStrategy.h"
 #include "StokesHypreSolver.h"
 #include "SAMRAI/solv/SAMRAIVectorReal.h"
 #include "StokesSpecifications.h"
@@ -44,6 +42,8 @@
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/tbox/Timer.h"
+#include "V_Refine_Patch_Strategy.h"
+#include "V_Coarsen_Patch_Strategy.h"
 
 #include <string>
 
@@ -320,9 +320,9 @@ public:
     * @param physical_bc_coef tbox::Pointer to an object that can
     *        set the Robin bc coefficients.
     */
-   void
-   setPhysicalBcCoefObject(
-      const RobinBcCoefStrategy* physical_bc_coef);
+   // void
+   // setPhysicalBcCoefObject(
+   //    const RobinBcCoefStrategy* physical_bc_coef);
 
    //@{
 
@@ -483,6 +483,11 @@ public:
       const SAMRAIVectorReal<double>& current_soln,
       const SAMRAIVectorReal<double>& residual);
 
+  void set_boundaries(const int &v_id, const int &l)
+  {
+    tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(l);
+    set_boundaries(v_id,level);
+  }
   void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level);
 
    //@}
@@ -492,6 +497,8 @@ private:
    /*!
     * @name Private workhorse functions.
     */
+
+  const int invalid_id;
 
    /*!
     * @brief Red-black Gauss-Seidel error smoothing on a level.
@@ -872,7 +879,7 @@ private:
     *
     * see setPhysicalBcCoefObject()
     */
-   const RobinBcCoefStrategy* d_physical_bc_coef;
+   // const RobinBcCoefStrategy* d_physical_bc_coef;
 
    //@}
 
@@ -1008,11 +1015,12 @@ private:
     * this object is used.  Note that in the code, before we
     * use this object to set ghost cell values, directly or
     * indirectly by calling xfer::RefineSchedule::fillData(),
-    * we must tell d_bc_helper the patch data index we want
+    * we must tell the patch strategies the patch data index we want
     * to set and whether we are setting data with homogeneous
     * boundary condition.
     */
-   // CartesianRobinBcHelper d_bc_helper;
+   V_Refine_Patch_Strategy v_refine_patch_strategy;
+   V_Coarsen_Patch_Strategy v_coarsen_patch_strategy;
 
    //@{
    /*!

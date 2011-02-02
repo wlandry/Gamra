@@ -67,24 +67,6 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
    hier::Box coarse_box=coarse.getBox();
    hier::Box fine_box=fine.getBox();
 
-   std::cout << "VBR "
-             << fine.getPatchLevelNumber() << " "
-             << axis << " "
-             << coarse_box.lower(0) << " "
-             << coarse_box.upper(0) << " "
-             << coarse_box.lower(1) << " "
-             << coarse_box.upper(1) << " "
-             << fine_box.lower(0) << " "
-             << fine_box.upper(0) << " "
-             << fine_box.lower(1) << " "
-             << fine_box.upper(1) << " "
-
-             << overlap_box.lower(0) << " "
-             << overlap_box.upper(0) << " "
-             << overlap_box.lower(1) << " "
-             << overlap_box.upper(1) << " "
-             << "\n";
-
    /* We have to infer where the boundary is from the boxes */
    int boundary_direction;
    bool boundary_positive(false);
@@ -161,6 +143,31 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
            ++j_min;
          }
      }
+
+   tbox::plog << "VBR "
+              << fine.getPatchLevelNumber() << " "
+              << axis << " "
+              << boundary_direction << " "
+              << std::boolalpha
+              << boundary_positive << " "
+              << coarse_box.lower(0) << " "
+              << coarse_box.upper(0) << " "
+              << coarse_box.lower(1) << " "
+              << coarse_box.upper(1) << " "
+              << fine_box.lower(0) << " "
+              << fine_box.upper(0) << " "
+              << fine_box.lower(1) << " "
+              << fine_box.upper(1) << " "
+
+              << overlap_box.lower(0) << " "
+              << overlap_box.upper(0) << " "
+              << overlap_box.lower(1) << " "
+              << overlap_box.upper(1) << " "
+              << i_min << " "
+              << i_max << " "
+              << j_min << " "
+              << j_max << " "
+              << "\n";
 
    for(int j=j_min; j<=j_max; ++j)
      for(int i=i_min; i<=i_max; ++i)

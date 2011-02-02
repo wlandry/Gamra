@@ -38,16 +38,16 @@ void StokesFACOps::setUseSMG(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
-void StokesFACOps::setPhysicalBcCoefObject(
-   const RobinBcCoefStrategy* physical_bc_coef)
-{
-   d_physical_bc_coef = physical_bc_coef;
-   // d_bc_helper.setCoefImplementation(physical_bc_coef);
-#ifdef HAVE_HYPRE
-   d_hypre_solver.setPhysicalBcCoefObject(d_physical_bc_coef);
-#endif
-}
+// SAMRAI_INLINE_KEYWORD
+// void StokesFACOps::setPhysicalBcCoefObject(
+//    const RobinBcCoefStrategy* physical_bc_coef)
+// {
+//    d_physical_bc_coef = physical_bc_coef;
+//    // d_bc_helper.setCoefImplementation(physical_bc_coef);
+// #ifdef HAVE_HYPRE
+//    d_hypre_solver.setPhysicalBcCoefObject(d_physical_bc_coef);
+// #endif
+// }
 
 /*
  ********************************************************************

@@ -69,22 +69,22 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
 
 #ifdef DEBUG_CHECK_ASSERTIONS
 
-  if (d_physical_bc_coef == NULL) {
-    /*
-     * It's an error not to have bc object set.
-     * Note that the bc object cannot be passed in through
-     * the argument because the interface is inherited.
-     */
-    TBOX_ERROR(
-               d_object_name << ": No physical bc object in\n"
-               <<
-               "StokesFACOps::initializeOperatorState\n"
-               << "You must use "
-               <<
-               "StokesFACOps::setPhysicalBcCoefObject\n"
-               <<
-               "to set one before calling initializeOperatorState\n");
-  }
+  // if (d_physical_bc_coef == NULL) {
+  //   /*
+  //    * It's an error not to have bc object set.
+  //    * Note that the bc object cannot be passed in through
+  //    * the argument because the interface is inherited.
+  //    */
+  //   TBOX_ERROR(
+  //              d_object_name << ": No physical bc object in\n"
+  //              <<
+  //              "StokesFACOps::initializeOperatorState\n"
+  //              << "You must use "
+  //              <<
+  //              "StokesFACOps::setPhysicalBcCoefObject\n"
+  //              <<
+  //              "to set one before calling initializeOperatorState\n");
+  // }
 
   if (solution.getNumberOfComponents() != 1) {
     TBOX_WARNING(d_object_name
@@ -201,18 +201,18 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                                                      ln,
                                                      max_gcw);
   }
-#ifdef HAVE_HYPRE
-  if (d_coarse_solver_choice == "hypre") {
-    d_hypre_solver.initializeSolverState(d_hierarchy, d_ln_min);
-    /*
-     * Share the boundary condition object with the hypre solver
-     * to make sure that boundary condition settings are consistent
-     * between the two objects.
-     */
-    d_hypre_solver.setPhysicalBcCoefObject(d_physical_bc_coef);
-    d_hypre_solver.setMatrixCoefficients(d_stokes_spec);
-  }
-#endif
+// #ifdef HAVE_HYPRE
+//   if (d_coarse_solver_choice == "hypre") {
+//     d_hypre_solver.initializeSolverState(d_hierarchy, d_ln_min);
+//     /*
+//      * Share the boundary condition object with the hypre solver
+//      * to make sure that boundary condition settings are consistent
+//      * between the two objects.
+//      */
+//     d_hypre_solver.setPhysicalBcCoefObject(d_physical_bc_coef);
+//     d_hypre_solver.setMatrixCoefficients(d_stokes_spec);
+//   }
+// #endif
 
   /*
    * Get the transfer operators.
@@ -401,6 +401,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                    solution.getComponentDescriptorIndex(1),
                    v_nocoarse_refine_operator);
 
+  /* Refinement and ghost fill operators */
   for (int dest_ln = d_ln_min + 1; dest_ln <= d_ln_max; ++dest_ln) {
 
     tbox::Pointer<xfer::PatchLevelFullFillPattern>
@@ -412,7 +413,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                      tbox::Pointer<hier::PatchLevel>(),
                      dest_ln - 1,
                      d_hierarchy);
-                     // &d_bc_helper);
+                     // &v_refine_patch_strategy);
     if (!p_prolongation_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for p prolongation!\n");
@@ -424,7 +425,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                      tbox::Pointer<hier::PatchLevel>(),
                      dest_ln - 1,
                      d_hierarchy);
-                     // &d_bc_helper);
+                     // &v_refine_patch_strategy);
     if (!v_prolongation_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for v prolongation!\n");
@@ -434,7 +435,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      dest_ln - 1,
                      d_hierarchy);
-                     // &d_bc_helper);
+                     // &v_refine_patch_strategy);
     if (!p_ghostfill_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
@@ -443,8 +444,9 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
       v_ghostfill_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      dest_ln - 1,
-                     d_hierarchy);
-                     // &d_bc_helper);
+                     // d_hierarchy);
+                     d_hierarchy,
+                     &v_refine_patch_strategy);
     if (!v_ghostfill_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
@@ -452,7 +454,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     p_nocoarse_refine_schedules[dest_ln] =
       p_nocoarse_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln));
-                     // &d_bc_helper);
+                     // &v_refine_patch_strategy);
     if (!p_nocoarse_refine_schedules[dest_ln]) {
       TBOX_ERROR(
                  d_object_name
@@ -462,7 +464,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     v_nocoarse_refine_schedules[dest_ln] =
       v_nocoarse_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln));
-                     // &d_bc_helper);
+                     // &v_refine_patch_strategy);
     if (!v_nocoarse_refine_schedules[dest_ln]) {
       TBOX_ERROR(
                  d_object_name
@@ -470,6 +472,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                  ": Cannot create a refine schedule for ghost filling on bottom level!\n");
     }
   }
+
+  /* Coarsening operators */
   for (int dest_ln = d_ln_min; dest_ln < d_ln_max; ++dest_ln) {
     p_urestriction_coarsen_schedules[dest_ln] =
       p_urestriction_coarsen_algorithm->
@@ -491,7 +495,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     v_urestriction_coarsen_schedules[dest_ln] =
       v_urestriction_coarsen_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1));
+                     d_hierarchy->getPatchLevel(dest_ln + 1),
+                     &v_coarsen_patch_strategy);
     if (!v_urestriction_coarsen_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a coarsen schedule for U v restriction!\n");
@@ -499,7 +504,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     v_rrestriction_coarsen_schedules[dest_ln] =
       v_rrestriction_coarsen_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1));
+                     d_hierarchy->getPatchLevel(dest_ln + 1),
+                     &v_coarsen_patch_strategy);
     if (!v_rrestriction_coarsen_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a coarsen schedule for R v restriction!\n");
@@ -513,10 +519,12 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                  << ": Cannot create a coarsen schedule for flux transfer!\n");
     }
   }
+
+  /* Ordinary ghost fill operator on the coarsest level */
   p_nocoarse_refine_schedules[d_ln_min] =
     p_nocoarse_refine_algorithm->
     createSchedule(d_hierarchy->getPatchLevel(d_ln_min));
-                   // &d_bc_helper);
+                   // &v_refine_patch_strategy);
   if (!p_nocoarse_refine_schedules[d_ln_min]) {
     TBOX_ERROR(
                d_object_name
@@ -526,7 +534,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   v_nocoarse_refine_schedules[d_ln_min] =
     v_nocoarse_refine_algorithm->
     createSchedule(d_hierarchy->getPatchLevel(d_ln_min));
-                   // &d_bc_helper);
+                   // &v_refine_patch_strategy);
   if (!v_nocoarse_refine_schedules[d_ln_min]) {
     TBOX_ERROR(
                d_object_name

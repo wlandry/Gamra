@@ -40,6 +40,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
+#include "Boundary.h"
 /*
 ********************************************************************
 * Updates one component of the velocity during a red-black *
@@ -73,13 +74,13 @@ void SAMRAI::solv::StokesFACOps::Update_V
             && (*v)(pdat::SideIndex(left,
                                     axis,
                                     pdat::SideIndex::Lower))
-            ==std::numeric_limits<double>::max())
+            ==boundary_value)
            || (center[axis]==pbox.upper(axis)+1
                && (*v)(pdat::SideIndex
                        (right,
                         axis,
                         pdat::SideIndex::Lower))
-               ==std::numeric_limits<double>::max())))
+               ==boundary_value)))
         {
           double dp_dx, d2vx_dxx, d2vx_dyy, C_vx;
           /* If y==0 */
@@ -139,6 +140,13 @@ void SAMRAI::solv::StokesFACOps::Update_V
                                      axis,
                                      pdat::SideIndex::Lower))
             - viscosity*(d2vx_dxx + d2vx_dyy) + dp_dx;
+
+
+          tbox::plog << "v " << axis << " "
+                     << (*v_rhs)(pdat::SideIndex(center,
+                                                 axis,
+                                                 pdat::SideIndex::Lower))
+                     << " ";
 
           // tbox::plog << "Update "
           //            << axis << " "

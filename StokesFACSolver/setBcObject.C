@@ -29,7 +29,7 @@ namespace SAMRAI {
       }
 #endif
       d_bc_object = bc_object;
-      d_fac_ops.setPhysicalBcCoefObject(d_bc_object);
+      // d_fac_ops.setPhysicalBcCoefObject(d_bc_object);
     }
 
   }

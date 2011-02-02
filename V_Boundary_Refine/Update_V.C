@@ -20,6 +20,7 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/pdat/CellData.h"
 
+#include "Boundary.h"
 
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
@@ -48,8 +49,34 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V
       double v_minus=(*v)(center)
         - (5.0/32)*dv_minus + (3.0/32)*dv_plus;
 
-      (*v_fine)(fine)=v_minus*(2*(*v)(center))/(v_plus + v_minus);
-      (*v_fine)(fine+jp)=v_plus*(2*(*v)(center))/(v_plus + v_minus);
+      const double epsilon(1.0e-8);
+      if(std::abs(v_plus+v_minus)<=epsilon*std::abs((*v)(center)))
+        {
+          (*v_fine)(fine)=(*v_fine)(fine+jp)=(*v)(center);
+        }
+      else
+        {
+          (*v_fine)(fine)=v_minus*(2*(*v)(center))/(v_plus + v_minus);
+          (*v_fine)(fine+jp)=v_plus*(2*(*v)(center))/(v_plus + v_minus);
+        }
+
+      tbox::plog << "Update V "
+                 << axis << " "
+                 << fine[0] << " "
+                 << fine[1] << " "
+                 << center[0] << " "
+                 << center[1] << " "
+                 << (*v_fine)(fine) << " "
+                 << (*v_fine)(fine+jp) << " "
+                 << (*v)(center) << " "
+                 << (*v)(center+jp) << " "
+                 << (*v)(center-jp) << " "
+                 << (&(*v)(center-jp)) << " "
+                 << v_plus << " "
+                 << v_minus << " "
+                 << dv_plus << " "
+                 << dv_minus << " "
+                 << "\n";
 
       /* Set the point outside of the boundary to be max_double.  This
          give us a marker for whether the current value is a boundary
@@ -60,7 +87,7 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V
           offset[axis]=-1;
         }
       (*v_fine)(fine+offset)=(*v_fine)(fine+offset+jp)=
-        std::numeric_limits<double>::max();
+        boundary_value;
       ++j;
     }
   else
