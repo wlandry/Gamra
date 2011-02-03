@@ -73,9 +73,9 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
    if(std::abs(overlap_box.lower(0)-overlap_box.upper(0))==(axis==0 ? 1 : 0))
      {
        boundary_direction=0;
-       if(fine_box.upper(0)<overlap_box.lower(0))
+       if(fine_box.upper(0)<=overlap_box.lower(0))
          boundary_positive=true;
-       else if(fine_box.lower(0)>overlap_box.upper(0))
+       else if(fine_box.lower(0)>=overlap_box.upper(0))
          boundary_positive=false;
        else
          abort();
@@ -84,9 +84,9 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
            (axis==1 ? 1 : 0))
      {
        boundary_direction=1;
-       if(fine_box.upper(1)<overlap_box.lower(1))
+       if(fine_box.upper(1)<=overlap_box.lower(1))
          boundary_positive=true;
-       else if(fine_box.lower(1)>overlap_box.upper(1))
+       else if(fine_box.lower(1)>=overlap_box.upper(1))
          boundary_positive=false;
        else
          abort();
