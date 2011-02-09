@@ -88,12 +88,12 @@ void SAMRAI::solv::StokesFACOps::Update_V
           bool set_boundary(false);
           if(center[axis]==pbox.lower(axis)+1)
             {
-              offset[axis]=-1;
+              offset[axis]=-2;
               set_boundary=true;
             }
-          else if(center[axis]==pbox.upper(axis)-1)
+          else if(center[axis]==pbox.upper(axis))
             {
-              offset[axis]=1;
+              offset[axis]=2;
               set_boundary=true;
             }
 
@@ -101,11 +101,11 @@ void SAMRAI::solv::StokesFACOps::Update_V
           if(set_boundary)
             {
               dv=(*v)(pdat::SideIndex
-                      (center-offset,
+                      (center+offset,
                        axis,
                        pdat::SideIndex::Lower))
                 - (*v)(pdat::SideIndex
-                       (center+offset,axis,
+                       (center,axis,
                         pdat::SideIndex::Lower));
             }
                                     
@@ -150,30 +150,9 @@ void SAMRAI::solv::StokesFACOps::Update_V
                      << (*v_rhs)(pdat::SideIndex(center,
                                                  axis,
                                                  pdat::SideIndex::Lower))
-                     << " ";
-
-          // tbox::plog << "Update "
-          //            << axis << " "
-          //            << off_axis << " "
-          //            << j << " "
-          //            << center[axis] << " "
-          //            << pbox.lower(axis) << " "
-          //            << pbox.upper(axis) << " "
-          //            << pbox.lower(off_axis) << " "
-          //            << pbox.upper(off_axis) << " "
-          //            << (*v_rhs)(pdat::SideIndex(center,
-          //                                        axis,
-          //                                        pdat::SideIndex::Lower)) << " "
-          //            << right[0] << " "
-          //            << right[1] << " "
-          //            << (*v)(pdat::SideIndex
-          //                    (right,
-          //                     axis,
-          //                     pdat::SideIndex::Lower)) << " "
-          //            << delta_Rx << " "
-          //            << (theta_momentum/C_vx) << " "
-          //            << "\n";
-            
+                     << " "
+                     << std::boolalpha
+                     << set_boundary << " ";
 
           /* No scaling here, though there should be. */
           maxres=std::max(maxres,delta_Rx);
@@ -186,12 +165,12 @@ void SAMRAI::solv::StokesFACOps::Update_V
              derivative is zero. */
           if(set_boundary)
             {
-              (*v)(pdat::SideIndex
-                   (center+offset,axis,
-                    pdat::SideIndex::Lower))=
-                (*v)(pdat::SideIndex(center-offset,axis,
-                                     pdat::SideIndex::Lower))
-                -dv;
+              (*v)(pdat::SideIndex(center+offset,axis,
+                                   pdat::SideIndex::Lower))=
+                (*v)(pdat::SideIndex(center,axis,pdat::SideIndex::Lower)) + dv;
+              tbox::plog << offset(0) << " "
+                         << offset(1) << " "
+                         << dv << " ";
             }
         }
     }
