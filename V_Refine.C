@@ -78,14 +78,17 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
 
          hier::Index ip(1,0), jp(0,1);
          pdat::SideIndex center(fine);
-         center[0]/=2;
-         center[1]/=2;
+         center.coarsen(hier::Index(2,2));
 
          /* This assumes that the levels are always properly nested,
             so that we always have an extra grid space for
             interpolation.  So we only have to have a special case for
             physical boundaries, where we do not have an extra grid
             space. */
+
+         tbox::plog << "V refine "
+                    << i << " "
+                    << j << " ";
 
          if(axis==0)
            {
@@ -187,6 +190,10 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
                                   + ((i%2==0) ? (-dvy_dx) : dvy_dx))/2;
                }
            }
+         tbox::plog << axis << " "
+                    << (*v_fine)(fine) << " "
+                    << "\n";
+
        }
 }
 #endif

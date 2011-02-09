@@ -74,6 +74,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
    */
   const int p_id = solution.getComponentDescriptorIndex(0);
   const int v_id = solution.getComponentDescriptorIndex(1);
+  p_refine_patch_strategy.setTargetDataId(p_id);
   v_refine_patch_strategy.setTargetDataId(v_id);
   // v_refine_patch_strategy.setHomogeneousBc(error_equation_indicator);
 
@@ -264,6 +265,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
 
 
                 tbox::plog << "resid "
+                           << ln << " "
                            << i << " "
                            << j << " "
                            // << (*p_resid)(center) << " "
@@ -274,15 +276,15 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                            << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
                                                    pdat::SideIndex::Lower))
                            << " "
-                           // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                           //                         pdat::SideIndex::Upper))
-                           // << " "
+                           << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                   pdat::SideIndex::Upper))
+                           << " "
                            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
                            //                         pdat::SideIndex::Lower))
                            // << " "
-                           // << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                           //                           pdat::SideIndex::Upper)))
-                           // << " "
+                           << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                     pdat::SideIndex::Upper)))
+                           << " "
                            << "\n";
               }
 

@@ -47,29 +47,30 @@ void SAMRAI::geom::P_Refine::refine(
 }
 
 void SAMRAI::geom::P_Refine::refine(
-   hier::Patch& fine,
-   const hier::Patch& coarse,
+   hier::Patch& fine_patch,
+   const hier::Patch& coarse_patch,
    const int dst_component,
    const int src_component,
    const hier::Box& fine_box,
    const hier::IntVector& ratio) const
 {
    const tbox::Dimension& dim(getDim());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, fine, coarse, fine_box, ratio);
+   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, fine_patch, coarse_patch,
+                                   fine_box, ratio);
 
    tbox::Pointer<pdat::CellData<double> >
-   p = coarse.getPatchData(src_component);
+   p = coarse_patch.getPatchData(src_component);
    tbox::Pointer<pdat::CellData<double> >
-   p_fine = fine.getPatchData(dst_component);
+   p_fine = fine_patch.getPatchData(dst_component);
 #ifdef DEBUG_CHECK_ASSERTIONS
    TBOX_ASSERT(!p.isNull());
    TBOX_ASSERT(!p_fine.isNull());
    TBOX_ASSERT(p->getDepth() == p_fine->getDepth());
 #endif
 
-   hier::Box coarse_box=coarse.getBox();
+   hier::Box coarse_box=coarse_patch.getBox();
    tbox::Pointer<geom::CartesianPatchGeometry>
-     geom = coarse.getPatchGeometry();
+     geom = coarse_patch.getPatchGeometry();
 
    for(int j=fine_box.lower(1); j<=fine_box.upper(1); ++j)
      for(int i=fine_box.lower(0); i<=fine_box.upper(0); ++i)
@@ -129,14 +130,15 @@ void SAMRAI::geom::P_Refine::refine(
            + ((i%2==0) ? (-dp_dx) : dp_dx)
            + ((j%2==0) ? (-dp_dy) : dp_dy);
 
-         // tbox::plog << "P_Refine "
-         //            << i << " "
-         //            << j << " "
-         //            << (*p_fine)(fine) << " "
-         //            << (*p)(center) << " "
-         //            << dp_dx << " "
-         //            << dp_dy << " "
-         //            << "\n";
+         tbox::plog << "P_Refine "
+                    << fine_patch.getPatchLevelNumber() << " "
+                    << i << " "
+                    << j << " "
+                    << (*p_fine)(fine) << " "
+                    << (*p)(center) << " "
+                    << dp_dx << " "
+                    << dp_dy << " "
+                    << "\n";
 
        }
 }

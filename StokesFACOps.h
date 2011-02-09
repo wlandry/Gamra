@@ -42,6 +42,7 @@
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/tbox/Timer.h"
+#include "P_Refine_Patch_Strategy.h"
 #include "V_Refine_Patch_Strategy.h"
 #include "V_Coarsen_Patch_Strategy.h"
 
@@ -1019,6 +1020,7 @@ private:
     * to set and whether we are setting data with homogeneous
     * boundary condition.
     */
+   P_Refine_Patch_Strategy p_refine_patch_strategy;
    V_Refine_Patch_Strategy v_refine_patch_strategy;
    V_Coarsen_Patch_Strategy v_coarsen_patch_strategy;
 

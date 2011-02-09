@@ -201,6 +201,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                                                      ln,
                                                      max_gcw);
   }
+
+  v_coarsen_patch_strategy.coarse_fine=d_cf_boundary;
 // #ifdef HAVE_HYPRE
 //   if (d_coarse_solver_choice == "hypre") {
 //     d_hypre_solver.initializeSolverState(d_hierarchy, d_ln_min);
@@ -252,7 +254,7 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   "LINEAR_REFINE");
+                                   "P_BOUNDARY_REFINE");
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_ghostfill_refine_operator =
@@ -434,8 +436,8 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
       p_ghostfill_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      dest_ln - 1,
-                     d_hierarchy);
-                     // &v_refine_patch_strategy);
+                     d_hierarchy,
+                     &p_refine_patch_strategy);
     if (!p_ghostfill_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
@@ -444,7 +446,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
       v_ghostfill_refine_algorithm->
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                      dest_ln - 1,
-                     // d_hierarchy);
                      d_hierarchy,
                      &v_refine_patch_strategy);
     if (!v_ghostfill_refine_schedules[dest_ln]) {

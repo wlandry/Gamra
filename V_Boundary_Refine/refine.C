@@ -104,22 +104,12 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
          {
            if(boundary_positive)
              {
-               i_max=i_min;
+               i_min=i_max;
              }
            else
              {
-               i_min=i_max;
+               i_max=i_min;
              }
-           j_min=std::max(j_min,fine_box.lower(1));
-           j_max=std::min(j_max,fine_box.upper(1));
-         }
-       /* We need to shrink the box because we do not want the edges.
-          Those are points that are either covered by other patches or
-          are ghost points that we do not care about.  */
-       else
-         {
-           --i_max;
-           ++i_min;
          }
      }
    else if(axis==1)
@@ -128,19 +118,12 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
          {
            if(boundary_positive)
              {
-               j_max=j_min;
+               j_min=j_max;
              }
            else
              {
-               j_min=j_max;
+               j_max=j_min;
              }
-           i_min=std::max(i_min,fine_box.lower(0));
-           i_max=std::min(i_max,fine_box.upper(0));
-         }
-       else
-         {
-           --j_max;
-           ++j_min;
          }
      }
 
@@ -178,12 +161,12 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
          if(axis==0)
            {
              Update_V(axis,boundary_direction,boundary_positive,fine,
-                      ip,jp,j,v,v_fine);
+                      ip,jp,i,j,j_max,v,v_fine);
            }
          else if(axis==1)
            {
              Update_V(axis,boundary_direction,boundary_positive,fine,
-                      jp,ip,i,v,v_fine);
+                      jp,ip,j,i,i_max,v,v_fine);
            }
        }
 }

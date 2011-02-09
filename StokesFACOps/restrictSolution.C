@@ -69,6 +69,7 @@ void SAMRAI::solv::StokesFACOps::restrictSolution
   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(dest_ln);
   set_boundaries(v_dst,level);
   // v_refine_patch_strategy.setHomogeneousBc(false);
+  p_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));
   v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(1));
 
   if (dest_ln == d_ln_min) {

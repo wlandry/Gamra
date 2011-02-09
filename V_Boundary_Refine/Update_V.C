@@ -10,6 +10,7 @@
  ************************************************************************/
 
 #include "V_Boundary_Refine.h"
+#include "quad_offset_interpolate.h"
 
 #include <float.h>
 #include <math.h>
@@ -30,84 +31,85 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V
  const bool &boundary_positive,
  const pdat::SideIndex &fine,
  const hier::Index &ip, const hier::Index &jp,
+ int &i,
  int &j,
+ const int &j_max,
  tbox::Pointer<SAMRAI::pdat::SideData<double> > &v,
  tbox::Pointer<SAMRAI::pdat::SideData<double> > &v_fine) const
 {
   pdat::SideIndex center(fine);
-  center/=2;
+  center.coarsen(hier::Index(2,2));
   const int off_axis= (axis==0) ? 1 : 0;
+
+  /* Set the derivative for the normal direction */
   if(boundary_direction==axis)
     {
-      /* Interpolate in the y direction */
-      const double dv_plus=(*v)(center+jp)-(*v)(center);
-      const double dv_minus=(*v)(center)-(*v)(center-jp);
+      /* Return early if we are at j==j_max, because that is a corner
+         that we do not care about. */
+      if(j==j_max)
+        return;
+      /* Compute the derivative at the nearest three coarse points and
+         then interpolate */
 
-      /* Quadratic interpolation */
-      double v_plus=(*v)(center)
-        + (5.0/32)*dv_plus - (3.0/32)*dv_minus;
-      double v_minus=(*v)(center)
-        - (5.0/32)*dv_minus + (3.0/32)*dv_plus;
+      const double dv_plus=(*v)(center+jp+ip)-(*v)(center+jp-ip);
+      const double dv_minus=(*v)(center-jp+ip)-(*v)(center-jp-ip);
+      const double dv_center=(*v)(center+ip)-(*v)(center-ip);
 
-      const double epsilon(1.0e-8);
-      if(std::abs(v_plus+v_minus)<=epsilon*std::abs((*v)(center)))
-        {
-          (*v_fine)(fine)=(*v_fine)(fine+jp)=(*v)(center);
-        }
-      else
-        {
-          (*v_fine)(fine)=v_minus*(2*(*v)(center))/(v_plus + v_minus);
-          (*v_fine)(fine+jp)=v_plus*(2*(*v)(center))/(v_plus + v_minus);
-        }
+      double dv_fine_minus, dv_fine_plus;
 
-      tbox::plog << "Update V "
-                 << axis << " "
-                 << fine[0] << " "
-                 << fine[1] << " "
-                 << center[0] << " "
-                 << center[1] << " "
-                 << (*v_fine)(fine) << " "
-                 << (*v_fine)(fine+jp) << " "
-                 << (*v)(center) << " "
-                 << (*v)(center+jp) << " "
-                 << (*v)(center-jp) << " "
-                 << (&(*v)(center-jp)) << " "
-                 << v_plus << " "
-                 << v_minus << " "
-                 << dv_plus << " "
-                 << dv_minus << " "
-                 << "\n";
+      quad_offset_interpolate(dv_plus,dv_minus,dv_center,
+                              dv_fine_plus,dv_fine_minus);
 
-      /* Set the point outside of the boundary to be max_double.  This
-         give us a marker for whether the current value is a boundary
-         condition. */
       hier::Index offset(ip);
       if(!boundary_positive)
         {
-          offset[axis]=-1;
+          offset[axis]=-2;
         }
-      (*v_fine)(fine+offset)=(*v_fine)(fine+offset+jp)=
-        boundary_value;
+
+      (*v_fine)(fine)=(*v_fine)(fine-offset) + dv_fine_minus;
+      (*v_fine)(fine+jp)=(*v_fine)(fine-offset+jp) + dv_fine_plus;
+
+      // tbox::plog << "Update V "
+      //            << axis << " "
+      //            << fine[0] << " "
+      //            << fine[1] << " "
+      //            << center[0] << " "
+      //            << center[1] << " "
+      //            << (*v_fine)(fine) << " "
+      //            << (*v_fine)(fine+jp) << " "
+      //            << (*v)(center) << " "
+      //            << (*v)(center+jp) << " "
+      //            << (*v)(center-jp) << " "
+      //            << (&(*v)(center-jp)) << " "
+      //            << v_plus << " "
+      //            << v_minus << " "
+      //            << dv_plus << " "
+      //            << dv_minus << " "
+      //            << "\n";
+
+      /* Since we update two points on j at once, we increment j again.
+         This is ok, since the box in the 'i' direction is defined to be
+         only one cell wide */
       ++j;
     }
+  /* Set the value for the tangential direction */
   else
     {
-      double dv;
-      /* Compute derivatives and use that to set the new vx */
-      if(fine[axis]%2==0)
+      double v_center, v_plus;
+
+      v_center=
+        quad_offset_interpolate((*v)(center-jp),(*v)(center),(*v)(center+jp));
+      (*v_fine)(fine)=v_center;
+
+      if(j<j_max)
         {
-          dv=((*v)(center+jp) - (*v)(center))/2;
+          v_plus=quad_offset_interpolate((*v)(center+ip-jp),(*v)(center+ip),
+                                         (*v)(center+ip+jp));
+          (*v_fine)(fine+ip)=(v_center+v_plus)/2;
         }
-      else
-        {
-          dv=((*v)(center+jp) - (*v)(center)
-              + (*v)(center+jp+ip) - (*v)(center+ip))/4;
-        }
-      hier::Index offset(jp);
-      if(!boundary_positive)
-        {
-          offset[off_axis]=-1;
-        }
-      (*v_fine)(fine)=(*v_fine)(fine-offset)+dv;
+      /* Since we update two points on 'i' at once, we increment 'i' again.
+         This is ok, since the box in the 'j' direction is defined to be
+         only one cell wide */
+      ++i;
     }
 }

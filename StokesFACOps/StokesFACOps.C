@@ -146,6 +146,8 @@ namespace SAMRAI {
       v_nocoarse_refine_operator(),
       v_nocoarse_refine_algorithm(),
       v_nocoarse_refine_schedules(),
+      p_refine_patch_strategy(dim,
+                              d_object_name + "::refine patch strategy"),
       v_refine_patch_strategy(dim,
                               d_object_name + "::refine patch strategy"),
       v_coarsen_patch_strategy(dim,

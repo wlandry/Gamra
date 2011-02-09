@@ -31,10 +31,13 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	FACStokes/setupPlotter.o \
 	FACStokes/solveStokes.o \
 	P_Refine.o V_Refine.o V_Coarsen.o \
+	P_Boundary_Refine.o \
 	V_Boundary_Refine/refine.o \
 	V_Boundary_Refine/Update_V.o \
+	P_Refine_Patch_Strategy.o \
 	V_Refine_Patch_Strategy.o \
 	V_Coarsen_Patch_Strategy.o \
+	set_V_boundary.o \
 	StokesFACOps/StokesFACOps.o \
 	StokesFACOps/checkInputPatchDataIndices.o \
 	StokesFACOps/computeCompositeResidualOnLevel.o \

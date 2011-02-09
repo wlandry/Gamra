@@ -7,15 +7,14 @@
  * Description:   Robin boundary condition support on cartesian grids. 
  *
  ************************************************************************/
-#ifndef included_solv_V_Coarsen_Patch_Strategy
-#define included_solv_V_Coarsen_Patch_Strategy
+#ifndef included_solv_P_Refine_Patch_Strategy
+#define included_solv_P_Refine_Patch_Strategy
 
 #include "SAMRAI/SAMRAI_config.h"
 
-#include "SAMRAI/xfer/CoarsenPatchStrategy.h"
+#include "SAMRAI/xfer/RefinePatchStrategy.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
-#include "SAMRAI/hier/CoarseFineBoundary.h"
-#include "SAMRAI/pdat/SideData.h"
+#include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/pdat/CellIndex.h"
 #include "Boundary.h"
 
@@ -23,14 +22,14 @@ namespace SAMRAI {
 namespace solv {
 
 /*!
- * @brief Helper utility for setting boundary conditions on V.
+ * @brief Helper utility for setting boundary conditions on P.
  *
  * This class inherits and implements virtual functions from
- * xfer::CoarsenPatchStrategy so it may be used to help create
+ * xfer::RefinePatchStrategy so it may be used to help create
  * communication schedules if desired.
  */
-class V_Coarsen_Patch_Strategy:
-   public xfer::CoarsenPatchStrategy
+class P_Refine_Patch_Strategy:
+   public xfer::RefinePatchStrategy
 {
 
 public:
@@ -40,40 +39,50 @@ public:
     * @param object_name Name of the object, for general referencing.
     * @param coef_strategy Coefficients strategy being helped.
     */
-   V_Coarsen_Patch_Strategy(
+   P_Refine_Patch_Strategy(
       const tbox::Dimension& dim,
       std::string object_name = std::string()):
-     xfer::CoarsenPatchStrategy(dim), d_dim(dim),
-     d_object_name(object_name) {}
+     xfer::RefinePatchStrategy(dim), d_dim(dim),d_object_name(object_name) {}
 
    /*!
     * @brief Destructor.
     */
-   virtual ~V_Coarsen_Patch_Strategy(void) {}
+   virtual ~P_Refine_Patch_Strategy(void) {}
 
-   //@{ @name xfer::CoarsenPatchStrategy virtuals
+   //@{ @name xfer::RefinePatchStrategy virtuals
 
-   virtual hier::IntVector
-   getCoarsenOpStencilWidth() const
+   virtual void
+   setPhysicalBoundaryConditions(
+      hier::Patch& patch,
+      const double fill_time,
+      const hier::IntVector& ghost_width_to_fill) {}
+   hier::IntVector
+   getRefineOpStencilWidth() const
   { return hier::IntVector::getOne(d_dim); }
    // virtual void
-   // preprocessCoarsenBoxes(
+   // preprocessRefineBoxes(
    //    hier::Patch& fine,
    //    const hier::Patch& coarse,
    //    const hier::BoxList& fine_boxes,
    //    const hier::IntVector& ratio) {}
    virtual void
-   preprocessCoarsen(hier::Patch& coarse,
-                    const hier::Patch& fine,
-                    const hier::Box& coarse_box,
+   preprocessRefine(hier::Patch& fine,
+                    const hier::Patch& coarse,
+                    const hier::Box& fine_box,
                     const hier::IntVector& ratio);
 
    virtual void
-   postprocessCoarsen(
-      hier::Patch& coarse,
-      const hier::Patch& fine,
-      const hier::Box& coarse_box,
-      const hier::IntVector& ratio);
+   postprocessRefineBoxes(
+      hier::Patch& fine,
+      const hier::Patch& coarse,
+      const hier::BoxList& fine_boxes,
+      const hier::IntVector& ratio) {}
+   virtual void
+   postprocessRefine(
+      hier::Patch& fine,
+      const hier::Patch& coarse,
+      const hier::Box& fine_box,
+      const hier::IntVector& ratio) {}
 
    //@}
 
@@ -88,7 +97,7 @@ public:
     * value of the first ghost cells.
     *
     * This function has an interface similar to the virtual function
-    * xfer::CoarsenPatchStrategy::setPhysicalBoundaryConditions(),
+    * xfer::RefinePatchStrategy::setPhysicalBoundaryConditions(),
     * and it may be used to help implement that function,
     * but it does not serve the same purpose.  The primary
     * differences are:
@@ -213,7 +222,7 @@ public:
     *    to compute the value to be set?
     *
     * This function has an interface similar to the virtual function
-    * xfer::CoarsenPatchStrategy::setPhysicalBoundaryConditions(),
+    * xfer::RefinePatchStrategy::setPhysicalBoundaryConditions(),
     * and it may be used to help implement that function,
     * but it does not serve the same purpose.  The primary
     * differences are:
@@ -276,9 +285,9 @@ public:
     * the it is not passed in through the argument list of
     * setPhysicalBounaryConditions.
     */
-  void setSourceDataId(int id)
+  void setTargetDataId(int id)
   {
-    v_id=id;
+    p_id=id;
   }
 
    /*!
@@ -297,8 +306,6 @@ public:
    //    bool homogeneous_bc);
 
    //@}
-
-  tbox::Array<tbox::Pointer<hier::CoarseFineBoundary> > coarse_fine;
 
 private:
    /*!
@@ -377,7 +384,7 @@ private:
    /*!
     * @brief hier::Index of target patch data when filling ghosts.
     */
-   int v_id;
+   int p_id;
 
    /*!
     * @brief Whether to assumg g=0 when filling ghosts.
@@ -394,4 +401,4 @@ private:
 }
 }
 
-#endif  // included_solv_V_Coarsen_Patch_Strategy
+#endif  // included_solv_P_Refine_Patch_Strategy

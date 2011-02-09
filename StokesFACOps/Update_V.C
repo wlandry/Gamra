@@ -86,14 +86,14 @@ void SAMRAI::solv::StokesFACOps::Update_V
           /* If y==0 */
           hier::Index offset(0,0);
           bool set_boundary(false);
-          if(center[off_axis]==pbox.lower(off_axis))
+          if(center[axis]==pbox.lower(axis)+1)
             {
-              offset[off_axis]=-1;
+              offset[axis]=-1;
               set_boundary=true;
             }
-          else if(center[off_axis]==pbox.upper(off_axis))
+          else if(center[axis]==pbox.upper(axis)-1)
             {
-              offset[off_axis]=1;
+              offset[axis]=1;
               set_boundary=true;
             }
 
@@ -101,7 +101,7 @@ void SAMRAI::solv::StokesFACOps::Update_V
           if(set_boundary)
             {
               dv=(*v)(pdat::SideIndex
-                      (center,
+                      (center-offset,
                        axis,
                        pdat::SideIndex::Lower))
                 - (*v)(pdat::SideIndex
@@ -143,6 +143,10 @@ void SAMRAI::solv::StokesFACOps::Update_V
 
 
           tbox::plog << "v " << axis << " "
+                     << (*v)(pdat::SideIndex(center,
+                                             axis,
+                                             pdat::SideIndex::Lower))
+                     << " "
                      << (*v_rhs)(pdat::SideIndex(center,
                                                  axis,
                                                  pdat::SideIndex::Lower))
@@ -185,7 +189,7 @@ void SAMRAI::solv::StokesFACOps::Update_V
               (*v)(pdat::SideIndex
                    (center+offset,axis,
                     pdat::SideIndex::Lower))=
-                (*v)(pdat::SideIndex(center,axis,
+                (*v)(pdat::SideIndex(center-offset,axis,
                                      pdat::SideIndex::Lower))
                 -dv;
             }

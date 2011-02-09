@@ -72,28 +72,29 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 #endif
   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
 
-  {
-    hier::PatchLevel::Iterator pi(*level);
-    for (pi.initialize(*level); pi; pi++) {
-      tbox::Pointer<hier::Patch> patch = *pi;
-      tbox::Pointer<pdat::CellData<double> > p_rhs_data =
-        patch->getPatchData(p_rhs_id);
-      for(pdat::CellIterator ci(p_rhs_data->getBox()); ci; ci++)
-        {
-          pdat::CellIndex cc=ci();
-          tbox::plog << "p_rhs "
-                     << cc[0] << " "
-                     << cc[1] << " "
-                     << (*p_rhs_data)(cc) << " "
-                     // << (&(*p_rhs_data)(cc)) << " "
-                     << "\n";
-        }
-    }
-  }
+  // {
+  //   hier::PatchLevel::Iterator pi(*level);
+  //   for (pi.initialize(*level); pi; pi++) {
+  //     tbox::Pointer<hier::Patch> patch = *pi;
+  //     tbox::Pointer<pdat::CellData<double> > p_rhs_data =
+  //       patch->getPatchData(p_rhs_id);
+  //     for(pdat::CellIterator ci(p_rhs_data->getBox()); ci; ci++)
+  //       {
+  //         pdat::CellIndex cc=ci();
+  //         tbox::plog << "p_rhs "
+  //                    << cc[0] << " "
+  //                    << cc[1] << " "
+  //                    << (*p_rhs_data)(cc) << " "
+  //                    // << (&(*p_rhs_data)(cc)) << " "
+  //                    << "\n";
+  //       }
+  //   }
+  // }
   /* Only need to sync the rhs once. This sync is needed because
      calculating a new pressure update requires computing in the ghost
      region so that the update for the velocity inside the box will be
      correct. */
+  p_refine_patch_strategy.setTargetDataId(p_id);
   v_refine_patch_strategy.setTargetDataId(v_id);
   xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
   set_boundaries(v_id,level);
@@ -149,6 +150,25 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
               double dx = *(geom->getDx());
               double dy = *(geom->getDx());
 
+              /* Set an array of bools that tells me whether a point
+                 should set the pressure or just let it be.  This is
+                 needed at coarse/fine boundaries where the pressure
+                 is fixed. */
+              hier::Box gbox=p->getGhostBox();
+              std::vector<bool> set_p(gbox.size(),true);
+          
+              const tbox::Array<hier::BoundaryBox >&boundaries
+                =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
+              for(int mm=0; mm<boundaries.size(); ++mm)
+                for(int j=boundaries[mm].getBox().lower(1);
+                    j<=boundaries[mm].getBox().upper(1); ++j)
+                  for(int i=boundaries[mm].getBox().lower(0);
+                      i<=boundaries[mm].getBox().upper(0); ++i)
+                    {
+                      set_p[(i-gbox.lower(0))
+                            + (gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
+                    }
+
               for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
                 {
                   /* Do the red-black skip */
@@ -169,6 +189,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 
                       tbox::plog << "smooth "
                                  << ln << " "
+                                 << sweep << " "
+                                 << rb << " "
                                  << i << " "
                                  << j << " "
                                  << pbox.lower(0) << " "
@@ -177,18 +199,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                  << pbox.upper(1) << " ";
 
                       /* Update p */
-                      if(!((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                pdat::SideIndex::Lower))
-                           ==boundary_value
-                           || (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                   pdat::SideIndex::Upper))
-                           ==boundary_value
-                           || (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                   pdat::SideIndex::Lower))
-                           ==boundary_value
-                           || (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                   pdat::SideIndex::Upper))
-                           ==boundary_value))
+                      if(set_p[(i-gbox.lower(0))
+                               + (gbox.upper(0)+1)*(j-gbox.lower(1))])
                         {
                           double dvx_dx=
                             ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
@@ -215,14 +227,28 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                      << (*p_rhs)(center) << " "
                                      << dvx_dx << " "
                                      << dvy_dy << " "
-                                     << delta_R_continuity << " ";
+                                     << delta_R_continuity << " "
+                                     << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                             pdat::SideIndex::Upper)) << " "
+                                     << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                                             pdat::SideIndex::Lower)) << " "
+                                     << dx << " ";
                         }
                       /* Update v */
-                      Update_V(0,j,pbox,center,left,right,down,up,p,v,v_rhs,
-                               maxres,dx,dy,viscosity,theta_momentum);
-                      Update_V(1,i,pbox,center,down,up,left,right,p,v,v_rhs,
-                               maxres,dy,dx,viscosity,theta_momentum);
-
+                      if(set_p[(i-gbox.lower(0))
+                               + (gbox.upper(0)+1)*(j-gbox.lower(1))]
+                         || j<pbox.upper(1)+1)
+                        {
+                          Update_V(0,j,pbox,center,left,right,down,up,p,v,v_rhs,
+                                   maxres,dx,dy,viscosity,theta_momentum);
+                        }
+                      if(set_p[(i-gbox.lower(0))
+                               + (gbox.upper(0)+1)*(j-gbox.lower(1))]
+                         || i<pbox.upper(0)+1)
+                        {
+                          Update_V(1,i,pbox,center,down,up,left,right,p,v,v_rhs,
+                                   maxres,dy,dx,viscosity,theta_momentum);
+                        }
                                 // << (*v)(pdat::SideIndex
                                 //         (center,
                                 //          pdat::SideIndex::X,

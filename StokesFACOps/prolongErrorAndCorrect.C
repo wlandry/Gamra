@@ -87,6 +87,7 @@ void SAMRAI::solv::StokesFACOps::prolongErrorAndCorrect
    * interior in the scratch space, then use that refined data
    * to correct the fine level error.
    */
+  p_refine_patch_strategy.setTargetDataId(d_cell_scratch_id);
   v_refine_patch_strategy.setTargetDataId(d_side_scratch_id);
   // v_refine_patch_strategy.setHomogeneousBc(true);
   xeqScheduleProlongation(d_cell_scratch_id,
