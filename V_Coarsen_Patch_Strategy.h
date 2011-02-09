@@ -18,6 +18,7 @@
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/CellIndex.h"
 #include "Boundary.h"
+#include "set_V_boundary.h"
 
 namespace SAMRAI {
 namespace solv {
@@ -66,7 +67,10 @@ public:
    preprocessCoarsen(hier::Patch& coarse,
                     const hier::Patch& fine,
                     const hier::Box& coarse_box,
-                    const hier::IntVector& ratio);
+                    const hier::IntVector& ratio)
+  {
+    set_V_boundary(fine,v_id);
+  }
 
    virtual void
    postprocessCoarsen(
