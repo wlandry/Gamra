@@ -84,7 +84,7 @@ void SAMRAI::geom::P_Refine::refine(
          ip[1]=0;
          jp[0]=0;
          jp[1]=1;
-         pdat::CellIndex center(fine/2);
+         pdat::CellIndex center(hier::Index::coarsen(fine,hier::Index(2,2)));
          double dp_dx,dp_dy;
 
          /* Pressure is cell-centered, so prolongation is a
