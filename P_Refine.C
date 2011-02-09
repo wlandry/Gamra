@@ -96,6 +96,10 @@ void SAMRAI::geom::P_Refine::refine(
             physical boundaries, where we do not have an extra grid
             space. */
 
+         /* We could, in theory, use a refine_patch_strategy to fill
+            in the ghost zones with extrapolations, and then use
+            simple differences here. */
+
          if(center[0]==coarse_box.lower(0)
             && geom->getTouchesRegularBoundary(0,0))
            {
