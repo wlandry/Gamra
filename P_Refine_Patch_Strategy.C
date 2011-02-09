@@ -1,3 +1,6 @@
+/* Extrapolate pressure onto ghost cells at physical boundaries.
+   Everywhere else the pressure should already be set correctly. */ 
+
 #include "P_Refine_Patch_Strategy.h"
 
 void
@@ -15,16 +18,6 @@ SAMRAI::solv::P_Refine_Patch_Strategy::preprocessRefine
 
   tbox::Pointer<geom::CartesianPatchGeometry>
     geom = coarse.getPatchGeometry();
-  tbox::plog << "P Refine Patch preprocess "
-             << gbox.lower(0) << " "
-             << gbox.upper(0) << " "
-             << gbox.lower(1) << " "
-             << gbox.upper(1) << " "
-             << pbox.lower(0) << " "
-             << pbox.upper(0) << " "
-             << pbox.lower(1) << " "
-             << pbox.upper(1) << " "
-             << "\n";
   for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
     for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
       {
