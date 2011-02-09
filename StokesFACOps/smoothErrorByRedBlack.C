@@ -157,17 +157,57 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
               hier::Box gbox=p->getGhostBox();
               std::vector<bool> set_p(gbox.size(),true);
           
-              const tbox::Array<hier::BoundaryBox >&boundaries
+              const tbox::Array<hier::BoundaryBox >&edges
                 =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
-              for(int mm=0; mm<boundaries.size(); ++mm)
-                for(int j=boundaries[mm].getBox().lower(1);
-                    j<=boundaries[mm].getBox().upper(1); ++j)
-                  for(int i=boundaries[mm].getBox().lower(0);
-                      i<=boundaries[mm].getBox().upper(0); ++i)
+              for(int mm=0; mm<edges.size(); ++mm)
+                for(int j=edges[mm].getBox().lower(1);
+                    j<=edges[mm].getBox().upper(1); ++j)
+                  for(int i=edges[mm].getBox().lower(0);
+                      i<=edges[mm].getBox().upper(0); ++i)
                     {
                       set_p[(i-gbox.lower(0))
                             + (gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
                     }
+
+              const tbox::Array<hier::BoundaryBox >&nodes
+                =d_cf_boundary[ln]->getNodeBoundaries(patch->getGlobalId());
+              for(int mm=0; mm<nodes.size(); ++mm)
+                {
+                  tbox::plog << "nodes "
+                             << mm << " "
+                             << nodes[mm].getBox().lower(0) << " "
+                             << nodes[mm].getBox().upper(0) << " "
+                             << nodes[mm].getBox().lower(1) << " "
+                             << nodes[mm].getBox().upper(1) << " "
+                             << "\n";
+                    
+                for(int j=nodes[mm].getBox().lower(1);
+                    j<=nodes[mm].getBox().upper(1); ++j)
+                  for(int i=nodes[mm].getBox().lower(0);
+                      i<=nodes[mm].getBox().upper(0); ++i)
+                    {
+                      set_p[(i-gbox.lower(0))
+                            + (gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
+                    }
+                }
+
+              if(geom->getTouchesRegularBoundary(0,0))
+                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  set_p[(gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
+                  
+              if(geom->getTouchesRegularBoundary(0,1))
+                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  set_p[(gbox.upper(0)-gbox.lower(0))
+                        + (gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
+
+              if(geom->getTouchesRegularBoundary(1,0))
+                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  set_p[i-gbox.lower(0)]=false;
+
+              if(geom->getTouchesRegularBoundary(1,1))
+                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  set_p[(i-gbox.lower(0))
+                        + (gbox.upper(0)+1)*(gbox.upper(1)-gbox.lower(1))]=false;
 
               for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
                 {
