@@ -52,17 +52,6 @@ void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id)
                   (*v)(pdat::SideIndex(center-jp,pdat::SideIndex::X,
                                        pdat::SideIndex::Lower));
               }
-            // tbox::plog << "V Refine Patch vx "
-            //            << coarse.getPatchLevelNumber() << " "
-            //            << i << " "
-            //            << j << " "
-            //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-            //                                    pdat::SideIndex::Lower))
-            //            << " "
-            //            << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-            //                                      pdat::SideIndex::Lower)))
-            //            << " "
-            //            << "\n";
           }
         /* vy */
         if(i<=gbox.upper(0))
@@ -88,17 +77,6 @@ void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id)
                   (*v)(pdat::SideIndex(center-ip,pdat::SideIndex::Y,
                                        pdat::SideIndex::Lower));
               }
-            // tbox::plog << "V Refine Patch vy "
-            //            << coarse.getPatchLevelNumber() << " "
-            //            << i << " "
-            //            << j << " "
-            //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-            //                                    pdat::SideIndex::Lower))
-            //            << " "
-            //            << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-            //                                      pdat::SideIndex::Lower)))
-            //            << " "
-            //            << "\n";
           }
       }
 }

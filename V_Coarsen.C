@@ -101,17 +101,13 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
      case, (i*2,j*2), (i*2,j*2+1), (i*2-1,j*2),
      (i*2-1,j*2+1), (i*2+1,j*2), (i*2+1,j*2+1).
 
-     The boundaries get fixed up later.
+     The coarse/fine boundaries get fixed up later in
+     V_Coarsen_Patch_Strategy::postprocessCoarsen.
   */
   hier::Index ip(1,0), jp(0,1);
    for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
      for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
        {
-         tbox::plog << "v coarsen "
-                    << coarse.getPatchLevelNumber() << " "
-                    << i << " "
-                    << j << " ";
-
          if(directions(0) && j!=coarse_box.upper(1)+1)
            {
              pdat::SideIndex coarse(hier::Index(i,j),0,
@@ -128,16 +124,6 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
                {
                  coarsen_v(coarse,ip,jp,v,v_fine);
                }
-             tbox::plog << "vx "
-                        << (*v)(coarse) << " "
-                        << (*v_fine)(center) << " "
-                        << (*v_fine)(center+jp) << " "
-                        << (*v_fine)(center-ip) << " "
-                        << (*v_fine)(center-ip+jp) << " "
-                        << (*v_fine)(center+ip) << " "
-                        << (*v_fine)(center+ip+jp) << " "
-                        << &((*v_fine)(center+ip)) << " ";
-
            }
          if(directions(1) && i!=coarse_box.upper(0)+1)
            {
@@ -155,10 +141,7 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
                {
                  coarsen_v(coarse,jp,ip,v,v_fine);
                }
-             tbox::plog << "vy "
-                        << (*v)(coarse) << " ";
            }
-         tbox::plog << "\n";
        }
 }
 
