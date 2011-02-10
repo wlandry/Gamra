@@ -72,24 +72,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 #endif
   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
 
-  // {
-  //   hier::PatchLevel::Iterator pi(*level);
-  //   for (pi.initialize(*level); pi; pi++) {
-  //     tbox::Pointer<hier::Patch> patch = *pi;
-  //     tbox::Pointer<pdat::CellData<double> > p_rhs_data =
-  //       patch->getPatchData(p_rhs_id);
-  //     for(pdat::CellIterator ci(p_rhs_data->getBox()); ci; ci++)
-  //       {
-  //         pdat::CellIndex cc=ci();
-  //         tbox::plog << "p_rhs "
-  //                    << cc[0] << " "
-  //                    << cc[1] << " "
-  //                    << (*p_rhs_data)(cc) << " "
-  //                    // << (&(*p_rhs_data)(cc)) << " "
-  //                    << "\n";
-  //       }
-  //   }
-  // }
   /* Only need to sync the rhs once. This sync is needed because
      calculating a new pressure update requires computing in the ghost
      region so that the update for the velocity inside the box will be
