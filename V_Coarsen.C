@@ -108,6 +108,19 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
    for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
      for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
        {
+         tbox::plog << "V Coarsen "
+                    << coarse.getPatchLevelNumber() << " "
+                    << i << " "
+                    << j << " "
+                    << fine.getBox().lower(0) << " "
+                    << fine.getBox().upper(0) << " "
+                    << fine.getBox().lower(1) << " "
+                    << fine.getBox().upper(1) << " "
+                    << v_fine->getGhostBox().lower(0) << " "
+                    << v_fine->getGhostBox().upper(0) << " "
+                    << v_fine->getGhostBox().lower(1) << " "
+                    << v_fine->getGhostBox().upper(1) << " ";
+
          if(directions(0) && j!=coarse_box.upper(1)+1)
            {
              pdat::SideIndex coarse(hier::Index(i,j),0,
@@ -124,6 +137,14 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
                {
                  coarsen_v(coarse,ip,jp,v,v_fine);
                }
+             tbox::plog << "vx "
+                        << (*v)(coarse) << " "
+                        << (*v_fine)(center) << " "
+                        << (*v_fine)(center+jp) << " "
+                        << (*v_fine)(center+ip) << " "
+                        << (*v_fine)(center+jp+ip) << " "
+                        << (*v_fine)(center-ip) << " "
+                        << (*v_fine)(center+jp-ip) << " ";
            }
          if(directions(1) && i!=coarse_box.upper(0)+1)
            {
@@ -133,15 +154,26 @@ void SAMRAI::geom::V_Coarsen::coarsen(hier::Patch& coarse,
              if((j==coarse_box.lower(1)
                  && cgeom->getTouchesRegularBoundary(1,0))
                 || (j==coarse_box.upper(1)+1
-                    && cgeom->getTouchesRegularBoundary(0,0)))
+                    && cgeom->getTouchesRegularBoundary(1,1)))
                {
+                 tbox::plog << "vy bound ";
                  (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
                }
              else
                {
+                 tbox::plog << "vy center ";
                  coarsen_v(coarse,jp,ip,v,v_fine);
                }
+             tbox::plog << "vy "
+                        << (*v)(coarse) << " "
+                        << (*v_fine)(center) << " "
+                        << (*v_fine)(center+ip) << " "
+                        << (*v_fine)(center+jp) << " "
+                        << (*v_fine)(center+jp+ip) << " "
+                        << (*v_fine)(center-jp) << " "
+                        << (*v_fine)(center+ip-jp) << " ";
            }
+         tbox::plog << "\n";
        }
 }
 

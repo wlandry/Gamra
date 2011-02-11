@@ -138,7 +138,14 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                  is fixed. */
               hier::Box gbox=p->getGhostBox();
               std::vector<bool> set_p(gbox.size(),true);
-          
+
+              // tbox::plog << "set_p "
+              //            << gbox.lower(0) << " "
+              //            << gbox.upper(0) << " "
+              //            << gbox.lower(1) << " "
+              //            << gbox.upper(1) << " "
+              //            << "\n";
+
               const tbox::Array<hier::BoundaryBox >&edges
                 =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
               for(int mm=0; mm<edges.size(); ++mm)
@@ -148,7 +155,12 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       i<=edges[mm].getBox().upper(0); ++i)
                     {
                       set_p[(i-gbox.lower(0))
-                            + (gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
+                            + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+                      // tbox::plog << i << " "
+                      //            << j << " "
+                      //            << (i-gbox.lower(0))
+                      //   + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1)) << " "
+                      //            << "\n";
                     }
 
               const tbox::Array<hier::BoundaryBox >&nodes
@@ -160,27 +172,52 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       i<=nodes[mm].getBox().upper(0); ++i)
                     {
                       set_p[(i-gbox.lower(0))
-                            + (gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
+                            + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+                      // tbox::plog << i << " "
+                      //            << j << " "
+                      //            << (i-gbox.lower(0))
+                      //   + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1)) << " "
+                      //            << "\n";
                     }
 
               if(geom->getTouchesRegularBoundary(0,0))
                 for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
-                  set_p[(gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
+                  {
+                  set_p[(gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+                      // tbox::plog << gbox.lower(0) << " "
+                      //            << j << " "
+                      //            << "\n";
+                    }
                   
               if(geom->getTouchesRegularBoundary(0,1))
                 for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  {
                   set_p[(gbox.upper(0)-gbox.lower(0))
-                        + (gbox.upper(0)+1)*(j-gbox.lower(1))]=false;
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+                      // tbox::plog << gbox.upper(0) << " "
+                      //            << j << " "
+                      //            << "\n";
+                    }
 
               if(geom->getTouchesRegularBoundary(1,0))
                 for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  {
                   set_p[i-gbox.lower(0)]=false;
+                      // tbox::plog << i << " "
+                      //            << gbox.lower(1) << " "
+                      //            << "\n";
+                    }
 
               if(geom->getTouchesRegularBoundary(1,1))
                 for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  {
                   set_p[(i-gbox.lower(0))
-                        + (gbox.upper(0)+1)*(gbox.upper(1)-gbox.lower(1))]=
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(gbox.upper(1)-gbox.lower(1))]=
                     false;
+                      // tbox::plog << i << " "
+                      //            << gbox.upper(1) << " "
+                      //            << "\n";
+                    }
 
               for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
                 {
@@ -206,14 +243,19 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                  << rb << " "
                                  << i << " "
                                  << j << " "
-                                 << pbox.lower(0) << " "
-                                 << pbox.upper(0) << " "
-                                 << pbox.lower(1) << " "
-                                 << pbox.upper(1) << " ";
+                                 << std::boolalpha
+                                 << set_p[(i-gbox.lower(0))
+                                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))] << " "
+                                 << (i-gbox.lower(0))
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1)) << " ";
+                                 // << pbox.lower(0) << " "
+                                 // << pbox.upper(0) << " "
+                                 // << pbox.lower(1) << " "
+                                 // << pbox.upper(1) << " ";
 
                       /* Update p */
                       if(set_p[(i-gbox.lower(0))
-                               + (gbox.upper(0)+1)*(j-gbox.lower(1))])
+                               + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))])
                         {
                           double dvx_dx=
                             ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
@@ -237,27 +279,28 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
 
                           tbox::plog << "p "
                                      << (*p)(center) << " "
-                                     << (*p_rhs)(center) << " "
-                                     << dvx_dx << " "
-                                     << dvy_dy << " "
-                                     << delta_R_continuity << " "
-                                     << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                             pdat::SideIndex::Upper)) << " "
-                                     << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                             pdat::SideIndex::Lower)) << " "
-                                     << dx << " ";
+                                     << maxres << " ";
+                                     // << (*p_rhs)(center) << " "
+                                     // << dvx_dx << " "
+                                     // << dvy_dy << " "
+                                     // << delta_R_continuity << " "
+                                     // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                     //                         pdat::SideIndex::Upper)) << " "
+                                     // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                     //                         pdat::SideIndex::Lower)) << " "
+                                     // << dx << " ";
                         }
                       /* Update v */
                       if(set_p[(i-gbox.lower(0))
-                               + (gbox.upper(0)+1)*(j-gbox.lower(1))]
-                         || j<pbox.upper(1)+1)
+                               + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
+                         || (i==pbox.upper(0)+1 && j<pbox.upper(1)+1))
                         {
                           Update_V(0,j,pbox,center,left,right,down,up,p,v,v_rhs,
                                    maxres,dx,dy,viscosity,theta_momentum);
                         }
                       if(set_p[(i-gbox.lower(0))
-                               + (gbox.upper(0)+1)*(j-gbox.lower(1))]
-                         || i<pbox.upper(0)+1)
+                               + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
+                         || (i<pbox.upper(0)+1 && j==pbox.upper(1)+1))
                         {
                           Update_V(1,i,pbox,center,down,up,left,right,p,v,v_rhs,
                                    maxres,dy,dx,viscosity,theta_momentum);
@@ -267,7 +310,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                 }
             }
         }
-      if (residual_tolerance >= 0.0) {
+      // if (residual_tolerance >= 0.0) {
         /*
          * Check for early end of sweeps due to convergence
          * only if it is numerically possible (user gave a
@@ -286,7 +329,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
           tbox::plog
             << d_object_name << "\n"
             << " RBGS sweep #" << sweep << " : " << maxres << "\n";
-      }
+      // }
     }
 }
 
