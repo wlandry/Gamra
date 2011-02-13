@@ -178,18 +178,31 @@ void SAMRAI::geom::P_Boundary_Refine::Update_P
   p_offset=
     quad_offset_interpolate((*p)(center-ip),(*p)(center),(*p)(center+ip));
 
-  (*p_fine)(fine)=p_minus + p_offset - (*p)(center)
+  const double p_low=p_minus + p_offset - (*p)(center)
     + ((*p)(center-ip-jp) + (*p)(center)
        - (*p)(center-ip) - (*p)(center-jp))/16;
 
-  (*p_fine)(fine+jp)=p_plus + p_offset - (*p)(center)
+  const double p_high=p_plus + p_offset - (*p)(center)
     + ((*p)(center-ip+jp) + (*p)(center)
        - (*p)(center-ip) - (*p)(center+jp))/16;
 
-  /* Since we update two points on j at once, we increment j again.
-     This is ok, since the box in the 'i' direction is defined to be
-     only one cell wide */
-  ++j;
+
+  /* If we are at an even index, update both of the elements in the cell */
+  if(j%2==0)
+    {
+      (*p_fine)(fine)=p_low;
+
+      (*p_fine)(fine+jp)=p_high;
+
+      /* Since we update two points on j at once, we increment j again.
+         This is ok, since the box in the 'i' direction is defined to be
+         only one cell wide */
+      ++j;
+    }
+  else
+    {
+      (*p_fine)(fine)=p_high;
+    }
 
   tbox::plog << "p bc "
              << fine[0] << " "
@@ -206,5 +219,9 @@ void SAMRAI::geom::P_Boundary_Refine::Update_P
              << (*p)(center+jp) << " "
              << (*p)(center) << " "
              << (*p)(center-jp) << " "
+             << (*p)(center+ip) << " "
+             << (*p)(center-ip) << " "
+             << (*p)(center-ip+jp) << " "
+             << (*p)(center-ip-jp) << " "
              << "\n";
 }
