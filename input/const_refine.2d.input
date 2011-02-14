@@ -32,11 +32,11 @@ FACStokes {
     // This is the input for the cell-centered Stokes FAC solver
     // class in the SAMRAI library.
     enable_logging = TRUE   // Bool flag to switch logging on/off
-    max_cycles = 20         // Max number of FAC cycles to use
+    max_cycles = 100         // Max number of FAC cycles to use
     residual_tol = 1e-8     // Residual tolerance to solve for
     num_pre_sweeps = 5      // Number of presmoothing sweeps to use
     num_post_sweeps = 5     // Number of postsmoothing sweeps to use
-    coarse_solver_max_iterations = 100
+    coarse_solver_max_iterations = 1000
     coarse_solver_tolerance = 1e-10
     p_prolongation_method = "P_REFINE" // Type of refinement
       					  // used in prolongation.
@@ -81,7 +81,7 @@ CartesianGridGeometry {
   //  x_lo  -- (double array) lower corner of computational domain [REQD]
   //  x_up  -- (double array) upper corner of computational domain [REQD]
   //  domain_boxes  -- (box array) set of boxes that define interior of 
-  //                   hysical domain. [REQD]
+  //                   physical domain. [REQD]
   //  periodic_dimension -- (int array) coordinate directions in which 
   //                        domain is periodic.  Zero indicates not
   //                        periodic, non-zero value indicates periodicity.
@@ -97,9 +97,9 @@ StandardTagAndInitialize {
     level_0 = [(0,0),(3,3)]
     // level_1 = [(0,0),(7,7)]
     // level_2 = [(0,0),(15,15)]
-    level_1 = [(2,2),(3,3)]
-    level_2 = [(4,4),(5,5)]
-    // level_3 = [(0,0),(1,1)]
+    level_1 = [(2,2),(5,5)]
+    level_2 = [(4,4),(10,10)]
+    // level_3 = [(8,8),(20,20)]
     //etc.
   }
 }
@@ -134,10 +134,12 @@ PatchHierarchy {
    ratio_to_coarser {
       level_1            = 2, 2
       level_2            = 2, 2
+      level_3            = 2, 2
+      level_4            = 2, 2
    }
    largest_patch_size {
       level_0 = 32, 32
-      // level_0 = 8, 8
+      // level_0 = 4, 4
       // all finer levels will use same values as level_0...
    }
 }
