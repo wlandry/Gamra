@@ -558,9 +558,11 @@ public:
    double
    getResidualNorm() const;
 
-  void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level)
+  void set_boundaries(const int &v_id,
+                      tbox::Pointer<hier::PatchLevel> &level,
+                      const bool &homogeneous)
   {
-    d_fac_ops.set_boundaries(v_id,level);
+    d_fac_ops.set_boundaries(v_id,level,homogeneous);
   }
 
 

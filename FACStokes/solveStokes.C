@@ -52,7 +52,7 @@ int SAMRAI::FACStokes::solveStokes()
         v = patch->getPatchData(v_id);
       v->fill(0.0);
     }
-    d_stokes_fac_solver.set_boundaries(v_id,level);
+    d_stokes_fac_solver.set_boundaries(v_id,level,false);
   }
 
   d_stokes_fac_solver.initializeSolverState

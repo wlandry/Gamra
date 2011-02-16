@@ -27,7 +27,7 @@ SAMRAI::solv::V_Refine_Patch_Strategy::preprocessRefine
   //            << pbox.upper(1) << " "
   //            << "\n";
 
-  set_V_boundary(coarse,v_id);
+  set_V_boundary(coarse,v_id,true);
 
 
   // for(int j=gbox.lower(1); j<=gbox.upper(1)+1; ++j)

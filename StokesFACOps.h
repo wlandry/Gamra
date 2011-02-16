@@ -486,10 +486,19 @@ public:
 
   void set_boundaries(const int &v_id, const int &l)
   {
-    tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(l);
-    set_boundaries(v_id,level);
+    set_boundaries(v_id,l,true);
   }
-  void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level);
+  void set_boundaries(const int &v_id, const int &l, const bool &rhs)
+  {
+    tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(l);
+    set_boundaries(v_id,level,rhs);
+  }
+  void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level)
+  {
+    set_boundaries(v_id,level,true);
+  }
+  void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level,
+                      const bool &rhs);
 
    //@}
 
@@ -523,6 +532,7 @@ private:
 
   void Update_V(const int &axis, const int j,
                 const hier::Box &pbox,
+                tbox::Pointer<geom::CartesianPatchGeometry> &geom,
                 const pdat::CellIndex &center,
                 const pdat::CellIndex &left,
                 const pdat::CellIndex &right, 

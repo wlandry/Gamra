@@ -117,7 +117,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
 
   /* S1. Fill solution ghost data. */
 
-  set_boundaries(v_id,ln);
+  set_boundaries(v_id,ln,error_equation_indicator);
   if (ln > d_ln_min) {
     /* Fill from current, next coarser level and physical boundary */
     xeqScheduleGhostFill(p_id, v_id, ln);
@@ -197,6 +197,10 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
             ++right[0];
             --left[0];
 
+            tbox::plog << "resid "
+                       << ln << " "
+                       << i << " "
+                       << j << " ";
             /* p */
             if(i!=pbox.upper(0)+1 && j!=pbox.upper(1)+1)
               {
@@ -211,6 +215,14 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                    - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
                                           pdat::SideIndex::Lower)))/dy;
                 (*p_resid)(center)=(*p_rhs)(center) - dvx_dx - dvy_dy;
+
+
+                tbox::plog << "p "
+                           << (*p)(center) << " ";
+                           // << (*p_resid)(center) << " "
+                           // << (*p_rhs)(center) << " "
+                           // << dvx_dx << " "
+                           // << dvy_dy << " ";
               }
 
             /* vx */
@@ -264,28 +276,22 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
 
 
 
-                tbox::plog << "resid "
-                           << ln << " "
-                           << i << " "
-                           << j << " "
-                           // << (*p_resid)(center) << " "
-                           // << (*p_rhs)(center) << " "
-                           // << dvx_dx << " "
-                           // << dvy_dy << " "
-                           << "vx "
-                           << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                   pdat::SideIndex::Lower))
-                           << " "
+                tbox::plog << "vx "
                            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                   pdat::SideIndex::Upper))
-                           << " "
+                                                   pdat::SideIndex::Lower))
+                           << " ";
+                           // << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
+                           //                         pdat::SideIndex::Lower))
+                           // << " ";
+                           // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                           //                         pdat::SideIndex::Upper))
+                           // << " "
                            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
                            //                         pdat::SideIndex::Lower))
                            // << " "
-                           << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                     pdat::SideIndex::Upper)))
-                           << " "
-                           << "\n";
+                           // << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                           //                           pdat::SideIndex::Upper)))
+                           // << " "
               }
 
             /* vy */
@@ -335,7 +341,12 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                                                pdat::SideIndex::Lower))
                       - viscosity*(d2vy_dxx + d2vy_dyy) + dp_dy;
                   }
+                tbox::plog << "vy "
+                           << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                                   pdat::SideIndex::Lower))
+                           << " ";
               }
+            tbox::plog << "\n";
           }
       }
 
@@ -359,7 +370,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
   /* We also need to set the boundaries of the rhs so that coarsening
      works correctly. */
   const int v_rhs_id = rhs.getComponentDescriptorIndex(1);
-  set_boundaries(v_rhs_id,ln);
+  set_boundaries(v_rhs_id,ln,true);
   xeqScheduleGhostFillNoCoarse(invalid_id, v_rhs_id, ln);
   
 

@@ -78,8 +78,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
      correct. */
   p_refine_patch_strategy.setTargetDataId(p_id);
   v_refine_patch_strategy.setTargetDataId(v_id);
+  set_boundaries(v_id,level,true);
   xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
-  set_boundaries(v_id,level);
 
   if (ln > d_ln_min) {
     /*
@@ -237,21 +237,16 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       ++right[0];
                       --left[0];
 
-                      tbox::plog << "smooth "
-                                 << ln << " "
-                                 << sweep << " "
-                                 << rb << " "
-                                 << i << " "
-                                 << j << " "
-                                 << std::boolalpha
-                                 << set_p[(i-gbox.lower(0))
-                                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))] << " "
-                                 << (i-gbox.lower(0))
-                        + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1)) << " ";
-                                 // << pbox.lower(0) << " "
-                                 // << pbox.upper(0) << " "
-                                 // << pbox.lower(1) << " "
-                                 // << pbox.upper(1) << " ";
+                      // tbox::plog << "smooth "
+                      //            << ln << " "
+                      //            << sweep << " "
+                      //            << rb << " "
+                      //            << i << " "
+                      //            << j << " ";
+                      //            // << pbox.lower(0) << " "
+                      //            // << pbox.upper(0) << " "
+                      //            // << pbox.lower(1) << " "
+                      //            // << pbox.upper(1) << " ";
 
                       /* Update p */
                       if(set_p[(i-gbox.lower(0))
@@ -272,43 +267,49 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                             (*p_rhs)(center) - dvx_dx - dvy_dy;
 
                           /* No scaling here, though there should be. */
-                          maxres=std::max(maxres,delta_R_continuity);
+                          maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
                           (*p)(center)+=
                             viscosity*delta_R_continuity*theta_continuity;
 
-                          tbox::plog << "p "
-                                     << (*p)(center) << " "
-                                     << maxres << " ";
-                                     // << (*p_rhs)(center) << " "
-                                     // << dvx_dx << " "
-                                     // << dvy_dy << " "
-                                     // << delta_R_continuity << " "
-                                     // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                     //                         pdat::SideIndex::Upper)) << " "
-                                     // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                     //                         pdat::SideIndex::Lower)) << " "
-                                     // << dx << " ";
+                          // tbox::plog << "p "
+                          //            // << (*p)(center) << " "
+                          //            // << maxres << " "
+                          //            // << (*p_rhs)(center) << " "
+                          //            // << dvx_dx << " "
+                          //            // << dvy_dy << " "
+                          //            << delta_R_continuity << " ";
+                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                          //            //                         pdat::SideIndex::Upper)) << " "
+                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                          //            //                         pdat::SideIndex::Lower)) << " "
+                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                          //            //                         pdat::SideIndex::Upper)) << " "
+                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                          //            //                         pdat::SideIndex::Lower)) << " ";
+                          //            // << dx << " "
+                          //            // << dy << " ";
                         }
                       /* Update v */
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
                          || (i==pbox.upper(0)+1 && j<pbox.upper(1)+1))
                         {
-                          Update_V(0,j,pbox,center,left,right,down,up,p,v,v_rhs,
-                                   maxres,dx,dy,viscosity,theta_momentum);
+                          Update_V(0,j,pbox,geom,center,left,right,down,up,p,
+                                   v,v_rhs,maxres,dx,dy,viscosity,theta_momentum);
                         }
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
                          || (i<pbox.upper(0)+1 && j==pbox.upper(1)+1))
                         {
-                          Update_V(1,i,pbox,center,down,up,left,right,p,v,v_rhs,
-                                   maxres,dy,dx,viscosity,theta_momentum);
+                          Update_V(1,i,pbox,geom,center,down,up,left,right,p,
+                                   v,v_rhs,maxres,dy,dx,viscosity,theta_momentum);
                         }
-                      tbox::plog << "\n";
+                      // tbox::plog << "\n";
                     }
                 }
             }
+          set_boundaries(v_id,level,true);
         }
       // if (residual_tolerance >= 0.0) {
         /*
@@ -327,8 +328,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
         converged=(tmp==1);
         if (d_enable_logging)
           tbox::plog
-            << d_object_name << "\n"
-            << " RBGS sweep #" << sweep << " : " << maxres << "\n";
+            // << d_object_name << "\n"
+            << "Smooth " << ln << " " << sweep << " : " << maxres << "\n";
       // }
     }
 }

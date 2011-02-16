@@ -127,30 +127,30 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
          }
      }
 
-   tbox::plog << "VBR "
-              << fine.getPatchLevelNumber() << " "
-              << axis << " "
-              << boundary_direction << " "
-              << std::boolalpha
-              << boundary_positive << " "
-              << coarse_box.lower(0) << " "
-              << coarse_box.upper(0) << " "
-              << coarse_box.lower(1) << " "
-              << coarse_box.upper(1) << " "
-              << fine_box.lower(0) << " "
-              << fine_box.upper(0) << " "
-              << fine_box.lower(1) << " "
-              << fine_box.upper(1) << " "
+   // tbox::plog << "VBR "
+   //            << fine.getPatchLevelNumber() << " "
+   //            << axis << " "
+   //            << boundary_direction << " "
+   //            << std::boolalpha
+   //            << boundary_positive << " "
+   //            << coarse_box.lower(0) << " "
+   //            << coarse_box.upper(0) << " "
+   //            << coarse_box.lower(1) << " "
+   //            << coarse_box.upper(1) << " "
+   //            << fine_box.lower(0) << " "
+   //            << fine_box.upper(0) << " "
+   //            << fine_box.lower(1) << " "
+   //            << fine_box.upper(1) << " "
 
-              << overlap_box.lower(0) << " "
-              << overlap_box.upper(0) << " "
-              << overlap_box.lower(1) << " "
-              << overlap_box.upper(1) << " "
-              << i_min << " "
-              << i_max << " "
-              << j_min << " "
-              << j_max << " "
-              << "\n";
+   //            << overlap_box.lower(0) << " "
+   //            << overlap_box.upper(0) << " "
+   //            << overlap_box.lower(1) << " "
+   //            << overlap_box.upper(1) << " "
+   //            << i_min << " "
+   //            << i_max << " "
+   //            << j_min << " "
+   //            << j_max << " "
+   //            << "\n";
 
    for(int j=j_min; j<=j_max; ++j)
      for(int i=i_min; i<=i_max; ++i)
@@ -161,12 +161,12 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
          if(axis==0)
            {
              Update_V(axis,boundary_direction,boundary_positive,fine,
-                      ip,jp,i,j,j_max,v,v_fine);
+                      ip,jp,i,j,i_max,j_max,v,v_fine);
            }
          else if(axis==1)
            {
              Update_V(axis,boundary_direction,boundary_positive,fine,
-                      jp,ip,j,i,i_max,v,v_fine);
+                      jp,ip,j,i,j_max,i_max,v,v_fine);
            }
        }
 }

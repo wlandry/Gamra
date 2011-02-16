@@ -51,6 +51,7 @@ void SAMRAI::solv::StokesFACOps::Update_V
 (const int &axis,
  const int j,
  const hier::Box &pbox,
+ tbox::Pointer<geom::CartesianPatchGeometry> &geom,
  const pdat::CellIndex &center,
  const pdat::CellIndex &left,
  const pdat::CellIndex &right, 
@@ -86,18 +87,20 @@ void SAMRAI::solv::StokesFACOps::Update_V
           /* If y==0 */
           hier::Index offset(0,0);
           bool set_boundary(false);
-          if(center[axis]==pbox.lower(axis)+1)
+          if(center[axis]==pbox.lower(axis)+1
+             && !geom->getTouchesRegularBoundary(axis,0))
             {
               offset[axis]=-2;
               set_boundary=true;
             }
-          else if(center[axis]==pbox.upper(axis))
+          else if(center[axis]==pbox.upper(axis)
+                  && !geom->getTouchesRegularBoundary(axis,1))
             {
               offset[axis]=2;
               set_boundary=true;
             }
 
-          double dv;
+          double dv(0);
           if(set_boundary)
             {
               dv=(*v)(pdat::SideIndex
@@ -108,7 +111,7 @@ void SAMRAI::solv::StokesFACOps::Update_V
                        (center,axis,
                         pdat::SideIndex::Lower));
             }
-                                    
+
           d2vx_dyy=
             ((*v)(pdat::SideIndex(up,axis,
                                   pdat::SideIndex::Lower))
@@ -142,20 +145,50 @@ void SAMRAI::solv::StokesFACOps::Update_V
             - viscosity*(d2vx_dxx + d2vx_dyy) + dp_dx;
 
 
-          tbox::plog << "v " << axis << " "
-                     << (*v)(pdat::SideIndex(center,
-                                             axis,
-                                             pdat::SideIndex::Lower))
-                     << " "
-                     << (*v_rhs)(pdat::SideIndex(center,
-                                                 axis,
-                                                 pdat::SideIndex::Lower))
-                     << " "
-                     << std::boolalpha
-                     << set_boundary << " ";
-
           /* No scaling here, though there should be. */
-          maxres=std::max(maxres,delta_Rx);
+          maxres=std::max(maxres,std::fabs(delta_Rx));
+
+          // tbox::plog << "v " << axis << " "
+          //            // << (*v)(pdat::SideIndex(center,
+          //            //                         axis,
+          //            //                         pdat::SideIndex::Lower))
+          //            // << " "
+          //            // << maxres << " "
+          //            // << (*v_rhs)(pdat::SideIndex(center,
+          //            //                             axis,
+          //            //                             pdat::SideIndex::Lower))
+          //            // << " "
+          //            // << &(*v_rhs)(pdat::SideIndex(center,
+          //            //                             axis,
+          //            //                             pdat::SideIndex::Lower))
+          //            // << " ";
+          //            << delta_Rx << " ";
+          //            // << d2vx_dxx << " "
+          //            // << d2vx_dyy << " "
+          //            // << dp_dx << " "
+          //            // << (*v)(pdat::SideIndex(left,axis,
+          //            //                         pdat::SideIndex::Lower)) << " "
+          //            // << (*v)(pdat::SideIndex
+          //            //         (center,axis,
+          //            //          pdat::SideIndex::Lower)) << " "
+          //            // << (*v)(pdat::SideIndex
+          //            //         (right,axis,
+          //            //          pdat::SideIndex::Lower)) << " "
+          //            // << (*v)(pdat::SideIndex(up,axis,
+          //            //                         pdat::SideIndex::Lower)) << " "
+          //            // << (*v)(pdat::SideIndex
+          //            //         (down,axis,
+          //            //          pdat::SideIndex::Lower)) << " ";
+
+          //            // << (*p)(center) << " "
+          //            // << (*p)(left) << " ";
+
+          //            // << &(*v_rhs)(pdat::SideIndex(center,
+          //            //                             axis,
+          //            //                             pdat::SideIndex::Lower))
+          //            // << " "
+          //            // << std::boolalpha
+          //            // << set_boundary << " ";
 
           (*v)(pdat::SideIndex(center,axis,
                                pdat::SideIndex::Lower))+=
@@ -168,9 +201,21 @@ void SAMRAI::solv::StokesFACOps::Update_V
               (*v)(pdat::SideIndex(center+offset,axis,
                                    pdat::SideIndex::Lower))=
                 (*v)(pdat::SideIndex(center,axis,pdat::SideIndex::Lower)) + dv;
-              tbox::plog << offset(0) << " "
-                         << offset(1) << " "
-                         << dv << " ";
+              // tbox::plog << "setbc "
+              //            << (center+offset)(0) << " "
+              //            << (center+offset)(1) << " "
+              //            // << center(0) << " "
+              //            // << center(1) << " "
+              //            // << offset(0) << " "
+              //            // << offset(1) << " "
+              //            // << pbox.lower(0) << " "
+              //            // << pbox.upper(0) << " "
+              //            // << pbox.lower(1) << " "
+              //            // << pbox.upper(1) << " "
+              //            << (*v)(pdat::SideIndex(center+offset,axis,
+              //                                    pdat::SideIndex::Lower)) << " "
+              //            << (*v)(pdat::SideIndex(center,axis,pdat::SideIndex::Lower)) << " "
+              //            << dv << " ";
             }
         }
     }

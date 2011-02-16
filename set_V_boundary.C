@@ -7,7 +7,8 @@
 
 using namespace SAMRAI;
 
-void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id)
+void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id,
+                    const bool &rhs)
 {
   tbox::Pointer<pdat::SideData<double> >
     v = patch.getPatchData(v_id);
@@ -29,6 +30,12 @@ void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id)
         /* vx */
         if(j<=gbox.upper(1))
           {
+            // tbox::plog << "V boundary "
+            //            << i << " "
+            //            << j << " "
+            //            << pbox.lower(0) << " "
+            //            << pbox.upper(0) << " ";
+
             /* Set a sentinel value */
             if((i<pbox.lower(0) && geom->getTouchesRegularBoundary(0,0))
                || (i>pbox.upper(0)+1 && geom->getTouchesRegularBoundary(0,1)))
@@ -36,6 +43,13 @@ void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id)
                 (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
                                      pdat::SideIndex::Lower))=
                   boundary_value;
+              }
+            /* Set vx=-1 on the right boundary */
+            else if(i==pbox.upper(0)+1 && geom->getTouchesRegularBoundary(0,1)
+                    && !rhs)
+              {
+                (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                                     pdat::SideIndex::Lower))=-1;
               }
             /* Set the value so the derivative=0 */
             else if(j<pbox.lower(1) && geom->getTouchesRegularBoundary(1,0))
@@ -52,10 +66,14 @@ void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id)
                   (*v)(pdat::SideIndex(center-jp,pdat::SideIndex::X,
                                        pdat::SideIndex::Lower));
               }
+            // tbox::plog << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+            //                                    pdat::SideIndex::Lower)) << " "
+            //            << "\n";
           }
         /* vy */
         if(i<=gbox.upper(0))
           {
+            /* Set a sentinel value */
             if((j<pbox.lower(1) && geom->getTouchesRegularBoundary(1,0))
                || (j>pbox.upper(1)+1 && geom->getTouchesRegularBoundary(1,1)))
               {
@@ -63,6 +81,14 @@ void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id)
                                      pdat::SideIndex::Lower))=
                   boundary_value;
               }
+            /* Set vy=1 on the top boundary */
+            else if(j==pbox.upper(1)+1 && geom->getTouchesRegularBoundary(1,1)
+                    && !rhs)
+              {
+                (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                                     pdat::SideIndex::Lower))=1;
+              }
+            /* Set the value so the derivative=0 */
             else if(i<pbox.lower(0) && geom->getTouchesRegularBoundary(0,0))
               {
                 (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,

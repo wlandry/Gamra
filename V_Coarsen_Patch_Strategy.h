@@ -69,7 +69,7 @@ public:
                     const hier::Box& coarse_box,
                     const hier::IntVector& ratio)
   {
-    set_V_boundary(fine,v_id);
+    set_V_boundary(fine,v_id,true);
   }
 
    virtual void
