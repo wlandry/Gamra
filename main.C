@@ -97,6 +97,7 @@ int main(
     }
 
     tbox::SAMRAI_MPI::setCallAbortInSerialInsteadOfExit(true);
+    tbox::SAMRAI_MPI::setCallAbortInParallelInsteadOfMPIAbort(true);
 
     /*
      * Create input database and parse all data in input file.
@@ -152,8 +153,8 @@ int main(
                     (dim,
                      base_name + "CartesianGridGeometry",
                      input_db->getDatabase("CartesianGridGeometry")));
-    tbox::plog << "Cartesian Geometry:" << endl;
-    grid_geometry->printClassData(tbox::plog);
+    // tbox::plog << "Cartesian Geometry:" << endl;
+    // grid_geometry->printClassData(tbox::plog);
     grid_geometry->addSpatialRefineOperator
       (tbox::Pointer<SAMRAI::xfer::RefineOperator>
        (new SAMRAI::geom::P_Refine(dim)));
@@ -222,8 +223,8 @@ int main(
                                   tag_and_initializer,
                                   box_generator,
                                   load_balancer);
-    tbox::plog << "Gridding algorithm:" << endl;
-    gridding_algorithm->printClassData(tbox::plog);
+    // tbox::plog << "Gridding algorithm:" << endl;
+    // gridding_algorithm->printClassData(tbox::plog);
 
     /*
      * Make the coarsest patch level where we will be solving.
