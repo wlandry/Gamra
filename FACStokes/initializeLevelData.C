@@ -88,17 +88,6 @@ namespace SAMRAI {
 
       p_rhs_data->fill(0.0);
 
-      // for(pdat::CellIterator ci(p_rhs_data->getBox()); ci; ci++)
-      //   {
-      //     pdat::CellIndex cc=ci();
-      //     tbox::plog << "p_rhs "
-      //                << cc[0] << " "
-      //                << cc[1] << " "
-      //                << (*p_rhs_data)(cc) << " "
-      //                << (&(*p_rhs_data)(cc)) << " "
-      //                << "\n";
-      //   }
-
       tbox::Pointer<pdat::SideData<double> > v_rhs_data =
         patch->getPatchData(v_rhs_id);
 
@@ -112,7 +101,6 @@ namespace SAMRAI {
       for(pdat::SideIterator si(pbox,1); si; si++)
         {
           pdat::SideIndex s=si();
-
           (*v_rhs_data)(s)=10;
         }
     }    // End patch loop.
