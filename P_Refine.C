@@ -134,15 +134,15 @@ void SAMRAI::geom::P_Refine::refine(
            + ((i%2==0) ? (-dp_dx) : dp_dx)
            + ((j%2==0) ? (-dp_dy) : dp_dy);
 
-         tbox::plog << "P_Refine "
-                    << fine_patch.getPatchLevelNumber() << " "
-                    << i << " "
-                    << j << " "
-                    << (*p_fine)(fine) << " "
-                    << (*p)(center) << " "
-                    << dp_dx << " "
-                    << dp_dy << " "
-                    << "\n";
+         // tbox::plog << "P_Refine "
+         //            << fine_patch.getPatchLevelNumber() << " "
+         //            << i << " "
+         //            << j << " "
+         //            << (*p_fine)(fine) << " "
+         //            << (*p)(center) << " "
+         //            << dp_dx << " "
+         //            << dp_dy << " "
+         //            << "\n";
 
        }
 }

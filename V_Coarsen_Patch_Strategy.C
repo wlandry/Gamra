@@ -36,28 +36,28 @@ SAMRAI::solv::V_Coarsen_Patch_Strategy::postprocessCoarsen
       hier::Index lower=hier::Index::coarsen(bbox.lower(),hier::Index(2,2)),
         upper=hier::Index::coarsen(bbox.upper(),hier::Index(2,2));
 
-      tbox::plog << "VCPS "
-                 << mm << " "
-                 << bbox.lower(0) << " "
-                 << bbox.upper(0) << " "
-                 << bbox.lower(1) << " "
-                 << bbox.upper(1) << " "
-                 << lower(0) << " "
-                 << upper(0) << " "
-                 << lower(1) << " "
-                 << upper(1) << " "
-                 << v_fine->getGhostBox().lower(0) << " "
-                 << v_fine->getGhostBox().upper(0) << " "
-                 << v_fine->getGhostBox().lower(1) << " "
-                 << v_fine->getGhostBox().upper(1) << " "
-                 << "\n";
+      // tbox::plog << "VCPS "
+      //            << mm << " "
+      //            << bbox.lower(0) << " "
+      //            << bbox.upper(0) << " "
+      //            << bbox.lower(1) << " "
+      //            << bbox.upper(1) << " "
+      //            << lower(0) << " "
+      //            << upper(0) << " "
+      //            << lower(1) << " "
+      //            << upper(1) << " "
+      //            << v_fine->getGhostBox().lower(0) << " "
+      //            << v_fine->getGhostBox().upper(0) << " "
+      //            << v_fine->getGhostBox().lower(1) << " "
+      //            << v_fine->getGhostBox().upper(1) << " "
+      //            << "\n";
 
       for(int j=lower(1); j<=upper(1); ++j)
         for(int i=lower(0); i<=upper(0); ++i)
           {
-            tbox::plog << "V Patch "
-                       << i << " "
-                       << j << " ";
+            // tbox::plog << "V Patch "
+            //            << i << " "
+            //            << j << " ";
             /* Fix vx */
             if(location_index==0)
               {
@@ -67,7 +67,7 @@ SAMRAI::solv::V_Coarsen_Patch_Strategy::postprocessCoarsen
                 if(center[1]>=gbox.lower(1) && center[1]<gbox.upper(1))
                   {
                     (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
-                    tbox::plog << (*v)(coarse) << " ";
+                    // tbox::plog << (*v)(coarse) << " ";
                   }
               }
             else if(location_index==1)
@@ -78,7 +78,7 @@ SAMRAI::solv::V_Coarsen_Patch_Strategy::postprocessCoarsen
                 if(center[1]>=gbox.lower(1) && center[1]<gbox.upper(1))
                   {
                     (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
-                    tbox::plog << (*v)(coarse) << " ";
+                    // tbox::plog << (*v)(coarse) << " ";
                   }
               }
             /* Fix vy */
@@ -90,7 +90,7 @@ SAMRAI::solv::V_Coarsen_Patch_Strategy::postprocessCoarsen
                 if(center[0]>=gbox.lower(0) && center[0]<gbox.upper(0))
                   {
                     (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
-                    tbox::plog << (*v)(coarse) << " ";
+                    // tbox::plog << (*v)(coarse) << " ";
                   }
               }
             else if(location_index==3)
@@ -101,14 +101,14 @@ SAMRAI::solv::V_Coarsen_Patch_Strategy::postprocessCoarsen
                 if(center[0]>=gbox.lower(0) && center[0]<gbox.upper(0))
                   {
                     (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
-                    tbox::plog << (*v)(coarse) << " ";
+                    // tbox::plog << (*v)(coarse) << " ";
                   }
               }
             else
               {
                 abort();
               }
-            tbox::plog << "\n";
+            // tbox::plog << "\n";
           }
     }
 }

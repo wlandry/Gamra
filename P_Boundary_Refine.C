@@ -83,25 +83,25 @@ void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
         }
 
       /* We have to infer where the boundary is from the boxes */
-      tbox::plog << "PBR "
-                 << fine.getPatchLevelNumber() << " "
-                 << boundary_direction << " "
-                 << std::boolalpha
-                 << boundary_positive << " "
-                 << coarse_box.lower(0) << " "
-                 << coarse_box.upper(0) << " "
-                 << coarse_box.lower(1) << " "
-                 << coarse_box.upper(1) << " "
-                 << fine_box.lower(0) << " "
-                 << fine_box.upper(0) << " "
-                 << fine_box.lower(1) << " "
-                 << fine_box.upper(1) << " "
+      // tbox::plog << "PBR "
+      //            << fine.getPatchLevelNumber() << " "
+      //            << boundary_direction << " "
+      //            << std::boolalpha
+      //            << boundary_positive << " "
+      //            << coarse_box.lower(0) << " "
+      //            << coarse_box.upper(0) << " "
+      //            << coarse_box.lower(1) << " "
+      //            << coarse_box.upper(1) << " "
+      //            << fine_box.lower(0) << " "
+      //            << fine_box.upper(0) << " "
+      //            << fine_box.lower(1) << " "
+      //            << fine_box.upper(1) << " "
 
-                 << overlap_box.lower(0) << " "
-                 << overlap_box.upper(0) << " "
-                 << overlap_box.lower(1) << " "
-                 << overlap_box.upper(1) << " "
-                 << "\n";
+      //            << overlap_box.lower(0) << " "
+      //            << overlap_box.upper(0) << " "
+      //            << overlap_box.lower(1) << " "
+      //            << overlap_box.upper(1) << " "
+      //            << "\n";
 
       int i_min(std::max(overlap_box.lower(0),gbox.lower(0))),
         i_max(std::min(overlap_box.upper(0),gbox.upper(0))),
@@ -204,24 +204,24 @@ void SAMRAI::geom::P_Boundary_Refine::Update_P
       (*p_fine)(fine)=p_high;
     }
 
-  tbox::plog << "p bc "
-             << fine[0] << " "
-             << fine[1] << " "
-             << center[0] << " "
-             << center[1] << " "
-             << jp[0] << " "
-             << jp[1] << " "
-             << (*p_fine)(fine) << " "
-             << (*p_fine)(fine+jp) << " "
-             << p_minus << " "
-             << p_plus << " "
-             << p_offset << " "
-             << (*p)(center+jp) << " "
-             << (*p)(center) << " "
-             << (*p)(center-jp) << " "
-             << (*p)(center+ip) << " "
-             << (*p)(center-ip) << " "
-             << (*p)(center-ip+jp) << " "
-             << (*p)(center-ip-jp) << " "
-             << "\n";
+  // tbox::plog << "p bc "
+  //            << fine[0] << " "
+  //            << fine[1] << " "
+  //            << center[0] << " "
+  //            << center[1] << " "
+  //            << jp[0] << " "
+  //            << jp[1] << " "
+  //            << (*p_fine)(fine) << " "
+  //            << (*p_fine)(fine+jp) << " "
+  //            << p_minus << " "
+  //            << p_plus << " "
+  //            << p_offset << " "
+  //            << (*p)(center+jp) << " "
+  //            << (*p)(center) << " "
+  //            << (*p)(center-jp) << " "
+  //            << (*p)(center+ip) << " "
+  //            << (*p)(center-ip) << " "
+  //            << (*p)(center-ip+jp) << " "
+  //            << (*p)(center-ip-jp) << " "
+  //            << "\n";
 }

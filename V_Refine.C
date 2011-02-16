@@ -86,9 +86,10 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
             physical boundaries, where we do not have an extra grid
             space. */
 
-         tbox::plog << "V refine "
-                    << i << " "
-                    << j << " ";
+         // tbox::plog << "V refine "
+         //            << axis << " "
+         //            << i << " "
+         //            << j << " ";
 
          if(axis==0)
            {
@@ -117,6 +118,11 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
 
                  (*v_fine)(fine)=(*v)(center)
                    + ((j%2==0) ? (-dvx_dy) : dvx_dy);
+
+                 // tbox::plog << (*v)(center) << " "
+                 //            << center[0] << " "
+                 //            << center[1] << " "
+                 //            << dvx_dy << " ";
                }
              else
                {
@@ -190,9 +196,8 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
                                   + ((i%2==0) ? (-dvy_dx) : dvy_dx))/2;
                }
            }
-         tbox::plog << axis << " "
-                    << (*v_fine)(fine) << " "
-                    << "\n";
+         // tbox::plog << (*v_fine)(fine) << " "
+         //            << "\n";
 
        }
 }
