@@ -16,7 +16,7 @@
 Main {
   dim = 2
   // Base name for output files.
-  base_name = "constantrefine2"
+  base_name = "linear_pressure"
   // Whether to log all nodes in a parallel run.
   log_all_nodes = TRUE
   // Visualization writers to write files for.
