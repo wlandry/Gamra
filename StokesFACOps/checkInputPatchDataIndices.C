@@ -74,14 +74,6 @@ namespace SAMRAI {
           TBOX_ERROR(d_object_name << ": Bad linear term patch data index.");
         }
       }
-
-      if (d_flux_id != -1) {
-        tbox::Pointer<hier::Variable> var;
-        vdb.mapIndexToVariable(d_flux_id, var);
-        tbox::Pointer<pdat::SideVariable<double> > flux_var = var;
-
-        TBOX_ASSERT(flux_var);
-      }
     }
 
   }

@@ -59,6 +59,7 @@ void SAMRAI::solv::StokesFACOps::xeqScheduleGhostFillNoCoarse(int p_id,
   }
 
   /* v */
+  if(v_id!=invalid_id)
   {
     if (!v_nocoarse_refine_schedules[dest_ln]) {
       TBOX_ERROR("Expected side schedule not found.");

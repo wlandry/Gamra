@@ -246,11 +246,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     geometry->lookupCoarsenOperator(variable,
                                     "V_COARSEN");
 
-  vdb->mapIndexToVariable(d_oflux_scratch_id, variable);
-  d_flux_coarsen_operator =
-    geometry->lookupCoarsenOperator(variable,
-                                    "CONSERVATIVE_COARSEN");
-
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,
@@ -296,10 +291,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     TBOX_ERROR(d_object_name
                << ": Cannot find v restriction coarsening operator");
   }
-  if (!d_flux_coarsen_operator) {
-    TBOX_ERROR(d_object_name
-               << ": Cannot find flux coarsening operator");
-  }
   if (!p_ghostfill_refine_operator) {
     TBOX_ERROR(d_object_name
                << ": Cannot find ghost filling refinement operator");
@@ -318,11 +309,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   }
 #endif
 
-  for (ln = d_ln_min + 1; ln <= d_ln_max; ++ln) {
-    d_hierarchy->getPatchLevel(ln)->
-      allocatePatchData(d_oflux_scratch_id);
-  }
-
   /*
    * Make space for saving communication schedules.
    * There is no need to delete the old schedules first
@@ -338,7 +324,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   p_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   v_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   v_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
-  d_flux_coarsen_schedules.resizeArray(d_ln_max + 1);
 
   p_prolongation_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
   v_prolongation_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
@@ -346,7 +331,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
   p_rrestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   v_urestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   v_rrestriction_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
-  d_flux_coarsen_algorithm = new xfer::CoarsenAlgorithm(d_dim);
   p_ghostfill_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
   v_ghostfill_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
   p_nocoarse_refine_algorithm = new xfer::RefineAlgorithm(d_dim);
@@ -388,10 +372,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
                    solution.getComponentDescriptorIndex(1),
                    solution.getComponentDescriptorIndex(1),
                    v_ghostfill_refine_operator);
-  d_flux_coarsen_algorithm->
-    registerCoarsen(((d_flux_id != -1) ? d_flux_id : d_flux_scratch_id),
-                    d_oflux_scratch_id,
-                    d_flux_coarsen_operator);
   p_nocoarse_refine_algorithm->
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
@@ -510,14 +490,6 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
     if (!v_rrestriction_coarsen_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a coarsen schedule for R v restriction!\n");
-    }
-    d_flux_coarsen_schedules[dest_ln] =
-      d_flux_coarsen_algorithm->
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1));
-    if (!d_flux_coarsen_schedules[dest_ln]) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot create a coarsen schedule for flux transfer!\n");
     }
   }
 

@@ -168,7 +168,7 @@ namespace SAMRAI {
      *
      * These are initialized in the constructor and never change.
      */
-    int p_id, p_exact_id, p_rhs_id, v_id, v_rhs_id;
+    int p_id, viscosity_id, dp_id, p_exact_id, p_rhs_id, v_id, v_rhs_id;
 
     //@}
 

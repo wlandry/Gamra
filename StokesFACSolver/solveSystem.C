@@ -28,7 +28,8 @@
 *************************************************************************
 */
 
-bool SAMRAI::solv::StokesFACSolver::solveSystem(const int p, const int p_rhs,
+bool SAMRAI::solv::StokesFACSolver::solveSystem(const int p, const int viscosity,
+                                                const int dp, const int p_rhs,
                                                 const int v, const int v_rhs)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -61,9 +62,6 @@ bool SAMRAI::solv::StokesFACSolver::solveSystem(const int p, const int p_rhs,
   createVectorWrappers(p, p_rhs, v, v_rhs);
   bool solver_rval;
 
-  // d_fac_ops.relax(*d_uv, *d_fv, 0, 5, 1.0, p, p_rhs, v, v_rhs);
-  // d_fac_ops.relax(*d_uv, *d_fv, 1, 5, 1.0, p, p_rhs, v, v_rhs);
-  // d_fac_ops.relax(*d_uv, *d_fv, 2, 100, 1.0);
   solver_rval = d_fac_precond.solveSystem(*d_uv, *d_fv);
 
   return solver_rval;
@@ -84,6 +82,8 @@ bool SAMRAI::solv::StokesFACSolver::solveSystem(const int p, const int p_rhs,
 
 bool SAMRAI::solv::StokesFACSolver::solveSystem
 (const int p,
+ const int viscosity,
+ const int dp,
  const int p_rhs,
  const int v,
  const int v_rhs,
@@ -116,10 +116,11 @@ bool SAMRAI::solv::StokesFACSolver::solveSystem
                << "specified.\n");
   }
 #endif
-  initializeSolverState(p, p_rhs, v, v_rhs, hierarchy, coarse_ln, fine_ln);
+  initializeSolverState(p, viscosity, dp, p_rhs, v, v_rhs,
+                        hierarchy, coarse_ln, fine_ln);
 
   bool solver_rval;
-  solver_rval = solveSystem(p, p_rhs, v, v_rhs);
+  solver_rval = solveSystem(p, viscosity, dp, p_rhs, v, v_rhs);
 
   deallocateSolverState();
 

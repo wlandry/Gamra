@@ -66,6 +66,8 @@ namespace SAMRAI {
 
     if (allocate_data) {
       level->allocatePatchData(p_id);
+      level->allocatePatchData(viscosity_id);
+      level->allocatePatchData(dp_id);
       level->allocatePatchData(p_rhs_id);
       level->allocatePatchData(p_exact_id);
       level->allocatePatchData(v_id);
@@ -83,6 +85,19 @@ namespace SAMRAI {
         TBOX_ERROR(d_object_name
                    << ": Cannot find patch.  Null patch pointer.");
       }
+      tbox::Pointer<pdat::CellData<double> > viscosity_data =
+        patch->getPatchData(viscosity_id);
+
+      /* At some point this needs to do the proper interpolation for
+         lower levels */
+      viscosity_data->fill(1.0);
+
+      tbox::Pointer<pdat::CellData<double> > dp_data =
+        patch->getPatchData(dp_id);
+
+      /* This is mostly so that the outer boundaries are set properly. */
+      dp_data->fill(0.0);
+
       tbox::Pointer<pdat::CellData<double> > p_rhs_data =
         patch->getPatchData(p_rhs_id);
 

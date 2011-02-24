@@ -37,7 +37,7 @@ namespace SAMRAI {
                  << "The hierarchy must be set before calling\n"
                  << "this function.\n");
     }
-    plotter.registerPlotQuantity("Computed solution",
+    plotter.registerPlotQuantity("Pressure",
                                  "SCALAR",
                                  p_id);
     plotter.registerDerivedPlotQuantity("Error",
@@ -46,6 +46,9 @@ namespace SAMRAI {
     plotter.registerPlotQuantity("Exact solution",
                                  "SCALAR",
                                  p_exact_id);
+    plotter.registerPlotQuantity("Viscosity",
+                                 "SCALAR",
+                                 viscosity_id);
     plotter.registerPlotQuantity("Stokes source",
                                  "SCALAR",
                                  p_rhs_id);

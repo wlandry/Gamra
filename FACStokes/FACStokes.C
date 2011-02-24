@@ -70,6 +70,21 @@ namespace SAMRAI {
                                               stencil widths */);
 
     tbox::Pointer<pdat::CellVariable<double> >
+      viscosity(new pdat::CellVariable<double>(dim,
+                                               object_name + ":viscosity"));
+    viscosity_id = vdb->registerVariableAndContext(viscosity,d_context,
+                                                   hier::IntVector(dim, 1)
+                                                   /* ghost cell width is
+                                                      1 in case needed */);
+
+    tbox::Pointer<pdat::CellVariable<double> >
+      dp(new pdat::CellVariable<double>(dim, object_name + ":dp"));
+    dp_id = vdb->registerVariableAndContext(dp,d_context,
+                                            hier::IntVector(dim, 1)
+                                            /* ghost cell width is
+                                                    1 in case needed */);
+
+    tbox::Pointer<pdat::CellVariable<double> >
       p_exact(new pdat::CellVariable<double>(dim, object_name + ":p exact"));
     p_exact_id = vdb->registerVariableAndContext(p_exact,d_context,
                                                  hier::IntVector(dim, 1)

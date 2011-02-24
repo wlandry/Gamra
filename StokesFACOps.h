@@ -296,10 +296,11 @@ public:
     * flux and you would like that to be used, set flux id to the
     * patch data index of that space.
     */
-   void
-   setFluxId(
-      int flux_id);
-
+   void set_viscosity_dp_id(const int &viscosity, const int &dp)
+  {
+    viscosity_id=viscosity;
+    dp_id=dp;
+  }
    //@}
 
    /*!
@@ -869,14 +870,11 @@ private:
    double d_residual_tolerance_during_smoothing;
 
    /*!
-    * @brief Id of the flux.
+    * @brief Id of viscosity and dp.
     *
-    * If set to -1, create and delete storage space on the fly.
-    * Else, user has provided space for flux.
-    *
-    * @see setFluxId
+    * @see set_viscosity_dp_id.
     */
-   int d_flux_id;
+   int viscosity_id, dp_id;
 
 #ifdef HAVE_HYPRE
    /*!

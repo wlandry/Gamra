@@ -76,21 +76,6 @@ void StokesFACOps::enableLogging(
 
 /*
  ********************************************************************
- * Set the patch data id for the flux.                              *
- ********************************************************************
- */
-
-SAMRAI_INLINE_KEYWORD
-void StokesFACOps::setFluxId(
-   int flux_id) {
-   d_flux_id = flux_id;
-#ifdef DEBUG_CHECK_ASSERTIONS
-   checkInputPatchDataIndices();
-#endif
-}
-
-/*
- ********************************************************************
  * Set the choice for smoothing algorithm.                          *
  ********************************************************************
  */

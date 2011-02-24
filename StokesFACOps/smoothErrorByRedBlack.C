@@ -91,8 +91,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
   }
 
   double viscosity=1;
-  double theta_momentum=1.2;
-  double theta_continuity=0.3;
+  double theta_momentum=0.7;
+  double theta_continuity=1.0;
 
   /*
    * Smooth the number of sweeps specified or until
@@ -108,7 +108,10 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
   bool converged = false;
   for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged; ++sweep)
     {
+
       maxres=0;
+
+      /* vx sweep */
       for(int rb=0;rb<2;++rb)
         {
           // Need to sync
@@ -139,13 +142,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
               hier::Box gbox=p->getGhostBox();
               std::vector<bool> set_p(gbox.size(),true);
 
-              // tbox::plog << "set_p "
-              //            << gbox.lower(0) << " "
-              //            << gbox.upper(0) << " "
-              //            << gbox.lower(1) << " "
-              //            << gbox.upper(1) << " "
-              //            << "\n";
-
               const tbox::Array<hier::BoundaryBox >&edges
                 =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
               for(int mm=0; mm<edges.size(); ++mm)
@@ -153,15 +149,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                     j<=edges[mm].getBox().upper(1); ++j)
                   for(int i=edges[mm].getBox().lower(0);
                       i<=edges[mm].getBox().upper(0); ++i)
-                    {
-                      set_p[(i-gbox.lower(0))
-                            + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                      // tbox::plog << i << " "
-                      //            << j << " "
-                      //            << (i-gbox.lower(0))
-                      //   + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1)) << " "
-                      //            << "\n";
-                    }
+                    set_p[(i-gbox.lower(0))
+                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
 
               const tbox::Array<hier::BoundaryBox >&nodes
                 =d_cf_boundary[ln]->getNodeBoundaries(patch->getGlobalId());
@@ -170,54 +159,27 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                     j<=nodes[mm].getBox().upper(1); ++j)
                   for(int i=nodes[mm].getBox().lower(0);
                       i<=nodes[mm].getBox().upper(0); ++i)
-                    {
-                      set_p[(i-gbox.lower(0))
-                            + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                      // tbox::plog << i << " "
-                      //            << j << " "
-                      //            << (i-gbox.lower(0))
-                      //   + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1)) << " "
-                      //            << "\n";
-                    }
+                    set_p[(i-gbox.lower(0))
+                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
 
               if(geom->getTouchesRegularBoundary(0,0))
                 for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
-                  {
                   set_p[(gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                      // tbox::plog << gbox.lower(0) << " "
-                      //            << j << " "
-                      //            << "\n";
-                    }
                   
               if(geom->getTouchesRegularBoundary(0,1))
                 for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
-                  {
                   set_p[(gbox.upper(0)-gbox.lower(0))
                         + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                      // tbox::plog << gbox.upper(0) << " "
-                      //            << j << " "
-                      //            << "\n";
-                    }
 
               if(geom->getTouchesRegularBoundary(1,0))
                 for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
-                  {
                   set_p[i-gbox.lower(0)]=false;
-                      // tbox::plog << i << " "
-                      //            << gbox.lower(1) << " "
-                      //            << "\n";
-                    }
 
               if(geom->getTouchesRegularBoundary(1,1))
                 for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
-                  {
                   set_p[(i-gbox.lower(0))
                         + (gbox.upper(0)-gbox.lower(0)+1)*(gbox.upper(1)-gbox.lower(1))]=
                     false;
-                      // tbox::plog << i << " "
-                      //            << gbox.upper(1) << " "
-                      //            << "\n";
-                    }
 
               for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
                 {
@@ -237,16 +199,214 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       ++right[0];
                       --left[0];
 
-                      // tbox::plog << "smooth "
-                      //            << ln << " "
-                      //            << sweep << " "
-                      //            << rb << " "
-                      //            << i << " "
-                      //            << j << " ";
-                      //            // << pbox.lower(0) << " "
-                      //            // << pbox.upper(0) << " "
-                      //            // << pbox.lower(1) << " "
-                      //            // << pbox.upper(1) << " ";
+                      /* Update v */
+                      if(set_p[(i-gbox.lower(0))
+                               + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
+                         || (i==pbox.upper(0)+1 && j<pbox.upper(1)+1))
+                        {
+                          Update_V(0,j,pbox,geom,center,left,right,down,up,p,
+                                   v,v_rhs,maxres,dx,dy,viscosity,theta_momentum);
+                        }
+                    }
+                }
+            }
+          set_boundaries(v_id,level,true);
+        }
+
+
+      /* vy sweep */
+      for(int rb=0;rb<2;++rb)
+        {
+          // Need to sync
+          xeqScheduleGhostFillNoCoarse(p_id,v_id,ln);
+          for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+            {
+              tbox::Pointer<hier::Patch> patch = *pi;
+
+              tbox::Pointer<pdat::CellData<double> >
+                p = patch->getPatchData(p_id);
+              tbox::Pointer<pdat::CellData<double> >
+                p_rhs = patch->getPatchData(p_rhs_id);
+              tbox::Pointer<pdat::SideData<double> >
+                v = patch->getPatchData(v_id);
+              tbox::Pointer<pdat::SideData<double> >
+                v_rhs = patch->getPatchData(v_rhs_id);
+
+              hier::Box pbox=patch->getBox();
+              tbox::Pointer<geom::CartesianPatchGeometry>
+                geom = patch->getPatchGeometry();
+              double dx = *(geom->getDx());
+              double dy = *(geom->getDx());
+
+              /* Set an array of bools that tells me whether a point
+                 should set the pressure or just let it be.  This is
+                 needed at coarse/fine boundaries where the pressure
+                 is fixed. */
+              hier::Box gbox=p->getGhostBox();
+              std::vector<bool> set_p(gbox.size(),true);
+
+              const tbox::Array<hier::BoundaryBox >&edges
+                =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
+              for(int mm=0; mm<edges.size(); ++mm)
+                for(int j=edges[mm].getBox().lower(1);
+                    j<=edges[mm].getBox().upper(1); ++j)
+                  for(int i=edges[mm].getBox().lower(0);
+                      i<=edges[mm].getBox().upper(0); ++i)
+                    set_p[(i-gbox.lower(0))
+                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              const tbox::Array<hier::BoundaryBox >&nodes
+                =d_cf_boundary[ln]->getNodeBoundaries(patch->getGlobalId());
+              for(int mm=0; mm<nodes.size(); ++mm)
+                for(int j=nodes[mm].getBox().lower(1);
+                    j<=nodes[mm].getBox().upper(1); ++j)
+                  for(int i=nodes[mm].getBox().lower(0);
+                      i<=nodes[mm].getBox().upper(0); ++i)
+                    set_p[(i-gbox.lower(0))
+                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              if(geom->getTouchesRegularBoundary(0,0))
+                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  set_p[(gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+                  
+              if(geom->getTouchesRegularBoundary(0,1))
+                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  set_p[(gbox.upper(0)-gbox.lower(0))
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              if(geom->getTouchesRegularBoundary(1,0))
+                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  set_p[i-gbox.lower(0)]=false;
+
+              if(geom->getTouchesRegularBoundary(1,1))
+                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  set_p[(i-gbox.lower(0))
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(gbox.upper(1)-gbox.lower(1))]=
+                    false;
+
+              for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
+                {
+                  /* Do the red-black skip */
+                  int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
+                  for(int i=i_min; i<=pbox.upper(0)+1; i+=2)
+                    {
+                      pdat::CellIndex center(tbox::Dimension(2));
+                      center[0]=i;
+                      center[1]=j;
+
+                      pdat::CellIndex up(center), down(center), right(center),
+                        left(center);
+
+                      ++up[1];
+                      --down[1];
+                      ++right[0];
+                      --left[0];
+
+                      /* Update v */
+                      if(set_p[(i-gbox.lower(0))
+                               + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
+                         || (i<pbox.upper(0)+1 && j==pbox.upper(1)+1))
+                        {
+                          Update_V(1,i,pbox,geom,center,down,up,left,right,p,
+                                   v,v_rhs,maxres,dy,dx,viscosity,theta_momentum);
+                        }
+                    }
+                }
+            }
+          set_boundaries(v_id,level,true);
+        }
+
+
+
+      /* p sweep */
+      for(int rb=0;rb<2;++rb)
+        {
+          // Need to sync
+          xeqScheduleGhostFillNoCoarse(-1,v_id,ln);
+          for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+            {
+              tbox::Pointer<hier::Patch> patch = *pi;
+
+              tbox::Pointer<pdat::CellData<double> >
+                p = patch->getPatchData(p_id);
+              tbox::Pointer<pdat::CellData<double> >
+                dp = patch->getPatchData(dp_id);
+              tbox::Pointer<pdat::CellData<double> >
+                p_rhs = patch->getPatchData(p_rhs_id);
+              tbox::Pointer<pdat::SideData<double> >
+                v = patch->getPatchData(v_id);
+              tbox::Pointer<pdat::SideData<double> >
+                v_rhs = patch->getPatchData(v_rhs_id);
+
+              hier::Box pbox=patch->getBox();
+              tbox::Pointer<geom::CartesianPatchGeometry>
+                geom = patch->getPatchGeometry();
+              double dx = *(geom->getDx());
+              double dy = *(geom->getDx());
+
+              /* Set an array of bools that tells me whether a point
+                 should set the pressure or just let it be.  This is
+                 needed at coarse/fine boundaries where the pressure
+                 is fixed. */
+              hier::Box gbox=p->getGhostBox();
+              std::vector<bool> set_p(gbox.size(),true);
+
+              const tbox::Array<hier::BoundaryBox >&edges
+                =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
+              for(int mm=0; mm<edges.size(); ++mm)
+                for(int j=edges[mm].getBox().lower(1);
+                    j<=edges[mm].getBox().upper(1); ++j)
+                  for(int i=edges[mm].getBox().lower(0);
+                      i<=edges[mm].getBox().upper(0); ++i)
+                    set_p[(i-gbox.lower(0))
+                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              const tbox::Array<hier::BoundaryBox >&nodes
+                =d_cf_boundary[ln]->getNodeBoundaries(patch->getGlobalId());
+              for(int mm=0; mm<nodes.size(); ++mm)
+                for(int j=nodes[mm].getBox().lower(1);
+                    j<=nodes[mm].getBox().upper(1); ++j)
+                  for(int i=nodes[mm].getBox().lower(0);
+                      i<=nodes[mm].getBox().upper(0); ++i)
+                    set_p[(i-gbox.lower(0))
+                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              if(geom->getTouchesRegularBoundary(0,0))
+                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  set_p[(gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+                  
+              if(geom->getTouchesRegularBoundary(0,1))
+                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  set_p[(gbox.upper(0)-gbox.lower(0))
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              if(geom->getTouchesRegularBoundary(1,0))
+                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  set_p[i-gbox.lower(0)]=false;
+
+              if(geom->getTouchesRegularBoundary(1,1))
+                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  set_p[(i-gbox.lower(0))
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(gbox.upper(1)-gbox.lower(1))]=
+                    false;
+
+              for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
+                {
+                  /* Do the red-black skip */
+                  int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
+                  for(int i=i_min; i<=pbox.upper(0)+1; i+=2)
+                    {
+                      pdat::CellIndex center(tbox::Dimension(2));
+                      center[0]=i;
+                      center[1]=j;
+
+                      pdat::CellIndex up(center), down(center), right(center),
+                        left(center);
+
+                      ++up[1];
+                      --down[1];
+                      ++right[0];
+                      --left[0];
 
                       /* Update p */
                       if(set_p[(i-gbox.lower(0))
@@ -269,48 +429,175 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                           /* No scaling here, though there should be. */
                           maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
-                          (*p)(center)+=
+                          (*dp)(center)=
                             viscosity*delta_R_continuity*theta_continuity;
 
-                          // tbox::plog << "p "
-                          //            // << (*p)(center) << " "
-                          //            // << maxres << " "
-                          //            // << (*p_rhs)(center) << " "
-                          //            // << dvx_dx << " "
-                          //            // << dvy_dy << " "
-                          //            << delta_R_continuity << " ";
-                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //            //                         pdat::SideIndex::Upper)) << " "
-                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //            //                         pdat::SideIndex::Lower)) << " "
-                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //            //                         pdat::SideIndex::Upper)) << " "
-                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //            //                         pdat::SideIndex::Lower)) << " ";
-                          //            // << dx << " "
-                          //            // << dy << " ";
+
+                          // if(ln==2 && i==15)
+                          //   tbox::plog << "smooth p "
+                          //              << i << " "
+                          //              << j << " "
+                          //              << (*dp)(center) << " "
+                          //              << delta_R_continuity << " "
+                          //              << dvx_dx << " "
+                          //              << dvy_dy << " "
+                          //              << (*p_rhs)(center) << " "
+                          //              << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                          //                                      pdat::SideIndex::Upper)) << " "
+                          //              << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                          //                                      pdat::SideIndex::Lower)) << " "
+                          //              << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                          //                                      pdat::SideIndex::Upper)) << " "
+                          //              <<  (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                          //                                       pdat::SideIndex::Lower)) << " "
+
+                          //              << "\n";
+
+                          (*p)(center)+=(*dp)(center);
                         }
+                    }
+                }
+            }
+        }
+
+
+      /* fix v sweep */
+      for(int rb=0;rb<2;++rb)
+        {
+          // Need to sync
+          xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
+          for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+            {
+              tbox::Pointer<hier::Patch> patch = *pi;
+
+              tbox::Pointer<pdat::CellData<double> >
+                p = patch->getPatchData(p_id);
+              tbox::Pointer<pdat::CellData<double> >
+                dp = patch->getPatchData(dp_id);
+              tbox::Pointer<pdat::CellData<double> >
+                p_rhs = patch->getPatchData(p_rhs_id);
+              tbox::Pointer<pdat::SideData<double> >
+                v = patch->getPatchData(v_id);
+              tbox::Pointer<pdat::SideData<double> >
+                v_rhs = patch->getPatchData(v_rhs_id);
+
+              hier::Box pbox=patch->getBox();
+              tbox::Pointer<geom::CartesianPatchGeometry>
+                geom = patch->getPatchGeometry();
+              double dx = *(geom->getDx());
+              double dy = *(geom->getDx());
+
+              /* Set an array of bools that tells me whether a point
+                 should set the pressure or just let it be.  This is
+                 needed at coarse/fine boundaries where the pressure
+                 is fixed. */
+              hier::Box gbox=p->getGhostBox();
+              std::vector<bool> set_p(gbox.size(),true);
+
+              const tbox::Array<hier::BoundaryBox >&edges
+                =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
+              for(int mm=0; mm<edges.size(); ++mm)
+                for(int j=edges[mm].getBox().lower(1);
+                    j<=edges[mm].getBox().upper(1); ++j)
+                  for(int i=edges[mm].getBox().lower(0);
+                      i<=edges[mm].getBox().upper(0); ++i)
+                    set_p[(i-gbox.lower(0))
+                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              const tbox::Array<hier::BoundaryBox >&nodes
+                =d_cf_boundary[ln]->getNodeBoundaries(patch->getGlobalId());
+              for(int mm=0; mm<nodes.size(); ++mm)
+                for(int j=nodes[mm].getBox().lower(1);
+                    j<=nodes[mm].getBox().upper(1); ++j)
+                  for(int i=nodes[mm].getBox().lower(0);
+                      i<=nodes[mm].getBox().upper(0); ++i)
+                    set_p[(i-gbox.lower(0))
+                          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              if(geom->getTouchesRegularBoundary(0,0))
+                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  set_p[(gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+                  
+              if(geom->getTouchesRegularBoundary(0,1))
+                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
+                  set_p[(gbox.upper(0)-gbox.lower(0))
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
+
+              if(geom->getTouchesRegularBoundary(1,0))
+                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  set_p[i-gbox.lower(0)]=false;
+
+              if(geom->getTouchesRegularBoundary(1,1))
+                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
+                  set_p[(i-gbox.lower(0))
+                        + (gbox.upper(0)-gbox.lower(0)+1)*(gbox.upper(1)-gbox.lower(1))]=
+                    false;
+
+              for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
+                {
+                  /* Do the red-black skip */
+                  int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
+                  for(int i=i_min; i<=pbox.upper(0)+1; i+=2)
+                    {
+                      pdat::CellIndex center(tbox::Dimension(2));
+                      center[0]=i;
+                      center[1]=j;
+
+                      pdat::CellIndex up(center), down(center), right(center),
+                        left(center);
+
+                      ++up[1];
+                      --down[1];
+                      ++right[0];
+                      --left[0];
+
                       /* Update v */
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
                          || (i==pbox.upper(0)+1 && j<pbox.upper(1)+1))
                         {
-                          Update_V(0,j,pbox,geom,center,left,right,down,up,p,
-                                   v,v_rhs,maxres,dx,dy,viscosity,theta_momentum);
+                          if(!((center[0]==pbox.lower(0)
+                                && (*v)(pdat::SideIndex(left,
+                                                        0,
+                                                        pdat::SideIndex::Lower))
+                                ==boundary_value)
+                               || (center[0]==pbox.upper(0)+1
+                                   && (*v)(pdat::SideIndex
+                                           (right,
+                                            0,
+                                            pdat::SideIndex::Lower))
+                                   ==boundary_value)))
+                            (*v)(pdat::SideIndex(center,0,pdat::SideIndex::Lower))
+                              -=((*dp)(center) - (*dp)(left))
+                              /(dx*2*viscosity*(1/(dx*dx) + 1/(dy*dy)));
                         }
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
                          || (i<pbox.upper(0)+1 && j==pbox.upper(1)+1))
                         {
-                          Update_V(1,i,pbox,geom,center,down,up,left,right,p,
-                                   v,v_rhs,maxres,dy,dx,viscosity,theta_momentum);
+                          if(!((center[1]==pbox.lower(1)
+                                && (*v)(pdat::SideIndex(down,
+                                                        1,
+                                                        pdat::SideIndex::Lower))
+                                ==boundary_value)
+                               || (center[1]==pbox.upper(1)+1
+                                   && (*v)(pdat::SideIndex
+                                           (up,
+                                            1,
+                                            pdat::SideIndex::Lower))
+                                   ==boundary_value)))
+                            (*v)(pdat::SideIndex(center,1,pdat::SideIndex::Lower))
+                              -=((*dp)(center) - (*dp)(down))
+                              /(dy*2*viscosity*(1/(dx*dx) + 1/(dy*dy)));
                         }
-                      // tbox::plog << "\n";
                     }
                 }
             }
           set_boundaries(v_id,level,true);
         }
+
+
+
       // if (residual_tolerance >= 0.0) {
         /*
          * Check for early end of sweeps due to convergence

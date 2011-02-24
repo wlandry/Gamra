@@ -180,6 +180,8 @@ public:
    bool
    solveSystem(
       const int p,
+      const int viscosity,
+      const int dp,
       const int p_rhs,
       const int v,
       const int v_rhs,
@@ -208,7 +210,8 @@ public:
     * @see solveSystem( const int, const int, tbox::Pointer< hier::PatchHierarchy >, int, int);
     */
    bool
-   solveSystem(const int p, const int p_rhs, const int v, const int v_rhs);
+   solveSystem(const int p, const int viscosity, const int dp, const int p_rhs,
+               const int v, const int v_rhs);
 
    /*!
     * @brief Specify the boundary conditions that are to be used at the
@@ -505,6 +508,8 @@ public:
     */
    void
    initializeSolverState(const int p,
+                         const int viscosity,
+                         const int dp,
                          const int p_rhs,
                          const int v,
                          const int v_rhs,
