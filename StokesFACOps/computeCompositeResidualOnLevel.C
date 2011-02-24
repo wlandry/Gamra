@@ -197,10 +197,10 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
             ++right[0];
             --left[0];
 
-            tbox::plog << "resid "
-                       << ln << " "
-                       << i << " "
-                       << j << " ";
+            // tbox::plog << "resid "
+            //            << ln << " "
+            //            << i << " "
+            //            << j << " ";
             /* p */
             if(i!=pbox.upper(0)+1 && j!=pbox.upper(1)+1)
               {
@@ -217,12 +217,20 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                 (*p_resid)(center)=(*p_rhs)(center) - dvx_dx - dvy_dy;
 
 
-                tbox::plog << "p "
-                           << (*p)(center) << " ";
-                           // << (*p_resid)(center) << " "
-                           // << (*p_rhs)(center) << " "
-                           // << dvx_dx << " "
-                           // << dvy_dy << " ";
+                // tbox::plog << "p "
+                //            // << (*p)(center) << " ";
+                //            << (*p_resid)(center) << " "
+                //            << (*p_rhs)(center) << " "
+                //            << dvx_dx << " "
+                //            << dvy_dy << " "
+                //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //                                    pdat::SideIndex::Upper)) << " "
+                //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //                                    pdat::SideIndex::Lower)) << " "
+                //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                //                                    pdat::SideIndex::Upper)) << " "
+                //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                //                                    pdat::SideIndex::Lower)) << " ";
               }
 
             /* vx */
@@ -276,22 +284,22 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
 
 
 
-                tbox::plog << "vx "
-                           << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                   pdat::SideIndex::Lower))
-                           << " ";
-                           // << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
-                           //                         pdat::SideIndex::Lower))
-                           // << " ";
-                           // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                           //                         pdat::SideIndex::Upper))
-                           // << " "
-                           // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                           //                         pdat::SideIndex::Lower))
-                           // << " "
-                           // << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                           //                           pdat::SideIndex::Upper)))
-                           // << " "
+                // tbox::plog << "vx "
+                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //            //                         pdat::SideIndex::Lower))
+                //            // << " ";
+                //            << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //                                    pdat::SideIndex::Lower))
+                //            << " ";
+                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //            //                         pdat::SideIndex::Upper))
+                //            // << " "
+                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //            //                         pdat::SideIndex::Lower))
+                //            // << " "
+                //            // << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //            //                           pdat::SideIndex::Upper)))
+                //            // << " "
               }
 
             /* vy */
@@ -341,12 +349,12 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                                                pdat::SideIndex::Lower))
                       - viscosity*(d2vy_dxx + d2vy_dyy) + dp_dy;
                   }
-                tbox::plog << "vy "
-                           << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                   pdat::SideIndex::Lower))
-                           << " ";
+                // tbox::plog << "vy "
+                //            << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                //                                    pdat::SideIndex::Lower))
+                //            << " ";
               }
-            tbox::plog << "\n";
+            // tbox::plog << "\n";
           }
       }
 
