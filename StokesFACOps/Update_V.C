@@ -63,7 +63,8 @@ void SAMRAI::solv::StokesFACOps::Update_V
  double &maxres,
  const double &dx,
  const double &dy,
- const double &viscosity,
+ tbox::Pointer<pdat::CellData<double> > &cell_viscosity,
+ tbox::Pointer<pdat::NodeData<double> > &node_viscosity,
  const double &theta_momentum)
 {
   const int off_axis=(axis==0) ? 1 : 0;
@@ -123,7 +124,9 @@ void SAMRAI::solv::StokesFACOps::Update_V
                      pdat::SideIndex::Lower)))
             /(dy*dy);
 
-          C_vx=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
+          C_vx=-2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy));
+          // C_vx=-2*((*cell_viscosity)(center) + (*cell_viscosity)(left))/(dx*dx)
+            // - ((*node_viscosity)(up) + (*node_viscosity)(center))/(dx*dx)/(dy*dy));
 
           d2vx_dxx=((*v)(pdat::SideIndex
                          (left,axis,
@@ -142,7 +145,7 @@ void SAMRAI::solv::StokesFACOps::Update_V
             (*v_rhs)(pdat::SideIndex(center,
                                      axis,
                                      pdat::SideIndex::Lower))
-            - viscosity*(d2vx_dxx + d2vx_dyy) + dp_dx;
+            - (*cell_viscosity)(center)*(d2vx_dxx + d2vx_dyy) + dp_dx;
 
 
           /* No scaling here, though there should be. */

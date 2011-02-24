@@ -90,7 +90,6 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
     xeqScheduleGhostFill(p_id, v_id, ln);
   }
 
-  double viscosity=1;
   double theta_momentum=0.7;
   double theta_continuity=1.0;
 
@@ -128,6 +127,10 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                 v = patch->getPatchData(v_id);
               tbox::Pointer<pdat::SideData<double> >
                 v_rhs = patch->getPatchData(v_rhs_id);
+              tbox::Pointer<pdat::CellData<double> >
+                cell_viscosity = patch->getPatchData(cell_viscosity_id);
+              tbox::Pointer<pdat::NodeData<double> >
+                node_viscosity = patch->getPatchData(node_viscosity_id);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -205,7 +208,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                          || (i==pbox.upper(0)+1 && j<pbox.upper(1)+1))
                         {
                           Update_V(0,j,pbox,geom,center,left,right,down,up,p,
-                                   v,v_rhs,maxres,dx,dy,viscosity,theta_momentum);
+                                   v,v_rhs,maxres,dx,dy,cell_viscosity,
+                                   node_viscosity,theta_momentum);
                         }
                     }
                 }
@@ -231,6 +235,10 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                 v = patch->getPatchData(v_id);
               tbox::Pointer<pdat::SideData<double> >
                 v_rhs = patch->getPatchData(v_rhs_id);
+              tbox::Pointer<pdat::CellData<double> >
+                cell_viscosity = patch->getPatchData(cell_viscosity_id);
+              tbox::Pointer<pdat::NodeData<double> >
+                node_viscosity = patch->getPatchData(node_viscosity_id);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -308,7 +316,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                          || (i<pbox.upper(0)+1 && j==pbox.upper(1)+1))
                         {
                           Update_V(1,i,pbox,geom,center,down,up,left,right,p,
-                                   v,v_rhs,maxres,dy,dx,viscosity,theta_momentum);
+                                   v,v_rhs,maxres,dy,dx,cell_viscosity,
+                                   node_viscosity,theta_momentum);
                         }
                     }
                 }
@@ -337,6 +346,10 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                 v = patch->getPatchData(v_id);
               tbox::Pointer<pdat::SideData<double> >
                 v_rhs = patch->getPatchData(v_rhs_id);
+              tbox::Pointer<pdat::CellData<double> >
+                cell_viscosity = patch->getPatchData(cell_viscosity_id);
+              tbox::Pointer<pdat::NodeData<double> >
+                node_viscosity = patch->getPatchData(node_viscosity_id);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -430,7 +443,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                           maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
                           (*dp)(center)=
-                            viscosity*delta_R_continuity*theta_continuity;
+                            (*cell_viscosity)(center)*delta_R_continuity*theta_continuity;
 
 
                           // if(ln==2 && i==15)
@@ -480,6 +493,10 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                 v = patch->getPatchData(v_id);
               tbox::Pointer<pdat::SideData<double> >
                 v_rhs = patch->getPatchData(v_rhs_id);
+              tbox::Pointer<pdat::CellData<double> >
+                cell_viscosity = patch->getPatchData(cell_viscosity_id);
+              tbox::Pointer<pdat::NodeData<double> >
+                node_viscosity = patch->getPatchData(node_viscosity_id);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -569,7 +586,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                    ==boundary_value)))
                             (*v)(pdat::SideIndex(center,0,pdat::SideIndex::Lower))
                               -=((*dp)(center) - (*dp)(left))
-                              /(dx*2*viscosity*(1/(dx*dx) + 1/(dy*dy)));
+                              /(dx*2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy)));
                         }
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
@@ -588,7 +605,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                                    ==boundary_value)))
                             (*v)(pdat::SideIndex(center,1,pdat::SideIndex::Lower))
                               -=((*dp)(center) - (*dp)(down))
-                              /(dy*2*viscosity*(1/(dx*dx) + 1/(dy*dy)));
+                              /(dy*2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy)));
                         }
                     }
                 }

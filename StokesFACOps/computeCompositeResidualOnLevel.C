@@ -159,7 +159,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
   /*
    * S4. Compute residual on patches in level.
    */
-  double viscosity=1;
 
   for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
     tbox::Pointer<hier::Patch> patch = *pi;
@@ -167,6 +166,10 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
       p = solution.getComponentPatchData(0, *patch);
     tbox::Pointer<pdat::SideData<double> >
       v = solution.getComponentPatchData(1, *patch);
+    tbox::Pointer<pdat::CellData<double> >
+      cell_viscosity = patch->getPatchData(cell_viscosity_id);
+    tbox::Pointer<pdat::NodeData<double> >
+      node_viscosity = patch->getPatchData(node_viscosity_id);
     tbox::Pointer<pdat::CellData<double> >
       p_rhs = rhs.getComponentPatchData(0, *patch);
     tbox::Pointer<pdat::SideData<double> >
@@ -263,7 +266,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                                               pdat::SideIndex::Lower)))
                       /(dy*dy);
 
-                    C_vx=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
+                    C_vx=-2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy));
 
                     d2vx_dxx=((*v)(pdat::SideIndex(left,pdat::SideIndex::X,
                                                    pdat::SideIndex::Lower))
@@ -279,7 +282,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                                                pdat::SideIndex::Lower))=
                       (*v_rhs)(pdat::SideIndex(center,pdat::SideIndex::X,
                                                pdat::SideIndex::Lower))
-                      - viscosity*(d2vx_dxx + d2vx_dyy) + dp_dx;
+                      - (*cell_viscosity)(center)*(d2vx_dxx + d2vx_dyy) + dp_dx;
                   }
 
 
@@ -332,7 +335,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                                               pdat::SideIndex::Lower)))
                       /(dx*dx);
 
-                    C_vy=-2*viscosity*(1/(dx*dx) + 1/(dy*dy));
+                    C_vy=-2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy));
                     d2vy_dyy=((*v)(pdat::SideIndex(up,pdat::SideIndex::Y,
                                                    pdat::SideIndex::Lower))
                               - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
@@ -347,7 +350,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                                                pdat::SideIndex::Lower))=
                       (*v_rhs)(pdat::SideIndex(center,pdat::SideIndex::Y,
                                                pdat::SideIndex::Lower))
-                      - viscosity*(d2vy_dxx + d2vy_dyy) + dp_dy;
+                      - (*cell_viscosity)(center)*(d2vy_dxx + d2vy_dyy) + dp_dy;
                   }
                 // tbox::plog << "vy "
                 //            << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::Y,

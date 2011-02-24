@@ -56,12 +56,13 @@ int SAMRAI::FACStokes::solveStokes()
   }
 
   d_stokes_fac_solver.initializeSolverState
-    (p_id,viscosity_id,dp_id,p_rhs_id,v_id,v_rhs_id,d_hierarchy,0,
-     d_hierarchy->getFinestLevelNumber());
+    (p_id,cell_viscosity_id,node_viscosity_id,dp_id,p_rhs_id,v_id,v_rhs_id,
+     d_hierarchy,0,d_hierarchy->getFinestLevelNumber());
 
   tbox::plog << "solving..." << std::endl;
   int solver_ret;
-  solver_ret = d_stokes_fac_solver.solveSystem(p_id,viscosity_id,dp_id,
+  solver_ret = d_stokes_fac_solver.solveSystem(p_id,cell_viscosity_id,
+                                               node_viscosity_id,dp_id,
                                                p_rhs_id,v_id,v_rhs_id);
   /*
    * Present data on the solve.

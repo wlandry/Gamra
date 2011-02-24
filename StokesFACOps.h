@@ -296,9 +296,11 @@ public:
     * flux and you would like that to be used, set flux id to the
     * patch data index of that space.
     */
-   void set_viscosity_dp_id(const int &viscosity, const int &dp)
+  void set_viscosity_dp_id(const int &cell_viscosity,
+                           const int &node_viscosity, const int &dp)
   {
-    viscosity_id=viscosity;
+    cell_viscosity_id=cell_viscosity;
+    node_viscosity_id=node_viscosity;
     dp_id=dp;
   }
    //@}
@@ -545,7 +547,8 @@ private:
                 double &maxres,
                 const double &dx,
                 const double &dy,
-                const double &viscosity,
+                tbox::Pointer<pdat::CellData<double> > &cell_viscosity,
+                tbox::Pointer<pdat::NodeData<double> > &node_viscosity,
                 const double &theta_momentum);
 
    /*!
@@ -874,7 +877,7 @@ private:
     *
     * @see set_viscosity_dp_id.
     */
-   int viscosity_id, dp_id;
+  int cell_viscosity_id, node_viscosity_id, dp_id;
 
 #ifdef HAVE_HYPRE
    /*!
