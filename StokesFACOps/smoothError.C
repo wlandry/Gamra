@@ -55,7 +55,7 @@ void SAMRAI::solv::StokesFACOps::smoothError
 
   checkInputPatchDataIndices();
   if (d_smoothing_choice == "redblack") {
-    smoothErrorByRedBlack(data,
+    smooth_Gerya(data,
                           residual,
                           ln,
                           num_sweeps,

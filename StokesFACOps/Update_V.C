@@ -113,10 +113,10 @@ void SAMRAI::solv::StokesFACOps::Update_V
               dv=v(center_x+offset) - v(center_x);
             }
 
-          // const double dv_xx_dx =
+          // const double dtau_xx_dx =
           //   (v(right_x) - 2*v(center_x) + v(left_x))/(dx*dx);
 
-          // const double dv_xy_dy = 
+          // const double dtau_xy_dy = 
           //   (v(up_x)-2*v(center_x)+v(down_x))/(dy*dy);
 
           const double dtau_xx_dx =

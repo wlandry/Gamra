@@ -533,6 +533,14 @@ private:
       int num_sweeps,
       double residual_tolerance = -1.0);
 
+   void
+   smooth_Gerya(
+      SAMRAIVectorReal<double>& error,
+      const SAMRAIVectorReal<double>& residual,
+      int ln,
+      int num_sweeps,
+      double residual_tolerance = -1.0);
+
   void Update_V
   (const int &axis,
    const int j,
