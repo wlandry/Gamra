@@ -67,7 +67,7 @@ namespace SAMRAI {
     if (allocate_data) {
       level->allocatePatchData(p_id);
       level->allocatePatchData(cell_viscosity_id);
-      level->allocatePatchData(node_viscosity_id);
+      level->allocatePatchData(edge_viscosity_id);
       level->allocatePatchData(dp_id);
       level->allocatePatchData(p_rhs_id);
       level->allocatePatchData(p_exact_id);
@@ -93,12 +93,12 @@ namespace SAMRAI {
          lower levels */
       cell_viscosity_data->fill(1.0);
 
-      tbox::Pointer<pdat::NodeData<double> > node_viscosity_data =
-        patch->getPatchData(node_viscosity_id);
+      tbox::Pointer<pdat::NodeData<double> > edge_viscosity_data =
+        patch->getPatchData(edge_viscosity_id);
 
       /* At some point this needs to do the proper interpolation for
          lower levels */
-      node_viscosity_data->fill(1.0);
+      edge_viscosity_data->fill(1.0);
 
 
       tbox::Pointer<pdat::CellData<double> > dp_data =

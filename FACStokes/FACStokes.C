@@ -80,10 +80,10 @@ namespace SAMRAI {
                                                            1 in case needed */);
 
     tbox::Pointer<pdat::NodeVariable<double> >
-      node_viscosity(new pdat::NodeVariable<double>(dim,
+      edge_viscosity(new pdat::NodeVariable<double>(dim,
                                                     object_name
-                                                    + ":node_viscosity"));
-    node_viscosity_id = vdb->registerVariableAndContext(node_viscosity,
+                                                    + ":edge_viscosity"));
+    edge_viscosity_id = vdb->registerVariableAndContext(edge_viscosity,
                                                         d_context,
                                                         hier::IntVector(dim, 1)
                                                         /* ghost cell width is

@@ -49,9 +49,6 @@ namespace SAMRAI {
     plotter.registerPlotQuantity("Cell Viscosity",
                                  "SCALAR",
                                  cell_viscosity_id);
-    plotter.registerPlotQuantity("Node Viscosity",
-                                 "SCALAR",
-                                 node_viscosity_id);
     plotter.registerPlotQuantity("Stokes source",
                                  "SCALAR",
                                  p_rhs_id);

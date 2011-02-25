@@ -169,7 +169,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
     tbox::Pointer<pdat::CellData<double> >
       cell_viscosity = patch->getPatchData(cell_viscosity_id);
     tbox::Pointer<pdat::NodeData<double> >
-      node_viscosity = patch->getPatchData(node_viscosity_id);
+      edge_viscosity = patch->getPatchData(edge_viscosity_id);
     tbox::Pointer<pdat::CellData<double> >
       p_rhs = rhs.getComponentPatchData(0, *patch);
     tbox::Pointer<pdat::SideData<double> >
@@ -222,18 +222,18 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
 
                 // tbox::plog << "p "
                 //            // << (*p)(center) << " ";
-                //            << (*p_resid)(center) << " "
-                //            << (*p_rhs)(center) << " "
-                //            << dvx_dx << " "
-                //            << dvy_dy << " "
-                //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //                                    pdat::SideIndex::Upper)) << " "
-                //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //                                    pdat::SideIndex::Lower)) << " "
-                //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                //                                    pdat::SideIndex::Upper)) << " "
-                //            << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                //                                    pdat::SideIndex::Lower)) << " ";
+                //            << (*p_resid)(center) << " ";
+                //            // << (*p_rhs)(center) << " "
+                //            // << dvx_dx << " "
+                //            // << dvy_dy << " "
+                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //            //                         pdat::SideIndex::Upper)) << " "
+                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                //            //                         pdat::SideIndex::Lower)) << " "
+                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                //            //                         pdat::SideIndex::Upper)) << " "
+                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                //            //                         pdat::SideIndex::Lower)) << " ";
               }
 
             /* vx */

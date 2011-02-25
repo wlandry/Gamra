@@ -57,32 +57,38 @@ void SAMRAI::solv::StokesFACOps::Update_V
  const pdat::CellIndex &right, 
  const pdat::CellIndex &down,
  const pdat::CellIndex &up,
- tbox::Pointer<pdat::CellData<double> > &p,
- tbox::Pointer<pdat::SideData<double> > &v,
- tbox::Pointer<pdat::SideData<double> > &v_rhs,
+ pdat::CellData<double> &p,
+ pdat::SideData<double> &v,
+ pdat::SideData<double> &v_rhs,
  double &maxres,
  const double &dx,
  const double &dy,
- tbox::Pointer<pdat::CellData<double> > &cell_viscosity,
- tbox::Pointer<pdat::NodeData<double> > &node_viscosity,
+ pdat::CellData<double> &cell_viscosity,
+ pdat::NodeData<double> &edge_viscosity,
  const double &theta_momentum)
 {
   const int off_axis=(axis==0) ? 1 : 0;
+  hier::Index ip(0,0);
+  ip[axis]=1;
+
+  const pdat::SideIndex
+    center_x(center,axis,pdat::SideIndex::Lower),
+    left_x(left,axis,pdat::SideIndex::Lower),
+    right_x(right,axis,pdat::SideIndex::Lower),
+    down_x(down,axis,pdat::SideIndex::Lower),
+    up_x(up,axis,pdat::SideIndex::Lower),
+    center_y(center,off_axis,pdat::SideIndex::Lower),
+    up_y(up,off_axis,pdat::SideIndex::Lower);
+  const pdat::NodeIndex
+    center_e(center,pdat::NodeIndex::LowerLeft),
+    up_e(up,pdat::NodeIndex::LowerLeft);
+    
   /* Update vx */
   if(j<pbox.upper(off_axis)+1)
     {
       /* If at the 'x' boundaries, leave vx as is */
-      if(!((center[axis]==pbox.lower(axis)
-            && (*v)(pdat::SideIndex(left,
-                                    axis,
-                                    pdat::SideIndex::Lower))
-            ==boundary_value)
-           || (center[axis]==pbox.upper(axis)+1
-               && (*v)(pdat::SideIndex
-                       (right,
-                        axis,
-                        pdat::SideIndex::Lower))
-               ==boundary_value)))
+      if(!((center[axis]==pbox.lower(axis) && v(left_x)==boundary_value)
+           || (center[axis]==pbox.upper(axis)+1 && v(right_x)==boundary_value)))
         {
           double dp_dx, d2vx_dxx, d2vx_dyy, C_vx;
           /* If y==0 */
@@ -104,55 +110,49 @@ void SAMRAI::solv::StokesFACOps::Update_V
           double dv(0);
           if(set_boundary)
             {
-              dv=(*v)(pdat::SideIndex
-                      (center+offset,
-                       axis,
-                       pdat::SideIndex::Lower))
-                - (*v)(pdat::SideIndex
-                       (center,axis,
-                        pdat::SideIndex::Lower));
+              dv=v(center_x+offset) - v(center_x);
             }
 
-          d2vx_dyy=
-            ((*v)(pdat::SideIndex(up,axis,
-                                  pdat::SideIndex::Lower))
-             - 2*(*v)(pdat::SideIndex
-                      (center,axis,
-                       pdat::SideIndex::Lower))
-             + (*v)(pdat::SideIndex
-                    (down,axis,
-                     pdat::SideIndex::Lower)))
-            /(dy*dy);
+          // const double dv_xx_dx =
+          //   (v(right_x) - 2*v(center_x) + v(left_x))/(dx*dx);
 
-          C_vx=-2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy));
-          // C_vx=-2*((*cell_viscosity)(center) + (*cell_viscosity)(left))/(dx*dx)
-            // - ((*node_viscosity)(up) + (*node_viscosity)(center))/(dx*dx)/(dy*dy));
+          // const double dv_xy_dy = 
+          //   (v(up_x)-2*v(center_x)+v(down_x))/(dy*dy);
 
-          d2vx_dxx=((*v)(pdat::SideIndex
-                         (left,axis,
-                          pdat::SideIndex::Lower))
-                    - 2*(*v)(pdat::SideIndex
-                             (center,axis,
-                              pdat::SideIndex::Lower))
-                    + (*v)(pdat::SideIndex
-                           (right,axis,
-                            pdat::SideIndex::Lower)))
-            /(dx*dx);
+          const double dtau_xx_dx =
+            2*((v(right_x)-v(center_x))*cell_viscosity(center)
+               - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
 
-          dp_dx=((*p)(center)-(*p)(left))/dx;
+          const double dtau_xy_dy = 
+            edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
+                                  + (v(up_y)-v(up_y-ip))/(dx*dy))
+            - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
+                                        + (v(center_y)-v(center_y-ip))/(dx*dy));
+
+
+          // tbox::plog << "v "
+          //            << axis << " "
+          //            << center[0] << " "
+          //            << center[1] << " "
+          //            << dv_xx_dx << " "
+          //            << dtau_xx_dx << " "
+          //            << dv_xy_dy << " "
+          //            << dtau_xy_dy << " "
+          //            << "\n";
+
+          // C_vx=-2*(1/(dx*dx) + 1/(dy*dy));
+          C_vx=dRm_dv(cell_viscosity,edge_viscosity,center,left,up_e,center_e,
+                      dx,dy);
+
+          dp_dx=(p(center)-p(left))/dx;
                               
-          double delta_Rx=
-            (*v_rhs)(pdat::SideIndex(center,
-                                     axis,
-                                     pdat::SideIndex::Lower))
-            - (*cell_viscosity)(center)*(d2vx_dxx + d2vx_dyy) + dp_dx;
-
+          double delta_Rx=v_rhs(center_x) - dtau_xx_dx - dtau_xy_dy + dp_dx;
 
           /* No scaling here, though there should be. */
           maxres=std::max(maxres,std::fabs(delta_Rx));
 
           // tbox::plog << "v " << axis << " "
-          //            // << (*v)(pdat::SideIndex(center,
+          //            // << v(pdat::SideIndex(center,
           //            //                         axis,
           //            //                         pdat::SideIndex::Lower))
           //            // << " "
@@ -169,17 +169,17 @@ void SAMRAI::solv::StokesFACOps::Update_V
           //            // << d2vx_dxx << " "
           //            // << d2vx_dyy << " "
           //            // << dp_dx << " "
-          //            // << (*v)(pdat::SideIndex(left,axis,
+          //            // << v(pdat::SideIndex(left,axis,
           //            //                         pdat::SideIndex::Lower)) << " "
-          //            // << (*v)(pdat::SideIndex
+          //            // << v(pdat::SideIndex
           //            //         (center,axis,
           //            //          pdat::SideIndex::Lower)) << " "
-          //            // << (*v)(pdat::SideIndex
+          //            // << v(pdat::SideIndex
           //            //         (right,axis,
           //            //          pdat::SideIndex::Lower)) << " "
-          //            // << (*v)(pdat::SideIndex(up,axis,
+          //            // << v(pdat::SideIndex(up,axis,
           //            //                         pdat::SideIndex::Lower)) << " "
-          //            // << (*v)(pdat::SideIndex
+          //            // << v(pdat::SideIndex
           //            //         (down,axis,
           //            //          pdat::SideIndex::Lower)) << " ";
 
@@ -193,17 +193,14 @@ void SAMRAI::solv::StokesFACOps::Update_V
           //            // << std::boolalpha
           //            // << set_boundary << " ";
 
-          (*v)(pdat::SideIndex(center,axis,
-                               pdat::SideIndex::Lower))+=
-            delta_Rx*theta_momentum/C_vx;
+          v(center_x)+=delta_Rx*theta_momentum/C_vx;
 
           /* Set the boundary elements so that the
              derivative is zero. */
           if(set_boundary)
             {
-              (*v)(pdat::SideIndex(center+offset,axis,
-                                   pdat::SideIndex::Lower))=
-                (*v)(pdat::SideIndex(center,axis,pdat::SideIndex::Lower)) + dv;
+              v(center_x+offset)=v(center_x) + dv;
+                
               // tbox::plog << "setbc "
               //            << (center+offset)(0) << " "
               //            << (center+offset)(1) << " "
@@ -215,9 +212,9 @@ void SAMRAI::solv::StokesFACOps::Update_V
               //            // << pbox.upper(0) << " "
               //            // << pbox.lower(1) << " "
               //            // << pbox.upper(1) << " "
-              //            << (*v)(pdat::SideIndex(center+offset,axis,
+              //            << v(pdat::SideIndex(center+offset,axis,
               //                                    pdat::SideIndex::Lower)) << " "
-              //            << (*v)(pdat::SideIndex(center,axis,pdat::SideIndex::Lower)) << " "
+              //            << v(pdat::SideIndex(center,axis,pdat::SideIndex::Lower)) << " "
               //            << dv << " ";
             }
         }

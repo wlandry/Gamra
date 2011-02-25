@@ -297,10 +297,10 @@ public:
     * patch data index of that space.
     */
   void set_viscosity_dp_id(const int &cell_viscosity,
-                           const int &node_viscosity, const int &dp)
+                           const int &edge_viscosity, const int &dp)
   {
     cell_viscosity_id=cell_viscosity;
-    node_viscosity_id=node_viscosity;
+    edge_viscosity_id=edge_viscosity;
     dp_id=dp;
   }
    //@}
@@ -533,23 +533,43 @@ private:
       int num_sweeps,
       double residual_tolerance = -1.0);
 
-  void Update_V(const int &axis, const int j,
-                const hier::Box &pbox,
-                tbox::Pointer<geom::CartesianPatchGeometry> &geom,
+  void Update_V
+  (const int &axis,
+   const int j,
+   const hier::Box &pbox,
+   tbox::Pointer<geom::CartesianPatchGeometry> &geom,
+   const pdat::CellIndex &center,
+   const pdat::CellIndex &left,
+   const pdat::CellIndex &right, 
+   const pdat::CellIndex &down,
+   const pdat::CellIndex &up,
+   pdat::CellData<double> &p,
+   pdat::SideData<double> &v,
+   pdat::SideData<double> &v_rhs,
+   double &maxres,
+   const double &dx,
+   const double &dy,
+   pdat::CellData<double> &cell_viscosity,
+   pdat::NodeData<double> &edge_viscosity,
+   const double &theta_momentum);
+
+  /* Compute the derivative of the momentum equation w/respect to
+     velocity. It is written from the perspective of vx(center_x), but
+     pass in different values for center etc. to get vy or
+     vx(!center_x). */
+
+  double dRm_dv(pdat::CellData<double> &cell_viscosity,
+                pdat::NodeData<double> &edge_viscosity,
                 const pdat::CellIndex &center,
                 const pdat::CellIndex &left,
-                const pdat::CellIndex &right, 
-                const pdat::CellIndex &down,
-                const pdat::CellIndex &up,
-                tbox::Pointer<pdat::CellData<double> > &p,
-                tbox::Pointer<pdat::SideData<double> > &v,
-                tbox::Pointer<pdat::SideData<double> > &v_rhs,
-                double &maxres,
+                const pdat::NodeIndex &up_e,
+                const pdat::NodeIndex &center_e,
                 const double &dx,
-                const double &dy,
-                tbox::Pointer<pdat::CellData<double> > &cell_viscosity,
-                tbox::Pointer<pdat::NodeData<double> > &node_viscosity,
-                const double &theta_momentum);
+                const double &dy)
+  {
+    return -2*(cell_viscosity(center) + cell_viscosity(left))/(dx*dx)
+      - (edge_viscosity(up_e) + edge_viscosity(center_e))/(dy*dy);
+  }
 
    /*!
     * @brief Solve the coarsest level using HYPRE
@@ -877,7 +897,7 @@ private:
     *
     * @see set_viscosity_dp_id.
     */
-  int cell_viscosity_id, node_viscosity_id, dp_id;
+  int cell_viscosity_id, edge_viscosity_id, dp_id;
 
 #ifdef HAVE_HYPRE
    /*!

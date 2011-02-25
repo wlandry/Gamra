@@ -93,6 +93,8 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
   double theta_momentum=0.7;
   double theta_continuity=1.0;
 
+  const hier::Index ip(1,0), jp(0,1);
+
   /*
    * Smooth the number of sweeps specified or until
    * the convergence is satisfactory.
@@ -119,18 +121,29 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
             {
               tbox::Pointer<hier::Patch> patch = *pi;
 
-              tbox::Pointer<pdat::CellData<double> >
-                p = patch->getPatchData(p_id);
-              tbox::Pointer<pdat::CellData<double> >
-                p_rhs = patch->getPatchData(p_rhs_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v = patch->getPatchData(v_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v_rhs = patch->getPatchData(v_rhs_id);
-              tbox::Pointer<pdat::CellData<double> >
-                cell_viscosity = patch->getPatchData(cell_viscosity_id);
-              tbox::Pointer<pdat::NodeData<double> >
-                node_viscosity = patch->getPatchData(node_viscosity_id);
+              tbox::Pointer<pdat::CellData<double> > p_ptr =
+                patch->getPatchData(p_id);
+              pdat::CellData<double> &p(*p_ptr);
+              tbox::Pointer<pdat::CellData<double> > dp_ptr =
+                patch->getPatchData(dp_id);
+              pdat::CellData<double> &dp(*dp_ptr);
+              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
+                patch->getPatchData(p_rhs_id);
+              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
+                
+              tbox::Pointer<pdat::SideData<double> > v_ptr =
+                patch->getPatchData(v_id);
+              pdat::SideData<double> &v(*v_ptr);
+              tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
+                patch->getPatchData(v_rhs_id);
+              pdat::SideData<double> &v_rhs(*v_rhs_ptr);
+                
+              tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
+                = patch->getPatchData(cell_viscosity_id);
+              pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+              tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
+                = patch->getPatchData(edge_viscosity_id);
+              pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -142,7 +155,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                  should set the pressure or just let it be.  This is
                  needed at coarse/fine boundaries where the pressure
                  is fixed. */
-              hier::Box gbox=p->getGhostBox();
+              hier::Box gbox=p.getGhostBox();
               std::vector<bool> set_p(gbox.size(),true);
 
               const tbox::Array<hier::BoundaryBox >&edges
@@ -209,7 +222,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                         {
                           Update_V(0,j,pbox,geom,center,left,right,down,up,p,
                                    v,v_rhs,maxres,dx,dy,cell_viscosity,
-                                   node_viscosity,theta_momentum);
+                                   edge_viscosity,theta_momentum);
                         }
                     }
                 }
@@ -227,18 +240,29 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
             {
               tbox::Pointer<hier::Patch> patch = *pi;
 
-              tbox::Pointer<pdat::CellData<double> >
-                p = patch->getPatchData(p_id);
-              tbox::Pointer<pdat::CellData<double> >
-                p_rhs = patch->getPatchData(p_rhs_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v = patch->getPatchData(v_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v_rhs = patch->getPatchData(v_rhs_id);
-              tbox::Pointer<pdat::CellData<double> >
-                cell_viscosity = patch->getPatchData(cell_viscosity_id);
-              tbox::Pointer<pdat::NodeData<double> >
-                node_viscosity = patch->getPatchData(node_viscosity_id);
+              tbox::Pointer<pdat::CellData<double> > p_ptr =
+                patch->getPatchData(p_id);
+              pdat::CellData<double> &p(*p_ptr);
+              tbox::Pointer<pdat::CellData<double> > dp_ptr =
+                patch->getPatchData(dp_id);
+              pdat::CellData<double> &dp(*dp_ptr);
+              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
+                patch->getPatchData(p_rhs_id);
+              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
+                
+              tbox::Pointer<pdat::SideData<double> > v_ptr =
+                patch->getPatchData(v_id);
+              pdat::SideData<double> &v(*v_ptr);
+              tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
+                patch->getPatchData(v_rhs_id);
+              pdat::SideData<double> &v_rhs(*v_rhs_ptr);
+                
+              tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
+                = patch->getPatchData(cell_viscosity_id);
+              pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+              tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
+                = patch->getPatchData(edge_viscosity_id);
+              pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -250,7 +274,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                  should set the pressure or just let it be.  This is
                  needed at coarse/fine boundaries where the pressure
                  is fixed. */
-              hier::Box gbox=p->getGhostBox();
+              hier::Box gbox=p.getGhostBox();
               std::vector<bool> set_p(gbox.size(),true);
 
               const tbox::Array<hier::BoundaryBox >&edges
@@ -317,7 +341,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                         {
                           Update_V(1,i,pbox,geom,center,down,up,left,right,p,
                                    v,v_rhs,maxres,dy,dx,cell_viscosity,
-                                   node_viscosity,theta_momentum);
+                                   edge_viscosity,theta_momentum);
                         }
                     }
                 }
@@ -336,20 +360,29 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
             {
               tbox::Pointer<hier::Patch> patch = *pi;
 
-              tbox::Pointer<pdat::CellData<double> >
-                p = patch->getPatchData(p_id);
-              tbox::Pointer<pdat::CellData<double> >
-                dp = patch->getPatchData(dp_id);
-              tbox::Pointer<pdat::CellData<double> >
-                p_rhs = patch->getPatchData(p_rhs_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v = patch->getPatchData(v_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v_rhs = patch->getPatchData(v_rhs_id);
-              tbox::Pointer<pdat::CellData<double> >
-                cell_viscosity = patch->getPatchData(cell_viscosity_id);
-              tbox::Pointer<pdat::NodeData<double> >
-                node_viscosity = patch->getPatchData(node_viscosity_id);
+              tbox::Pointer<pdat::CellData<double> > p_ptr =
+                patch->getPatchData(p_id);
+              pdat::CellData<double> &p(*p_ptr);
+              tbox::Pointer<pdat::CellData<double> > dp_ptr =
+                patch->getPatchData(dp_id);
+              pdat::CellData<double> &dp(*dp_ptr);
+              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
+                patch->getPatchData(p_rhs_id);
+              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
+                
+              tbox::Pointer<pdat::SideData<double> > v_ptr =
+                patch->getPatchData(v_id);
+              pdat::SideData<double> &v(*v_ptr);
+              tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
+                patch->getPatchData(v_rhs_id);
+              pdat::SideData<double> &v_rhs(*v_rhs_ptr);
+                
+              tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
+                = patch->getPatchData(cell_viscosity_id);
+              pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+              tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
+                = patch->getPatchData(edge_viscosity_id);
+              pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -361,7 +394,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                  should set the pressure or just let it be.  This is
                  needed at coarse/fine boundaries where the pressure
                  is fixed. */
-              hier::Box gbox=p->getGhostBox();
+              hier::Box gbox=p.getGhostBox();
               std::vector<bool> set_p(gbox.size(),true);
 
               const tbox::Array<hier::BoundaryBox >&edges
@@ -421,52 +454,88 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       ++right[0];
                       --left[0];
 
+                      const pdat::NodeIndex
+                        center_e(center,pdat::NodeIndex::LowerLeft),
+                        up_e(up,pdat::NodeIndex::LowerLeft),
+                        right_e(right,pdat::NodeIndex::LowerLeft);
+
                       /* Update p */
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))])
                         {
                           double dvx_dx=
-                            ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                            (v(pdat::SideIndex(center,pdat::SideIndex::X,
                                                   pdat::SideIndex::Upper))
-                             - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
+                             - v(pdat::SideIndex(center,pdat::SideIndex::X,
                                                     pdat::SideIndex::Lower)))/dx;
                           double dvy_dy=
-                            ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                            (v(pdat::SideIndex(center,pdat::SideIndex::Y,
                                                   pdat::SideIndex::Upper))
-                             - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
+                             - v(pdat::SideIndex(center,pdat::SideIndex::Y,
                                                     pdat::SideIndex::Lower)))/dy;
 
                           double delta_R_continuity=
-                            (*p_rhs)(center) - dvx_dx - dvy_dy;
+                            p_rhs(center) - dvx_dx - dvy_dy;
 
                           /* No scaling here, though there should be. */
                           maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
-                          (*dp)(center)=
-                            (*cell_viscosity)(center)*delta_R_continuity*theta_continuity;
+                          const double dRm_dp_xp(1/dx), dRm_dp_xm(-1/dx),
+                            dRm_dp_yp(1/dy), dRm_dp_ym(-1/dy),
+                            dRc_dvx_p(-1/dx), dRc_dvx_m(1/dx),
+                            dRc_dvy_p(-1/dy), dRc_dvy_m(1/dy);
+
+                          const double dRm_dvx_p =
+                            dRm_dv(cell_viscosity,edge_viscosity,
+                                   right,center,up_e+ip,center_e+ip,dx,dy);
+
+                          const double dRm_dvx_m =
+                            dRm_dv(cell_viscosity,edge_viscosity,
+                                   center,left,up_e,center_e,dx,dy);
+
+                          const double dRm_dvy_p =
+                            dRm_dv(cell_viscosity,edge_viscosity,
+                                   up,center,right_e+jp,center_e+jp,dy,dx);
+
+                          const double dRm_dvy_m =
+                            dRm_dv(cell_viscosity,edge_viscosity,
+                                   center,down,right_e,center_e,dy,dx);
+
+                          const double dRc_dp=dRc_dvx_p * dRm_dp_xp/dRm_dvx_p
+                            + dRc_dvx_m * dRm_dp_xm/dRm_dvx_m
+                            + dRc_dvy_p * dRm_dp_yp/dRm_dvy_p
+                            + dRc_dvy_m * dRm_dp_ym/dRm_dvy_m;
+                          
+
+                          dp(center)=
+                            delta_R_continuity*theta_continuity/dRc_dp;
+                          // dp(center)=
+                          //   delta_R_continuity*theta_continuity;
 
 
-                          // if(ln==2 && i==15)
+
+                          // if(ln==2)
                           //   tbox::plog << "smooth p "
                           //              << i << " "
                           //              << j << " "
-                          //              << (*dp)(center) << " "
-                          //              << delta_R_continuity << " "
-                          //              << dvx_dx << " "
-                          //              << dvy_dy << " "
-                          //              << (*p_rhs)(center) << " "
-                          //              << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //                                      pdat::SideIndex::Upper)) << " "
-                          //              << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //                                      pdat::SideIndex::Lower)) << " "
-                          //              << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //                                      pdat::SideIndex::Upper)) << " "
-                          //              <<  (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //                                       pdat::SideIndex::Lower)) << " "
+                          //              << dRc_dp << " "
+                          //              // << dp(center) << " "
+                          //              // << delta_R_continuity << " "
+                          //              // << dvx_dx << " "
+                          //              // << dvy_dy << " "
+                          //              // << p_rhs(center) << " "
+                          //              // << v(pdat::SideIndex(center,pdat::SideIndex::X,
+                          //              //                         pdat::SideIndex::Upper)) << " "
+                          //              // << v(pdat::SideIndex(center,pdat::SideIndex::X,
+                          //              //                         pdat::SideIndex::Lower)) << " "
+                          //              // << v(pdat::SideIndex(center,pdat::SideIndex::Y,
+                          //              //                         pdat::SideIndex::Upper)) << " "
+                          //              // <<  v(pdat::SideIndex(center,pdat::SideIndex::Y,
+                          //              //                          pdat::SideIndex::Lower)) << " "
 
                           //              << "\n";
 
-                          (*p)(center)+=(*dp)(center);
+                          p(center)+=dp(center);
                         }
                     }
                 }
@@ -483,20 +552,29 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
             {
               tbox::Pointer<hier::Patch> patch = *pi;
 
-              tbox::Pointer<pdat::CellData<double> >
-                p = patch->getPatchData(p_id);
-              tbox::Pointer<pdat::CellData<double> >
-                dp = patch->getPatchData(dp_id);
-              tbox::Pointer<pdat::CellData<double> >
-                p_rhs = patch->getPatchData(p_rhs_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v = patch->getPatchData(v_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v_rhs = patch->getPatchData(v_rhs_id);
-              tbox::Pointer<pdat::CellData<double> >
-                cell_viscosity = patch->getPatchData(cell_viscosity_id);
-              tbox::Pointer<pdat::NodeData<double> >
-                node_viscosity = patch->getPatchData(node_viscosity_id);
+              tbox::Pointer<pdat::CellData<double> > p_ptr =
+                patch->getPatchData(p_id);
+              pdat::CellData<double> &p(*p_ptr);
+              tbox::Pointer<pdat::CellData<double> > dp_ptr =
+                patch->getPatchData(dp_id);
+              pdat::CellData<double> &dp(*dp_ptr);
+              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
+                patch->getPatchData(p_rhs_id);
+              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
+                
+              tbox::Pointer<pdat::SideData<double> > v_ptr =
+                patch->getPatchData(v_id);
+              pdat::SideData<double> &v(*v_ptr);
+              tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
+                patch->getPatchData(v_rhs_id);
+              pdat::SideData<double> &v_rhs(*v_rhs_ptr);
+                
+              tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
+                = patch->getPatchData(cell_viscosity_id);
+              pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+              tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
+                = patch->getPatchData(edge_viscosity_id);
+              pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -508,7 +586,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                  should set the pressure or just let it be.  This is
                  needed at coarse/fine boundaries where the pressure
                  is fixed. */
-              hier::Box gbox=p->getGhostBox();
+              hier::Box gbox=p.getGhostBox();
               std::vector<bool> set_p(gbox.size(),true);
 
               const tbox::Array<hier::BoundaryBox >&edges
@@ -568,44 +646,64 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
                       ++right[0];
                       --left[0];
 
+                      const pdat::SideIndex
+                        center_x(center,0,pdat::SideIndex::Lower),
+                        left_x(left,0,pdat::SideIndex::Lower),
+                        right_x(right,0,pdat::SideIndex::Lower),
+                        center_y(center,1,pdat::SideIndex::Lower),
+                        up_y(up,1,pdat::SideIndex::Lower),
+                        down_y(down,1,pdat::SideIndex::Lower);
+                      const pdat::NodeIndex
+                        center_e(center,pdat::NodeIndex::LowerLeft),
+                        up_e(up,pdat::NodeIndex::LowerLeft),
+                        right_e(right,pdat::NodeIndex::LowerLeft);
+
                       /* Update v */
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
                          || (i==pbox.upper(0)+1 && j<pbox.upper(1)+1))
                         {
                           if(!((center[0]==pbox.lower(0)
-                                && (*v)(pdat::SideIndex(left,
-                                                        0,
-                                                        pdat::SideIndex::Lower))
-                                ==boundary_value)
+                                && v(left_x)==boundary_value)
                                || (center[0]==pbox.upper(0)+1
-                                   && (*v)(pdat::SideIndex
-                                           (right,
-                                            0,
-                                            pdat::SideIndex::Lower))
-                                   ==boundary_value)))
-                            (*v)(pdat::SideIndex(center,0,pdat::SideIndex::Lower))
-                              -=((*dp)(center) - (*dp)(left))
-                              /(dx*2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy)));
+                                   && v(right_x)==boundary_value)))
+
+                            // v(pdat::SideIndex(center,0,pdat::SideIndex::Lower))
+                            //   -=(dp(center) - dp(left))
+                            //   /(dx*3*(1/(dx*dx) + 1/(dy*dy)));
+
+                          // tbox::plog << "dRm_dv "
+                          //            << i << " "
+                          //            << j << " "
+                          //            << -3*(1/(dx*dx) + 1/(dy*dy)) << " "
+                          //            << dRm_dv(cell_viscosity,edge_viscosity,center,
+                          //                      left,up_e,center_e,dx,dy) << " "
+                          //            << (dp(center) - dp(left))
+                          //   /(dx*2*(1/(dx*dx) + 1/(dy*dy))) << " "
+                          //            << (dp(center) - dp(left))
+                          //   /(dx*dRm_dv(cell_viscosity,edge_viscosity,center,
+                          //               left,up_e,center_e,dx,dy)) << " "
+                          //            << "\n";
+
+                            v(center_x)+=(dp(center) - dp(left))
+                              /(dx*dRm_dv(cell_viscosity,edge_viscosity,center,
+                                          left,up_e,center_e,dx,dy));
                         }
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
                          || (i<pbox.upper(0)+1 && j==pbox.upper(1)+1))
                         {
                           if(!((center[1]==pbox.lower(1)
-                                && (*v)(pdat::SideIndex(down,
-                                                        1,
-                                                        pdat::SideIndex::Lower))
-                                ==boundary_value)
+                                && v(down_y)==boundary_value)
                                || (center[1]==pbox.upper(1)+1
-                                   && (*v)(pdat::SideIndex
-                                           (up,
-                                            1,
-                                            pdat::SideIndex::Lower))
-                                   ==boundary_value)))
-                            (*v)(pdat::SideIndex(center,1,pdat::SideIndex::Lower))
-                              -=((*dp)(center) - (*dp)(down))
-                              /(dy*2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy)));
+                                   && v(up_y)==boundary_value)))
+
+                            // v(pdat::SideIndex(center,1,pdat::SideIndex::Lower))
+                            //   -=(dp(center) - dp(down))
+                            //   /(dy*3*(1/(dx*dx) + 1/(dy*dy)));
+                            v(center_y)+=(dp(center) - dp(down))
+                              /(dy*dRm_dv(cell_viscosity,edge_viscosity,center,
+                                          down,right_e,center_e,dy,dx));
                         }
                     }
                 }

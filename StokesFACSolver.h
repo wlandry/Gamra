@@ -181,7 +181,7 @@ public:
    solveSystem(
       const int p,
       const int cell_viscosity,
-      const int node_viscosity,
+      const int edge_viscosity,
       const int dp,
       const int p_rhs,
       const int v,
@@ -211,7 +211,7 @@ public:
     * @see solveSystem( const int, const int, tbox::Pointer< hier::PatchHierarchy >, int, int);
     */
    bool
-   solveSystem(const int p, const int cell_viscosity, const int node_viscosity, 
+   solveSystem(const int p, const int cell_viscosity, const int edge_viscosity, 
                const int dp, const int p_rhs,
                const int v, const int v_rhs);
 
@@ -511,7 +511,7 @@ public:
    void
    initializeSolverState(const int p,
                          const int cell_viscosity,
-                         const int node_viscosity,
+                         const int edge_viscosity,
                          const int dp,
                          const int p_rhs,
                          const int v,
