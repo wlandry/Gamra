@@ -60,7 +60,7 @@ namespace SAMRAI {
       d_dim(dim),
       d_object_name(object_name),
       d_stokes_spec(object_name + "::stokes_spec"),
-      d_fac_ops(d_dim, object_name + "::fac_ops"),
+      d_fac_ops(d_dim, object_name + "::fac_ops",database),
       d_fac_precond(object_name + "::fac_precond", d_fac_ops),
       d_bc_object(NULL),
       d_simple_bc(d_dim, object_name + "::bc"),
@@ -90,7 +90,7 @@ namespace SAMRAI {
 //       setCoarsestLevelSolverMaxIterations(20);
 //       setUseSMG(true);
 // #else
-      setCoarsestLevelSolverChoice("redblack");
+      setCoarsestLevelSolverChoice("Tackley");
       setCoarsestLevelSolverTolerance(1e-8);
       setCoarsestLevelSolverMaxIterations(10);
 // #endif

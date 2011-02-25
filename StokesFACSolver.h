@@ -336,7 +336,8 @@ public:
     * @brief Set coarse level solver.
     *
     * Select from these:
-    * - @c "redblack"
+    * - @c "Tackley"
+    * - @c "Gerya"
     * - @c "hypre" (only if the HYPRE library is available).
     */
    void

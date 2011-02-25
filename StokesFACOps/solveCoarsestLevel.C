@@ -58,7 +58,8 @@ int SAMRAI::solv::StokesFACOps::solveCoarsestLevel
 
   int return_value = 0;
 
-  if (d_coarse_solver_choice == "redblack") {
+  if (d_coarse_solver_choice == "Tackley"
+      || d_coarse_solver_choice == "Gerya") {
     d_residual_tolerance_during_smoothing = d_coarse_solver_tolerance;
     smoothError(data,
                 residual,

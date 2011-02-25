@@ -53,7 +53,7 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	StokesFACOps/restrictResidual.o \
 	StokesFACOps/restrictSolution.o \
 	StokesFACOps/smoothError.o \
-	StokesFACOps/smoothErrorByRedBlack.o \
+	StokesFACOps/smooth_Tackley.o \
 	StokesFACOps/smooth_Gerya.o \
 	StokesFACOps/set_boundaries.o \
 	StokesFACOps/solveCoarsestLevel.o \

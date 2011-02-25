@@ -54,12 +54,18 @@ void SAMRAI::solv::StokesFACOps::smoothError
   t_smooth_error->start();
 
   checkInputPatchDataIndices();
-  if (d_smoothing_choice == "redblack") {
+  if (d_smoothing_choice == "Gerya") {
     smooth_Gerya(data,
-                          residual,
-                          ln,
-                          num_sweeps,
-                          d_residual_tolerance_during_smoothing);
+                 residual,
+                 ln,
+                 num_sweeps,
+                 d_residual_tolerance_during_smoothing);
+  } else if (d_smoothing_choice == "Tackley") {
+    smooth_Tackley(data,
+                   residual,
+                   ln,
+                   num_sweeps,
+                   d_residual_tolerance_during_smoothing);
   } else {
     TBOX_ERROR(d_object_name << ": Bad smoothing choice '"
                << d_smoothing_choice

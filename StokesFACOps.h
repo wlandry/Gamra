@@ -108,7 +108,7 @@ namespace solv {
  * coarse_solver_choice = "hypre"    // see setCoarsestLevelSolverChoice()
  * coarse_solver_tolerance = 1e-14   // see setCoarsestLevelSolverTolerance()
  * coarse_solver_max_iterations = 10 // see setCoarsestLevelSolverMaxIterations()
- * smoothing_choice = "redblack"     // see setSmoothingChoice()
+ * smoothing_choice = "Tackley"     // see setSmoothingChoice()
  * cf_discretization = "Ewing"       // see setCoarseFineDiscretization()
  * prolongation_method = "P_REFINE" // see setProlongationMethod()
  * hypre_solver = { ... }            // tbox::Database for initializing Hypre solver
@@ -166,7 +166,8 @@ public:
     * @brief Set the choice of smoothing algorithms.
     *
     * Current smoothing choices are:
-    * - "redblack": Red-black Gauss-Seidel smoothing.
+    * - "Tackley"
+    * - "Gerya"
     */
    void
    setSmoothingChoice(
@@ -176,7 +177,8 @@ public:
     * @brief Set coarse level solver.
     *
     * Select from these:
-    * - @c "redblack" (red-black smoothing until convergence--very slow!)
+    * - @c "Tackley" (red-black smoothing until convergence--very slow!)
+    * - @c "Gerya" (red-black smoothing until convergence--very slow!)
     * - @c "hypre" (only if the HYPRE library is available).
     */
    void
@@ -526,7 +528,7 @@ private:
     *        converged
     */
    void
-   smoothErrorByRedBlack(
+   smooth_Tackley(
       SAMRAIVectorReal<double>& error,
       const SAMRAIVectorReal<double>& residual,
       int ln,

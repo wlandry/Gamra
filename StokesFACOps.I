@@ -85,7 +85,7 @@ void StokesFACOps::setSmoothingChoice(
    const std::string& smoothing_choice)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
-   if (smoothing_choice != "redblack") {
+   if (smoothing_choice != "Tackley" && smoothing_choice != "Gerya") {
       TBOX_ERROR(d_object_name << ": Bad smoothing choice '"
                                << smoothing_choice
                                << "' in StokesFACOps::setSmoothingChoice.");
@@ -110,7 +110,8 @@ void StokesFACOps::setCoarsestLevelSolverChoice(
    }
 #endif
 #endif
-   if (choice == "redblack"
+   if (choice == "Tackley"
+       || choice == "Gerya"
        || choice == "hypre") {
       d_coarse_solver_choice = choice;
    } else {

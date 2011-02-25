@@ -36,6 +36,10 @@ FACStokes {
     residual_tol = 1e-8     // Residual tolerance to solve for
     num_pre_sweeps = 5      // Number of presmoothing sweeps to use
     num_post_sweeps = 5     // Number of postsmoothing sweeps to use
+    smoothing_choice = "Tackley"
+    coarse_solver_choice = "Tackley"
+    // smoothing_choice = "Gerya"
+    // coarse_solver_choice = "Gerya"
     coarse_solver_max_iterations = 25
     coarse_solver_tolerance = 1e-10
     p_prolongation_method = "P_REFINE" // Type of refinement

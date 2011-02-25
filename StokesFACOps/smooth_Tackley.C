@@ -48,7 +48,7 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
+void SAMRAI::solv::StokesFACOps::smooth_Tackley
 (SAMRAIVectorReal<double>& solution,
  const SAMRAIVectorReal<double>& residual,
  int ln,
@@ -731,7 +731,7 @@ void SAMRAI::solv::StokesFACOps::smoothErrorByRedBlack
         if (d_enable_logging)
           tbox::plog
             // << d_object_name << "\n"
-            << "Smooth " << ln << " " << sweep << " : " << maxres << "\n";
+            << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
       // }
     }
 }

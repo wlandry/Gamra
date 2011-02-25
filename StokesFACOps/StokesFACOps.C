@@ -82,12 +82,12 @@ namespace SAMRAI {
       d_ln_max(-1),
       d_cf_boundary(),
       d_stokes_spec(object_name + "::Stokes specs"),
-      d_smoothing_choice("redblack"),
+      d_smoothing_choice("Tackley"),
       d_coarse_solver_choice(
 #ifdef HAVE_HYPRE
                              "hypre"
 #else
-                             "redblack"
+                             "Tackley"
 #endif
 
                              ),
@@ -222,8 +222,11 @@ namespace SAMRAI {
       /*
        * Some variables initialized by default are overriden by input.
        */
+
+      std::cout << "setting database\n";
       if (database) {
 
+      std::cout << "setting smoother\n";
         d_coarse_solver_choice =
           database->getStringWithDefault("coarse_solver_choice",
                                          d_coarse_solver_choice);

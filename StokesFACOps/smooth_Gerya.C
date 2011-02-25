@@ -336,7 +336,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
         if (d_enable_logging)
           tbox::plog
             // << d_object_name << "\n"
-            << "Smooth " << ln << " " << sweep << " : " << maxres << "\n";
+            << "Gerya " << ln << " " << sweep << " : " << maxres << "\n";
       // }
     }
 }
