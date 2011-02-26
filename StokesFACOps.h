@@ -581,6 +581,52 @@ private:
       - (edge_viscosity(up_e) + edge_viscosity(center_e))/(dy*dy);
   }
 
+  double dRc_dp(const hier::Box &pbox,
+                const pdat::CellIndex &center,
+                const pdat::CellIndex &left,
+                const pdat::CellIndex &right, 
+                const pdat::CellIndex &down,
+                const pdat::CellIndex &up,
+                const pdat::SideIndex &left_x,
+                const pdat::SideIndex &right_x,
+                const pdat::SideIndex &down_y,
+                const pdat::SideIndex &up_y,
+                pdat::CellData<double> &cell_viscosity,
+                pdat::NodeData<double> &edge_viscosity,
+                pdat::SideData<double> &v,
+                const double &dx,
+                const double &dy)
+  {
+    const pdat::NodeIndex center_e(center,pdat::NodeIndex::LowerLeft),
+      up_e(up,pdat::NodeIndex::LowerLeft),
+      right_e(right,pdat::NodeIndex::LowerLeft);
+    const hier::Index ip(1,0), jp(0,1);
+    const double dRm_dp_xp(1/dx), dRm_dp_xm(-1/dx),
+      dRm_dp_yp(1/dy), dRm_dp_ym(-1/dy),
+      dRc_dvx_p(-1/dx), dRc_dvx_m(1/dx),
+      dRc_dvy_p(-1/dy), dRc_dvy_m(1/dy);
+
+    double result(0);
+
+    if(!(center[0]==pbox.lower(0) && v(left_x)==boundary_value))
+      result+=dRc_dvx_p * dRm_dp_xp/dRm_dv(cell_viscosity,edge_viscosity,right,
+                                           center,up_e+ip,center_e+ip,dx,dy);
+
+    if(!(center[0]==pbox.upper(0)+1 && v(right_x)==boundary_value))
+      result+=dRc_dvx_m * dRm_dp_xm/dRm_dv(cell_viscosity,edge_viscosity,
+                                           center,left,up_e,center_e,dx,dy);
+
+    if(!(center[1]==pbox.lower(1) && v(down_y)==boundary_value))
+      result+=dRc_dvy_p * dRm_dp_yp/dRm_dv(cell_viscosity,edge_viscosity,up,
+                                           center,right_e+jp,center_e+jp,dy,dx);
+
+    if(!(center[1]==pbox.upper(1)+1 && v(up_y)==boundary_value))
+      result+=dRc_dvy_m * dRm_dp_ym/dRm_dv(cell_viscosity,edge_viscosity,
+                                           center,down,right_e,center_e,dy,dx);
+
+    return result;
+  }
+
    /*!
     * @brief Solve the coarsest level using HYPRE
     */

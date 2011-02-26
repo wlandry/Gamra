@@ -93,8 +93,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
   double theta_momentum=0.7;
   double theta_continuity=1.0;
 
-  const hier::Index ip(1,0), jp(0,1);
-
   /*
    * Smooth the number of sweeps specified or until
    * the convergence is satisfactory.
@@ -454,25 +452,20 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                       ++right[0];
                       --left[0];
 
-                      const pdat::NodeIndex
-                        center_e(center,pdat::NodeIndex::LowerLeft),
-                        up_e(up,pdat::NodeIndex::LowerLeft),
-                        right_e(right,pdat::NodeIndex::LowerLeft);
+                      const pdat::SideIndex
+                        center_x(center,0,pdat::SideIndex::Lower),
+                        left_x(left,0,pdat::SideIndex::Lower),
+                        right_x(right,0,pdat::SideIndex::Lower),
+                        center_y(center,1,pdat::SideIndex::Lower),
+                        up_y(up,1,pdat::SideIndex::Lower),
+                        down_y(down,1,pdat::SideIndex::Lower);
 
                       /* Update p */
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))])
                         {
-                          double dvx_dx=
-                            (v(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                  pdat::SideIndex::Upper))
-                             - v(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                    pdat::SideIndex::Lower)))/dx;
-                          double dvy_dy=
-                            (v(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                  pdat::SideIndex::Upper))
-                             - v(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                    pdat::SideIndex::Lower)))/dy;
+                          double dvx_dx=(v(right_x) - v(center_x))/dx;
+                          double dvy_dy=(v(up_y) - v(center_y))/dy;
 
                           double delta_R_continuity=
                             p_rhs(center) - dvx_dx - dvy_dy;
@@ -480,39 +473,10 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                           /* No scaling here, though there should be. */
                           maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
-                          const double dRm_dp_xp(1/dx), dRm_dp_xm(-1/dx),
-                            dRm_dp_yp(1/dy), dRm_dp_ym(-1/dy),
-                            dRc_dvx_p(-1/dx), dRc_dvx_m(1/dx),
-                            dRc_dvy_p(-1/dy), dRc_dvy_m(1/dy);
-
-                          const double dRm_dvx_p =
-                            dRm_dv(cell_viscosity,edge_viscosity,
-                                   right,center,up_e+ip,center_e+ip,dx,dy);
-
-                          const double dRm_dvx_m =
-                            dRm_dv(cell_viscosity,edge_viscosity,
-                                   center,left,up_e,center_e,dx,dy);
-
-                          const double dRm_dvy_p =
-                            dRm_dv(cell_viscosity,edge_viscosity,
-                                   up,center,right_e+jp,center_e+jp,dy,dx);
-
-                          const double dRm_dvy_m =
-                            dRm_dv(cell_viscosity,edge_viscosity,
-                                   center,down,right_e,center_e,dy,dx);
-
-                          const double dRc_dp=dRc_dvx_p * dRm_dp_xp/dRm_dvx_p
-                            + dRc_dvx_m * dRm_dp_xm/dRm_dvx_m
-                            + dRc_dvy_p * dRm_dp_yp/dRm_dvy_p
-                            + dRc_dvy_m * dRm_dp_ym/dRm_dvy_m;
-                          
-
-                          dp(center)=
-                            delta_R_continuity*theta_continuity/dRc_dp;
-                          // dp(center)=
-                          //   delta_R_continuity*theta_continuity;
-
-
+                          dp(center)=delta_R_continuity*theta_continuity
+                            /dRc_dp(pbox,center,left,right,down,up,
+                                    left_x,right_x,down_y,up_y,
+                                    cell_viscosity,edge_viscosity,v,dx,dy);
 
                           // if(ln==2)
                           //   tbox::plog << "smooth p "
