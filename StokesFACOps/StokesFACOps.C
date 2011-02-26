@@ -223,10 +223,7 @@ namespace SAMRAI {
        * Some variables initialized by default are overriden by input.
        */
 
-      std::cout << "setting database\n";
       if (database) {
-
-      std::cout << "setting smoother\n";
         d_coarse_solver_choice =
           database->getStringWithDefault("coarse_solver_choice",
                                          d_coarse_solver_choice);
