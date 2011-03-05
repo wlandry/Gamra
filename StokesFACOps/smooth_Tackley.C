@@ -146,8 +146,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
                 geom = patch->getPatchGeometry();
-              double dx = *(geom->getDx());
-              double dy = *(geom->getDx());
+              double dx = geom->getDx()[0];
+              double dy = geom->getDx()[1];
 
               /* Set an array of bools that tells me whether a point
                  should set the pressure or just let it be.  This is
@@ -265,8 +265,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
                 geom = patch->getPatchGeometry();
-              double dx = *(geom->getDx());
-              double dy = *(geom->getDx());
+              double dx = geom->getDx()[0];
+              double dy = geom->getDx()[1];
 
               /* Set an array of bools that tells me whether a point
                  should set the pressure or just let it be.  This is
@@ -385,8 +385,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
                 geom = patch->getPatchGeometry();
-              double dx = *(geom->getDx());
-              double dy = *(geom->getDx());
+              double dx = geom->getDx()[0];
+              double dy = geom->getDx()[1];
 
               /* Set an array of bools that tells me whether a point
                  should set the pressure or just let it be.  This is
@@ -478,26 +478,28 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                                     left_x,right_x,down_y,up_y,
                                     cell_viscosity,edge_viscosity,v,dx,dy);
 
-                          // if(ln==2)
-                          //   tbox::plog << "smooth p "
-                          //              << i << " "
-                          //              << j << " "
-                          //              << dRc_dp << " "
-                          //              // << dp(center) << " "
-                          //              // << delta_R_continuity << " "
-                          //              // << dvx_dx << " "
-                          //              // << dvy_dy << " "
-                          //              // << p_rhs(center) << " "
-                          //              // << v(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //              //                         pdat::SideIndex::Upper)) << " "
-                          //              // << v(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //              //                         pdat::SideIndex::Lower)) << " "
-                          //              // << v(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //              //                         pdat::SideIndex::Upper)) << " "
-                          //              // <<  v(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //              //                          pdat::SideIndex::Lower)) << " "
+                            // tbox::plog << "smooth p "
+                            //            << i << " "
+                            //            << j << " "
+                            //            << p(center) << " "
+                            //            << dRc_dp(pbox,center,left,right,down,up,
+                            //         left_x,right_x,down_y,up_y,
+                            //         cell_viscosity,edge_viscosity,v,dx,dy) << " "
+                            //            << dp(center) << " "
+                            //            << delta_R_continuity << " "
+                            //            << dvx_dx << " "
+                            //            << dvy_dy << " "
+                            //            << p_rhs(center) << " "
+                            //            // << v(pdat::SideIndex(center,pdat::SideIndex::X,
+                            //            //                         pdat::SideIndex::Upper)) << " "
+                            //            // << v(pdat::SideIndex(center,pdat::SideIndex::X,
+                            //            //                         pdat::SideIndex::Lower)) << " "
+                            //            // << v(pdat::SideIndex(center,pdat::SideIndex::Y,
+                            //            //                         pdat::SideIndex::Upper)) << " "
+                            //            // <<  v(pdat::SideIndex(center,pdat::SideIndex::Y,
+                            //            //                          pdat::SideIndex::Lower)) << " "
 
-                          //              << "\n";
+                            //            << "\n";
 
                           p(center)+=dp(center);
                         }
@@ -543,8 +545,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
                 geom = patch->getPatchGeometry();
-              double dx = *(geom->getDx());
-              double dy = *(geom->getDx());
+              double dx = geom->getDx()[0];
+              double dy = geom->getDx()[1];
 
               /* Set an array of bools that tells me whether a point
                  should set the pressure or just let it be.  This is
@@ -622,6 +624,13 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                         up_e(up,pdat::NodeIndex::LowerLeft),
                         right_e(right,pdat::NodeIndex::LowerLeft);
 
+                      // tbox::plog << "Smooth "
+                      //            << i << " "
+                      //            << j << " ";
+                      // if(set_p[(i-gbox.lower(0))
+                      //          + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))])
+                      //   tbox::plog << p(center) << " ";
+
                       /* Update v */
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
@@ -631,27 +640,12 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                                 && v(left_x)==boundary_value)
                                || (center[0]==pbox.upper(0)+1
                                    && v(right_x)==boundary_value)))
-
-                            // v(pdat::SideIndex(center,0,pdat::SideIndex::Lower))
-                            //   -=(dp(center) - dp(left))
-                            //   /(dx*3*(1/(dx*dx) + 1/(dy*dy)));
-
-                          // tbox::plog << "dRm_dv "
-                          //            << i << " "
-                          //            << j << " "
-                          //            << -3*(1/(dx*dx) + 1/(dy*dy)) << " "
-                          //            << dRm_dv(cell_viscosity,edge_viscosity,center,
-                          //                      left,up_e,center_e,dx,dy) << " "
-                          //            << (dp(center) - dp(left))
-                          //   /(dx*2*(1/(dx*dx) + 1/(dy*dy))) << " "
-                          //            << (dp(center) - dp(left))
-                          //   /(dx*dRm_dv(cell_viscosity,edge_viscosity,center,
-                          //               left,up_e,center_e,dx,dy)) << " "
-                          //            << "\n";
-
                             v(center_x)+=(dp(center) - dp(left))
                               /(dx*dRm_dv(cell_viscosity,edge_viscosity,center,
                                           left,up_e,center_e,dx,dy));
+                          // tbox::plog << "vx "
+                          //            << v(center_x) << " "
+                          //            << v_rhs(center_x) << " ";
                         }
                       if(set_p[(i-gbox.lower(0))
                                + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
@@ -661,14 +655,14 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                                 && v(down_y)==boundary_value)
                                || (center[1]==pbox.upper(1)+1
                                    && v(up_y)==boundary_value)))
-
-                            // v(pdat::SideIndex(center,1,pdat::SideIndex::Lower))
-                            //   -=(dp(center) - dp(down))
-                            //   /(dy*3*(1/(dx*dx) + 1/(dy*dy)));
                             v(center_y)+=(dp(center) - dp(down))
                               /(dy*dRm_dv(cell_viscosity,edge_viscosity,center,
                                           down,right_e,center_e,dy,dx));
+                          // tbox::plog << "vy "
+                          //            << v(center_y) << " "
+                          //            << v_rhs(center_y) << " ";
                         }
+                      // tbox::plog << "\n";
                     }
                 }
             }

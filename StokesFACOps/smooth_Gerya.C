@@ -134,8 +134,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
                 geom = patch->getPatchGeometry();
-              double dx = *(geom->getDx());
-              double dy = *(geom->getDx());
+              double dx = geom->getDx()[0];
+              double dy = geom->getDx()[1];
 
               /* Set an array of bools that tells me whether a point
                  should set the pressure or just let it be.  This is
