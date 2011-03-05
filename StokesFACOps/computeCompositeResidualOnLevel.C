@@ -160,29 +160,38 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
    * S4. Compute residual on patches in level.
    */
 
+  const hier::Index ip(1,0), jp(0,1);
   for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
     tbox::Pointer<hier::Patch> patch = *pi;
     tbox::Pointer<pdat::CellData<double> >
-      p = solution.getComponentPatchData(0, *patch);
+      p_ptr = solution.getComponentPatchData(0, *patch);
+    pdat::CellData<double> &p(*p_ptr);
     tbox::Pointer<pdat::SideData<double> >
-      v = solution.getComponentPatchData(1, *patch);
+      v_ptr = solution.getComponentPatchData(1, *patch);
+    pdat::SideData<double> &v(*v_ptr);
     tbox::Pointer<pdat::CellData<double> >
-      cell_viscosity = patch->getPatchData(cell_viscosity_id);
+      cell_viscosity_ptr = patch->getPatchData(cell_viscosity_id);
+    pdat::CellData<double> &cell_viscosity(*cell_viscosity_ptr);
     tbox::Pointer<pdat::NodeData<double> >
-      edge_viscosity = patch->getPatchData(edge_viscosity_id);
+      edge_viscosity_ptr = patch->getPatchData(edge_viscosity_id);
+    pdat::NodeData<double> &edge_viscosity(*edge_viscosity_ptr);
     tbox::Pointer<pdat::CellData<double> >
-      p_rhs = rhs.getComponentPatchData(0, *patch);
+      p_rhs_ptr = rhs.getComponentPatchData(0, *patch);
+    pdat::CellData<double> &p_rhs(*p_rhs_ptr);
     tbox::Pointer<pdat::SideData<double> >
-      v_rhs = rhs.getComponentPatchData(1, *patch);
+      v_rhs_ptr = rhs.getComponentPatchData(1, *patch);
+    pdat::SideData<double> &v_rhs(*v_rhs_ptr);
     tbox::Pointer<pdat::CellData<double> >
-      p_resid = residual.getComponentPatchData(0, *patch);
+      p_resid_ptr = residual.getComponentPatchData(0, *patch);
+    pdat::CellData<double> &p_resid(*p_resid_ptr);
     tbox::Pointer<pdat::SideData<double> >
-      v_resid = residual.getComponentPatchData(1, *patch);
+      v_resid_ptr = residual.getComponentPatchData(1, *patch);
+    pdat::SideData<double> &v_resid(*v_resid_ptr);
 
     hier::Box pbox=patch->getBox();
     tbox::Pointer<geom::CartesianPatchGeometry> geom = patch->getPatchGeometry();
-    double dx = *(geom->getDx());
-    double dy = *(geom->getDx());
+    double dx = geom->getDx()[0];
+    double dy = geom->getDx()[1];
 
     for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
       {
@@ -200,6 +209,22 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
             ++right[0];
             --left[0];
 
+            const pdat::SideIndex
+              center_x(center,0,pdat::SideIndex::Lower),
+              left_x(left,0,pdat::SideIndex::Lower),
+              right_x(right,0,pdat::SideIndex::Lower),
+              down_x(down,0,pdat::SideIndex::Lower),
+              up_x(up,0,pdat::SideIndex::Lower),
+              center_y(center,1,pdat::SideIndex::Lower),
+              left_y(left,1,pdat::SideIndex::Lower),
+              right_y(right,1,pdat::SideIndex::Lower),
+              down_y(down,1,pdat::SideIndex::Lower),
+              up_y(up,1,pdat::SideIndex::Lower);
+            const pdat::NodeIndex
+              center_e(center,pdat::NodeIndex::LowerLeft),
+              up_e(up,pdat::NodeIndex::LowerLeft),
+              right_e(right,pdat::NodeIndex::LowerLeft);
+
             // tbox::plog << "resid "
             //            << ln << " "
             //            << i << " "
@@ -207,155 +232,57 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
             /* p */
             if(i!=pbox.upper(0)+1 && j!=pbox.upper(1)+1)
               {
-                double dvx_dx=
-                  ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                        pdat::SideIndex::Upper))
-                   - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                          pdat::SideIndex::Lower)))/dx;
-                double dvy_dy=
-                  ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                        pdat::SideIndex::Upper))
-                   - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                          pdat::SideIndex::Lower)))/dy;
-                (*p_resid)(center)=(*p_rhs)(center) - dvx_dx - dvy_dy;
-
+                double dvx_dx=(v(right_x) - v(center_x))/dx;
+                double dvy_dy=(v(up_y) - v(center_y))/dy;
+                p_resid(center)=p_rhs(center) - dvx_dx - dvy_dy;
 
                 // tbox::plog << "p "
-                //            // << (*p)(center) << " ";
-                //            << (*p_resid)(center) << " ";
-                //            // << (*p_rhs)(center) << " "
-                //            // << dvx_dx << " "
-                //            // << dvy_dy << " "
-                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //            //                         pdat::SideIndex::Upper)) << " "
-                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //            //                         pdat::SideIndex::Lower)) << " "
-                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                //            //                         pdat::SideIndex::Upper)) << " "
-                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                //            //                         pdat::SideIndex::Lower)) << " ";
+                //            << p_resid(center) << " ";
               }
 
             /* vx */
             if(j!=pbox.upper(1)+1)
               {
                 /* If x==0 */
-                if((center[0]==pbox.lower(0)
-                    && (*v)(pdat::SideIndex(left,
-                                            pdat::SideIndex::X,
-                                            pdat::SideIndex::Lower))
-                    ==boundary_value)
+                if((center[0]==pbox.lower(0) && v(left_x)==boundary_value)
                    || (center[0]==pbox.upper(0)+1
-                       && (*v)(pdat::SideIndex(right,
-                                               pdat::SideIndex::X,
-                                               pdat::SideIndex::Lower))
-                       ==boundary_value))
+                       && v(right_x)==boundary_value))
+                       
                   {
-                    (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                               pdat::SideIndex::Lower))=0;
+                    v_resid(center_x)=0;
                   }
                 else
                   {
-                    double dp_dx, d2vx_dxx, d2vx_dyy, C_vx;
-                    d2vx_dyy=
-                      ((*v)(pdat::SideIndex(up,pdat::SideIndex::X,
-                                            pdat::SideIndex::Lower))
-                       - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                pdat::SideIndex::Lower))
-                       + (*v)(pdat::SideIndex(down,pdat::SideIndex::X,
-                                              pdat::SideIndex::Lower)))
-                      /(dy*dy);
-
-                    C_vx=-2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy));
-
-                    d2vx_dxx=((*v)(pdat::SideIndex(left,pdat::SideIndex::X,
-                                                   pdat::SideIndex::Lower))
-                              - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                       pdat::SideIndex::Lower))
-                              + (*v)(pdat::SideIndex(right,pdat::SideIndex::X,
-                                                     pdat::SideIndex::Lower)))
-                      /(dx*dx);
-
-                    dp_dx=((*p)(center)-(*p)(left))/dx;
-                              
-                    (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                               pdat::SideIndex::Lower))=
-                      (*v_rhs)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                               pdat::SideIndex::Lower))
-                      - (*cell_viscosity)(center)*(d2vx_dxx + d2vx_dyy) + dp_dx;
-                  }
-
-
-
+                    v_resid(center_x)=v_rhs(center_x)
+                      - v_operator(v,p,cell_viscosity,edge_viscosity,center,
+                                   left,center_x,right_x,left_x,up_x,down_x,
+                                   center_y,up_y,center_e,up_e,ip,dx,dy);
                 // tbox::plog << "vx "
-                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //            //                         pdat::SideIndex::Lower))
-                //            // << " ";
-                //            << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //                                    pdat::SideIndex::Lower))
-                //            << " ";
-                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //            //                         pdat::SideIndex::Upper))
-                //            // << " "
-                //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //            //                         pdat::SideIndex::Lower))
-                //            // << " "
-                //            // << (&(*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                //            //                           pdat::SideIndex::Upper)))
-                //            // << " "
+                //            << v_resid(center_x) << " "
+                //            << v(center_x) << " "
+                //            << v(right_x) << " "
+                //            << v(left_x) << " ";
+                  }
               }
 
             /* vy */
             if(i!=pbox.upper(0)+1)
               {
                 /* If y==0 */
-                if((center[1]==pbox.lower(1)
-                    && (*v)(pdat::SideIndex(down,
-                                            pdat::SideIndex::Y,
-                                            pdat::SideIndex::Lower))
-                    ==boundary_value)
-                   || (center[1]==pbox.upper(1)+1
-                    && (*v)(pdat::SideIndex(up,
-                                            pdat::SideIndex::Y,
-                                            pdat::SideIndex::Lower))
-                       ==boundary_value))
+                if((center[1]==pbox.lower(1) && v(down_y)==boundary_value)
+                   || (center[1]==pbox.upper(1)+1 && v(up_y)==boundary_value))
                   {
-                    (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                               pdat::SideIndex::Lower))=0;
+                    v_resid(center_y)=0;
                   }
                 else
                   {
-                    double dp_dy, d2vy_dxx, d2vy_dyy, C_vy;
-                    d2vy_dxx=
-                      ((*v)(pdat::SideIndex(left,pdat::SideIndex::Y,
-                                            pdat::SideIndex::Lower))
-                       - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                pdat::SideIndex::Lower))
-                       + (*v)(pdat::SideIndex(right,pdat::SideIndex::Y,
-                                              pdat::SideIndex::Lower)))
-                      /(dx*dx);
-
-                    C_vy=-2*(*cell_viscosity)(center)*(1/(dx*dx) + 1/(dy*dy));
-                    d2vy_dyy=((*v)(pdat::SideIndex(up,pdat::SideIndex::Y,
-                                                   pdat::SideIndex::Lower))
-                              - 2*(*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                       pdat::SideIndex::Lower))
-                              + (*v)(pdat::SideIndex(down,pdat::SideIndex::Y,
-                                                     pdat::SideIndex::Lower)))
-                      /(dy*dy);
-
-                    dp_dy=((*p)(center)-(*p)(down))/dy;
-                              
-                    (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                               pdat::SideIndex::Lower))=
-                      (*v_rhs)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                               pdat::SideIndex::Lower))
-                      - (*cell_viscosity)(center)*(d2vy_dxx + d2vy_dyy) + dp_dy;
+                    v_resid(center_y)=v_rhs(center_y)
+                      - v_operator(v,p,cell_viscosity,edge_viscosity,center,
+                                   down,center_y,up_y,down_y,right_y,left_y,
+                                   center_x,right_x,center_e,right_e,jp,dy,dx);
                   }
                 // tbox::plog << "vy "
-                //            << (*v_resid)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                //                                    pdat::SideIndex::Lower))
-                //            << " ";
+                //            << v_resid(center_y) << " ";
               }
             // tbox::plog << "\n";
           }

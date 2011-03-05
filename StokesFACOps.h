@@ -563,10 +563,9 @@ private:
    pdat::NodeData<double> &edge_viscosity,
    const double &theta_momentum);
 
-  /* Compute the derivative of the momentum equation w/respect to
-     velocity. It is written from the perspective of vx(center_x), but
-     pass in different values for center etc. to get vy or
-     vx(!center_x). */
+  /* The derivative of the momentum equation w/respect to velocity. It
+     is written from the perspective of vx(center_x), but pass in
+     different values for center etc. to get vy or vx(!center_x). */
 
   double dRm_dv(pdat::CellData<double> &cell_viscosity,
                 pdat::NodeData<double> &edge_viscosity,
@@ -580,6 +579,11 @@ private:
     return -2*(cell_viscosity(center) + cell_viscosity(left))/(dx*dx)
       - (edge_viscosity(up_e) + edge_viscosity(center_e))/(dy*dy);
   }
+
+  /* The derivative of the continuity equation with respect to
+     pressure.  Note that pressure does not appear in the continuity
+     equation, so we use Tackley's method to chain together
+     derivatives */
 
   double dRc_dp(const hier::Box &pbox,
                 const pdat::CellIndex &center,
@@ -625,6 +629,43 @@ private:
                                            center,down,right_e,center_e,dy,dx);
 
     return result;
+  }
+
+  /* The action of the velocity operator. It is written from the
+     perspective of vx, but pass in different values for center_x
+     etc. to get vy. */
+
+  double v_operator(pdat::SideData<double> &v,
+                    pdat::CellData<double> &p,
+                    pdat::CellData<double> &cell_viscosity,
+                    pdat::NodeData<double> &edge_viscosity,
+                    const pdat::CellIndex &center,
+                    const pdat::CellIndex &left,
+                    const pdat::SideIndex &center_x,
+                    const pdat::SideIndex &right_x,
+                    const pdat::SideIndex &left_x,
+                    const pdat::SideIndex &up_x,
+                    const pdat::SideIndex &down_x,
+                    const pdat::SideIndex &center_y,
+                    const pdat::SideIndex &up_y,
+                    const pdat::NodeIndex &center_e,
+                    const pdat::NodeIndex &up_e,
+                    const hier::Index &ip,
+                    const double &dx,
+                    const double &dy)
+  {
+    const double dtau_xx_dx =
+      2*((v(right_x)-v(center_x))*cell_viscosity(center)
+         - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
+
+    const double dtau_xy_dy = 
+      edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
+                            + (v(up_y)-v(up_y-ip))/(dx*dy))
+      - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
+                                  + (v(center_y)-v(center_y-ip))/(dx*dy));
+    const double dp_dx=(p(center)-p(left))/dx;
+    
+    return dtau_xx_dx + dtau_xy_dy - dp_dx;
   }
 
    /*!

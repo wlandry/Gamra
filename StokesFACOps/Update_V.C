@@ -90,7 +90,7 @@ void SAMRAI::solv::StokesFACOps::Update_V
       if(!((center[axis]==pbox.lower(axis) && v(left_x)==boundary_value)
            || (center[axis]==pbox.upper(axis)+1 && v(right_x)==boundary_value)))
         {
-          double dp_dx, d2vx_dxx, d2vx_dyy, C_vx;
+          double d2vx_dxx, d2vx_dyy, C_vx;
           /* If y==0 */
           hier::Index offset(0,0);
           bool set_boundary(false);
@@ -113,85 +113,57 @@ void SAMRAI::solv::StokesFACOps::Update_V
               dv=v(center_x+offset) - v(center_x);
             }
 
-          // const double dtau_xx_dx =
-          //   (v(right_x) - 2*v(center_x) + v(left_x))/(dx*dx);
-
-          // const double dtau_xy_dy = 
-          //   (v(up_x)-2*v(center_x)+v(down_x))/(dy*dy);
-
-          const double dtau_xx_dx =
-            2*((v(right_x)-v(center_x))*cell_viscosity(center)
-               - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
-
-          const double dtau_xy_dy = 
-            edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
-                                  + (v(up_y)-v(up_y-ip))/(dx*dy))
-            - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
-                                        + (v(center_y)-v(center_y-ip))/(dx*dy));
-
-
-          // tbox::plog << "v "
-          //            << axis << " "
-          //            << center[0] << " "
-          //            << center[1] << " "
-          //            << dv_xx_dx << " "
-          //            << dtau_xx_dx << " "
-          //            << dv_xy_dy << " "
-          //            << dtau_xy_dy << " "
-          //            << "\n";
-
-          // C_vx=-2*(1/(dx*dx) + 1/(dy*dy));
           C_vx=dRm_dv(cell_viscosity,edge_viscosity,center,left,up_e,center_e,
                       dx,dy);
 
-          dp_dx=(p(center)-p(left))/dx;
-                              
-          double delta_Rx=v_rhs(center_x) - dtau_xx_dx - dtau_xy_dy + dp_dx;
+          double delta_Rx=v_rhs(center_x)
+            - v_operator(v,p,cell_viscosity,edge_viscosity,center,left,center_x,
+                         right_x,left_x,up_x,down_x,center_y,up_y,center_e,up_e,
+                         ip,dx,dy);
 
           /* No scaling here, though there should be. */
           maxres=std::max(maxres,std::fabs(delta_Rx));
 
+
+          {
+    const double dtau_xx_dx =
+      2*((v(right_x)-v(center_x))*cell_viscosity(center)
+         - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
+
+    const double dtau_xy_dy = 
+      edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
+                            + (v(up_y)-v(up_y-ip))/(dx*dy))
+      - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
+                                  + (v(center_y)-v(center_y-ip))/(dx*dy));
+    const double dp_dx=(p(center)-p(left))/dx;
+
           // tbox::plog << "v " << axis << " "
-          //            // << v(pdat::SideIndex(center,
-          //            //                         axis,
-          //            //                         pdat::SideIndex::Lower))
-          //            // << " "
-          //            // << maxres << " "
-          //            // << (*v_rhs)(pdat::SideIndex(center,
-          //            //                             axis,
-          //            //                             pdat::SideIndex::Lower))
-          //            // << " "
-          //            // << &(*v_rhs)(pdat::SideIndex(center,
-          //            //                             axis,
-          //            //                             pdat::SideIndex::Lower))
-          //            // << " ";
-          //            << delta_Rx << " ";
-          //            // << d2vx_dxx << " "
-          //            // << d2vx_dyy << " "
-          //            // << dp_dx << " "
-          //            // << v(pdat::SideIndex(left,axis,
-          //            //                         pdat::SideIndex::Lower)) << " "
-          //            // << v(pdat::SideIndex
-          //            //         (center,axis,
-          //            //          pdat::SideIndex::Lower)) << " "
-          //            // << v(pdat::SideIndex
-          //            //         (right,axis,
-          //            //          pdat::SideIndex::Lower)) << " "
-          //            // << v(pdat::SideIndex(up,axis,
-          //            //                         pdat::SideIndex::Lower)) << " "
-          //            // << v(pdat::SideIndex
-          //            //         (down,axis,
-          //            //          pdat::SideIndex::Lower)) << " ";
-
-          //            // << (*p)(center) << " "
-          //            // << (*p)(left) << " ";
-
-          //            // << &(*v_rhs)(pdat::SideIndex(center,
-          //            //                             axis,
-          //            //                             pdat::SideIndex::Lower))
-          //            // << " "
-          //            // << std::boolalpha
-          //            // << set_boundary << " ";
+          //            << center[0] << " "
+          //            << center[1] << " "
+          //            << v(center_x) << " "
+          //            << v(left_x) << " "
+          //            << v(right_x) << " "
+          //            << v(up_x) << " "
+          //            << v(down_x) << " "
+          //            << v(up_y) << " "
+          //            << v(up_y-ip) << " "
+          //            << v(center_y) << " "
+          //            << v(center_y-ip) << " "
+          //            << v_rhs(center_x) << " "
+          //            << delta_Rx << " "
+          //            << p(center) << " "
+          //            << p(left) << " "
+          //            << edge_viscosity(up_e) << " "
+          //            << edge_viscosity(center_e) << " "
+          //            << cell_viscosity(center) << " "
+          //            << cell_viscosity(left) << " "
+          //            << dx << " "
+          //            << dy << " "
+          //            << dtau_xx_dx << " "
+          //            << dtau_xy_dy << " "
+          //            << dp_dx << " "
+          //            << "\n";
+          }
 
           v(center_x)+=delta_Rx*theta_momentum/C_vx;
 
