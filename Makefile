@@ -37,6 +37,8 @@ CXX_OBJS      = main.o FACStokes/FACStokes.o \
 	P_Refine_Patch_Strategy.o \
 	V_Refine_Patch_Strategy.o \
 	V_Coarsen_Patch_Strategy.o \
+	Cell_Viscosity_Coarsen.o \
+	Edge_Viscosity_Coarsen.o \
 	set_V_boundary.o \
 	StokesFACOps/StokesFACOps.o \
 	StokesFACOps/checkInputPatchDataIndices.o \
