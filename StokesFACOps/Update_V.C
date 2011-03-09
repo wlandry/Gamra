@@ -68,8 +68,9 @@ void SAMRAI::solv::StokesFACOps::Update_V
  const double &theta_momentum)
 {
   const int off_axis=(axis==0) ? 1 : 0;
-  hier::Index ip(0,0);
+  hier::Index ip(0,0), jp(0,0);
   ip[axis]=1;
+  jp[off_axis]=1;
 
   const pdat::SideIndex
     center_x(center,axis,pdat::SideIndex::Lower),
@@ -117,9 +118,10 @@ void SAMRAI::solv::StokesFACOps::Update_V
                       dx,dy);
 
           double delta_Rx=v_rhs(center_x)
-            - v_operator(v,p,cell_viscosity,edge_viscosity,center,left,center_x,
+            - v_operator(pbox,axis,off_axis,
+                         v,p,cell_viscosity,edge_viscosity,center,left,center_x,
                          right_x,left_x,up_x,down_x,center_y,up_y,center_e,up_e,
-                         ip,dx,dy);
+                         ip,jp,dx,dy);
 
           /* No scaling here, though there should be. */
           maxres=std::max(maxres,std::fabs(delta_Rx));
