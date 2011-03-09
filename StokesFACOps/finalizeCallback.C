@@ -49,8 +49,6 @@ namespace SAMRAI {
       for (int d = 0; d < tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
         s_cell_scratch_var[d].setNull();
         s_side_scratch_var[d].setNull();
-        s_flux_scratch_var[d].setNull();
-        s_oflux_scratch_var[d].setNull();
       }
     }
 

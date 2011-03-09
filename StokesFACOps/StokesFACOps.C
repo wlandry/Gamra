@@ -51,13 +51,7 @@ namespace SAMRAI {
     StokesFACOps::s_cell_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
     tbox::Pointer<pdat::SideVariable<double> >
-    StokesFACOps::s_flux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
-
-    tbox::Pointer<pdat::SideVariable<double> >
     StokesFACOps::s_side_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
-
-    tbox::Pointer<pdat::OutersideVariable<double> >
-    StokesFACOps::s_oflux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
     tbox::StartupShutdownManager::Handler
     StokesFACOps::s_finalize_handler(
@@ -112,8 +106,6 @@ namespace SAMRAI {
                 ->getContext(object_name + "::PRIVATE_CONTEXT")),
       d_cell_scratch_id(-1),
       d_side_scratch_id(-1),
-      d_flux_scratch_id(-1),
-      d_oflux_scratch_id(-1),
       invalid_id(-1),
       p_prolongation_refine_operator(),
       p_prolongation_refine_algorithm(),
@@ -188,16 +180,8 @@ namespace SAMRAI {
         s_cell_scratch_var[dim.getValue() - 1] = new pdat::CellVariable<double>
           (dim, ss.str());
         ss.str("");
-        ss << "StokesFACOps::private_flux_scratch" << dim.getValue();
-        s_flux_scratch_var[dim.getValue() - 1] = new pdat::SideVariable<double>
-          (dim, ss.str());
-        ss.str("");
         ss << "StokesFACOps::private_side_scratch" << dim.getValue();
         s_side_scratch_var[dim.getValue() - 1] = new pdat::SideVariable<double>
-          (dim, ss.str());
-        ss.str("");
-        ss << "StokesFACOps::private_oflux_scratch" << dim.getValue();
-        s_oflux_scratch_var[dim.getValue() - 1] = new pdat::OutersideVariable<double>
           (dim, ss.str());
       }
 
@@ -206,18 +190,10 @@ namespace SAMRAI {
         registerVariableAndContext(s_cell_scratch_var[dim.getValue() - 1],
                                    d_context,
                                    hier::IntVector::getOne(dim));
-      d_flux_scratch_id = vdb->
-        registerVariableAndContext(s_flux_scratch_var[dim.getValue() - 1],
-                                   d_context,
-                                   hier::IntVector::getZero(d_dim));
       d_side_scratch_id = vdb->
         registerVariableAndContext(s_side_scratch_var[dim.getValue() - 1],
                                    d_context,
                                    hier::IntVector::getOne(d_dim));
-      d_oflux_scratch_id = vdb->
-        registerVariableAndContext(s_oflux_scratch_var[dim.getValue() - 1],
-                                   d_context,
-                                   hier::IntVector::getZero(d_dim));
 
       /*
        * Some variables initialized by default are overriden by input.

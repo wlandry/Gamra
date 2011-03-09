@@ -108,12 +108,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
   //  * undergoes transfer operations which require the
   //  * whole level data.
   //  */
-  // bool deallocate_flux_data_when_done = false;
-  // if (flux_id == d_flux_scratch_id) {
-  //   if (!level->checkAllocated(flux_id)) {
-  //     level->allocatePatchData(flux_id);
-  //     deallocate_flux_data_when_done = true;
-  //   }
 
   /* S1. Fill solution ghost data. */
 
@@ -146,14 +140,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
   //                      *soln_data,
   //                      *flux_data);
 
-  // }
-
-  // /*
-  //  * S3. Coarsen oflux data from next finer level so that
-  //  * the computed flux becomes the composite grid flux.
-  //  */
-  // if (ln < d_ln_max) {
-  //   xeqScheduleFluxCoarsen(flux_id, d_oflux_scratch_id, ln);
   // }
 
   /*
@@ -290,22 +276,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
             // tbox::plog << "\n";
           }
       }
-
-    // if (ln > d_ln_min) {
-    //   /*
-    //    * Save outerflux data so that next coarser level
-    //    *  can compute its coarse-fine composite flux.
-    //    *  This is not strictly needed in this "compute residual"
-    //    *  loop through the patches, but we put it here to
-    //    *  avoid writing another loop for it.
-    //    */
-    //   tbox::Pointer<pdat::OutersideData<double> >
-    //     oflux_data = patch->getPatchData(d_oflux_scratch_id);
-
-    //   TBOX_ASSERT(oflux_data);
-
-    //   oflux_data->copy(*flux_data);
-    // }
   }
 
   /* We also need to set the boundaries of the rhs so that coarsening

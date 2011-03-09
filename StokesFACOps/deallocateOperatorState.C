@@ -54,11 +54,6 @@ namespace SAMRAI {
     void StokesFACOps::deallocateOperatorState()
     {
       if (d_hierarchy) {
-        int ln;
-        for (ln = d_ln_min + 1; ln <= d_ln_max; ++ln) {
-          d_hierarchy->getPatchLevel(ln)->
-            deallocatePatchData(d_oflux_scratch_id);
-        }
         d_cf_boundary.resizeArray(0);
 #ifdef HAVE_HYPRE
         d_hypre_solver.deallocateSolverState();

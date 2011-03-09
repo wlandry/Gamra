@@ -774,27 +774,27 @@ private:
 
     // return dtau_xx_dx_limited + dtau_xy_dy_limited - dp_dx_limited;
 
-    if(axis==0 && center[1]<=2)
-      {
-        tbox::plog << "v_op "
-                   << center[0] << " "
-                   << center[1] << " "
-                   << axis << " "
-                   << v(center_x) << " "
-                   << v(center_y) << " "
-                   << p(center) << " "
-                   << (dtau_xx_dx_middle + dtau_xy_dy_middle - dp_dx_middle)
-                   << " "
-                   << (v(center_x + ip) - v(center_x)
-                       + v(center_y+jp) - v(center_y)) << " "
-          // << dtau_xx_dx_middle << " "
-          // << dtau_xx_dx_limited << " "
-          // << dtau_xy_dy_middle << " "
-          // << dtau_xy_dy_limited << " "
-          // << dp_dx_middle << " "
-          // << dp_dx_limited << " "
-                   << "\n";
-      }
+    // if(axis==0 && center[1]<=2)
+    //   {
+    //     tbox::plog << "v_op "
+    //                << center[0] << " "
+    //                << center[1] << " "
+    //                << axis << " "
+    //                << v(center_x) << " "
+    //                << v(center_y) << " "
+    //                << p(center) << " "
+    //                << (dtau_xx_dx_middle + dtau_xy_dy_middle - dp_dx_middle)
+    //                << " "
+    //                << (v(center_x + ip) - v(center_x)
+    //                    + v(center_y+jp) - v(center_y)) << " "
+    //       // << dtau_xx_dx_middle << " "
+    //       // << dtau_xx_dx_limited << " "
+    //       // << dtau_xy_dy_middle << " "
+    //       // << dtau_xy_dy_limited << " "
+    //       // << dp_dx_middle << " "
+    //       // << dp_dx_limited << " "
+    //                << "\n";
+    //   }
 
     return dtau_xx_dx_middle + dtau_xy_dy_middle - dp_dx_middle;
     
@@ -1163,13 +1163,7 @@ private:
    s_cell_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
    static tbox::Pointer<pdat::SideVariable<double> >
-   s_flux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
-
-   static tbox::Pointer<pdat::SideVariable<double> >
    s_side_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
-
-   static tbox::Pointer<pdat::OutersideVariable<double> >
-   s_oflux_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
    /*!
     * @brief Default context of internally maintained hierarchy data.
@@ -1186,27 +1180,6 @@ private:
     * to reduce memory usage.
     */
   int d_cell_scratch_id, d_side_scratch_id;
-
-   /*!
-    * @brief ID of the side-centered scratch data.
-    *
-    * Set in constructor and never changed.
-    * Corresponds to a pdat::SideVariable<double> named
-    * @c d_object_name+"::flux_scratch".
-    *
-    * This data is allocated only as needed and deallocated
-    * immediately after use.
-    */
-   int d_flux_scratch_id;
-
-   /*!
-    * @brief ID of the outerside-centered scratch data.
-    *
-    * Set in constructor and never changed.
-    * Corresponds to a pdat::OutersideVariable<double> named
-    * @c d_object_name+"::oflux_scratch".
-    */
-   int d_oflux_scratch_id;
 
    //@}
 
