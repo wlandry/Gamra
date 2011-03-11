@@ -19,7 +19,7 @@
 #include "SAMRAI/hier/IntVector.h"
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/tbox/Pointer.h"
-#include "SAMRAI/pdat/SideVariable.h"
+#include "SAMRAI/pdat/NodeVariable.h"
 
 #include <string>
 
@@ -57,7 +57,7 @@ public:
   virtual ~Edge_Viscosity_Coarsen(){}
 
   /**
-   * Return true if the variable and name std::string match the side-centered
+   * Return true if the variable and name std::string match the edge-centered
    * double weighted averaging; otherwise, return false.
    */
   
@@ -66,7 +66,7 @@ public:
   {
     TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
 
-    const tbox::Pointer<pdat::SideVariable<double> > cast_var(var);
+    const tbox::Pointer<pdat::NodeVariable<double> > cast_var(var);
     if (!cast_var.isNull() && (op_name == d_name_id)) {
       return true;
     } else {
@@ -83,7 +83,7 @@ public:
   }
 
   /**
-   * The priority of side-centered double weighted averaging is 0.
+   * The priority of edge-centered double weighted averaging is 0.
    * It will be performed before any user-defined coarsen operations.
    */
   int getOperatorPriority() const
@@ -102,7 +102,7 @@ public:
 
   /**
    * Coarsen the source component on the fine patch to the destination
-   * component on the coarse patch using the side-centered double weighted
+   * component on the coarse patch using the edge-centered double weighted
    * averaging operator.  Coarsening is performed on the intersection of
    * the destination patch and the coarse box.  It is assumed that the
    * fine patch contains sufficient data for the stencil width of the

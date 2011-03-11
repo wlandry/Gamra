@@ -34,6 +34,8 @@ using namespace std;
 #include "P_Boundary_Refine.h"
 #include "V_Boundary_Refine.h"
 #include "V_Coarsen.h"
+#include "Cell_Viscosity_Coarsen.h"
+#include "Edge_Viscosity_Coarsen.h"
 
 #include "FACStokes.h"
 
@@ -153,8 +155,6 @@ int main(
                     (dim,
                      base_name + "CartesianGridGeometry",
                      input_db->getDatabase("CartesianGridGeometry")));
-    // tbox::plog << "Cartesian Geometry:" << endl;
-    // grid_geometry->printClassData(tbox::plog);
     grid_geometry->addSpatialRefineOperator
       (tbox::Pointer<SAMRAI::xfer::RefineOperator>
        (new SAMRAI::geom::P_Refine(dim)));
@@ -189,6 +189,15 @@ int main(
                          input_db->isDatabase("FACStokes") ?
                          input_db->getDatabase("FACStokes") :
                          tbox::Pointer<tbox::Database>(NULL));
+
+    grid_geometry->addSpatialCoarsenOperator
+      (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+       (new SAMRAI::geom::Cell_Viscosity_Coarsen
+        (dim,fac_stokes.edge_viscosity_id)));
+    grid_geometry->addSpatialCoarsenOperator
+      (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+       (new SAMRAI::geom::Edge_Viscosity_Coarsen
+        (dim,fac_stokes.cell_viscosity_id)));
 
     /*
      * Create the tag-and-initializer, box-generator and load-balancer

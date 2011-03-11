@@ -12,6 +12,7 @@ def build(bld):
         features     = ['cxx','cprogram'],
         source       = ['main.C',
                         'FACStokes/FACStokes.C',
+                        'FACStokes/fix_viscosity.C',
                         'FACStokes/initializeLevelData.C',
                         'FACStokes/packDerivedDataIntoDoubleBuffer.C',
                         'FACStokes/resetHierarchyConfiguration.C',

@@ -27,18 +27,6 @@
 
 using namespace SAMRAI;
 
-inline void coarsen_v(const pdat::SideIndex &coarse,
-                      const hier::Index &ip, const hier::Index &jp,
-                      tbox::Pointer<pdat::SideData<double> > &v,
-                      tbox::Pointer<pdat::SideData<double> > &v_fine )
-{
-  pdat::SideIndex center(coarse*2);
-  (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/4
-    + ((*v_fine)(center-ip) + (*v_fine)(center-ip+jp)
-       + (*v_fine)(center+ip) + (*v_fine)(center+jp+ip))/8;
-}
-
-
 void SAMRAI::geom::Edge_Viscosity_Coarsen::coarsen(hier::Patch& coarse,
                                       const hier::Patch& fine,
                                       const int dst_component,
@@ -70,9 +58,22 @@ void SAMRAI::geom::Edge_Viscosity_Coarsen::coarsen(hier::Patch& coarse,
        {
          pdat::NodeIndex coarse_edge(hier::Index(i,j),
                                      pdat::NodeIndex::LowerLeft);
+
          (*edge_viscosity_coarse)(coarse_edge)=
            viscosity_coarsen(*cell_viscosity_fine,*edge_viscosity_fine,
                              coarse_edge*2);
+
+
+         tbox::plog << "Edge "
+                    << coarse_box.lower(0) << " "
+                    << coarse_box.upper(0) << " "
+                    << coarse_box.lower(1) << " "
+                    << coarse_box.upper(1) << " "
+                    << i << " "
+                    << j << " "
+                    << (*edge_viscosity_coarse)(coarse_edge) << " "
+                    << "\n";
+
        }
 }
 

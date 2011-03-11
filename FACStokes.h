@@ -129,6 +129,7 @@ namespace SAMRAI {
 #endif
 
   private:
+    void fix_viscosity();
     std::string d_object_name;
 
     const tbox::Dimension d_dim;
@@ -168,6 +169,7 @@ namespace SAMRAI {
      *
      * These are initialized in the constructor and never change.
      */
+  public:
     int p_id, cell_viscosity_id, edge_viscosity_id, dp_id, p_exact_id,
       p_rhs_id, v_id, v_rhs_id;
 

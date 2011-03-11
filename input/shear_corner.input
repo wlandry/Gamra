@@ -32,16 +32,16 @@ FACStokes {
     // This is the input for the cell-centered Stokes FAC solver
     // class in the SAMRAI library.
     enable_logging = TRUE   // Bool flag to switch logging on/off
-    max_cycles = 100         // Max number of FAC cycles to use
+    max_cycles = 1000         // Max number of FAC cycles to use
     residual_tol = 1e-8     // Residual tolerance to solve for
-    num_pre_sweeps = 5      // Number of presmoothing sweeps to use
-    num_post_sweeps = 5     // Number of postsmoothing sweeps to use
+    num_pre_sweeps = 30      // Number of presmoothing sweeps to use
+    num_post_sweeps = 30     // Number of postsmoothing sweeps to use
     smoothing_choice = "Tackley"
     coarse_solver_choice = "Tackley"
     // smoothing_choice = "Gerya"
     // coarse_solver_choice = "Gerya"
-    coarse_solver_max_iterations = 25
-    coarse_solver_tolerance = 1e-10
+    coarse_solver_max_iterations = 25000
+    coarse_solver_tolerance = 1e-8
     p_prolongation_method = "P_REFINE" // Type of refinement
       					  // used in prolongation.
                                           // Suggested values are
@@ -90,7 +90,7 @@ CartesianGridGeometry {
   //                        domain is periodic.  Zero indicates not
   //                        periodic, non-zero value indicates periodicity.
   //                        [0]
-  // domain_boxes = [(0,0), (63,63)]
+  // domain_boxes = [(0,0), (15,15)]
   domain_boxes = [(0,0), (3,3)]
   x_lo         = 0, 0
   x_up         = 1, 1
@@ -99,13 +99,13 @@ CartesianGridGeometry {
 StandardTagAndInitialize {
   tagging_method = "REFINE_BOXES"
   RefineBoxes {
-    // level_0 = [(0,0),(63,63)]
+    // level_0 = [(0,0),(15,15)]
     level_0 = [(0,0),(3,3)]
     level_1 = [(0,0),(7,7)]
     level_2 = [(0,0),(15,15)]
-    level_3 = [(0,0),(31,31)]
-    level_4 = [(0,0),(63,63)]
-    level_5 = [(0,0),(127,127)]
+    // level_3 = [(0,0),(31,31)]
+    // level_4 = [(0,0),(63,63)]
+    // level_5 = [(0,0),(127,127)]
     // level_1 = [(2,2),(3,3)]
     // level_2 = [(4,4),(5,5)]
     // level_3 = [(8,8),(20,20)]

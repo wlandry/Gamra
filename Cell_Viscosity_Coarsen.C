@@ -55,13 +55,25 @@ void SAMRAI::geom::Cell_Viscosity_Coarsen::coarsen(hier::Patch& coarse,
     coarse.getPatchGeometry();
 
   hier::Index ip(1,0), jp(0,1);
-   for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
-     for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
+   for(int j=coarse_box.lower(1); j<=coarse_box.upper(1); ++j)
+     for(int i=coarse_box.lower(0); i<=coarse_box.upper(0); ++i)
        {
          pdat::CellIndex coarse_cell(hier::Index(i,j));
+
          (*cell_viscosity_coarse)(coarse_cell)=
            viscosity_coarsen(*cell_viscosity_fine,*edge_viscosity_fine,
                              coarse_cell*2+ip+jp);
+
+         tbox::plog << "Cell "
+                    << coarse_box.lower(0) << " "
+                    << coarse_box.upper(0) << " "
+                    << coarse_box.lower(1) << " "
+                    << coarse_box.upper(1) << " "
+                    << i << " "
+                    << j << " "
+                    << (*cell_viscosity_coarse)(coarse_cell) << " "
+                    << "\n";
+
        }
 }
 
