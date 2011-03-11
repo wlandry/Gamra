@@ -41,6 +41,7 @@
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
 #include "Boundary.h"
+#include "dRc_dp.h"
 /*
 ********************************************************************
 * FACOperatorStrategy virtual                                *
@@ -240,10 +241,9 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                 else
                   {
                     v_resid(center_x)=v_rhs(center_x)
-                      - v_operator(pbox,0,1,
-                                   v,p,cell_viscosity,edge_viscosity,center,
+                      - v_operator(v,p,cell_viscosity,edge_viscosity,center,
                                    left,center_x,right_x,left_x,up_x,down_x,
-                                   center_y,up_y,center_e,up_e,ip,jp,dx,dy);
+                                   center_y,up_y,center_e,up_e,ip,dx,dy);
                 // tbox::plog << "vx "
                 //            << v_resid(center_x) << " "
                 //            << v(center_x) << " "
@@ -264,10 +264,9 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
                 else
                   {
                     v_resid(center_y)=v_rhs(center_y)
-                      - v_operator(pbox,1,0,
-                                   v,p,cell_viscosity,edge_viscosity,center,
+                      - v_operator(v,p,cell_viscosity,edge_viscosity,center,
                                    down,center_y,up_y,down_y,right_y,left_y,
-                                   center_x,right_x,center_e,right_e,jp,ip,
+                                   center_x,right_x,center_e,right_e,jp,
                                    dy,dx);
                   }
                 // tbox::plog << "vy "

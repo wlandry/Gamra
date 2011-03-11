@@ -41,6 +41,7 @@
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
 #include "Boundary.h"
+#include "dRc_dp.h"
 /*
 ********************************************************************
 * Workhorse function to smooth error using red-black               *

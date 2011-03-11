@@ -563,128 +563,11 @@ private:
    pdat::NodeData<double> &edge_viscosity,
    const double &theta_momentum);
 
-  /* The derivative of the momentum equation w/respect to velocity. It
-     is written from the perspective of vx(center_x), but pass in
-     different values for center etc. to get vy or vx(!center_x). */
-
-  double dRm_dv(pdat::CellData<double> &cell_viscosity,
-                pdat::NodeData<double> &edge_viscosity,
-                const pdat::CellIndex &center,
-                const pdat::CellIndex &left,
-                const pdat::NodeIndex &up_e,
-                const pdat::NodeIndex &center_e,
-                const double &dx,
-                const double &dy)
-  {
-    return -2*(cell_viscosity(center) + cell_viscosity(left))/(dx*dx)
-      - (edge_viscosity(up_e) + edge_viscosity(center_e))/(dy*dy);
-  }
-
-  /* The derivative of the continuity equation with respect to
-     pressure.  Note that pressure does not appear in the continuity
-     equation, so we use Tackley's method to chain together
-     derivatives */
-
-  double dRc_dp(const hier::Box &pbox,
-                const pdat::CellIndex &center,
-                const pdat::CellIndex &left,
-                const pdat::CellIndex &right, 
-                const pdat::CellIndex &down,
-                const pdat::CellIndex &up,
-                const pdat::SideIndex &left_x,
-                const pdat::SideIndex &right_x,
-                const pdat::SideIndex &down_y,
-                const pdat::SideIndex &up_y,
-                pdat::CellData<double> &cell_viscosity,
-                pdat::NodeData<double> &edge_viscosity,
-                pdat::SideData<double> &v,
-                const double &dx,
-                const double &dy)
-  {
-    const pdat::NodeIndex center_e(center,pdat::NodeIndex::LowerLeft),
-      up_e(up,pdat::NodeIndex::LowerLeft),
-      right_e(right,pdat::NodeIndex::LowerLeft);
-    const hier::Index ip(1,0), jp(0,1);
-    const double dRm_dp_xp(1/dx), dRm_dp_xm(-1/dx),
-      dRm_dp_yp(1/dy), dRm_dp_ym(-1/dy),
-      dRc_dvx_p(-1/dx), dRc_dvx_m(1/dx),
-      dRc_dvy_p(-1/dy), dRc_dvy_m(1/dy);
-
-    double result(0);
-
-    if(!(center[0]==pbox.lower(0) && v(left_x)==boundary_value))
-      result+=dRc_dvx_p * dRm_dp_xp/dRm_dv(cell_viscosity,edge_viscosity,right,
-                                           center,up_e+ip,center_e+ip,dx,dy);
-
-    if(!(center[0]==pbox.upper(0)+1 && v(right_x)==boundary_value))
-      result+=dRc_dvx_m * dRm_dp_xm/dRm_dv(cell_viscosity,edge_viscosity,
-                                           center,left,up_e,center_e,dx,dy);
-
-    if(!(center[1]==pbox.lower(1) && v(down_y)==boundary_value))
-      result+=dRc_dvy_p * dRm_dp_yp/dRm_dv(cell_viscosity,edge_viscosity,up,
-                                           center,right_e+jp,center_e+jp,dy,dx);
-
-    if(!(center[1]==pbox.upper(1)+1 && v(up_y)==boundary_value))
-      result+=dRc_dvy_m * dRm_dp_ym/dRm_dv(cell_viscosity,edge_viscosity,
-                                           center,down,right_e,center_e,dy,dx);
-
-    return result;
-  }
-
-  /* A flux limiter for the pressure and viscosity derivatives. Minmod
-     for now.*/
-
-  double slope_limiter(const double &lower, const double &middle,
-                       const double &upper)
-  {
-    if(lower>0 && middle>0 && upper>0)
-      return std::min(lower,std::min(middle,upper));
-    else if(lower<0 && middle<0 && upper<0)
-      return std::max(lower,std::max(middle,upper));
-    else return 0;
-  }
-    
-  double dtau_xx_dx(pdat::SideData<double> &v,
-                    pdat::CellData<double> &cell_viscosity,
-                    const pdat::CellIndex &center,
-                    const pdat::CellIndex &left,
-                    const pdat::SideIndex &center_x,
-                    const pdat::SideIndex &right_x,
-                    const pdat::SideIndex &left_x,
-                    const double &dx)
-  {
-    return 2*((v(right_x)-v(center_x))*cell_viscosity(center)
-              - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
-  }
-
-  double dtau_xy_dy(pdat::SideData<double> &v,
-                    pdat::NodeData<double> &edge_viscosity,
-                    const pdat::SideIndex &center_x,
-                    const pdat::SideIndex &up_x,
-                    const pdat::SideIndex &down_x,
-                    const pdat::SideIndex &center_y,
-                    const pdat::SideIndex &center_y_ip,
-                    const pdat::SideIndex &up_y,
-                    const pdat::SideIndex &up_y_ip,
-                    const pdat::NodeIndex &center_e,
-                    const pdat::NodeIndex &up_e,
-                    const double &dx,
-                    const double &dy)
-  {
-    return edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
-                                 + (v(up_y)-v(up_y_ip))/(dx*dy))
-      - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
-                                  + (v(center_y)-v(center_y_ip))/(dx*dy));
-  }
-
   /* The action of the velocity operator. It is written from the
      perspective of vx, but pass in different values for center_x
      etc. to get vy. */
 
-  double v_operator(const hier::Box &pbox,
-                    const int &axis,
-                    const int &off_axis,
-                    pdat::SideData<double> &v,
+  double v_operator(pdat::SideData<double> &v,
                     pdat::CellData<double> &p,
                     pdat::CellData<double> &cell_viscosity,
                     pdat::NodeData<double> &edge_viscosity,
@@ -700,117 +583,19 @@ private:
                     const pdat::NodeIndex &center_e,
                     const pdat::NodeIndex &up_e,
                     const hier::Index &ip,
-                    const hier::Index &jp,
                     const double &dx,
                     const double &dy)
   {
-    double dtau_xx_dx_lower, dtau_xx_dx_middle, dtau_xx_dx_upper,
-      dp_dx_lower, dp_dx_middle, dp_dx_upper;
-    dtau_xx_dx_middle=dtau_xx_dx(v,cell_viscosity,center,left,
-                                 center_x,right_x,left_x,dx);
-    dp_dx_middle=(p(center)-p(left))/dx;
-    if(center_x[axis]<=pbox.lower(axis)+1)
-      {
-        dtau_xx_dx_lower=dtau_xx_dx_middle;
-        dp_dx_lower=dp_dx_middle;
-      }
-    else
-      {
-        dtau_xx_dx_lower=dtau_xx_dx(v,cell_viscosity,center-ip,left-ip,
-                                    center_x-ip,right_x-ip,left_x-ip,dx);
-        dp_dx_lower=(p(center-ip)-p(left-ip))/dx;
-      }
-    if(center_x[axis]>=pbox.upper(axis))
-      {
-        dtau_xx_dx_upper=dtau_xx_dx_middle;
-        dp_dx_upper=dp_dx_middle;
-      }
-    else
-      {
-        dtau_xx_dx_upper=dtau_xx_dx(v,cell_viscosity,center+ip,left+ip,
-                                    center_x+ip,right_x+ip,left_x+ip,dx);
-        dp_dx_lower=(p(center+ip)-p(left+ip))/dx;
-      }
+    double dtau_xx_dx=
+      2*((v(right_x)-v(center_x))*cell_viscosity(center)
+         - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
+    double dtau_xy_dy=edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
+                                            + (v(up_y)-v(up_y-ip))/(dx*dy))
+      - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
+                                  + (v(center_y)-v(center_y-ip))/(dx*dy));
+    double dp_dx=(p(center)-p(left))/dx;
 
-    const double dtau_xx_dx_limited(slope_limiter(dtau_xx_dx_lower,
-                                                  dtau_xx_dx_middle,
-                                                  dtau_xx_dx_upper));
-    const double
-      dp_dx_limited=slope_limiter(dp_dx_lower,dp_dx_middle,dp_dx_upper);
-
-
-    double dtau_xy_dy_lower, dtau_xy_dy_middle, dtau_xy_dy_upper;
-    dtau_xy_dy_middle=dtau_xy_dy(v,edge_viscosity,center_x,up_x,down_x,
-                                 center_y,center_y-ip,up_y,up_y-ip,
-                                 center_e,up_e,dx,dy);
-    if(center_y[off_axis]<=pbox.lower(off_axis)+1)
-      {
-        dtau_xy_dy_lower=dtau_xy_dy_middle;
-      }
-    else
-      {
-        dtau_xy_dy_lower=dtau_xy_dy(v,edge_viscosity,center_x-jp,up_x-jp,
-                                    down_x-jp,
-                                    center_y-jp,center_y-ip-jp,
-                                    up_y-jp,up_y-ip-jp,
-                                    center_e-jp,up_e-jp,dx,dy);
-      }
-    if(center_y[off_axis]>=pbox.lower(off_axis))
-      {
-        dtau_xy_dy_upper=dtau_xy_dy_middle;
-      }
-    else
-      {
-        dtau_xy_dy_upper=dtau_xy_dy(v,edge_viscosity,center_x+jp,up_x+jp,
-                                    down_x+jp,
-                                    center_y+jp,center_y-ip+jp,
-                                    up_y+jp,up_y-ip+jp,
-                                    up_e+jp,center_e+jp,dx,dy);
-      }
-
-    const double dtau_xy_dy_limited(slope_limiter(dtau_xy_dy_lower,
-                                                  dtau_xy_dy_middle,
-                                                  dtau_xy_dy_upper));
-
-    // return dtau_xx_dx_limited + dtau_xy_dy_limited - dp_dx_limited;
-
-    // if(axis==0 && center[1]<=2)
-    //   {
-    //     tbox::plog << "v_op "
-    //                << center[0] << " "
-    //                << center[1] << " "
-    //                << axis << " "
-    //                << v(center_x) << " "
-    //                << v(center_y) << " "
-    //                << p(center) << " "
-    //                << (dtau_xx_dx_middle + dtau_xy_dy_middle - dp_dx_middle)
-    //                << " "
-    //                << (v(center_x + ip) - v(center_x)
-    //                    + v(center_y+jp) - v(center_y)) << " "
-    //       // << dtau_xx_dx_middle << " "
-    //       // << dtau_xx_dx_limited << " "
-    //       // << dtau_xy_dy_middle << " "
-    //       // << dtau_xy_dy_limited << " "
-    //       // << dp_dx_middle << " "
-    //       // << dp_dx_limited << " "
-    //                << "\n";
-    //   }
-
-    return dtau_xx_dx_middle + dtau_xy_dy_middle - dp_dx_middle;
-    
-
-    // const double dtau_xx_dx =
-    //   2*((v(right_x)-v(center_x))*cell_viscosity(center)
-    //      - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
-
-    // const double dtau_xy_dy = 
-    //   edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
-    //                         + (v(up_y)-v(up_y-ip))/(dx*dy))
-    //   - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
-    //                               + (v(center_y)-v(center_y-ip))/(dx*dy));
-    // const double dp_dx=(p(center)-p(left))/dx;
-    
-    // return dtau_xx_dx + dtau_xy_dy - dp_dx;
+    return dtau_xx_dx + dtau_xy_dy - dp_dx;
   }
 
    /*!

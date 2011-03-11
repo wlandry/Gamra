@@ -41,6 +41,7 @@
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
 #include "Boundary.h"
+#include "dRc_dp.h"
 /*
 ********************************************************************
 * Updates one component of the velocity during a red-black *
@@ -118,10 +119,9 @@ void SAMRAI::solv::StokesFACOps::Update_V
                       dx,dy);
 
           double delta_Rx=v_rhs(center_x)
-            - v_operator(pbox,axis,off_axis,
-                         v,p,cell_viscosity,edge_viscosity,center,left,center_x,
+            - v_operator(v,p,cell_viscosity,edge_viscosity,center,left,center_x,
                          right_x,left_x,up_x,down_x,center_y,up_y,center_e,up_e,
-                         ip,jp,dx,dy);
+                         ip,dx,dy);
 
           /* No scaling here, though there should be. */
           maxres=std::max(maxres,std::fabs(delta_Rx));
