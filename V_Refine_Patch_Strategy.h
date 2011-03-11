@@ -53,9 +53,9 @@ public:
 
    virtual void
    setPhysicalBoundaryConditions(
-      hier::Patch& patch,
-      const double fill_time,
-      const hier::IntVector& ghost_width_to_fill) {}
+      hier::Patch& ,
+      const double ,
+      const hier::IntVector& ) {}
    hier::IntVector
    getRefineOpStencilWidth() const
   { return hier::IntVector::getOne(d_dim); }
@@ -73,16 +73,16 @@ public:
 
    virtual void
    postprocessRefineBoxes(
-      hier::Patch& fine,
-      const hier::Patch& coarse,
-      const hier::BoxList& fine_boxes,
-      const hier::IntVector& ratio) {}
+      hier::Patch& ,
+      const hier::Patch& ,
+      const hier::BoxList& ,
+      const hier::IntVector& ) {}
    virtual void
    postprocessRefine(
-      hier::Patch& fine,
-      const hier::Patch& coarse,
-      const hier::Box& fine_box,
-      const hier::IntVector& ratio) {}
+      hier::Patch& ,
+      const hier::Patch& ,
+      const hier::Box& ,
+      const hier::IntVector& ) {}
 
    //@}
 

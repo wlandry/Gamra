@@ -63,13 +63,11 @@ int SAMRAI::FACStokes::solveStokes()
 
   tbox::plog << "solving..." << std::endl;
   int solver_ret;
-  solver_ret = d_stokes_fac_solver.solveSystem(p_id,cell_viscosity_id,
-                                               edge_viscosity_id,dp_id,
-                                               p_rhs_id,v_id,v_rhs_id);
+  solver_ret = d_stokes_fac_solver.solveSystem(p_id,p_rhs_id,v_id,v_rhs_id);
   /*
    * Present data on the solve.
    */
-  double avg_factor, final_factor;
+  // double avg_factor, final_factor;
   // d_stokes_fac_solver.getConvergenceFactors(avg_factor, final_factor);
   // tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
   //            << "	iterations: "

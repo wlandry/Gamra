@@ -513,8 +513,6 @@ private:
     * @name Private workhorse functions.
     */
 
-  const int invalid_id;
-
    /*!
     * @brief Red-black Gauss-Seidel error smoothing on a level.
     *
@@ -965,6 +963,8 @@ private:
     * to reduce memory usage.
     */
   int d_cell_scratch_id, d_side_scratch_id;
+
+  const int invalid_id;
 
    //@}
 

@@ -5,10 +5,10 @@
 
 void
 SAMRAI::solv::P_Refine_Patch_Strategy::preprocessRefine
-(hier::Patch& fine,
+(hier::Patch& ,
  const hier::Patch& coarse,
- const hier::Box& fine_box,
- const hier::IntVector& ratio)
+ const hier::Box& ,
+ const hier::IntVector& )
 {
   tbox::Pointer<pdat::CellData<double> >
     p = coarse.getPatchData(p_id);

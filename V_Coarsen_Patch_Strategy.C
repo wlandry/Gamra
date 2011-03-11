@@ -4,8 +4,8 @@ void
 SAMRAI::solv::V_Coarsen_Patch_Strategy::postprocessCoarsen
 (hier::Patch& coarse,
  const hier::Patch& fine,
- const hier::Box& coarse_box,
- const hier::IntVector& ratio)
+ const hier::Box& ,
+ const hier::IntVector& )
 {
   /* Fix up the boundary elements by iterating through the boundary
      boxes */

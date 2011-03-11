@@ -64,10 +64,10 @@ public:
    //    const hier::BoxList& fine_boxes,
    //    const hier::IntVector& ratio) {}
    virtual void
-   preprocessCoarsen(hier::Patch& coarse,
+   preprocessCoarsen(hier::Patch& ,
                     const hier::Patch& fine,
-                    const hier::Box& coarse_box,
-                    const hier::IntVector& ratio)
+                    const hier::Box& ,
+                    const hier::IntVector& )
   {
     set_V_boundary(fine,v_id,true);
   }

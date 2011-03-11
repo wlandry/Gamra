@@ -123,12 +123,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               tbox::Pointer<pdat::CellData<double> > p_ptr =
                 patch->getPatchData(p_id);
               pdat::CellData<double> &p(*p_ptr);
-              tbox::Pointer<pdat::CellData<double> > dp_ptr =
-                patch->getPatchData(dp_id);
-              pdat::CellData<double> &dp(*dp_ptr);
-              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
-                patch->getPatchData(p_rhs_id);
-              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
                 
               tbox::Pointer<pdat::SideData<double> > v_ptr =
                 patch->getPatchData(v_id);
@@ -242,12 +236,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               tbox::Pointer<pdat::CellData<double> > p_ptr =
                 patch->getPatchData(p_id);
               pdat::CellData<double> &p(*p_ptr);
-              tbox::Pointer<pdat::CellData<double> > dp_ptr =
-                patch->getPatchData(dp_id);
-              pdat::CellData<double> &dp(*dp_ptr);
-              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
-                patch->getPatchData(p_rhs_id);
-              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
                 
               tbox::Pointer<pdat::SideData<double> > v_ptr =
                 patch->getPatchData(v_id);
@@ -372,9 +360,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               tbox::Pointer<pdat::SideData<double> > v_ptr =
                 patch->getPatchData(v_id);
               pdat::SideData<double> &v(*v_ptr);
-              tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
-                patch->getPatchData(v_rhs_id);
-              pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
               tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
                 = patch->getPatchData(cell_viscosity_id);
@@ -525,16 +510,10 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               tbox::Pointer<pdat::CellData<double> > dp_ptr =
                 patch->getPatchData(dp_id);
               pdat::CellData<double> &dp(*dp_ptr);
-              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
-                patch->getPatchData(p_rhs_id);
-              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
                 
               tbox::Pointer<pdat::SideData<double> > v_ptr =
                 patch->getPatchData(v_id);
               pdat::SideData<double> &v(*v_ptr);
-              tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
-                patch->getPatchData(v_rhs_id);
-              pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
               tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
                 = patch->getPatchData(cell_viscosity_id);

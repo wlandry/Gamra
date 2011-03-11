@@ -40,7 +40,6 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V
 {
   pdat::SideIndex center(fine);
   center.coarsen(hier::Index(2,2));
-  const int off_axis= (axis==0) ? 1 : 0;
 
   // tbox::plog << "Boundary Update V "
   //            << axis << " "
