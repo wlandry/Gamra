@@ -19,6 +19,7 @@ def build(bld):
                         'FACStokes/setupPlotter.C',
                         'FACStokes/solveStokes.C',
                         'P_Refine.C',
+                        'P_MDPI_Refine.C',
                         'V_Refine.C',
                         'V_Coarsen.C',
                         'P_Boundary_Refine.C',

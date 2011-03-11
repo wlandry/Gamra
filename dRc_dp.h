@@ -5,6 +5,7 @@
 #include "SAMRAI/pdat/NodeData.h"
 #include "SAMRAI/pdat/SideData.h"
 #include "dRm_dv.h"
+#include "Boundary.h"
 
 /* The derivative of the continuity equation with respect to
    pressure.  Note that pressure does not appear in the continuity

@@ -42,17 +42,9 @@ FACStokes {
     // coarse_solver_choice = "Gerya"
     coarse_solver_max_iterations = 25000
     coarse_solver_tolerance = 1e-8
-    p_prolongation_method = "P_REFINE" // Type of refinement
-      					  // used in prolongation.
-                                          // Suggested values are
-                                          // "LINEAR_REFINE"
-                                          // "CONSTANT_REFINE"
-    v_prolongation_method = "V_REFINE" // Type of refinement
-      					  // used in prolongation.
-                                          // Suggested values are
-                                          // "LINEAR_REFINE"
-                                          // "CONSTANT_REFINE"
-    use_smg = TRUE	// Whether to use HYPRE's SMG instead of PFMG.
+    // p_prolongation_method = "P_MDPI_REFINE"
+    p_prolongation_method = "P_REFINE"
+    v_prolongation_method = "V_REFINE"
   }
   bc_coefs {
     // These are the boundary condition specifications.  The number

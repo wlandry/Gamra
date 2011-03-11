@@ -36,6 +36,7 @@ using namespace std;
 #include "V_Coarsen.h"
 #include "Cell_Viscosity_Coarsen.h"
 #include "Edge_Viscosity_Coarsen.h"
+#include "P_MDPI_Refine.h"
 
 #include "FACStokes.h"
 
@@ -198,6 +199,11 @@ int main(
       (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
        (new SAMRAI::geom::Edge_Viscosity_Coarsen
         (dim,fac_stokes.cell_viscosity_id)));
+    grid_geometry->addSpatialRefineOperator
+      (tbox::Pointer<SAMRAI::xfer::RefineOperator>
+       (new SAMRAI::geom::P_MDPI_Refine(dim,fac_stokes.v_id,
+                                        fac_stokes.cell_viscosity_id,
+                                        fac_stokes.edge_viscosity_id)));
 
     /*
      * Create the tag-and-initializer, box-generator and load-balancer
