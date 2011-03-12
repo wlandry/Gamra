@@ -63,7 +63,7 @@ void SAMRAI::FACStokes::initializeLevelData
   }
 
   const double inclusion_radius=0.5;
-  const double inclusion_viscosity=10;
+  const double inclusion_viscosity=1e2;
   const double background_viscosity=1;
 
   /*
@@ -126,6 +126,7 @@ void SAMRAI::FACStokes::initializeLevelData
         double y=geom->getXLower()[1]
           + geom->getDx()[1]*(e[1]-visc_box.lower()[1]);
         if(x*x + y*y < inclusion_radius*inclusion_radius)
+        // if(x<inclusion_radius && y<inclusion_radius)
           edge_viscosity(e)=inclusion_viscosity;
         else
           edge_viscosity(e)=background_viscosity;
