@@ -86,6 +86,8 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
    tbox::Pointer<geom::CartesianPatchGeometry>
      geom = coarse_patch.getPatchGeometry();
 
+   hier::Box gbox=p_fine.getGhostBox();
+
    const double dx = geom->getDx()[0];
    const double dy = geom->getDx()[1];
 
@@ -103,32 +105,41 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
          jp[1]=1;
          pdat::CellIndex center(hier::Index::coarsen(fine,hier::Index(2,2)));
 
-         double dRc_dp_total(0), dRc_dp_fine(0);
-         /* This is horribly inefficient */
-         for(int xx=0;xx<2;++xx)
-           for(int yy=0;yy<2;++yy)
-             {
-               pdat::CellIndex c_fine(center*2);
-               c_fine[0]+=xx;
-               c_fine[1]+=yy;
+         if(fine[0]>gbox.lower(0) && fine[0]<gbox.upper(0)
+            && fine[1]>gbox.lower(1) && fine[1]<gbox.upper(1))
+           {
+             double dRc_dp_total(0), dRc_dp_fine(0);
+             /* This is horribly inefficient */
+             for(int xx=0;xx<2;++xx)
+               for(int yy=0;yy<2;++yy)
+                 {
+                   pdat::CellIndex c_fine(center*2);
+                   c_fine[0]+=xx;
+                   c_fine[1]+=yy;
                
-               pdat::CellIndex left(c_fine-ip),right(c_fine+ip),
-                 down(c_fine-jp), up(c_fine+jp);
-               pdat::SideIndex left_x(left,0,pdat::SideIndex::Lower),
-                 right_x(right,0,pdat::SideIndex::Lower),
-                 down_y(down,1,pdat::SideIndex::Lower),
-                 up_y(up,1,pdat::SideIndex::Lower);
+                   pdat::CellIndex left(c_fine-ip),right(c_fine+ip),
+                     down(c_fine-jp), up(c_fine+jp);
+                   pdat::SideIndex left_x(left,0,pdat::SideIndex::Lower),
+                     right_x(right,0,pdat::SideIndex::Lower),
+                     down_y(down,1,pdat::SideIndex::Lower),
+                     up_y(up,1,pdat::SideIndex::Lower);
 
-               double dRc_dp_weight=dRc_dp(fine_box,c_fine,left,right,down,up,
-                                           left_x,right_x,down_y,up_y,
-                                           cell_viscosity,edge_viscosity,v,
-                                           dx,dy);
-               if(c_fine==fine)
-                 dRc_dp_fine=dRc_dp_weight;
-               dRc_dp_total+=dRc_dp_weight;
-             }
+                   double dRc_dp_weight=
+                     dRc_dp(fine_box,c_fine,left,right,down,up,
+                            left_x,right_x,down_y,up_y,
+                            cell_viscosity,edge_viscosity,v,dx,dy);
 
-         p_fine(fine)=p(center)*dRc_dp_total/(4*dRc_dp_fine);
+                   if(c_fine==fine)
+                     dRc_dp_fine=dRc_dp_weight;
+                   dRc_dp_total+=dRc_dp_weight;
+                 }
+
+             p_fine(fine)=p(center)*dRc_dp_total/(4*dRc_dp_fine);
+           }
+         else
+           {
+             p_fine(fine)=p(center);
+           }
 
          // tbox::plog << "P_MDPI_Refine "
          //            << fine_patch.getPatchLevelNumber() << " "
