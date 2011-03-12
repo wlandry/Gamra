@@ -62,18 +62,6 @@ void SAMRAI::geom::Edge_Viscosity_Coarsen::coarsen(hier::Patch& coarse,
          (*edge_viscosity_coarse)(coarse_edge)=
            viscosity_coarsen(*cell_viscosity_fine,*edge_viscosity_fine,
                              coarse_edge*2);
-
-
-         tbox::plog << "Edge "
-                    << coarse_box.lower(0) << " "
-                    << coarse_box.upper(0) << " "
-                    << coarse_box.lower(1) << " "
-                    << coarse_box.upper(1) << " "
-                    << i << " "
-                    << j << " "
-                    << (*edge_viscosity_coarse)(coarse_edge) << " "
-                    << "\n";
-
        }
 }
 
