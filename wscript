@@ -33,7 +33,7 @@ def build(bld):
                         'set_V_boundary.C',
                         'StokesFACOps/StokesFACOps.C',
                         'StokesFACOps/checkInputPatchDataIndices.C',
-                        'StokesFACOps/computeCompositeResidualOnLevel.C',
+                        'StokesFACOps/residual_2D.C',
                         'StokesFACOps/computeFluxOnPatch.C',
                         'StokesFACOps/computeResidualNorm.C',
                         'StokesFACOps/computeVectorWeights.C',
