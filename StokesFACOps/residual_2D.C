@@ -49,7 +49,7 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
+void SAMRAI::solv::StokesFACOps::residual_2D
 (SAMRAIVectorReal<double>& residual,
  const SAMRAIVectorReal<double>& solution,
  const SAMRAIVectorReal<double>& rhs,

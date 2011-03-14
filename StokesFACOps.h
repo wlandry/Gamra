@@ -467,7 +467,18 @@ public:
       const SAMRAIVectorReal<double>& solution,
       const SAMRAIVectorReal<double>& rhs,
       int ln,
-      bool error_equation_indicator);
+      bool error_equation_indicator)
+  {
+    if(d_dim.getValue()==2)
+      residual_2D(residual,solution,rhs,ln,error_equation_indicator);
+  }
+
+  void
+  residual_2D(SAMRAIVectorReal<double>& residual,
+              const SAMRAIVectorReal<double>& solution,
+              const SAMRAIVectorReal<double>& rhs,
+              int ln,
+              bool error_equation_indicator);
 
    virtual double
    computeResidualNorm(
