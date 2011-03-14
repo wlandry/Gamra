@@ -104,9 +104,9 @@ void SAMRAI::solv::StokesFACOps::residual_2D
           else
             {
               v_resid(center_x)=v_rhs(center_x)
-                - v_operator(v,p,cell_viscosity,edge_viscosity,center,
-                             left,center_x,right_x,left_x,up_x,down_x,
-                             center_y,up_y,center_e,up_e,ip,dx,dy);
+                - v_operator_2D(v,p,cell_viscosity,edge_viscosity,center,
+                                left,center_x,right_x,left_x,up_x,down_x,
+                                center_y,up_y,center_e,up_e,ip,dx,dy);
             }
         }
 
@@ -122,10 +122,10 @@ void SAMRAI::solv::StokesFACOps::residual_2D
           else
             {
               v_resid(center_y)=v_rhs(center_y)
-                - v_operator(v,p,cell_viscosity,edge_viscosity,center,
-                             down,center_y,up_y,down_y,right_y,left_y,
-                             center_x,right_x,center_e,right_e,jp,
-                             dy,dx);
+                - v_operator_2D(v,p,cell_viscosity,edge_viscosity,center,
+                                down,center_y,up_y,down_y,right_y,left_y,
+                                center_x,right_x,center_e,right_e,jp,
+                                dy,dx);
             }
         }
     }

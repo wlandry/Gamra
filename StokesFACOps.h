@@ -577,24 +577,24 @@ private:
      perspective of vx, but pass in different values for center_x
      etc. to get vy. */
 
-  double v_operator(pdat::SideData<double> &v,
-                    pdat::CellData<double> &p,
-                    pdat::CellData<double> &cell_viscosity,
-                    pdat::NodeData<double> &edge_viscosity,
-                    const pdat::CellIndex &center,
-                    const pdat::CellIndex &left,
-                    const pdat::SideIndex &center_x,
-                    const pdat::SideIndex &right_x,
-                    const pdat::SideIndex &left_x,
-                    const pdat::SideIndex &up_x,
-                    const pdat::SideIndex &down_x,
-                    const pdat::SideIndex &center_y,
-                    const pdat::SideIndex &up_y,
-                    const pdat::NodeIndex &center_e,
-                    const pdat::NodeIndex &up_e,
-                    const hier::Index &ip,
-                    const double &dx,
-                    const double &dy)
+  double v_operator_2D(pdat::SideData<double> &v,
+                       pdat::CellData<double> &p,
+                       pdat::CellData<double> &cell_viscosity,
+                       pdat::NodeData<double> &edge_viscosity,
+                       const pdat::CellIndex &center,
+                       const pdat::CellIndex &left,
+                       const pdat::SideIndex &center_x,
+                       const pdat::SideIndex &right_x,
+                       const pdat::SideIndex &left_x,
+                       const pdat::SideIndex &up_x,
+                       const pdat::SideIndex &down_x,
+                       const pdat::SideIndex &center_y,
+                       const pdat::SideIndex &up_y,
+                       const pdat::NodeIndex &center_e,
+                       const pdat::NodeIndex &up_e,
+                       const hier::Index &ip,
+                       const double &dx,
+                       const double &dy)
   {
     double dtau_xx_dx=
       2*((v(right_x)-v(center_x))*cell_viscosity(center)
