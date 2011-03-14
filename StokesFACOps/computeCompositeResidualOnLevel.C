@@ -100,16 +100,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
    * S4. Compute residual data from flux.
    */
 
-
-  // /*
-  //  * For the whole level, make sure the internal
-  //  * side-centered data is allocated and note
-  //  * whether that data should be deallocated when done.
-  //  * We do this for the whole level because the data
-  //  * undergoes transfer operations which require the
-  //  * whole level data.
-  //  */
-
   /* S1. Fill solution ghost data. */
 
   set_boundaries(v_id,ln,error_equation_indicator);
@@ -120,28 +110,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
     /* Fill from current and physical boundary */
     xeqScheduleGhostFillNoCoarse(p_id, v_id, ln);
   }
-
-  // /*
-  //  * S2. Compute flux on patches in level.
-  //  */
-  // for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
-  //   tbox::Pointer<hier::Patch> patch = *pi;
-
-  //   tbox::Pointer<pdat::CellData<double> >
-  //     soln_data = solution.getComponentPatchData(0, *patch);
-  //   tbox::Pointer<pdat::CellData<double> >
-  //     rhs_data = rhs.getComponentPatchData(0, *patch);
-  //   tbox::Pointer<pdat::CellData<double> >
-  //     residual_data = residual.getComponentPatchData(0, *patch);
-  //   tbox::Pointer<pdat::SideData<double> >
-  //     flux_data = patch->getPatchData(flux_id);
-  //   computeFluxOnPatch(
-  //                      *patch,
-  //                      level->getRatioToCoarserLevel(),
-  //                      *soln_data,
-  //                      *flux_data);
-
-  // }
 
   /*
    * S4. Compute residual on patches in level.
@@ -180,99 +148,79 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
     double dx = geom->getDx()[0];
     double dy = geom->getDx()[1];
 
-    for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
+    pbox.growUpper(hier::IntVector::getOne(d_dim));
+    for(pdat::CellIterator ci(pbox); ci; ci++)
       {
-        for(int i=pbox.lower(0); i<=pbox.upper(0)+1; ++i)
+        pdat::CellIndex center(*ci);
+        pdat::CellIndex up(center), down(center), right(center),
+          left(center);
+
+        ++up[1];
+        --down[1];
+        ++right[0];
+        --left[0];
+
+        const pdat::SideIndex
+          center_x(center,0,pdat::SideIndex::Lower),
+          left_x(left,0,pdat::SideIndex::Lower),
+          right_x(right,0,pdat::SideIndex::Lower),
+          down_x(down,0,pdat::SideIndex::Lower),
+          up_x(up,0,pdat::SideIndex::Lower),
+          center_y(center,1,pdat::SideIndex::Lower),
+          left_y(left,1,pdat::SideIndex::Lower),
+          right_y(right,1,pdat::SideIndex::Lower),
+          down_y(down,1,pdat::SideIndex::Lower),
+          up_y(up,1,pdat::SideIndex::Lower);
+        const pdat::NodeIndex
+          center_e(center,pdat::NodeIndex::LowerLeft),
+          up_e(up,pdat::NodeIndex::LowerLeft),
+          right_e(right,pdat::NodeIndex::LowerLeft);
+
+        /* p */
+        if(center[0]!=pbox.upper(0) && center[1]!=pbox.upper(1))
           {
-            pdat::CellIndex center(tbox::Dimension(2));
-            center[0]=i;
-            center[1]=j;
+            double dvx_dx=(v(right_x) - v(center_x))/dx;
+            double dvy_dy=(v(up_y) - v(center_y))/dy;
+            p_resid(center)=p_rhs(center) - dvx_dx - dvy_dy;
+          }
 
-            pdat::CellIndex up(center), down(center), right(center),
-              left(center);
-
-            ++up[1];
-            --down[1];
-            ++right[0];
-            --left[0];
-
-            const pdat::SideIndex
-              center_x(center,0,pdat::SideIndex::Lower),
-              left_x(left,0,pdat::SideIndex::Lower),
-              right_x(right,0,pdat::SideIndex::Lower),
-              down_x(down,0,pdat::SideIndex::Lower),
-              up_x(up,0,pdat::SideIndex::Lower),
-              center_y(center,1,pdat::SideIndex::Lower),
-              left_y(left,1,pdat::SideIndex::Lower),
-              right_y(right,1,pdat::SideIndex::Lower),
-              down_y(down,1,pdat::SideIndex::Lower),
-              up_y(up,1,pdat::SideIndex::Lower);
-            const pdat::NodeIndex
-              center_e(center,pdat::NodeIndex::LowerLeft),
-              up_e(up,pdat::NodeIndex::LowerLeft),
-              right_e(right,pdat::NodeIndex::LowerLeft);
-
-            // tbox::plog << "resid "
-            //            << ln << " "
-            //            << i << " "
-            //            << j << " ";
-            /* p */
-            if(i!=pbox.upper(0)+1 && j!=pbox.upper(1)+1)
-              {
-                double dvx_dx=(v(right_x) - v(center_x))/dx;
-                double dvy_dy=(v(up_y) - v(center_y))/dy;
-                p_resid(center)=p_rhs(center) - dvx_dx - dvy_dy;
-
-                // tbox::plog << "p "
-                //            << p_resid(center) << " ";
-              }
-
-            /* vx */
-            if(j!=pbox.upper(1)+1)
-              {
-                /* If x==0 */
-                if((center[0]==pbox.lower(0) && v(left_x)==boundary_value)
-                   || (center[0]==pbox.upper(0)+1
-                       && v(right_x)==boundary_value))
+        /* vx */
+        if(center[1]!=pbox.upper(1))
+          {
+            /* If x==0 */
+            if((center[0]==pbox.lower(0) && v(left_x)==boundary_value)
+               || (center[0]==pbox.upper(0)
+                   && v(right_x)==boundary_value))
                        
-                  {
-                    v_resid(center_x)=0;
-                  }
-                else
-                  {
-                    v_resid(center_x)=v_rhs(center_x)
-                      - v_operator(v,p,cell_viscosity,edge_viscosity,center,
-                                   left,center_x,right_x,left_x,up_x,down_x,
-                                   center_y,up_y,center_e,up_e,ip,dx,dy);
-                // tbox::plog << "vx "
-                //            << v_resid(center_x) << " "
-                //            << v(center_x) << " "
-                //            << v(right_x) << " "
-                //            << v(left_x) << " ";
-                  }
-              }
-
-            /* vy */
-            if(i!=pbox.upper(0)+1)
               {
-                /* If y==0 */
-                if((center[1]==pbox.lower(1) && v(down_y)==boundary_value)
-                   || (center[1]==pbox.upper(1)+1 && v(up_y)==boundary_value))
-                  {
-                    v_resid(center_y)=0;
-                  }
-                else
-                  {
-                    v_resid(center_y)=v_rhs(center_y)
-                      - v_operator(v,p,cell_viscosity,edge_viscosity,center,
-                                   down,center_y,up_y,down_y,right_y,left_y,
-                                   center_x,right_x,center_e,right_e,jp,
-                                   dy,dx);
-                  }
-                // tbox::plog << "vy "
-                //            << v_resid(center_y) << " ";
+                v_resid(center_x)=0;
               }
-            // tbox::plog << "\n";
+            else
+              {
+                v_resid(center_x)=v_rhs(center_x)
+                  - v_operator(v,p,cell_viscosity,edge_viscosity,center,
+                               left,center_x,right_x,left_x,up_x,down_x,
+                               center_y,up_y,center_e,up_e,ip,dx,dy);
+              }
+          }
+
+        /* vy */
+        if(center[0]!=pbox.upper(0))
+          {
+            /* If y==0 */
+            if((center[1]==pbox.lower(1) && v(down_y)==boundary_value)
+               || (center[1]==pbox.upper(1) && v(up_y)==boundary_value))
+              {
+                v_resid(center_y)=0;
+              }
+            else
+              {
+                v_resid(center_y)=v_rhs(center_y)
+                  - v_operator(v,p,cell_viscosity,edge_viscosity,center,
+                               down,center_y,up_y,down_y,right_y,left_y,
+                               center_x,right_x,center_e,right_e,jp,
+                               dy,dx);
+              }
           }
       }
   }
@@ -283,11 +231,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
   set_boundaries(v_rhs_id,ln,true);
   xeqScheduleGhostFillNoCoarse(invalid_id, v_rhs_id, ln);
   
-
-  // if (deallocate_flux_data_when_done) {
-  //   level->deallocatePatchData(flux_id);
-  // }
-
   t_compute_composite_residual->stop();
 }
 
