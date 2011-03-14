@@ -237,86 +237,77 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
 
 
 
-      /* p sweep */
+      /* p sweep
+         No need for red-black, because dp does not depend on
+         the pressure. */
       xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
 
-      for(int rb=0;rb<2;++rb)
+      for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
         {
-          for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+          tbox::Pointer<hier::Patch> patch = *pi;
+
+          tbox::Pointer<pdat::CellData<double> > p_ptr =
+            patch->getPatchData(p_id);
+          pdat::CellData<double> &p(*p_ptr);
+          tbox::Pointer<pdat::CellData<double> > dp_ptr =
+            patch->getPatchData(dp_id);
+          pdat::CellData<double> &dp(*dp_ptr);
+          tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
+            patch->getPatchData(p_rhs_id);
+          pdat::CellData<double> &p_rhs(*p_rhs_ptr);
+                
+          tbox::Pointer<pdat::SideData<double> > v_ptr =
+            patch->getPatchData(v_id);
+          pdat::SideData<double> &v(*v_ptr);
+                
+          tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
+            = patch->getPatchData(cell_viscosity_id);
+          pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+          tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
+            = patch->getPatchData(edge_viscosity_id);
+          pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
+
+          hier::Box pbox=patch->getBox();
+          tbox::Pointer<geom::CartesianPatchGeometry>
+            geom = patch->getPatchGeometry();
+          double dx = geom->getDx()[0];
+          double dy = geom->getDx()[1];
+
+          for(pdat::CellIterator ci(pbox); ci; ci++)
             {
-              tbox::Pointer<hier::Patch> patch = *pi;
+              pdat::CellIndex center(*ci);
+              pdat::CellIndex up(center), down(center), right(center),
+                left(center);
 
-              tbox::Pointer<pdat::CellData<double> > p_ptr =
-                patch->getPatchData(p_id);
-              pdat::CellData<double> &p(*p_ptr);
-              tbox::Pointer<pdat::CellData<double> > dp_ptr =
-                patch->getPatchData(dp_id);
-              pdat::CellData<double> &dp(*dp_ptr);
-              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
-                patch->getPatchData(p_rhs_id);
-              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
-                
-              tbox::Pointer<pdat::SideData<double> > v_ptr =
-                patch->getPatchData(v_id);
-              pdat::SideData<double> &v(*v_ptr);
-                
-              tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-                = patch->getPatchData(cell_viscosity_id);
-              pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-              tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
-                = patch->getPatchData(edge_viscosity_id);
-              pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
+              ++up[1];
+              --down[1];
+              ++right[0];
+              --left[0];
 
-              hier::Box pbox=patch->getBox();
-              tbox::Pointer<geom::CartesianPatchGeometry>
-                geom = patch->getPatchGeometry();
-              double dx = geom->getDx()[0];
-              double dy = geom->getDx()[1];
+              const pdat::SideIndex
+                center_x(center,0,pdat::SideIndex::Lower),
+                left_x(left,0,pdat::SideIndex::Lower),
+                right_x(right,0,pdat::SideIndex::Lower),
+                center_y(center,1,pdat::SideIndex::Lower),
+                up_y(up,1,pdat::SideIndex::Lower),
+                down_y(down,1,pdat::SideIndex::Lower);
 
-              for(int j=pbox.lower(1); j<=pbox.upper(1); ++j)
-                {
-                  /* Do the red-black skip */
-                  int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
-                  for(int i=i_min; i<=pbox.upper(0); i+=2)
-                    {
-                      pdat::CellIndex center(tbox::Dimension(2));
-                      center[0]=i;
-                      center[1]=j;
+              /* Update p */
+              double dvx_dx=(v(right_x) - v(center_x))/dx;
+              double dvy_dy=(v(up_y) - v(center_y))/dy;
 
-                      pdat::CellIndex up(center), down(center), right(center),
-                        left(center);
+              double delta_R_continuity=
+                p_rhs(center) - dvx_dx - dvy_dy;
 
-                      ++up[1];
-                      --down[1];
-                      ++right[0];
-                      --left[0];
+              /* No scaling here, though there should be. */
+              maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
-                      const pdat::SideIndex
-                        center_x(center,0,pdat::SideIndex::Lower),
-                        left_x(left,0,pdat::SideIndex::Lower),
-                        right_x(right,0,pdat::SideIndex::Lower),
-                        center_y(center,1,pdat::SideIndex::Lower),
-                        up_y(up,1,pdat::SideIndex::Lower),
-                        down_y(down,1,pdat::SideIndex::Lower);
-
-                      /* Update p */
-                      double dvx_dx=(v(right_x) - v(center_x))/dx;
-                      double dvy_dy=(v(up_y) - v(center_y))/dy;
-
-                      double delta_R_continuity=
-                        p_rhs(center) - dvx_dx - dvy_dy;
-
-                      /* No scaling here, though there should be. */
-                      maxres=std::max(maxres,std::fabs(delta_R_continuity));
-
-                      dp(center)=delta_R_continuity*theta_continuity
-                        /dRc_dp(pbox,center,left,right,down,up,
-                                left_x,right_x,down_y,up_y,
-                                cell_viscosity,edge_viscosity,
-                                v,dx,dy);
-                      p(center)+=dp(center);
-                    }
-                }
+              dp(center)=delta_R_continuity*theta_continuity
+                /dRc_dp(pbox,center,left,right,down,up,
+                        left_x,right_x,down_y,up_y,
+                        cell_viscosity,edge_viscosity,
+                        v,dx,dy);
+              p(center)+=dp(center);
             }
         }
 
@@ -349,55 +340,51 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
           double dx = geom->getDx()[0];
           double dy = geom->getDx()[1];
 
-          for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
+          pbox.growUpper(hier::IntVector::getOne(d_dim));
+
+          for(pdat::CellIterator ci(pbox); ci; ci++)
             {
-              for(int i=pbox.lower(0); i<=pbox.upper(0)+1; ++i)
+              pdat::CellIndex center(*ci);
+              pdat::CellIndex up(center), down(center), right(center),
+                left(center);
+
+              ++up[1];
+              --down[1];
+              ++right[0];
+              --left[0];
+
+              const pdat::SideIndex
+                center_x(center,0,pdat::SideIndex::Lower),
+                left_x(left,0,pdat::SideIndex::Lower),
+                right_x(right,0,pdat::SideIndex::Lower),
+                center_y(center,1,pdat::SideIndex::Lower),
+                up_y(up,1,pdat::SideIndex::Lower),
+                down_y(down,1,pdat::SideIndex::Lower);
+              const pdat::NodeIndex
+                center_e(center,pdat::NodeIndex::LowerLeft),
+                up_e(up,pdat::NodeIndex::LowerLeft),
+                right_e(right,pdat::NodeIndex::LowerLeft);
+
+              /* Update v */
+              if(center[1]<pbox.upper(1))
                 {
-                  pdat::CellIndex center(tbox::Dimension(2));
-                  center[0]=i;
-                  center[1]=j;
-
-                  pdat::CellIndex up(center), down(center), right(center),
-                    left(center);
-
-                  ++up[1];
-                  --down[1];
-                  ++right[0];
-                  --left[0];
-
-                  const pdat::SideIndex
-                    center_x(center,0,pdat::SideIndex::Lower),
-                    left_x(left,0,pdat::SideIndex::Lower),
-                    right_x(right,0,pdat::SideIndex::Lower),
-                    center_y(center,1,pdat::SideIndex::Lower),
-                    up_y(up,1,pdat::SideIndex::Lower),
-                    down_y(down,1,pdat::SideIndex::Lower);
-                  const pdat::NodeIndex
-                    center_e(center,pdat::NodeIndex::LowerLeft),
-                    up_e(up,pdat::NodeIndex::LowerLeft),
-                    right_e(right,pdat::NodeIndex::LowerLeft);
-
-                  /* Update v */
-                  if(j<pbox.upper(1)+1)
-                    {
-                      if(!((center[0]==pbox.lower(0)
-                            && v(left_x)==boundary_value)
-                           || (center[0]==pbox.upper(0)+1
-                               && v(right_x)==boundary_value)))
-                        v(center_x)+=(dp(center) - dp(left))
-                          /(dx*dRm_dv(cell_viscosity,edge_viscosity,center,
-                                      left,up_e,center_e,dx,dy));
-                    }
-                  if(i<pbox.upper(0)+1)
-                    {
-                      if(!((center[1]==pbox.lower(1)
-                            && v(down_y)==boundary_value)
-                           || (center[1]==pbox.upper(1)+1
-                               && v(up_y)==boundary_value)))
-                        v(center_y)+=(dp(center) - dp(down))
-                          /(dy*dRm_dv(cell_viscosity,edge_viscosity,center,
-                                      down,right_e,center_e,dy,dx));
-                    }
+                  if(!((center[0]==pbox.lower(0)
+                        && v(left_x)==boundary_value)
+                       || (center[0]==pbox.upper(0)
+                           && v(right_x)==boundary_value)))
+                    v(center_x)+=(dp(center) - dp(left))
+                      /(dx*dRm_dv(cell_viscosity,edge_viscosity,center,
+                                  left,up_e,center_e,dx,dy));
+                }
+              if(center[0]<pbox.upper(0))
+                {
+                  if(!((center[1]==pbox.lower(1)
+                        && v(down_y)==boundary_value)
+                       || (center[1]==pbox.upper(1)
+                           && v(up_y)==boundary_value)))
+                    v(center_y)+=(dp(center) - dp(down))
+                      /(dy*dRm_dv(cell_viscosity,edge_viscosity,center,
+                                  down,right_e,center_e,dy,dx));
                 }
             }
         }
