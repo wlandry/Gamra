@@ -467,18 +467,19 @@ public:
       const SAMRAIVectorReal<double>& solution,
       const SAMRAIVectorReal<double>& rhs,
       int ln,
-      bool error_equation_indicator)
-  {
-    if(d_dim.getValue()==2)
-      residual_2D(residual,solution,rhs,ln,error_equation_indicator);
-  }
+      bool error_equation_indicator);
 
-  void
-  residual_2D(SAMRAIVectorReal<double>& residual,
-              const SAMRAIVectorReal<double>& solution,
-              const SAMRAIVectorReal<double>& rhs,
-              int ln,
-              bool error_equation_indicator);
+  void residual_2D
+  (pdat::CellData<double> &p,
+   pdat::SideData<double> &v,
+   pdat::CellData<double> &cell_viscosity,
+   pdat::CellData<double> &p_rhs,
+   pdat::SideData<double> &v_rhs,
+   pdat::CellData<double> &p_resid,
+   pdat::SideData<double> &v_resid,
+   hier::Patch &patch,
+   const hier::Box &pbox,
+   const geom::CartesianPatchGeometry &geom);
 
    virtual double
    computeResidualNorm(
