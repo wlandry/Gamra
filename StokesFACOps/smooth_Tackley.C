@@ -115,7 +115,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                       center[1]=j;
 
                       /* Update v */
-                      Update_V(0,j,pbox,geom,center,center-ip,center+ip,
+                      smooth_V(0,j,pbox,geom,center,center-ip,center+ip,
                                center-jp,center+jp,p,
                                v,v_rhs,maxres,dx,dy,cell_viscosity,
                                edge_viscosity,theta_momentum);
@@ -170,7 +170,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                       center[1]=j;
 
                       /* Update v */
-                      Update_V(1,i,pbox,geom,center,center-jp,center+jp,
+                      smooth_V(1,i,pbox,geom,center,center-jp,center+jp,
                                center-ip,center+ip,
                                p,v,v_rhs,maxres,dy,dx,cell_viscosity,
                                edge_viscosity,theta_momentum);

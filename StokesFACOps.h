@@ -565,7 +565,7 @@ private:
       int num_sweeps,
       double residual_tolerance = -1.0);
 
-  void Update_V
+  void smooth_V
   (const int &axis,
    const int j,
    const hier::Box &pbox,

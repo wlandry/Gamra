@@ -53,7 +53,7 @@ def build(bld):
                         'StokesFACOps/set_boundaries.C',
                         'StokesFACOps/solveCoarsestLevel.C',
                         'StokesFACOps/solveCoarsestLevel_HYPRE.C',
-                        'StokesFACOps/Update_V.C',
+                        'StokesFACOps/smooth_V.C',
                         'StokesFACOps/xeqScheduleFluxCoarsen.C',
                         'StokesFACOps/xeqScheduleGhostFill.C',
                         'StokesFACOps/xeqScheduleGhostFillNoCoarse.C',

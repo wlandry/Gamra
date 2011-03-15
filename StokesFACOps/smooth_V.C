@@ -7,7 +7,7 @@
 * Gauss-Seidel iteration.  *
 ********************************************************************
 */
-void SAMRAI::solv::StokesFACOps::Update_V
+void SAMRAI::solv::StokesFACOps::smooth_V
 (const int &axis,
  const int j,
  const hier::Box &pbox,
