@@ -63,6 +63,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
    * different processes differently, leading to disagreement on
    * whether to continue smoothing.
    */
+  const hier::Index ip(1,0), jp(0,1);
+
   bool converged = false;
   for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged; ++sweep)
     {
@@ -75,14 +77,20 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
             {
               tbox::Pointer<hier::Patch> patch = *pi;
 
-              tbox::Pointer<pdat::CellData<double> >
-                p = patch->getPatchData(p_id);
-              tbox::Pointer<pdat::CellData<double> >
-                p_rhs = patch->getPatchData(p_rhs_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v = patch->getPatchData(v_id);
-              tbox::Pointer<pdat::SideData<double> >
-                v_rhs = patch->getPatchData(v_rhs_id);
+              tbox::Pointer<pdat::CellData<double> > p_ptr =
+                patch->getPatchData(p_id);
+              pdat::CellData<double> &p(*p_ptr);
+              tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
+                patch->getPatchData(p_rhs_id);
+              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
+                
+              tbox::Pointer<pdat::SideData<double> > v_ptr =
+                patch->getPatchData(v_id);
+              pdat::SideData<double> &v(*v_ptr);
+              tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
+                patch->getPatchData(v_rhs_id);
+              pdat::SideData<double> &v_rhs(*v_rhs_ptr);
+                
               tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
                 = patch->getPatchData(cell_viscosity_id);
               pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
@@ -95,58 +103,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                 geom = patch->getPatchGeometry();
               double dx = geom->getDx()[0];
               double dy = geom->getDx()[1];
-
-              /* Set an array of bools that tells me whether a point
-                 should set the pressure or just let it be.  This is
-                 needed at coarse/fine boundaries where the pressure
-                 is fixed. */
-              hier::Box gbox=p->getGhostBox();
-              std::vector<bool> set_p(gbox.size(),true);
-
-              const tbox::Array<hier::BoundaryBox >&edges
-                =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
-              for(int mm=0; mm<edges.size(); ++mm)
-                for(int j=edges[mm].getBox().lower(1);
-                    j<=edges[mm].getBox().upper(1); ++j)
-                  for(int i=edges[mm].getBox().lower(0);
-                      i<=edges[mm].getBox().upper(0); ++i)
-                    {
-                      set_p[(i-gbox.lower(0))
-                            + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                    }
-
-              const tbox::Array<hier::BoundaryBox >&nodes
-                =d_cf_boundary[ln]->getNodeBoundaries(patch->getGlobalId());
-              for(int mm=0; mm<nodes.size(); ++mm)
-                for(int j=nodes[mm].getBox().lower(1);
-                    j<=nodes[mm].getBox().upper(1); ++j)
-                  for(int i=nodes[mm].getBox().lower(0);
-                      i<=nodes[mm].getBox().upper(0); ++i)
-                    {
-                      set_p[(i-gbox.lower(0))
-                            + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                    }
-                  
-              if(geom->getTouchesRegularBoundary(0,1))
-                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
-                  {
-                  set_p[(gbox.upper(0)-gbox.lower(0))
-                        + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                    }
-
-              if(geom->getTouchesRegularBoundary(1,0))
-                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
-                  {
-                  set_p[i-gbox.lower(0)]=false;
-                    }
-
-              if(geom->getTouchesRegularBoundary(1,1))
-                for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
-                  {
-                  set_p[(i-gbox.lower(0))
-                        + (gbox.upper(0)-gbox.lower(0)+1)*(gbox.upper(1)-gbox.lower(1))]=
-                    false;
-                    }
 
               for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
                 {
@@ -166,46 +122,37 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                       ++right[0];
                       --left[0];
 
-                      /* Update p */
-                      if(set_p[(i-gbox.lower(0))
-                               + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))])
-                        {
-                          double dvx_dx=
-                            ((*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                  pdat::SideIndex::Upper))
-                             - (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                                    pdat::SideIndex::Lower)))/dx;
-                          double dvy_dy=
-                            ((*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                  pdat::SideIndex::Upper))
-                             - (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                                    pdat::SideIndex::Lower)))/dy;
+                      const pdat::SideIndex
+                        x(center,0,pdat::SideIndex::Lower),
+                        y(center,1,pdat::SideIndex::Lower);
+                      const pdat::NodeIndex
+                        edge(center,pdat::NodeIndex::LowerLeft);
 
-                          double delta_R_continuity=
-                            (*p_rhs)(center) - dvx_dx - dvy_dy;
+                      /* Update p */
+                      if(j<pbox.upper(1)+1 && i<pbox.upper(0)+1)
+                        {
+                          double dvx_dx=(v(x+ip)-v(x))/dx;
+                          double dvy_dy=(v(y+jp)-v(y))/dy;
+
+                          double delta_R_continuity=p_rhs(center)-dvx_dx-dvy_dy;
 
                           /* No scaling here, though there should be. */
                           maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
-                          (*p)(center)+=cell_viscosity(center)
+                          p(center)+=cell_viscosity(center)
                             *delta_R_continuity*theta_continuity;
-
                         }
                       /* Update v */
-                      if(set_p[(i-gbox.lower(0))
-                               + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
-                         || (i==pbox.upper(0)+1 && j<pbox.upper(1)+1))
+                      if(j<pbox.upper(1)+1)
                         {
-                          Update_V(0,j,pbox,geom,center,left,right,down,up,*p,
-                                   *v,*v_rhs,maxres,dx,dy,cell_viscosity,
+                          Update_V(0,j,pbox,geom,center,left,right,down,up,p,
+                                   v,v_rhs,maxres,dx,dy,cell_viscosity,
                                    edge_viscosity,theta_momentum);
                         }
-                      if(set_p[(i-gbox.lower(0))
-                               + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]
-                         || (i<pbox.upper(0)+1 && j==pbox.upper(1)+1))
+                      if(i<pbox.upper(0)+1)
                         {
-                          Update_V(1,i,pbox,geom,center,down,up,left,right,*p,
-                                   *v,*v_rhs,maxres,dy,dx,cell_viscosity,
+                          Update_V(1,i,pbox,geom,center,down,up,left,right,p,
+                                   v,v_rhs,maxres,dy,dx,cell_viscosity,
                                    edge_viscosity,theta_momentum);
                         }
                     }
