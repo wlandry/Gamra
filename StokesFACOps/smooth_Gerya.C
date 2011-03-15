@@ -1,11 +1,13 @@
 #include "StokesFACOps.h"
 #include "Boundary.h"
-/*
-********************************************************************
-* Workhorse function to smooth error using red-black               *
-* Gauss-Seidel iterations.                                         *
-********************************************************************
-*/
+/* Smooth the error using a red-black Gauss-Seidel smoother inspired
+   by Introduction to Numerical Geodynamic Modelling, Taras Gerya,
+   2010
+
+   This does not give the same answers in serial and parallel, because
+   it smooths both vx and vy at the same time.  The stencil for the vx
+   uses diagonal elements from vy and vice-versa.  So the red and
+   black updates are not entirely separate.  */
 
 void SAMRAI::solv::StokesFACOps::smooth_Gerya
 (SAMRAIVectorReal<double>& solution,
@@ -64,14 +66,13 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
    * whether to continue smoothing.
    */
   const hier::Index ip(1,0), jp(0,1);
-
   bool converged = false;
-  for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged; ++sweep)
+  for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
+       ++sweep)
     {
       maxres=0;
       for(int rb=0;rb<2;++rb)
         {
-          // Need to sync
           xeqScheduleGhostFillNoCoarse(p_id,v_id,ln);
           for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
             {
