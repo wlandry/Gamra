@@ -567,14 +567,11 @@ private:
 
   void smooth_V
   (const int &axis,
-   const int j,
    const hier::Box &pbox,
    tbox::Pointer<geom::CartesianPatchGeometry> &geom,
    const pdat::CellIndex &center,
-   const pdat::CellIndex &left,
-   const pdat::CellIndex &right, 
-   const pdat::CellIndex &down,
-   const pdat::CellIndex &up,
+   const hier::Index &ip,
+   const hier::Index &jp,
    pdat::CellData<double> &p,
    pdat::SideData<double> &v,
    pdat::SideData<double> &v_rhs,
