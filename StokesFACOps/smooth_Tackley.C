@@ -64,14 +64,14 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
    * different processes differently, leading to disagreement on
    * whether to continue smoothing.
    */
+  const hier::Index ip(1,0), jp(0,1);
   bool converged = false;
-  for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged; ++sweep)
+  for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
+       ++sweep)
     {
-
       maxres=0;
 
       /* vx sweep */
-
       xeqScheduleGhostFillNoCoarse(p_id,invalid_id,ln);
       for(int rb=0;rb<2;++rb)
         {
@@ -114,16 +114,9 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                       center[0]=i;
                       center[1]=j;
 
-                      pdat::CellIndex up(center), down(center), right(center),
-                        left(center);
-
-                      ++up[1];
-                      --down[1];
-                      ++right[0];
-                      --left[0];
-
                       /* Update v */
-                      Update_V(0,j,pbox,geom,center,left,right,down,up,p,
+                      Update_V(0,j,pbox,geom,center,center-ip,center+ip,
+                               center-jp,center+jp,p,
                                v,v_rhs,maxres,dx,dy,cell_viscosity,
                                edge_viscosity,theta_momentum);
                     }
@@ -176,17 +169,10 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
                       center[0]=i;
                       center[1]=j;
 
-                      pdat::CellIndex up(center), down(center), right(center),
-                        left(center);
-
-                      ++up[1];
-                      --down[1];
-                      ++right[0];
-                      --left[0];
-
                       /* Update v */
-                      Update_V(1,i,pbox,geom,center,down,up,left,right,p,
-                               v,v_rhs,maxres,dy,dx,cell_viscosity,
+                      Update_V(1,i,pbox,geom,center,center-jp,center+jp,
+                               center-ip,center+ip,
+                               p,v,v_rhs,maxres,dy,dx,cell_viscosity,
                                edge_viscosity,theta_momentum);
                     }
                 }
@@ -235,25 +221,13 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
           for(pdat::CellIterator ci(pbox); ci; ci++)
             {
               pdat::CellIndex center(*ci);
-              pdat::CellIndex up(center), down(center), right(center),
-                left(center);
-
-              ++up[1];
-              --down[1];
-              ++right[0];
-              --left[0];
-
               const pdat::SideIndex
-                center_x(center,0,pdat::SideIndex::Lower),
-                left_x(left,0,pdat::SideIndex::Lower),
-                right_x(right,0,pdat::SideIndex::Lower),
-                center_y(center,1,pdat::SideIndex::Lower),
-                up_y(up,1,pdat::SideIndex::Lower),
-                down_y(down,1,pdat::SideIndex::Lower);
+                x(center,0,pdat::SideIndex::Lower),
+                y(center,1,pdat::SideIndex::Lower);
 
               /* Update p */
-              double dvx_dx=(v(right_x) - v(center_x))/dx;
-              double dvy_dy=(v(up_y) - v(center_y))/dy;
+              double dvx_dx=(v(x+ip) - v(x))/dx;
+              double dvy_dy=(v(y+jp) - v(y))/dy;
 
               double delta_R_continuity=
                 p_rhs(center) - dvx_dx - dvy_dy;
@@ -262,8 +236,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
               maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
               dp(center)=delta_R_continuity*theta_continuity
-                /dRc_dp(pbox,center,left,right,down,up,
-                        left_x,right_x,down_y,up_y,
+                /dRc_dp(pbox,center,center-ip,center+ip,center-jp,center+jp,
+                        x-ip,x+ip,y-jp,y+jp,
                         cell_viscosity,edge_viscosity,
                         v,dx,dy);
               p(center)+=dp(center);
@@ -304,46 +278,29 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley
           for(pdat::CellIterator ci(pbox); ci; ci++)
             {
               pdat::CellIndex center(*ci);
-              pdat::CellIndex up(center), down(center), right(center),
-                left(center);
 
-              ++up[1];
-              --down[1];
-              ++right[0];
-              --left[0];
-
-              const pdat::SideIndex
-                center_x(center,0,pdat::SideIndex::Lower),
-                left_x(left,0,pdat::SideIndex::Lower),
-                right_x(right,0,pdat::SideIndex::Lower),
-                center_y(center,1,pdat::SideIndex::Lower),
-                up_y(up,1,pdat::SideIndex::Lower),
-                down_y(down,1,pdat::SideIndex::Lower);
-              const pdat::NodeIndex
-                center_e(center,pdat::NodeIndex::LowerLeft),
-                up_e(up,pdat::NodeIndex::LowerLeft),
-                right_e(right,pdat::NodeIndex::LowerLeft);
+              const pdat::SideIndex x(center,0,pdat::SideIndex::Lower),
+                y(center,1,pdat::SideIndex::Lower);
+              const pdat::NodeIndex edge(center,pdat::NodeIndex::LowerLeft);
 
               /* Update v */
               if(center[1]<pbox.upper(1))
                 {
-                  if(!((center[0]==pbox.lower(0)
-                        && v(left_x)==boundary_value)
+                  if(!((center[0]==pbox.lower(0) && v(x-ip)==boundary_value)
                        || (center[0]==pbox.upper(0)
-                           && v(right_x)==boundary_value)))
-                    v(center_x)+=(dp(center) - dp(left))
+                           && v(x+ip)==boundary_value)))
+                    v(x)+=(dp(center) - dp(center-ip))
                       /(dx*dRm_dv(cell_viscosity,edge_viscosity,center,
-                                  left,up_e,center_e,dx,dy));
+                                  center-ip,edge+jp,edge,dx,dy));
                 }
               if(center[0]<pbox.upper(0))
                 {
-                  if(!((center[1]==pbox.lower(1)
-                        && v(down_y)==boundary_value)
+                  if(!((center[1]==pbox.lower(1) && v(y-jp)==boundary_value)
                        || (center[1]==pbox.upper(1)
-                           && v(up_y)==boundary_value)))
-                    v(center_y)+=(dp(center) - dp(down))
+                           && v(y+jp)==boundary_value)))
+                    v(y)+=(dp(center) - dp(center-jp))
                       /(dy*dRm_dv(cell_viscosity,edge_viscosity,center,
-                                  down,right_e,center_e,dy,dx));
+                                  center-jp,edge+ip,edge,dy,dx));
                 }
             }
         }
