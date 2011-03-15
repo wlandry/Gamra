@@ -1,45 +1,4 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Operator class for cell-centered scalar Stokes using FAC 
- *
- ************************************************************************/
 #include "StokesFACOps.h"
-
-#include IOMANIP_HEADER_FILE
-
-#include "SAMRAI/hier/BoundaryBoxUtils.h"
-#include "SAMRAI/geom/CartesianGridGeometry.h"
-#include "SAMRAI/geom/CartesianPatchGeometry.h"
-#include "SAMRAI/hier/Index.h"
-#include "SAMRAI/hier/Variable.h"
-#include "SAMRAI/hier/VariableDatabase.h"
-#include "SAMRAI/pdat/CellDoubleConstantRefine.h"
-#include "SAMRAI/pdat/CellVariable.h"
-#include "SAMRAI/pdat/OutersideData.h"
-#include "SAMRAI/pdat/OutersideVariable.h"
-#include "SAMRAI/hier/PatchData.h"
-#include "SAMRAI/pdat/SideVariable.h"
-#include "SAMRAI/solv/FACPreconditioner.h"
-#include "StokesHypreSolver.h"
-#include "SAMRAI/tbox/Array.h"
-#include "SAMRAI/tbox/MathUtilities.h"
-#include "SAMRAI/tbox/StartupShutdownManager.h"
-#include "SAMRAI/tbox/Timer.h"
-#include "SAMRAI/tbox/TimerManager.h"
-#include "SAMRAI/tbox/Utilities.h"
-#include "SAMRAI/tbox/MathUtilities.h"
-#include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
-#include "SAMRAI/xfer/CoarsenSchedule.h"
-#include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
-#include "SAMRAI/xfer/RefineSchedule.h"
-#include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
-
 #include "Boundary.h"
 /*
 ********************************************************************
@@ -144,13 +103,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
               hier::Box gbox=p->getGhostBox();
               std::vector<bool> set_p(gbox.size(),true);
 
-              // tbox::plog << "set_p "
-              //            << gbox.lower(0) << " "
-              //            << gbox.upper(0) << " "
-              //            << gbox.lower(1) << " "
-              //            << gbox.upper(1) << " "
-              //            << "\n";
-
               const tbox::Array<hier::BoundaryBox >&edges
                 =d_cf_boundary[ln]->getEdgeBoundaries(patch->getGlobalId());
               for(int mm=0; mm<edges.size(); ++mm)
@@ -161,11 +113,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                     {
                       set_p[(i-gbox.lower(0))
                             + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                      // tbox::plog << i << " "
-                      //            << j << " "
-                      //            << (i-gbox.lower(0))
-                      //   + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1)) << " "
-                      //            << "\n";
                     }
 
               const tbox::Array<hier::BoundaryBox >&nodes
@@ -178,20 +125,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                     {
                       set_p[(i-gbox.lower(0))
                             + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                      // tbox::plog << i << " "
-                      //            << j << " "
-                      //            << (i-gbox.lower(0))
-                      //   + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1)) << " "
-                      //            << "\n";
-                    }
-
-              if(geom->getTouchesRegularBoundary(0,0))
-                for(int j=gbox.lower(1); j<=gbox.upper(1); ++j)
-                  {
-                  set_p[(gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                      // tbox::plog << gbox.lower(0) << " "
-                      //            << j << " "
-                      //            << "\n";
                     }
                   
               if(geom->getTouchesRegularBoundary(0,1))
@@ -199,18 +132,12 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                   {
                   set_p[(gbox.upper(0)-gbox.lower(0))
                         + (gbox.upper(0)-gbox.lower(0)+1)*(j-gbox.lower(1))]=false;
-                      // tbox::plog << gbox.upper(0) << " "
-                      //            << j << " "
-                      //            << "\n";
                     }
 
               if(geom->getTouchesRegularBoundary(1,0))
                 for(int i=gbox.lower(0); i<=gbox.upper(0); ++i)
                   {
                   set_p[i-gbox.lower(0)]=false;
-                      // tbox::plog << i << " "
-                      //            << gbox.lower(1) << " "
-                      //            << "\n";
                     }
 
               if(geom->getTouchesRegularBoundary(1,1))
@@ -219,9 +146,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                   set_p[(i-gbox.lower(0))
                         + (gbox.upper(0)-gbox.lower(0)+1)*(gbox.upper(1)-gbox.lower(1))]=
                     false;
-                      // tbox::plog << i << " "
-                      //            << gbox.upper(1) << " "
-                      //            << "\n";
                     }
 
               for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
@@ -241,17 +165,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                       --down[1];
                       ++right[0];
                       --left[0];
-
-                      // tbox::plog << "smooth "
-                      //            << ln << " "
-                      //            << sweep << " "
-                      //            << rb << " "
-                      //            << i << " "
-                      //            << j << " ";
-                      //            // << pbox.lower(0) << " "
-                      //            // << pbox.upper(0) << " "
-                      //            // << pbox.lower(1) << " "
-                      //            // << pbox.upper(1) << " ";
 
                       /* Update p */
                       if(set_p[(i-gbox.lower(0))
@@ -277,23 +190,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                           (*p)(center)+=cell_viscosity(center)
                             *delta_R_continuity*theta_continuity;
 
-                          // tbox::plog << "p "
-                          //            // << (*p)(center) << " "
-                          //            // << maxres << " "
-                          //            // << (*p_rhs)(center) << " "
-                          //            // << dvx_dx << " "
-                          //            // << dvy_dy << " "
-                          //            << delta_R_continuity << " ";
-                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //            //                         pdat::SideIndex::Upper)) << " "
-                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                          //            //                         pdat::SideIndex::Lower)) << " "
-                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //            //                         pdat::SideIndex::Upper)) << " "
-                          //            // << (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                          //            //                         pdat::SideIndex::Lower)) << " ";
-                          //            // << dx << " "
-                          //            // << dy << " ";
                         }
                       /* Update v */
                       if(set_p[(i-gbox.lower(0))
@@ -312,7 +208,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                                    *v,*v_rhs,maxres,dy,dx,cell_viscosity,
                                    edge_viscosity,theta_momentum);
                         }
-                      // tbox::plog << "\n";
                     }
                 }
             }
