@@ -120,10 +120,7 @@ void SAMRAI::solv::StokesFACOps::Update_V
 
           double delta_Rx=v_rhs(center_x)
             - v_operator_2D(v,p,cell_viscosity,edge_viscosity,center,
-                            left,center_x,
-                            right_x,left_x,up_x,down_x,center_y,up_y,
-                            center_e,up_e,
-                            ip,dx,dy);
+                            center_e,center_x,center_y,ip,jp,dx,dy);
 
           /* No scaling here, though there should be. */
           maxres=std::max(maxres,std::fabs(delta_Rx));

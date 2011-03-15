@@ -35,6 +35,7 @@ def build(bld):
                         'StokesFACOps/checkInputPatchDataIndices.C',
                         'StokesFACOps/computeCompositeResidualOnLevel.C',
                         'StokesFACOps/residual_2D.C',
+                        'StokesFACOps/residual_3D.C',
                         'StokesFACOps/computeFluxOnPatch.C',
                         'StokesFACOps/computeResidualNorm.C',
                         'StokesFACOps/computeVectorWeights.C',
