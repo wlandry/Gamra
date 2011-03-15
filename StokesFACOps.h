@@ -573,6 +573,29 @@ private:
    pdat::NodeData<double> &edge_viscosity,
    const double &theta_momentum);
 
+  /* The mixed derivative of the stress.  We have to use a template
+     because 2D uses Node for the edge viscosity, while 3D uses
+     Edge.  Written as if it is dtau_xy_dy. */
+  template<class E_data, class E_index>
+  double dtau_mixed(pdat::SideData<double> &v,
+                    const E_data &edge_viscosity,
+                    const pdat::SideIndex &center_x,
+                    const pdat::SideIndex &up_x,
+                    const pdat::SideIndex &down_x,
+                    const pdat::SideIndex &center_y,
+                    const pdat::SideIndex &up_y,
+                    const E_index &center_e,
+                    const E_index &up_e,
+                    const hier::Index &ip,
+                    const double &dx,
+                    const double &dy)
+  {
+    return edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
+                                 + (v(up_y)-v(up_y-ip))/(dx*dy))
+      - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
+                                  + (v(center_y)-v(center_y-ip))/(dx*dy));
+  }
+
   /* The action of the velocity operator. It is written from the
      perspective of vx, but pass in different values for center_x
      etc. to get vy. */
@@ -599,13 +622,46 @@ private:
     double dtau_xx_dx=
       2*((v(right_x)-v(center_x))*cell_viscosity(center)
          - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
-    double dtau_xy_dy=edge_viscosity(up_e)*((v(up_x)-v(center_x))/(dy*dy)
-                                            + (v(up_y)-v(up_y-ip))/(dx*dy))
-      - edge_viscosity(center_e)*((v(center_x)-v(down_x))/(dy*dy)
-                                  + (v(center_y)-v(center_y-ip))/(dx*dy));
+    double dtau_xy_dy=dtau_mixed(v,edge_viscosity,center_x,up_x,down_x,
+                                 center_y,up_y,center_e,up_e,ip,dx,dy);
     double dp_dx=(p(center)-p(left))/dx;
 
     return dtau_xx_dx + dtau_xy_dy - dp_dx;
+  }
+
+  double v_operator_3D(pdat::SideData<double> &v,
+                       pdat::CellData<double> &p,
+                       pdat::CellData<double> &cell_viscosity,
+                       pdat::EdgeData<double> &edge_viscosity,
+                       const pdat::CellIndex &center,
+                       const pdat::CellIndex &left,
+                       const pdat::SideIndex &center_x,
+                       const pdat::SideIndex &right_x,
+                       const pdat::SideIndex &left_x,
+                       const pdat::SideIndex &up_x,
+                       const pdat::SideIndex &down_x,
+                       const pdat::SideIndex &center_y,
+                       const pdat::SideIndex &up_y,
+                       const pdat::SideIndex &center_z,
+                       const pdat::SideIndex &front_z,
+                       const pdat::EdgeIndex &center_e,
+                       const pdat::EdgeIndex &up_e,
+                       const pdat::EdgeIndex &front_e,
+                       const hier::Index &ip,
+                       const double &dx,
+                       const double &dy,
+                       const double &dz)
+  {
+    double dtau_xx_dx=
+      2*((v(right_x)-v(center_x))*cell_viscosity(center)
+         - (v(center_x)-v(left_x))*cell_viscosity(left))/(dx*dx);
+    double dtau_xy_dy=dtau_mixed(v,edge_viscosity,center_x,up_x,down_x,
+                                 center_y,up_y,center_e,up_e,ip,dx,dy);
+    double dtau_xz_dz=dtau_mixed(v,edge_viscosity,center_x,up_x,down_x,
+                                 center_z,front_z,center_e,front_e,ip,dx,dz);
+    double dp_dx=(p(center)-p(left))/dx;
+
+    return dtau_xx_dx + dtau_xy_dy + dtau_xz_dz - dp_dx;
   }
 
    /*!
