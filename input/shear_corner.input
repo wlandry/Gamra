@@ -32,10 +32,10 @@ FACStokes {
     // This is the input for the cell-centered Stokes FAC solver
     // class in the SAMRAI library.
     enable_logging = TRUE   // Bool flag to switch logging on/off
-    max_cycles = 1000         // Max number of FAC cycles to use
+    max_cycles = 100         // Max number of FAC cycles to use
     residual_tol = 1e-8     // Residual tolerance to solve for
-    num_pre_sweeps = 15      // Number of presmoothing sweeps to use
-    num_post_sweeps = 15     // Number of postsmoothing sweeps to use
+    num_pre_sweeps = 5      // Number of presmoothing sweeps to use
+    num_post_sweeps = 5     // Number of postsmoothing sweeps to use
     smoothing_choice = "Tackley"
     coarse_solver_choice = "Tackley"
     // smoothing_choice = "Gerya"
@@ -93,14 +93,18 @@ StandardTagAndInitialize {
   RefineBoxes {
     // level_0 = [(0,0),(15,15)]
     level_0 = [(0,0),(3,3)]
-    // level_1 = [(0,0),(7,7)]
-    // level_2 = [(0,0),(15,15)]
+    level_1 = [(0,0),(7,7)]
+    level_2 = [(0,0),(15,15)]
     // level_3 = [(0,0),(31,31)]
     // level_4 = [(0,0),(63,63)]
     // level_5 = [(0,0),(127,127)]
-    level_1 = [(0,0),(5,5)]
-    level_2 = [(0,0),(9,9)]
-    level_3 = [(0,0),(16,16)]
+    // level_1 = [(2,2),(5,5)]
+    // level_2 = [(6,6),(9,9)]
+    // level_3 = [(14,14),(16,16)]
+
+    // level_1 = [(0,0),(5,5)]
+    // level_2 = [(0,0),(9,9)]
+    // level_3 = [(0,0),(16,16)]
     //etc.
   }
 }
@@ -131,7 +135,7 @@ PatchHierarchy {
    //              [level 0 entry]
    //   etc....                       
    // }
-   max_levels = 4
+   max_levels = 3
    ratio_to_coarser {
       level_1            = 2, 2
       level_2            = 2, 2
@@ -139,8 +143,8 @@ PatchHierarchy {
       level_4            = 2, 2
    }
    largest_patch_size {
-      level_0 = 64, 64
-      // level_0 = 4, 4
+      // level_0 = 32, 16
+      level_0 = 8, 8
       // all finer levels will use same values as level_0...
    }
 }
