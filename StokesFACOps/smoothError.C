@@ -61,7 +61,7 @@ void SAMRAI::solv::StokesFACOps::smoothError
                  num_sweeps,
                  d_residual_tolerance_during_smoothing);
   } else if (d_smoothing_choice == "Tackley") {
-    smooth_Tackley(data,
+    smooth_Tackley_2D(data,
                    residual,
                    ln,
                    num_sweeps,

@@ -550,7 +550,7 @@ private:
     *        converged
     */
    void
-   smooth_Tackley(
+   smooth_Tackley_2D(
       SAMRAIVectorReal<double>& error,
       const SAMRAIVectorReal<double>& residual,
       int ln,

@@ -8,7 +8,7 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::StokesFACOps::smooth_Tackley
+void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
 (SAMRAIVectorReal<double>& solution,
  const SAMRAIVectorReal<double>& residual,
  int ln,

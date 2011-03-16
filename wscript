@@ -48,7 +48,7 @@ def build(bld):
                         'StokesFACOps/restrictResidual.C',
                         'StokesFACOps/restrictSolution.C',
                         'StokesFACOps/smoothError.C',
-                        'StokesFACOps/smooth_Tackley.C',
+                        'StokesFACOps/smooth_Tackley_2D.C',
                         'StokesFACOps/smooth_Gerya.C',
                         'StokesFACOps/set_boundaries.C',
                         'StokesFACOps/solveCoarsestLevel.C',
