@@ -34,31 +34,27 @@ void SAMRAI::solv::StokesFACOps::smooth_V
   if(!((center[axis]==pbox.lower(axis) && v(x-ip)==boundary_value)
        || (center[axis]==pbox.upper(axis)+1 && v(x+ip)==boundary_value)))
     {
-      double C_vx;
-      /* If y==0 */
+      /* If at the boundary, set things up so that the derivative does
+         not change. */
       hier::Index offset(0,0);
-      bool set_boundary(false);
+      offset[axis]=2;
+      bool set_lower_boundary(false), set_upper_boundary(false);
+      double dv_lower(0), dv_upper(0);
       if(center[axis]==pbox.lower(axis)+1
          && !geom->getTouchesRegularBoundary(axis,0))
         {
-          offset[axis]=-2;
-          set_boundary=true;
+          set_lower_boundary=true;
+          dv_lower=v(x-offset) - v(x);
         }
-      else if(center[axis]==pbox.upper(axis)
-              && !geom->getTouchesRegularBoundary(axis,1))
+      if(center[axis]==pbox.upper(axis)
+         && !geom->getTouchesRegularBoundary(axis,1))
         {
-          offset[axis]=2;
-          set_boundary=true;
+          set_upper_boundary=true;
+          dv_upper=v(x+offset) - v(x);
         }
 
-      double dv(0);
-      if(set_boundary)
-        {
-          dv=v(x+offset) - v(x);
-        }
-
-      C_vx=dRm_dv(cell_viscosity,edge_viscosity,center,center-ip,edge+jp,edge,
-                  dx,dy);
+      double C_vx=dRm_dv(cell_viscosity,edge_viscosity,center,center-ip,
+                         edge+jp,edge,dx,dy);
 
       double delta_Rx=v_rhs(x)
         - v_operator_2D(v,p,cell_viscosity,edge_viscosity,center,
@@ -69,11 +65,50 @@ void SAMRAI::solv::StokesFACOps::smooth_V
 
       v(x)+=delta_Rx*theta_momentum/C_vx;
 
+      // tbox::plog << "smooth V "
+      //            << dx << " "
+      //            << axis << " "
+      //            << center[0] << " "
+      //            << center[1] << " "
+      //            << v(x) << " "
+      //            << delta_Rx << " "
+      //            << v(x+ip) << " "
+      //            << v(x-ip) << " "
+      //            << v(x+jp) << " "
+      //            << v(x-jp) << " "
+      //            << v(y+jp) << " "
+      //            << v(y+jp-ip) << " "
+      //            << v(y) << " "
+      //            << v(y-ip) << " "
+      //            << "\n";
+
       /* Set the boundary elements so that the
-         derivative is zero. */
-      if(set_boundary)
+         derivative is unchanged. */
+      if(set_lower_boundary)
         {
-          v(x+offset)=v(x) + dv;
+          v(x-offset)=v(x) + dv_lower;
+          // tbox::plog << "offset minus "
+          //            << dx << " "
+          //            << axis << " "
+          //            << (x-offset)[0] << " "
+          //            << (x-offset)[1] << " "
+          //            << v(x) << " "
+          //            << v(x-offset) << " "
+          //            << dv_lower << " "
+          //            << "\n";
+        }
+      if(set_upper_boundary)
+        {
+          v(x+offset)=v(x) + dv_upper;
+          // tbox::plog << "offset plus "
+          //            << dx << " "
+          //            << axis << " "
+          //            << (x+offset)[0] << " "
+          //            << (x+offset)[1] << " "
+          //            << v(x) << " "
+          //            << v(x+offset) << " "
+          //            << dv_upper << " "
+          //            << "\n";
         }
     }
 }
