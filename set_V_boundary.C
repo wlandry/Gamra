@@ -10,99 +10,64 @@ using namespace SAMRAI;
 void set_V_boundary(const SAMRAI::hier::Patch& patch, const int &v_id,
                     const bool &rhs)
 {
-  tbox::Pointer<pdat::SideData<double> >
-    v = patch.getPatchData(v_id);
+  tbox::Pointer<pdat::SideData<double> > v_ptr = patch.getPatchData(v_id);
+  pdat::SideData<double> &v(*v_ptr);
 
   hier::Box pbox=patch.getBox();
-  hier::Box gbox=v->getGhostBox();
+  hier::Box gbox=v.getGhostBox();
 
-  tbox::Pointer<geom::CartesianPatchGeometry>
-    geom = patch.getPatchGeometry();
+  tbox::Pointer<geom::CartesianPatchGeometry> geom = patch.getPatchGeometry();
+  const tbox::Dimension Dim(patch.getDim());
+  const int dim(patch.getDim().getValue());
 
-  for(int j=gbox.lower(1); j<=gbox.upper(1)+1; ++j)
-    for(int i=gbox.lower(0); i<=gbox.upper(0)+1; ++i)
-      {
-        pdat::CellIndex center(tbox::Dimension(2));
-        center[0]=i;
-        center[1]=j;
-        hier::Index ip(1,0), jp(0,1);
+  const hier::Index zero(hier::Index::getZeroIndex(Dim));
+  hier::Index pp[]={zero,zero,zero};
+  for(int i=0;i<dim;++i)
+    pp[i][i]=1;
+  /* This should really get read from the input file. */
+  double lower_boundary[]={0,0,0};
+  double upper_boundary[]={-1,1,0};
 
-        /* vx */
-        if(j<=gbox.upper(1))
-          {
-            // tbox::plog << "V boundary "
-            //            << i << " "
-            //            << j << " "
-            //            << pbox.lower(0) << " "
-            //            << pbox.upper(0) << " ";
+  for(int ix=0; ix<dim; ++ix)
+    {
+      for(pdat::SideIterator si(gbox,ix); si; si++)
+        {
+          pdat::SideIndex x(*si);
 
-            /* Set a sentinel value */
-            if((i<pbox.lower(0) && geom->getTouchesRegularBoundary(0,0))
-               || (i>pbox.upper(0)+1 && geom->getTouchesRegularBoundary(0,1)))
-              {
-                (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                     pdat::SideIndex::Lower))=
-                  boundary_value;
-              }
-            /* Set vx=-1 on the right boundary */
-            else if(i==pbox.upper(0)+1 && geom->getTouchesRegularBoundary(0,1)
-                    && !rhs)
-              {
-                (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                     pdat::SideIndex::Lower))=-1;
-              }
-            /* Set the value so the derivative=0 */
-            else if(j<pbox.lower(1) && geom->getTouchesRegularBoundary(1,0))
-              {
-                (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                     pdat::SideIndex::Lower))=
-                  (*v)(pdat::SideIndex(center+jp,pdat::SideIndex::X,
-                                       pdat::SideIndex::Lower));
-              }
-            else if(j>pbox.upper(1) && geom->getTouchesRegularBoundary(1,1))
-              {
-                (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-                                     pdat::SideIndex::Lower))=
-                  (*v)(pdat::SideIndex(center-jp,pdat::SideIndex::X,
-                                       pdat::SideIndex::Lower));
-              }
-            // tbox::plog << (*v)(pdat::SideIndex(center,pdat::SideIndex::X,
-            //                                    pdat::SideIndex::Lower)) << " "
-            //            << "\n";
-          }
-        /* vy */
-        if(i<=gbox.upper(0))
-          {
-            /* Set a sentinel value */
-            if((j<pbox.lower(1) && geom->getTouchesRegularBoundary(1,0))
-               || (j>pbox.upper(1)+1 && geom->getTouchesRegularBoundary(1,1)))
-              {
-                (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                     pdat::SideIndex::Lower))=
-                  boundary_value;
-              }
-            /* Set vy=1 on the top boundary */
-            else if(j==pbox.upper(1)+1 && geom->getTouchesRegularBoundary(1,1)
-                    && !rhs)
-              {
-                (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                     pdat::SideIndex::Lower))=1;
-              }
-            /* Set the value so the derivative=0 */
-            else if(i<pbox.lower(0) && geom->getTouchesRegularBoundary(0,0))
-              {
-                (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                     pdat::SideIndex::Lower))=
-                  (*v)(pdat::SideIndex(center+ip,pdat::SideIndex::Y,
-                                       pdat::SideIndex::Lower));
-              }
-            else if(i>pbox.upper(0) && geom->getTouchesRegularBoundary(0,1))
-              {
-                (*v)(pdat::SideIndex(center,pdat::SideIndex::Y,
-                                     pdat::SideIndex::Lower))=
-                  (*v)(pdat::SideIndex(center-ip,pdat::SideIndex::Y,
-                                       pdat::SideIndex::Lower));
-              }
-          }
-      }
+          /* Set a sentinel value for normal components */
+          if((x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
+             || (x[ix]>pbox.upper(ix)+1 && geom->getTouchesRegularBoundary(ix,1)))
+            {
+              v(x)=boundary_value;
+            }
+          /* Set values for normal components */
+          else if(x[ix]==pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0)
+                  && !rhs)
+            {
+              v(x)=lower_boundary[ix];
+            }
+          else if(x[ix]==pbox.upper(ix)+1 && geom->getTouchesRegularBoundary(ix,1)
+                  && !rhs)
+            {
+              v(x)=upper_boundary[ix];
+            }
+          /* Set derivatives for tangential component */
+          else
+            {
+              for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                {
+                  if(x[iy]<pbox.lower(iy)
+                     && geom->getTouchesRegularBoundary(iy,0))
+                    {
+                      v(x)=v(x+pp[iy]);
+                    }
+                  else if(x[iy]>pbox.upper(iy)
+                          && geom->getTouchesRegularBoundary(iy,1))
+                    {
+                      v(x)=v(x-pp[iy]);
+                    }
+                }
+            }
+        }
+    }
 }
