@@ -121,8 +121,8 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
                      y(c_fine,1,pdat::SideIndex::Lower);
 
                    double dRc_dp_weight=
-                     dRc_dp(fine_box,c_fine,x,y,
-                            cell_viscosity,edge_viscosity,v,dx,dy);
+                     dRc_dp_2D(fine_box,c_fine,x,y,
+                               cell_viscosity,edge_viscosity,v,dx,dy);
                             
 
                    if(c_fine==fine)

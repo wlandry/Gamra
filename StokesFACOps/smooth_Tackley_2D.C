@@ -115,9 +115,9 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                       center[1]=j;
 
                       /* Update v */
-                      smooth_V(0,pbox,geom,center,ip,jp,
-                               p,v,v_rhs,maxres,dx,dy,cell_viscosity,
-                               edge_viscosity,theta_momentum);
+                      smooth_V_2D(0,pbox,geom,center,ip,jp,
+                                  p,v,v_rhs,maxres,dx,dy,cell_viscosity,
+                                  edge_viscosity,theta_momentum);
                     }
                 }
             }
@@ -169,9 +169,9 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                       center[1]=j;
 
                       /* Update v */
-                      smooth_V(1,pbox,geom,center,jp,ip,
-                               p,v,v_rhs,maxres,dy,dx,cell_viscosity,
-                               edge_viscosity,theta_momentum);
+                      smooth_V_2D(1,pbox,geom,center,jp,ip,
+                                  p,v,v_rhs,maxres,dy,dx,cell_viscosity,
+                                  edge_viscosity,theta_momentum);
                     }
                 }
             }
@@ -234,7 +234,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
               maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
               dp(center)=delta_R_continuity*theta_continuity
-                /dRc_dp(pbox,center,x,y,cell_viscosity,edge_viscosity,v,dx,dy);
+                /dRc_dp_2D(pbox,center,x,y,cell_viscosity,edge_viscosity,v,dx,dy);
               p(center)+=dp(center);
             }
         }
@@ -285,8 +285,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                        || (center[0]==pbox.upper(0)
                            && v(x+ip)==boundary_value)))
                     v(x)+=(dp(center) - dp(center-ip))
-                      /(dx*dRm_dv(cell_viscosity,edge_viscosity,center,
-                                  center-ip,edge+jp,edge,dx,dy));
+                      /(dx*dRm_dv_2D(cell_viscosity,edge_viscosity,center,
+                                     center-ip,edge+jp,edge,dx,dy));
                 }
               if(center[0]<pbox.upper(0))
                 {
@@ -294,8 +294,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                        || (center[1]==pbox.upper(1)
                            && v(y+jp)==boundary_value)))
                     v(y)+=(dp(center) - dp(center-jp))
-                      /(dy*dRm_dv(cell_viscosity,edge_viscosity,center,
-                                  center-jp,edge+ip,edge,dy,dx));
+                      /(dy*dRm_dv_2D(cell_viscosity,edge_viscosity,center,
+                                     center-jp,edge+ip,edge,dy,dx));
                 }
             }
         }

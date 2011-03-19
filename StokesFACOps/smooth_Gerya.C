@@ -146,15 +146,15 @@ void SAMRAI::solv::StokesFACOps::smooth_Gerya
                       /* Update v */
                       if(j<pbox.upper(1)+1)
                         {
-                          smooth_V(0,pbox,geom,center,ip,jp,
-                                   p,v,v_rhs,maxres,dx,dy,cell_viscosity,
-                                   edge_viscosity,theta_momentum);
+                          smooth_V_2D(0,pbox,geom,center,ip,jp,
+                                      p,v,v_rhs,maxres,dx,dy,cell_viscosity,
+                                      edge_viscosity,theta_momentum);
                         }
                       if(i<pbox.upper(0)+1)
                         {
-                          smooth_V(1,pbox,geom,center,jp,ip,
-                                   p,v,v_rhs,maxres,dy,dx,cell_viscosity,
-                                   edge_viscosity,theta_momentum);
+                          smooth_V_2D(1,pbox,geom,center,jp,ip,
+                                      p,v,v_rhs,maxres,dy,dx,cell_viscosity,
+                                      edge_viscosity,theta_momentum);
                         }
                     }
                 }

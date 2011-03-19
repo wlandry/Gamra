@@ -1,13 +1,13 @@
 #include "StokesFACOps.h"
 #include "Boundary.h"
-#include "dRc_dp.h"
+#include "dRm_dv.h"
 /*
 ********************************************************************
 * Updates one component of the velocity during a red-black *
 * Gauss-Seidel iteration.  *
 ********************************************************************
 */
-void SAMRAI::solv::StokesFACOps::smooth_V
+void SAMRAI::solv::StokesFACOps::smooth_V_2D
 (const int &axis,
  const hier::Box &pbox,
  tbox::Pointer<geom::CartesianPatchGeometry> &geom,
@@ -53,8 +53,8 @@ void SAMRAI::solv::StokesFACOps::smooth_V
           dv_upper=v(x+offset) - v(x);
         }
 
-      double C_vx=dRm_dv(cell_viscosity,edge_viscosity,center,center-ip,
-                         edge+jp,edge,dx,dy);
+      double C_vx=dRm_dv_2D(cell_viscosity,edge_viscosity,center,center-ip,
+                            edge+jp,edge,dx,dy);
 
       double delta_Rx=v_rhs(x)
         - v_operator_2D(v,p,cell_viscosity,edge_viscosity,center,
@@ -65,50 +65,15 @@ void SAMRAI::solv::StokesFACOps::smooth_V
 
       v(x)+=delta_Rx*theta_momentum/C_vx;
 
-      // tbox::plog << "smooth V "
-      //            << dx << " "
-      //            << axis << " "
-      //            << center[0] << " "
-      //            << center[1] << " "
-      //            << v(x) << " "
-      //            << delta_Rx << " "
-      //            << v(x+ip) << " "
-      //            << v(x-ip) << " "
-      //            << v(x+jp) << " "
-      //            << v(x-jp) << " "
-      //            << v(y+jp) << " "
-      //            << v(y+jp-ip) << " "
-      //            << v(y) << " "
-      //            << v(y-ip) << " "
-      //            << "\n";
-
-      /* Set the boundary elements so that the
-         derivative is unchanged. */
+      /* Set the boundary elements so that the derivative is
+         unchanged. */
       if(set_lower_boundary)
         {
           v(x-offset)=v(x) + dv_lower;
-          // tbox::plog << "offset minus "
-          //            << dx << " "
-          //            << axis << " "
-          //            << (x-offset)[0] << " "
-          //            << (x-offset)[1] << " "
-          //            << v(x) << " "
-          //            << v(x-offset) << " "
-          //            << dv_lower << " "
-          //            << "\n";
         }
       if(set_upper_boundary)
         {
           v(x+offset)=v(x) + dv_upper;
-          // tbox::plog << "offset plus "
-          //            << dx << " "
-          //            << axis << " "
-          //            << (x+offset)[0] << " "
-          //            << (x+offset)[1] << " "
-          //            << v(x) << " "
-          //            << v(x+offset) << " "
-          //            << dv_upper << " "
-          //            << "\n";
         }
     }
 }
