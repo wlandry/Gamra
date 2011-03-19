@@ -102,12 +102,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
       }
   }
 
-  /* We also need to set the boundaries of the rhs so that coarsening
-     works correctly. */
-  const int v_rhs_id = rhs.getComponentDescriptorIndex(1);
-  set_boundaries(v_rhs_id,ln,true);
-  xeqScheduleGhostFillNoCoarse(invalid_id, v_rhs_id, ln);
-  
   t_compute_composite_residual->stop();
 }
 
