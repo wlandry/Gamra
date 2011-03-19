@@ -83,7 +83,7 @@ CartesianGridGeometry {
   //                        periodic, non-zero value indicates periodicity.
   //                        [0]
   // domain_boxes = [(0,0), (15,15)]
-  domain_boxes = [(0,0), (3,3)]
+  domain_boxes = [(0,0), (7,7)]
   x_lo         = 0, 0
   x_up         = 1, 1
 }
@@ -92,9 +92,9 @@ StandardTagAndInitialize {
   tagging_method = "REFINE_BOXES"
   RefineBoxes {
     // level_0 = [(0,0),(15,15)]
-    level_0 = [(0,0),(3,3)]
-    level_1 = [(0,0),(7,7)]
-    level_2 = [(0,0),(15,15)]
+    level_0 = [(0,0),(5,5)]
+    // level_1 = [(0,0),(7,7)]
+    // level_2 = [(0,0),(15,15)]
     // level_3 = [(0,0),(31,31)]
     // level_4 = [(0,0),(63,63)]
     // level_5 = [(0,0),(127,127)]
@@ -102,9 +102,9 @@ StandardTagAndInitialize {
     // level_2 = [(6,6),(9,9)]
     // level_3 = [(14,14),(16,16)]
 
-    // level_1 = [(0,0),(5,5)]
-    // level_2 = [(0,0),(9,9)]
-    // level_3 = [(0,0),(16,16)]
+    level_1 = [(0,0),(5,5)]
+    level_2 = [(2,2),(9,9)]
+    level_3 = [(6,6),(16,16)]
     //etc.
   }
 }
@@ -135,7 +135,7 @@ PatchHierarchy {
    //              [level 0 entry]
    //   etc....                       
    // }
-   max_levels = 3
+   max_levels = 4
    ratio_to_coarser {
       level_1            = 2, 2
       level_2            = 2, 2
@@ -143,7 +143,7 @@ PatchHierarchy {
       level_4            = 2, 2
    }
    largest_patch_size {
-      // level_0 = 32, 16
+      // level_0 = 32, 32
       level_0 = 8, 8
       // all finer levels will use same values as level_0...
    }
