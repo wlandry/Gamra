@@ -234,10 +234,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
               maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
               dp(center)=delta_R_continuity*theta_continuity
-                /dRc_dp(pbox,center,center-ip,center+ip,center-jp,center+jp,
-                        x-ip,x+ip,y-jp,y+jp,
-                        cell_viscosity,edge_viscosity,
-                        v,dx,dy);
+                /dRc_dp(pbox,center,x,y,cell_viscosity,edge_viscosity,v,dx,dy);
               p(center)+=dp(center);
             }
         }

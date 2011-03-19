@@ -117,17 +117,13 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
                    c_fine[0]+=xx;
                    c_fine[1]+=yy;
                
-                   pdat::CellIndex left(c_fine-ip),right(c_fine+ip),
-                     down(c_fine-jp), up(c_fine+jp);
-                   pdat::SideIndex left_x(left,0,pdat::SideIndex::Lower),
-                     right_x(right,0,pdat::SideIndex::Lower),
-                     down_y(down,1,pdat::SideIndex::Lower),
-                     up_y(up,1,pdat::SideIndex::Lower);
+                   pdat::SideIndex x(c_fine,0,pdat::SideIndex::Lower),
+                     y(c_fine,1,pdat::SideIndex::Lower);
 
                    double dRc_dp_weight=
-                     dRc_dp(fine_box,c_fine,left,right,down,up,
-                            left_x,right_x,down_y,up_y,
+                     dRc_dp(fine_box,c_fine,x,y,
                             cell_viscosity,edge_viscosity,v,dx,dy);
+                            
 
                    if(c_fine==fine)
                      dRc_dp_fine=dRc_dp_weight;
