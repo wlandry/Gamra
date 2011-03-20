@@ -79,16 +79,30 @@ namespace SAMRAI {
                                                         /* ghost cell width is
                                                            1 in case needed */);
 
-    tbox::Pointer<pdat::NodeVariable<double> >
-      edge_viscosity(new pdat::NodeVariable<double>(dim,
-                                                    object_name
-                                                    + ":edge_viscosity"));
-    edge_viscosity_id = vdb->registerVariableAndContext(edge_viscosity,
-                                                        d_context,
-                                                        hier::IntVector(dim, 1)
-                                                        /* ghost cell width is
-                                                           1 in case needed */);
-
+    if(dim.getValue()==2)
+      {
+        tbox::Pointer<pdat::NodeVariable<double> >
+          edge_viscosity(new pdat::NodeVariable<double>(dim,
+                                                        object_name
+                                                        + ":edge_viscosity"));
+        edge_viscosity_id =
+          vdb->registerVariableAndContext(edge_viscosity,d_context,
+                                          hier::IntVector(dim,1)
+                                          /* ghost cell width is 1 in
+                                             case needed */);
+      }
+    else if(dim.getValue()==3)
+      {
+        tbox::Pointer<pdat::EdgeVariable<double> >
+          edge_viscosity(new pdat::EdgeVariable<double>(dim,
+                                                        object_name
+                                                        + ":edge_viscosity"));
+        edge_viscosity_id =
+          vdb->registerVariableAndContext(edge_viscosity,d_context,
+                                          hier::IntVector(dim,1)
+                                          /* ghost cell width is 1 in
+                                             case needed */);
+      }
 
     tbox::Pointer<pdat::CellVariable<double> >
       dp(new pdat::CellVariable<double>(dim, object_name + ":dp"));

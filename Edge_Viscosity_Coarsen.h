@@ -20,6 +20,7 @@
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/pdat/NodeVariable.h"
+#include "SAMRAI/pdat/EdgeVariable.h"
 
 #include <string>
 
@@ -66,8 +67,9 @@ public:
   {
     TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
 
-    const tbox::Pointer<pdat::NodeVariable<double> > cast_var(var);
-    if (!cast_var.isNull() && (op_name == d_name_id)) {
+    const tbox::Pointer<pdat::NodeVariable<double> > node_var(var);
+    const tbox::Pointer<pdat::EdgeVariable<double> > edge_var(var);
+    if ((!node_var.isNull() || !edge_var.isNull()) && (op_name == d_name_id)) {
       return true;
     } else {
       return false;
