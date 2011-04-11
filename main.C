@@ -245,14 +245,14 @@ int main(
      * Make the coarsest patch level where we will be solving.
      */
     gridding_algorithm->makeCoarsestLevel(0.0);
-    bool done = false;
-    for (int lnum = 0;
-         patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++) {
-      tbox::plog << "Adding finner levels with lnum = " << lnum << endl;
-      gridding_algorithm->makeFinerLevel(0.0,true,0);
-      tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
-      done = !(patch_hierarchy->finerLevelExists(lnum));
-    }
+    // bool done = false;
+    // for (int lnum = 0;
+    //      patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++) {
+    //   tbox::plog << "Adding finner levels with lnum = " << lnum << endl;
+    //   gridding_algorithm->makeFinerLevel(0.0,true,0);
+    //   tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
+    //   done = !(patch_hierarchy->finerLevelExists(lnum));
+    // }
 
     /*
      * Set up the plotter for the hierarchy just created.
@@ -296,6 +296,37 @@ int main(
      */
     fac_stokes.solveStokes();
 
+    bool done(false);
+    for (int lnum = 0;
+         patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++)
+      {
+            tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
+            for (int ln = 0; ln < tag_buffer.getSize(); ++ln) {
+               tag_buffer[ln] = 2;
+            }
+            gridding_algorithm->regridAllFinerLevels(
+               0,
+               0.0,
+               tag_buffer);
+            tbox::plog << "Newly adapted hierarchy\n";
+
+
+      // tbox::plog << "Adding finner levels with lnum = " << lnum << endl;
+      // gridding_algorithm->makeFinerLevel(0.0,true,0);
+      // tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
+      done = !(patch_hierarchy->finerLevelExists(lnum));
+      fac_stokes.solveStokes();
+    }
+    // {
+    //     tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
+    //     for (int ln = 0; ln < tag_buffer.getSize(); ++ln) {
+    //       tag_buffer[ln] = 1;
+    //     }
+    //     gridding_algorithm->regridAllFinerLevels(
+    //                                              0,
+    //                                              0.0,
+    //                                              tag_buffer);
+    // }
 #ifdef HAVE_HDF5
     /*
      * Plot.
