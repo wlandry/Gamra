@@ -83,6 +83,18 @@ namespace SAMRAI {
 
     //@}
 
+    virtual void
+    applyGradientDetector(const tbox::Pointer<hier::BasePatchHierarchy> hierarchy,
+                          const int level_number,
+                          const double error_data_time,
+                          const int tag_index,
+                          const bool initial_time,
+                          const bool uses_richardson_extrapolation);
+
+    void computeAdaptionEstimate(pdat::CellData<double>& estimate_data,
+                                 const pdat::CellData<double>& soln_cell_data)
+      const;
+
     //@{ @name appu::VisDerivedDataStrategy virtuals
 
     virtual bool
@@ -169,6 +181,8 @@ namespace SAMRAI {
      *
      * These are initialized in the constructor and never change.
      */
+
+    double d_adaptation_threshold;
   public:
     int p_id, cell_viscosity_id, edge_viscosity_id, dp_id, p_exact_id,
       p_rhs_id, v_id, v_rhs_id;

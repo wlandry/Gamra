@@ -139,6 +139,10 @@ namespace SAMRAI {
                                                   1 for coarsening
                                                   operator */);
 
+    d_adaptation_threshold=database->getDoubleWithDefault("adaption_threshold",
+                                                          // 0.5);
+                                                          1e1);
+
     /*
      * Specify an implementation of solv::RobinBcCoefStrategy for the
      * solver to use.  We use the implementation

@@ -13,6 +13,7 @@ def build(bld):
         source       = ['main.C',
                         'FACStokes/FACStokes.C',
                         'FACStokes/fix_viscosity.C',
+                        'FACStokes/applyGradientDetector.C',
                         'FACStokes/initializeLevelData.C',
                         'FACStokes/packDerivedDataIntoDoubleBuffer.C',
                         'FACStokes/resetHierarchyConfiguration.C',
