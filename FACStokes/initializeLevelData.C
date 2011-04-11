@@ -32,18 +32,12 @@
 void SAMRAI::FACStokes::initializeLevelData
 (const tbox::Pointer<hier::BasePatchHierarchy> patch_hierarchy,
  const int level_number,
- const double init_data_time,
- const bool can_be_refined,
- const bool initial_time,
- const tbox::Pointer<hier::BasePatchLevel> old_level,
+ const double ,
+ const bool ,
+ const bool ,
+ const tbox::Pointer<hier::BasePatchLevel> ,
  const bool allocate_data)
 {
-
-  (void)init_data_time;
-  (void)can_be_refined;
-  (void)initial_time;
-  (void)old_level;
-
   tbox::Pointer<hier::PatchHierarchy> hierarchy = patch_hierarchy;
   tbox::Pointer<geom::CartesianGridGeometry> grid_geom =
     hierarchy->getGridGeometry();
@@ -65,6 +59,49 @@ void SAMRAI::FACStokes::initializeLevelData
   const double inclusion_radius=0.5;
   const double inclusion_viscosity=1e2;
   const double background_viscosity=1;
+
+  static double viscosity[129][129];
+  static int max_x(0), max_y(0);
+
+  double max_viscosity(.1), min_viscosity(0.0001);
+  // double max_viscosity(100), min_viscosity(0);
+
+  max_x=127;
+  // max_y=127;
+  max_y=31;
+
+  double scale_x(0.21615179018), scale_y(0.04);
+  // double scale_x(1), scale_y(1);
+
+  if(viscosity[128][128]!=boundary_value)
+    {
+      viscosity[128][128]=boundary_value;
+      std::ifstream infile("viscosity");
+      // int i, j;
+      // infile >> i >> j;
+      double x, y;
+      infile >> x >> y;
+      while(infile)
+        {
+          // max_x=std::max(i,max_x);
+          // max_y=std::max(j,max_y);
+          double visc;
+          infile >> visc;
+          int i(static_cast<int>(max_x*x/scale_x + 0.05)),
+            j(static_cast<int>(max_y*y/scale_y + 0.05));
+          // viscosity[i][j]=1;
+          viscosity[i][j]=std::max(min_viscosity,std::min(max_viscosity,visc));
+          // std::cout << "viscosity "
+          //           << i << " " << j << " "
+          //           << (max_x*x/scale_x) << " "
+          //           << (max_y*y/scale_y) << " "
+          //           << visc << " "
+          //           << viscosity[i][j] << " "
+          //           << "\n";
+          infile >> x >> y;
+        }
+    }
+
 
   /*
    * Initialize data in all patches in the level.
@@ -93,10 +130,26 @@ void SAMRAI::FACStokes::initializeLevelData
         double y=geom->getXLower()[1]
           + geom->getDx()[1]*(c[1]-cell_visc_box.lower()[1] + 0.5);
 
-        if(x*x + y*y < inclusion_radius*inclusion_radius)
-          cell_viscosity(c)=inclusion_viscosity;
-        else
-          cell_viscosity(c)=background_viscosity;
+        int i(static_cast<int>(x*max_x/scale_x)),
+          j(static_cast<int>(y*max_y/scale_y));
+        i=std::max(0,std::min(max_x,i));
+        j=std::max(0,std::min(max_y,j));
+              
+        cell_viscosity(c)=viscosity[i][j];
+
+        // std::cout << "cell "
+        //           << c[0] << " "
+        //           << c[1] << " "
+        //           << i << " "
+        //           << j << " "
+        //           << cell_viscosity(c) << " "
+        //           << "\n";
+
+
+        // if(x*x + y*y < inclusion_radius*inclusion_radius)
+        //   cell_viscosity(c)=inclusion_viscosity;
+        // else
+        //   cell_viscosity(c)=background_viscosity;
       }
 
     if(d_dim.getValue()==2)
@@ -113,10 +166,28 @@ void SAMRAI::FACStokes::initializeLevelData
               + geom->getDx()[0]*(e[0]-edge_visc_box.lower()[0]);
             double y=geom->getXLower()[1]
               + geom->getDx()[1]*(e[1]-edge_visc_box.lower()[1]);
-            if(x*x + y*y < inclusion_radius*inclusion_radius)
-              edge_viscosity(e)=inclusion_viscosity;
-            else
-              edge_viscosity(e)=background_viscosity;
+
+            int i(static_cast<int>(x*max_x/scale_x)),
+              j(static_cast<int>(y*max_y/scale_y));
+            i=std::max(0,std::min(max_x,i));
+            j=std::max(0,std::min(max_y,j));
+              
+            edge_viscosity(e)=viscosity[i][j];
+
+        // std::cout << "edge "
+        //           << e[0] << " "
+        //           << e[1] << " "
+        //           << i << " "
+        //           << j << " "
+        //           << x << " "
+        //           << y << " "
+        //           << edge_viscosity(e) << " "
+        //           << "\n";
+
+            // if(x*x + y*y < inclusion_radius*inclusion_radius)
+            //   edge_viscosity(e)=inclusion_viscosity;
+            // else
+            //   edge_viscosity(e)=background_viscosity;
           }
       }
     else if(d_dim.getValue()==3)
@@ -140,10 +211,13 @@ void SAMRAI::FACStokes::initializeLevelData
                 + geom->getDx()[0]*(e[0]-edge_visc_box.lower()[0] + dx);
               double y=geom->getXLower()[1]
                 + geom->getDx()[1]*(e[1]-edge_visc_box.lower()[1] + dy);
-              if(x*x + y*y < inclusion_radius*inclusion_radius)
-                edge_viscosity(e)=inclusion_viscosity;
-              else
-                edge_viscosity(e)=background_viscosity;
+
+              int i(static_cast<int>(x*max_x)), j(static_cast<int>(y*max_y));
+              edge_viscosity(e)=viscosity[i][j];
+              // if(x*x + y*y < inclusion_radius*inclusion_radius)
+              //   edge_viscosity(e)=inclusion_viscosity;
+              // else
+              //   edge_viscosity(e)=background_viscosity;
             }
       }
 
@@ -171,8 +245,8 @@ void SAMRAI::FACStokes::initializeLevelData
     for(pdat::SideIterator si(pbox,1); si; si++)
       {
         pdat::SideIndex s=si();
-        (*v_rhs_data)(s)=10;
-        // (*v_rhs_data)(s)=0;
+        // (*v_rhs_data)(s)=10;
+        (*v_rhs_data)(s)=0;
       }
     if(d_dim.getValue()==3)
       for(pdat::SideIterator si(pbox,2); si; si++)
