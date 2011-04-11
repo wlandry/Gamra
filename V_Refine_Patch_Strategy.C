@@ -1,5 +1,5 @@
 #include "V_Refine_Patch_Strategy.h"
-#include "set_V_boundary.h"
+#include "set_boundary.h"
 
 void
 SAMRAI::solv::V_Refine_Patch_Strategy::preprocessRefine
@@ -8,5 +8,5 @@ SAMRAI::solv::V_Refine_Patch_Strategy::preprocessRefine
  const hier::Box& ,
  const hier::IntVector& )
 {
-  set_V_boundary(coarse,v_id,true);
+  set_boundary(coarse,-1,v_id,true);
 }

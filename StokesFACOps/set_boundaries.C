@@ -41,16 +41,17 @@
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
 #include "Boundary.h"
-#include "set_V_boundary.h"
+#include "set_boundary.h"
 
 /* Set the physical boundaries for the velocity. */
 
 void SAMRAI::solv::StokesFACOps::set_boundaries
-(const int &v_id, tbox::Pointer<hier::PatchLevel> &level, const bool &rhs)
+(const int &p_id, const int &v_id,
+ tbox::Pointer<hier::PatchLevel> &level, const bool &rhs)
 {
   for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
     {
       tbox::Pointer<hier::Patch> patch = *pi;
-      set_V_boundary(*patch,v_id,rhs);
+      set_boundary(*patch,p_id,v_id,rhs);
     }
 }

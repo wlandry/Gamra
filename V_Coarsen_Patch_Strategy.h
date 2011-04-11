@@ -18,7 +18,7 @@
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/CellIndex.h"
 #include "Boundary.h"
-#include "set_V_boundary.h"
+#include "set_boundary.h"
 
 namespace SAMRAI {
 namespace solv {
@@ -69,7 +69,7 @@ public:
                     const hier::Box& ,
                     const hier::IntVector& )
   {
-    set_V_boundary(fine,v_id,true);
+    set_boundary(fine,-1,v_id,true);
   }
 
    virtual void

@@ -38,7 +38,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
      correct. */
   p_refine_patch_strategy.setTargetDataId(p_id);
   v_refine_patch_strategy.setTargetDataId(v_id);
-  set_boundaries(v_id,level,true);
+  set_boundaries(p_id,v_id,level,true);
   xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
 
   if (ln > d_ln_min) {
@@ -121,7 +121,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                     }
                 }
             }
-          set_boundaries(v_id,level,true);
+          set_boundaries(p_id,v_id,level,true);
         }
 
 
@@ -175,7 +175,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                     }
                 }
             }
-          set_boundaries(v_id,level,true);
+          set_boundaries(p_id,v_id,level,true);
         }
 
 
@@ -238,6 +238,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
               p(center)+=dp(center);
             }
         }
+      set_boundaries(p_id,v_id,level,true);
 
 
       /* fix v sweep */
@@ -299,7 +300,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                 }
             }
         }
-      set_boundaries(v_id,level,true);
+      set_boundaries(p_id,v_id,level,true);
 
       // if (residual_tolerance >= 0.0) {
         /*
@@ -316,10 +317,10 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
             mpi.AllReduce(&tmp, 1, MPI_MIN);
           }
         converged=(tmp==1);
-        if (d_enable_logging)
-          tbox::plog
-            // << d_object_name << "\n"
-            << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
+        // if (d_enable_logging)
+        //   tbox::plog
+        //     // << d_object_name << "\n"
+        //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
       // }
     }
 }

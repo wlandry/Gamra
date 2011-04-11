@@ -36,7 +36,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
      calculating a new pressure update requires computing in the ghost
      region so that the update for the velocity inside the box will be
      correct. */
-  set_boundaries(v_id,level,true);
+  set_boundaries(p_id,v_id,level,true);
   xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
 
   p_refine_patch_strategy.setTargetDataId(p_id);
@@ -123,7 +123,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
                         }
                     }
               }
-            set_boundaries(v_id,level,true);
+            set_boundaries(p_id,v_id,level,true);
           }
 
       /* p sweep
@@ -256,7 +256,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
                     }
                 }
             }
-          set_boundaries(v_id,level,true);
+          set_boundaries(p_id,v_id,level,true);
         }
       // if (residual_tolerance >= 0.0) {
         /*

@@ -98,7 +98,8 @@ void SAMRAI::solv::StokesFACOps::prolongErrorAndCorrect
                           d_side_scratch_id,
                           dest_ln);
 
-  set_boundaries(s.getComponentDescriptorIndex(1),fine_level,true);
+  set_boundaries(s.getComponentDescriptorIndex(0),
+                 s.getComponentDescriptorIndex(1),fine_level,true);
   /*
    * Add the refined error in the scratch space to the error currently
    * residing in the destination level.

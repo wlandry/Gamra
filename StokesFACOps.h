@@ -513,20 +513,23 @@ public:
       const SAMRAIVectorReal<double>& current_soln,
       const SAMRAIVectorReal<double>& residual);
 
-  void set_boundaries(const int &v_id, const int &l)
+  void set_boundaries(const int &p_id, const int &v_id, const int &l)
   {
-    set_boundaries(v_id,l,true);
+    set_boundaries(p_id,v_id,l,true);
   }
-  void set_boundaries(const int &v_id, const int &l, const bool &rhs)
+  void set_boundaries(const int &p_id, const int &v_id, const int &l,
+                      const bool &rhs)
   {
     tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(l);
-    set_boundaries(v_id,level,rhs);
+    set_boundaries(p_id,v_id,level,rhs);
   }
-  void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level)
+  void set_boundaries(const int &p_id, const int &v_id,
+                      tbox::Pointer<hier::PatchLevel> &level)
   {
-    set_boundaries(v_id,level,true);
+    set_boundaries(p_id,v_id,level,true);
   }
-  void set_boundaries(const int &v_id, tbox::Pointer<hier::PatchLevel> &level,
+  void set_boundaries(const int &p_id, const int &v_id, 
+                      tbox::Pointer<hier::PatchLevel> &level,
                       const bool &rhs);
 
    //@}

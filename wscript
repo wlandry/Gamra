@@ -30,7 +30,7 @@ def build(bld):
                         'V_Coarsen_Patch_Strategy.C',
                         'Cell_Viscosity_Coarsen.C',
                         'Edge_Viscosity_Coarsen.C',
-                        'set_V_boundary.C',
+                        'set_boundary.C',
                         'StokesFACOps/StokesFACOps.C',
                         'StokesFACOps/checkInputPatchDataIndices.C',
                         'StokesFACOps/computeCompositeResidualOnLevel.C',
