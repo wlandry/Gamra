@@ -33,7 +33,7 @@ FACStokes {
     // class in the SAMRAI library.
     enable_logging = TRUE   // Bool flag to switch logging on/off
     max_cycles = 100         // Max number of FAC cycles to use
-    residual_tol = 1e-8     // Residual tolerance to solve for
+    residual_tol = 1e-5     // Residual tolerance to solve for
     num_pre_sweeps = 5      // Number of presmoothing sweeps to use
     num_post_sweeps = 5     // Number of postsmoothing sweeps to use
     smoothing_choice = "Tackley"
@@ -89,24 +89,7 @@ CartesianGridGeometry {
 }
 
 StandardTagAndInitialize {
-  tagging_method = "REFINE_BOXES"
-  RefineBoxes {
-    // level_0 = [(0,0),(15,15)]
-    level_0 = [(0,0),(5,5)]
-    // level_1 = [(0,0),(7,7)]
-    // level_2 = [(0,0),(15,15)]
-    // level_3 = [(0,0),(31,31)]
-    // level_4 = [(0,0),(63,63)]
-    // level_5 = [(0,0),(127,127)]
-    // level_1 = [(2,2),(5,5)]
-    // level_2 = [(6,6),(9,9)]
-    // level_3 = [(14,14),(16,16)]
-
-    level_1 = [(0,0),(5,5)]
-    level_2 = [(2,2),(9,9)]
-    level_3 = [(6,6),(16,16)]
-    //etc.
-  }
+  tagging_method = "GRADIENT_DETECTOR"
 }
 
 PatchHierarchy {
@@ -135,7 +118,8 @@ PatchHierarchy {
    //              [level 0 entry]
    //   etc....                       
    // }
-   max_levels = 4
+   max_levels = 5
+   proper_nesting_buffer = 2, 2, 2, 2, 2, 2
    ratio_to_coarser {
       level_1            = 2, 2
       level_2            = 2, 2
@@ -144,10 +128,33 @@ PatchHierarchy {
    }
    largest_patch_size {
       // level_0 = 32, 32
-      level_0 = 8, 8
+      // level_0 = 8, 8
+      level_0 = -1, -1
       // all finer levels will use same values as level_0...
    }
 }
 
 GriddingAlgorithm {
+   enforce_proper_nesting = TRUE
+   extend_to_domain_boundary = FALSE
+   proper_nesting_buffer = 2, 2, 2, 2, 2, 2
+   // load_balance = FALSE
+   efficiency_tolerance = 0.80
+   combine_efficiency = 0.75
+   // write_regrid_boxes = TRUE
+   // read_regrid_boxes = TRUE
+   // regrid_boxes_filename = "grid"
+   check_nonrefined_tags = "ERROR"
+   check_overlapping_patches = "ERROR"
+   extend_tags_to_bdry = TRUE
+   sequentialize_patch_indices = TRUE
+   barrier_before_regrid = TRUE
+   barrier_before_find_refinement = TRUE
+   barrier_before_cluster = TRUE
+   barrier_before_nest = TRUE
+   barrier_before_limit = TRUE
+   barrier_before_extend = TRUE
+   barrier_before_balance = TRUE
+   barrier_after_find_refinement = TRUE
+   coalesce_boxes = FALSE
 }
