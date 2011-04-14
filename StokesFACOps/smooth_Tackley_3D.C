@@ -273,10 +273,10 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
             mpi.AllReduce(&tmp, 1, MPI_MIN);
           }
         converged=(tmp==1);
-        if (d_enable_logging)
-          tbox::plog
-            // << d_object_name << "\n"
-            << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
+        // if (d_enable_logging)
+        //   tbox::plog
+        //     // << d_object_name << "\n"
+        //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
       // }
     }
 }
