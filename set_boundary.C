@@ -24,11 +24,14 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
   double lower_boundary[]={0,0,0};
   bool lower_dirichlet[]={true,true,true};
 
-  double upper_boundary[]={-6.94444444444e4,0,0};
-  bool upper_dirichlet[]={true,false,true};
+  // double upper_boundary[]={-6.94444444444e4,0,0};
+  // bool upper_dirichlet[]={true,false,true};
 
   // bool upper_dirichlet[]={true,true,true};
   // double upper_boundary[]={-1,1,0};
+
+  bool upper_dirichlet[]={true,true,true};
+  double upper_boundary[]={0,0,0};
 
   if(p_id!=-1)
     {
@@ -45,12 +48,14 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
               if(center[ix]<pbox.lower(ix)
                  && geom->getTouchesRegularBoundary(ix,0))
                 {
+                  p(center)=2*p(center+pp[ix])-p(center+pp[ix]*2);
                   if(!lower_dirichlet[ix])
                     p(center)=p(center+pp[ix]);
                 }
               else if(center[ix]>pbox.upper(ix)
                       && geom->getTouchesRegularBoundary(ix,1))
                 {
+                  p(center)=2*p(center-pp[ix])-p(center-pp[ix]*2);
                   if(!upper_dirichlet[ix])
                     {
                       // p(center)=p(center-pp[ix]);
@@ -111,27 +116,27 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                     {
                       v(x)=v(x+pp[iy]);
 
-                      if(ix==0 && iy==1)
-                        {
-                          if(pos_x<0.1 || rhs)
-                            {
-                              v(x)=-v(x+pp[iy]);
-                            }
-                          else
-                            {
-                              v(x)=-v(x+pp[iy]) + 2*upper_boundary[0];
-                            }
-                        }
+                      // if(ix==0 && iy==1)
+                      //   {
+                      //     if(pos_x<0.1 || rhs)
+                      //       {
+                      //         v(x)=-v(x+pp[iy]);
+                      //       }
+                      //     else
+                      //       {
+                      //         v(x)=-v(x+pp[iy]) + 2*upper_boundary[0];
+                      //       }
+                      //   }
                     }
                   else if(x[iy]>pbox.upper(iy)
                           && geom->getTouchesRegularBoundary(iy,1))
                     {
                       v(x)=v(x-pp[iy]);
 
-                      if(ix==1 && iy==0)
-                        {
-                          v(x)=-v(x-pp[iy]);
-                        }
+                      // if(ix==1 && iy==0)
+                      //   {
+                      //     v(x)=-v(x-pp[iy]);
+                      //   }
                     }
                 }
             }
