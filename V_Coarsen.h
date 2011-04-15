@@ -112,13 +112,34 @@ public:
    * coarsening operator.
    */
   void
-  coarsen(
-          hier::Patch& coarse,
-          const hier::Patch& fine,
-          const int dst_component,
-          const int src_component,
-          const hier::Box& coarse_box,
-          const hier::IntVector& ratio) const;
+  coarsen(hier::Patch& coarse,
+             const hier::Patch& fine,
+             const int dst_component,
+             const int src_component,
+             const hier::Box& coarse_box,
+             const hier::IntVector& ratio) const
+  {
+    if(getDim().getValue()==2)
+      coarsen_2D(coarse,fine,dst_component,src_component,coarse_box,ratio);
+    else
+      coarsen_3D(coarse,fine,dst_component,src_component,coarse_box,ratio);
+  }
+
+  void
+  coarsen_2D(hier::Patch& coarse,
+             const hier::Patch& fine,
+             const int dst_component,
+             const int src_component,
+             const hier::Box& coarse_box,
+             const hier::IntVector& ratio) const;
+
+  void
+  coarsen_3D(hier::Patch& coarse,
+             const hier::Patch& fine,
+             const int dst_component,
+             const int src_component,
+             const hier::Box& coarse_box,
+             const hier::IntVector& ratio) const;
 
 private:
   std::string d_name_id;
