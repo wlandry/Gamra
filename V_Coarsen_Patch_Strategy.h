@@ -44,7 +44,7 @@ public:
    V_Coarsen_Patch_Strategy(
       const tbox::Dimension& dim,
       std::string object_name = std::string()):
-     xfer::CoarsenPatchStrategy(dim), d_dim(dim),
+     xfer::CoarsenPatchStrategy(dim),
      d_object_name(object_name) {}
 
    /*!
@@ -56,13 +56,8 @@ public:
 
    virtual hier::IntVector
    getCoarsenOpStencilWidth() const
-  { return hier::IntVector::getOne(d_dim); }
-   // virtual void
-   // preprocessCoarsenBoxes(
-   //    hier::Patch& fine,
-   //    const hier::Patch& coarse,
-   //    const hier::BoxList& fine_boxes,
-   //    const hier::IntVector& ratio) {}
+  { return hier::IntVector::getOne(getDim()); }
+
    virtual void
    preprocessCoarsen(hier::Patch& ,
                     const hier::Patch& fine,
@@ -74,6 +69,26 @@ public:
 
    virtual void
    postprocessCoarsen(
+      hier::Patch& coarse,
+      const hier::Patch& fine,
+      const hier::Box& coarse_box,
+      const hier::IntVector& ratio)
+  {
+    if(getDim().getValue()==2)
+      postprocessCoarsen_2D(coarse,fine,coarse_box,ratio);
+    else
+      postprocessCoarsen_3D(coarse,fine,coarse_box,ratio);
+  }
+
+  void
+  postprocessCoarsen_2D(
+      hier::Patch& coarse,
+      const hier::Patch& fine,
+      const hier::Box& coarse_box,
+      const hier::IntVector& ratio);
+
+  void
+  postprocessCoarsen_3D(
       hier::Patch& coarse,
       const hier::Patch& fine,
       const hier::Box& coarse_box,
@@ -367,8 +382,6 @@ private:
    // hier::Box
    // makeFaceBoundaryBox(
    //    const hier::BoundaryBox& boundary_box) const;
-
-   const tbox::Dimension d_dim;
 
    std::string d_object_name;
 
