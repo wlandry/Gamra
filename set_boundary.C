@@ -77,8 +77,8 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
         {
           pdat::SideIndex x(*si);
 
-          double pos_x=geom->getXLower()[0]
-            + geom->getDx()[0]*(x[0]-pbox.lower()[0]);
+          // double pos_x=geom->getXLower()[0]
+          //   + geom->getDx()[0]*(x[0]-pbox.lower()[0]);
 
           /* Set a sentinel value for normal components */
           if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
