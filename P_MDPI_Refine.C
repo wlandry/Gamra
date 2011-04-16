@@ -145,17 +145,6 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
          {
            p_fine(fine)=p(center);
          }
-
-       // tbox::plog << "P_MDPI_Refine "
-       //            << fine_patch.getPatchLevelNumber() << " "
-       //            << i << " "
-       //            << j << " "
-       //            << (*p_fine)(fine) << " "
-       //            << (*p)(center) << " "
-       //            << dp_dx << " "
-       //            << dp_dy << " "
-       //            << "\n";
-
      }
 }
 #endif
