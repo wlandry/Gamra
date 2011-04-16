@@ -139,7 +139,7 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
                  dRc_dp_total+=dRc_dp_weight;
                }
 
-           p_fine(fine)=p(center)*dRc_dp_total/(4*dRc_dp_fine);
+           p_fine(fine)=p(center)*dRc_dp_total/(4*(dim.getValue()-1)*dRc_dp_fine);
          }
        else
          {
