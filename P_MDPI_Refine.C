@@ -72,9 +72,12 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
    tbox::Pointer<pdat::CellData<double> >
      cell_viscosity_ptr = fine_patch.getPatchData(cell_viscosity_id);
    pdat::CellData<double> &cell_viscosity(*cell_viscosity_ptr);
-   tbox::Pointer<pdat::NodeData<double> >
-     edge_viscosity_ptr = fine_patch.getPatchData(edge_viscosity_id);
-   pdat::NodeData<double> &edge_viscosity(*edge_viscosity_ptr);
+   tbox::Pointer<pdat::NodeData<double> > edge_viscosity2D_ptr;
+   tbox::Pointer<pdat::EdgeData<double> > edge_viscosity3D_ptr;
+   if(dim.getValue()==2)
+     edge_viscosity2D_ptr = fine_patch.getPatchData(edge_viscosity_id);
+   else
+     edge_viscosity3D_ptr = fine_patch.getPatchData(edge_viscosity_id);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
    TBOX_ASSERT(!p_ptr.isNull());
@@ -88,65 +91,71 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
 
    hier::Box gbox=p_fine.getGhostBox();
 
-   const double dx = geom->getDx()[0];
-   const double dy = geom->getDx()[1];
+   double Dx[dim.getValue()];
+   for(int d=0;d<dim.getValue();++d)
+     Dx[d]=geom->getDx()[d];
 
-   for(int j=fine_box.lower(1); j<=fine_box.upper(1); ++j)
-     for(int i=fine_box.lower(0); i<=fine_box.upper(0); ++i)
-       {
-         pdat::CellIndex fine(tbox::Dimension(2));
-         fine[0]=i;
-         fine[1]=j;
+   hier::Box gbox_interior(gbox);
+   gbox_interior.grow(hier::Index::getOneIndex(dim)*(-1));
 
-         pdat::CellIndex ip(fine), jp(fine);
-         ip[0]=1;
-         ip[1]=0;
-         jp[0]=0;
-         jp[1]=1;
-         pdat::CellIndex center(hier::Index::coarsen(fine,hier::Index(2,2)));
+   hier::Box cell_box(hier::Index::getZeroIndex(dim),
+                      hier::Index::getOneIndex(dim)*2);
 
-         if(fine[0]>gbox.lower(0) && fine[0]<gbox.upper(0)
-            && fine[1]>gbox.lower(1) && fine[1]<gbox.upper(1))
-           {
-             double dRc_dp_total(0), dRc_dp_fine(0);
-             /* This is horribly inefficient */
-             for(int xx=0;xx<2;++xx)
-               for(int yy=0;yy<2;++yy)
-                 {
-                   pdat::CellIndex c_fine(center*2);
-                   c_fine[0]+=xx;
-                   c_fine[1]+=yy;
+   for(pdat::CellIterator ci(fine_box); ci; ci++)
+     {
+       pdat::CellIndex fine(*ci);
+       pdat::CellIndex
+         center(hier::Index::coarsen(fine,hier::Index::getOneIndex(dim)*2));
+
+       if(gbox_interior.contains(fine))
+         {
+           double dRc_dp_total(0), dRc_dp_fine(0);
+           /* This is horribly inefficient */
+
+           for(pdat::CellIterator ii(cell_box); ii; ii++)
+               {
+                 pdat::CellIndex c_fine(center*2);
+                 c_fine+=ii;
                
-                   pdat::SideIndex x(c_fine,0,pdat::SideIndex::Lower),
-                     y(c_fine,1,pdat::SideIndex::Lower);
+                 double dRc_dp_weight;
+                 if(dim.getValue()==2)
+                   {
+                     pdat::SideIndex x(c_fine,0,pdat::SideIndex::Lower),
+                       y(c_fine,1,pdat::SideIndex::Lower);
+                     dRc_dp_weight=dRc_dp_2D(fine_box,c_fine,x,y,
+                                             cell_viscosity,
+                                             *edge_viscosity2D_ptr,v,Dx[0],Dx[1]);
+                   }
+                 else
+                   {
+                     const hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
+                     const hier::Index pp[]={ip,jp,kp};
+                     dRc_dp_weight=dRc_dp_3D(fine_box,c_fine,cell_viscosity,
+                                             *edge_viscosity3D_ptr,v,Dx,pp);
+                   }
 
-                   double dRc_dp_weight=
-                     dRc_dp_2D(fine_box,c_fine,x,y,
-                               cell_viscosity,edge_viscosity,v,dx,dy);
-                            
+                 if(c_fine==fine)
+                   dRc_dp_fine=dRc_dp_weight;
+                 dRc_dp_total+=dRc_dp_weight;
+               }
 
-                   if(c_fine==fine)
-                     dRc_dp_fine=dRc_dp_weight;
-                   dRc_dp_total+=dRc_dp_weight;
-                 }
+           p_fine(fine)=p(center)*dRc_dp_total/(4*dRc_dp_fine);
+         }
+       else
+         {
+           p_fine(fine)=p(center);
+         }
 
-             p_fine(fine)=p(center)*dRc_dp_total/(4*dRc_dp_fine);
-           }
-         else
-           {
-             p_fine(fine)=p(center);
-           }
+       // tbox::plog << "P_MDPI_Refine "
+       //            << fine_patch.getPatchLevelNumber() << " "
+       //            << i << " "
+       //            << j << " "
+       //            << (*p_fine)(fine) << " "
+       //            << (*p)(center) << " "
+       //            << dp_dx << " "
+       //            << dp_dy << " "
+       //            << "\n";
 
-         // tbox::plog << "P_MDPI_Refine "
-         //            << fine_patch.getPatchLevelNumber() << " "
-         //            << i << " "
-         //            << j << " "
-         //            << (*p_fine)(fine) << " "
-         //            << (*p)(center) << " "
-         //            << dp_dx << " "
-         //            << dp_dy << " "
-         //            << "\n";
-
-       }
+     }
 }
 #endif
