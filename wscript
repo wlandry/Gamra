@@ -27,8 +27,6 @@ def build(bld):
                         'P_Boundary_Refine.C',
                         'V_Boundary_Refine/refine.C',
                         'V_Boundary_Refine/Update_V.C',
-                        'P_Refine_Patch_Strategy.C',
-                        'V_Refine_Patch_Strategy.C',
                         'V_Coarsen_Patch_Strategy/postprocessCoarsen_2D.C',
                         'V_Coarsen_Patch_Strategy/postprocessCoarsen_3D.C',
                         'Cell_Viscosity_Coarsen.C',

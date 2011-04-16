@@ -17,6 +17,7 @@
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/CellIndex.h"
 #include "Boundary.h"
+#include "set_boundary.h"
 
 namespace SAMRAI {
 namespace solv {
@@ -66,10 +67,13 @@ public:
    //    const hier::BoxList& fine_boxes,
    //    const hier::IntVector& ratio) {}
    virtual void
-   preprocessRefine(hier::Patch& fine,
+   preprocessRefine(hier::Patch& ,
                     const hier::Patch& coarse,
-                    const hier::Box& fine_box,
-                    const hier::IntVector& ratio);
+                    const hier::Box& ,
+                    const hier::IntVector& )
+  {
+    set_boundary(coarse,-1,v_id,true);
+  }
 
    virtual void
    postprocessRefineBoxes(
