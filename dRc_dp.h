@@ -7,6 +7,8 @@
 #include "dRm_dv.h"
 #include "Boundary.h"
 
+/* These two functions should really have a more similar API */
+
 /* The derivative of the continuity equation with respect to
    pressure.  Note that pressure does not appear in the continuity
    equation, so we use Tackley's method to chain together
