@@ -21,6 +21,7 @@
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/tbox/Utilities.h"
+#include "SAMRAI/pdat/CellData.h"
 
 void SAMRAI::geom::V_Refine::refine(
    hier::Patch& fine,
@@ -53,152 +54,105 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
                                     const hier::IntVector& ratio,
                                     const int &axis) const
 {
-   const tbox::Dimension& dim(getDim());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, fine, coarse, fine_box, ratio);
+   const tbox::Dimension& dimension(getDim());
+   const int dim(dimension.getValue());
+   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, fine_box, ratio);
 
    tbox::Pointer<pdat::SideData<double> >
-   v = coarse.getPatchData(src_component);
+   v_ptr = coarse.getPatchData(src_component);
+   pdat::SideData<double> &v(*v_ptr);
    tbox::Pointer<pdat::SideData<double> >
-   v_fine = fine.getPatchData(dst_component);
+   v_fine_ptr = fine.getPatchData(dst_component);
+   pdat::SideData<double> &v_fine(*v_fine_ptr);
+
 #ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(!v.isNull());
-   TBOX_ASSERT(!v_fine.isNull());
-   TBOX_ASSERT(v->getDepth() == v_fine->getDepth());
-   TBOX_ASSERT(v->getDepth() == 1);
+   TBOX_ASSERT(!v_ptr.isNull());
+   TBOX_ASSERT(!v_fine_ptr.isNull());
+   TBOX_ASSERT(v.getDepth() == v_fine.getDepth());
+   TBOX_ASSERT(v.getDepth() == 1);
 #endif
 
    hier::Box coarse_box=coarse.getBox();
    tbox::Pointer<geom::CartesianPatchGeometry>
      geom = coarse.getPatchGeometry();
 
-   for(int j=fine_box.lower(1); j<=fine_box.upper(1); ++j)
-     for(int i=fine_box.lower(0); i<=fine_box.upper(0); ++i)
-       {
-         pdat::SideIndex fine(hier::Index(i,j),axis,pdat::SideIndex::Lower);
+   hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+   ip[0]=1;
+   jp[1]=1;
+   if(dim>2)
+     kp[2]=2;
+   hier::Index pp[]={ip,jp,kp};
 
-         hier::Index ip(1,0), jp(0,1);
-         pdat::SideIndex center(fine);
-         center.coarsen(hier::Index(2,2));
+   for(pdat::CellIterator ci(fine_box); ci; ci++)
+     {
+       pdat::SideIndex fine(*ci,axis,pdat::SideIndex::Lower);
 
-         /* This assumes that the levels are always properly nested,
-            so that we always have an extra grid space for
-            interpolation.  So we only have to have a special case for
-            physical boundaries, where we do not have an extra grid
-            space. */
+       pdat::SideIndex center(fine);
+       center.coarsen(hier::Index::getOneIndex(dimension)*2);
 
-         // tbox::plog << "V refine "
-         //            << axis << " "
-         //            << i << " "
-         //            << j << " ";
+       /* This assumes that the levels are always properly nested, so
+          that we always have an extra grid space for interpolation.
+          So we only have to have a special case for physical
+          boundaries, where we do not have an extra grid space. */
 
-         if(axis==0)
-           {
-             double dvx_dy;
+       double dvx_dy;
 
-             if(i%2==0)
-               {
-                 /* Maybe this has to be fixed when dvx/dy != 0 on the
-                    outer boundary because the approximation to the
-                    derivative is not accurate enough? */
+       if(fine[axis]%2==0)
+         {
+           /* Maybe this has to be fixed when dvx/dy != 0 on the
+              outer boundary because the approximation to the
+              derivative is not accurate enough? */
 
-                 if(center[1]==coarse_box.lower(1)
-                    && geom->getTouchesRegularBoundary(1,0))
-                   {
-                     dvx_dy=((*v)(center+jp)-(*v)(center))/4;
-                   }
-                 else if(center[1]==coarse_box.upper(1)
-                         && geom->getTouchesRegularBoundary(1,1))
-                   {
-                     dvx_dy=((*v)(center)-(*v)(center-jp))/4;
-                   }
-                 else
-                   {
-                     dvx_dy=((*v)(center+jp)-(*v)(center-jp))/8;
-                   }
+           /* Maybe in 3D we should include cross derivatives? */
 
-                 (*v_fine)(fine)=(*v)(center)
-                   + ((j%2==0) ? (-dvx_dy) : dvx_dy);
+           v_fine(fine)=v(center);
 
-                 // tbox::plog << (*v)(center) << " "
-                 //            << center[0] << " "
-                 //            << center[1] << " "
-                 //            << dvx_dy << " ";
-               }
-             else
-               {
-                 if(center[1]==coarse_box.lower(1)
-                    && geom->getTouchesRegularBoundary(1,0))
-                   {
-                     dvx_dy=((*v)(center+jp)-(*v)(center)
-                             + (*v)(center+ip+jp)-(*v)(center+ip))/4;
-                   }
-                 else if(center[1]==coarse_box.upper(1)
-                         && geom->getTouchesRegularBoundary(1,1))
-                   {
-                     dvx_dy=((*v)(center)-(*v)(center-jp)
-                             + (*v)(center+ip)-(*v)(center+ip-jp))/4;
-                   }
-                 else
-                   {
-                     dvx_dy=((*v)(center+jp)-(*v)(center-jp)
-                             + (*v)(center+ip+jp)-(*v)(center+ip-jp))/8;
-                   }
+           for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
+             {
+               if(center[d]==coarse_box.lower(d)
+                  && geom->getTouchesRegularBoundary(d,0))
+                 {
+                   dvx_dy=(v(center+pp[d])-v(center))/4;
+                 }
+               else if(center[d]==coarse_box.upper(d)
+                       && geom->getTouchesRegularBoundary(d,1))
+                 {
+                   dvx_dy=(v(center)-v(center-pp[d]))/4;
+                 }
+               else
+                 {
+                   dvx_dy=(v(center+pp[d])-v(center-pp[d]))/8;
+                 }
+               v_fine(fine)+=((fine[d]%2==0) ? (-dvx_dy) : dvx_dy);
+             }
+         }
+       else
+         {
+           v_fine(fine)=(v(center) + v(center+pp[axis]))/2;
 
-                 (*v_fine)(fine)=((*v)(center) + (*v)(center+ip)
-                                  + ((j%2==0) ? (-dvx_dy) : dvx_dy))/2;
-               }
-           }
-         else
-           {
-             double dvy_dx;
-
-             if(j%2==0)
-               {
-                 if(center[0]==coarse_box.lower(0)
-                    && geom->getTouchesRegularBoundary(0,0))
-                   {
-                     dvy_dx=((*v)(center+ip)-(*v)(center))/4;
-                   }
-                 else if(center[0]==coarse_box.upper(0)
-                         && geom->getTouchesRegularBoundary(0,1))
-                   {
-                     dvy_dx=((*v)(center)-(*v)(center-ip))/4;
-                   }
-                 else
-                   {
-                     dvy_dx=((*v)(center+ip)-(*v)(center-ip))/8;
-                   }
-
-                 (*v_fine)(fine)=(*v)(center)
-                   + ((i%2==0) ? (-dvy_dx) : dvy_dx);
-               }
-             else
-               {
-                 if(center[0]==coarse_box.lower(0)
-                    && geom->getTouchesRegularBoundary(0,0))
-                   {
-                     dvy_dx=((*v)(center+ip)-(*v)(center)
-                             + (*v)(center+jp+ip)-(*v)(center+jp))/4;
-                   }
-                 else if(center[0]==coarse_box.upper(0)
-                         && geom->getTouchesRegularBoundary(0,1))
-                   {
-                     dvy_dx=((*v)(center)-(*v)(center-ip)
-                             + (*v)(center+jp)-(*v)(center+jp-ip))/4;
-                   }
-                 else
-                   {
-                     dvy_dx=((*v)(center+ip)-(*v)(center-ip)
-                             + (*v)(center+jp+ip)-(*v)(center+jp-ip))/8;
-                   }
-
-                 (*v_fine)(fine)=((*v)(center) + (*v)(center+jp)
-                                  + ((i%2==0) ? (-dvy_dx) : dvy_dx))/2;
-               }
-           }
-         // tbox::plog << (*v_fine)(fine) << " "
-         //            << "\n";
-
-       }
+           for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
+             {
+               if(center[d]==coarse_box.lower(d)
+                  && geom->getTouchesRegularBoundary(d,0))
+                 {
+                   dvx_dy=(v(center+pp[d])-v(center)
+                           + v(center+pp[d]+pp[axis])-v(center+pp[axis]))/8;
+                 }
+               else if(center[d]==coarse_box.upper(d)
+                       && geom->getTouchesRegularBoundary(d,1))
+                 {
+                   dvx_dy=(v(center)-v(center-pp[d])
+                           + v(center+pp[axis])-v(center-pp[d]+pp[axis]))/8;
+                 }
+               else
+                 {
+                   dvx_dy=
+                     (v(center+pp[d])-v(center-pp[d])
+                      + v(center+pp[d]+pp[axis])-v(center-pp[d]+pp[axis]))/16;
+                 }
+               v_fine(fine)+=((fine[d]%2==0) ? (-dvx_dy) : dvx_dy);
+             }
+         }
+     }
 }
 #endif
