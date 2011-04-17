@@ -34,35 +34,84 @@ void SAMRAI::geom::Edge_Viscosity_Coarsen::coarsen(hier::Patch& coarse,
                                       const hier::Box& coarse_box,
                                       const hier::IntVector& ratio) const
 {
-  const tbox::Dimension& dim(getDim());
+  const tbox::Dimension& dimension(getDim());
+  const int dim(dimension.getValue());
 
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, coarse, fine, coarse_box, ratio);
+  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, coarse, fine, coarse_box, ratio);
 
   tbox::Pointer<pdat::CellData<double> >
-    cell_viscosity_fine = fine.getPatchData(cell_viscosity_id);
-  tbox::Pointer<pdat::NodeData<double> >
-    edge_viscosity_fine = fine.getPatchData(src_component);
-  tbox::Pointer<pdat::NodeData<double> >
-    edge_viscosity_coarse = coarse.getPatchData(dst_component);
+    cell_viscosity_fine_ptr = fine.getPatchData(cell_viscosity_id);
+  pdat::CellData<double> &cell_viscosity_fine(*cell_viscosity_fine_ptr);
 
-  TBOX_ASSERT(!edge_viscosity_coarse.isNull());
-  TBOX_ASSERT(!edge_viscosity_fine.isNull());
-  TBOX_ASSERT(edge_viscosity_fine->getDepth() == edge_viscosity_coarse->getDepth());
-  TBOX_ASSERT(edge_viscosity_coarse->getDepth() == 1);
+  tbox::Pointer<pdat::NodeData<double> > edge_viscosity_fine_2D_ptr;
+  tbox::Pointer<pdat::EdgeData<double> > edge_viscosity_fine_3D_ptr;
+  if(dim==2)
+    {
+      edge_viscosity_fine_2D_ptr = fine.getPatchData(src_component);
+      TBOX_ASSERT(!edge_viscosity_fine_2D_ptr.isNull());
+    }
+  else
+    {
+      edge_viscosity_fine_3D_ptr = fine.getPatchData(src_component);
+      TBOX_ASSERT(!edge_viscosity_fine_3D_ptr.isNull());
+    }
+
+  tbox::Pointer<pdat::NodeData<double> > edge_viscosity_coarse_2D_ptr;
+  tbox::Pointer<pdat::EdgeData<double> > edge_viscosity_coarse_3D_ptr;
+  if(dim==2)
+    {
+      edge_viscosity_coarse_2D_ptr = coarse.getPatchData(dst_component);
+      TBOX_ASSERT(!edge_viscosity_coarse_2D_ptr.isNull());
+      TBOX_ASSERT(edge_viscosity_fine_2D_ptr->getDepth()
+                  == edge_viscosity_coarse_2D_ptr->getDepth());
+      TBOX_ASSERT(edge_viscosity_coarse_2D_ptr->getDepth() == 1);
+    }
+  else
+    {
+      edge_viscosity_coarse_3D_ptr = coarse.getPatchData(dst_component);
+      TBOX_ASSERT(!edge_viscosity_coarse_3D_ptr.isNull());
+      TBOX_ASSERT(edge_viscosity_fine_3D_ptr->getDepth()
+                  == edge_viscosity_coarse_3D_ptr->getDepth());
+      TBOX_ASSERT(edge_viscosity_coarse_3D_ptr->getDepth() == 1);
+    }
+
 
   const tbox::Pointer<CartesianPatchGeometry> cgeom =
     coarse.getPatchGeometry();
-  hier::Index ip(1,0), jp(0,1);
-   for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
-     for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
-       {
-         pdat::NodeIndex coarse_edge(hier::Index(i,j),
-                                     pdat::NodeIndex::LowerLeft);
 
-         (*edge_viscosity_coarse)(coarse_edge)=
-           viscosity_coarsen(*cell_viscosity_fine,*edge_viscosity_fine,
-                             coarse_edge*2);
-       }
+  hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+  ip[0]=1;
+  jp[1]=1;
+  if(dim>2)
+    kp[2]=1;
+  hier::Index pp[]={ip,jp,kp};
+
+  if(dim==2)
+    {
+      for(pdat::NodeIterator ni(coarse_box); ni; ni++)
+        {
+          pdat::NodeIndex coarse_edge(*ni);
+
+          (*edge_viscosity_coarse_2D_ptr)(coarse_edge)=
+            viscosity_coarsen_2D(cell_viscosity_fine,*edge_viscosity_fine_2D_ptr,
+                                 coarse_edge*2);
+        }
+    }
+  else
+    {
+      for(int axis=0;axis<3;++axis)
+        {
+          const int axis2((axis+1)%3), axis3((axis+2)%3);
+          for(pdat::EdgeIterator ni(coarse_box,axis); ni; ni++)
+            {
+              pdat::EdgeIndex coarse_edge(*ni);
+
+              (*edge_viscosity_coarse_3D_ptr)(coarse_edge)=
+                viscosity_coarsen_3D(cell_viscosity_fine,
+                                     *edge_viscosity_fine_3D_ptr,
+                                     coarse_edge*2-pp[axis2]-pp[axis3]);
+            }
+        }
+    }
 }
-
 #endif

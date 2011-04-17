@@ -35,35 +35,56 @@ void SAMRAI::geom::Cell_Viscosity_Coarsen::coarsen(hier::Patch& coarse,
                                                    const hier::IntVector& ratio)
   const
 {
-  const tbox::Dimension& dim(getDim());
+  const tbox::Dimension& dimension(getDim());
+  const int dim(dimension.getValue());
 
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, coarse, fine, coarse_box, ratio);
+  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, coarse, fine, coarse_box, ratio);
 
   tbox::Pointer<pdat::CellData<double> >
-    cell_viscosity_fine = fine.getPatchData(src_component);
-  tbox::Pointer<pdat::NodeData<double> >
-    edge_viscosity_fine = fine.getPatchData(edge_viscosity_id);
-  tbox::Pointer<pdat::CellData<double> >
-    cell_viscosity_coarse = coarse.getPatchData(dst_component);
+    cell_viscosity_fine_ptr = fine.getPatchData(src_component);
+  pdat::CellData<double> &cell_viscosity_fine(*cell_viscosity_fine_ptr);
+  tbox::Pointer<pdat::NodeData<double> > edge_viscosity_fine_2D_ptr;
+  tbox::Pointer<pdat::EdgeData<double> > edge_viscosity_fine_3D_ptr;
+  if(dim==2)
+    edge_viscosity_fine_2D_ptr = fine.getPatchData(edge_viscosity_id);
+  else
+    edge_viscosity_fine_3D_ptr = fine.getPatchData(edge_viscosity_id);
 
-  TBOX_ASSERT(!cell_viscosity_coarse.isNull());
-  TBOX_ASSERT(!cell_viscosity_fine.isNull());
-  TBOX_ASSERT(cell_viscosity_fine->getDepth() == cell_viscosity_coarse->getDepth());
-  TBOX_ASSERT(cell_viscosity_coarse->getDepth() == 1);
+  tbox::Pointer<pdat::CellData<double> >
+    cell_viscosity_coarse_ptr = coarse.getPatchData(dst_component);
+  pdat::CellData<double> &cell_viscosity_coarse(*cell_viscosity_coarse_ptr);
+
+  TBOX_ASSERT(!cell_viscosity_coarse_ptr.isNull());
+  TBOX_ASSERT(!cell_viscosity_fine_ptr.isNull());
+  TBOX_ASSERT(cell_viscosity_fine.getDepth() == cell_viscosity_coarse.getDepth());
+  TBOX_ASSERT(cell_viscosity_coarse.getDepth() == 1);
 
   const tbox::Pointer<CartesianPatchGeometry> cgeom =
     coarse.getPatchGeometry();
 
-  hier::Index ip(1,0), jp(0,1);
-   for(int j=coarse_box.lower(1); j<=coarse_box.upper(1); ++j)
-     for(int i=coarse_box.lower(0); i<=coarse_box.upper(0); ++i)
-       {
-         pdat::CellIndex coarse_cell(hier::Index(i,j));
+  hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+  ip[0]=1;
+  jp[1]=1;
+  if(dim>2)
+    kp[2]=1;
 
-         (*cell_viscosity_coarse)(coarse_cell)=
-           viscosity_coarsen(*cell_viscosity_fine,*edge_viscosity_fine,
-                             coarse_cell*2+ip+jp);
-       }
+  for(pdat::CellIterator ci(coarse_box); ci; ci++)
+    {
+      pdat::CellIndex coarse_cell(*ci);
+
+      if(dim==2)
+        {
+          cell_viscosity_coarse(coarse_cell)=
+            viscosity_coarsen_2D(cell_viscosity_fine,*edge_viscosity_fine_2D_ptr,
+                                 coarse_cell*2+ip+jp);
+        }
+      else
+        {
+          cell_viscosity_coarse(coarse_cell)=
+            viscosity_coarsen_3D(cell_viscosity_fine,*edge_viscosity_fine_3D_ptr,
+                                 coarse_cell*2);
+        }
+    }
 }
 
 #endif
