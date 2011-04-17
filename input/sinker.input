@@ -34,13 +34,13 @@ FACStokes {
     enable_logging = TRUE   // Bool flag to switch logging on/off
     max_cycles = 100         // Max number of FAC cycles to use
     residual_tol = 1e-5     // Residual tolerance to solve for
-    num_pre_sweeps = 10      // Number of presmoothing sweeps to use
-    num_post_sweeps = 10     // Number of postsmoothing sweeps to use
+    num_pre_sweeps = 0      // Number of presmoothing sweeps to use
+    num_post_sweeps = 0     // Number of postsmoothing sweeps to use
     smoothing_choice = "Tackley"
     coarse_solver_choice = "Tackley"
     // smoothing_choice = "Gerya"
     // coarse_solver_choice = "Gerya"
-    coarse_solver_max_iterations = 25
+    coarse_solver_max_iterations = 250
     coarse_solver_tolerance = 1e-8
     // p_prolongation_method = "P_MDPI_REFINE"
     p_prolongation_method = "P_REFINE"

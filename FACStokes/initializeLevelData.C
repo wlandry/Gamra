@@ -57,8 +57,11 @@ void SAMRAI::FACStokes::initializeLevelData
   }
 
   // const double inclusion_radius=0.5;
-  const double inclusion_viscosity=1e2;
+  const double inclusion_viscosity=1;
   const double background_viscosity=1;
+
+  const double background_density(1), block_density(1);
+  // const double background_density(1), block_density(1.03);
 
   static double viscosity[129][129];
   static int max_x(0), max_y(0);
@@ -269,18 +272,18 @@ void SAMRAI::FACStokes::initializeLevelData
         if(d_dim.getValue()==2)
           {
             if(x<1.0/3 || x>2.0/3 || y<1.0/3 || y>2.0/3)
-              (*v_rhs_data)(s)=1;
+              (*v_rhs_data)(s)=background_density;
             else
-              (*v_rhs_data)(s)=1.03;
+              (*v_rhs_data)(s)=block_density;
           }
         else
           {
             double z=geom->getXLower()[2]
               + geom->getDx()[2]*(s[2]-pbox.lower()[2]);
             if(x<1.0/3 || x>2.0/3 || y<1.0/3 || y>2.0/3 || z<1.0/3 || z>2.0/3)
-              (*v_rhs_data)(s)=1;
+              (*v_rhs_data)(s)=background_density;
             else
-              (*v_rhs_data)(s)=1.03;
+              (*v_rhs_data)(s)=block_density;
           }
             
         // (*v_rhs_data)(s)=10;
