@@ -80,7 +80,7 @@ void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
    ip[0]=1;
    jp[1]=1;
    if(dim>2)
-     kp[2]=2;
+     kp[2]=1;
    hier::Index pp[]={ip,jp,kp};
 
    for(pdat::CellIterator ci(fine_box); ci; ci++)
