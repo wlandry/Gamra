@@ -169,20 +169,11 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
             {
               pdat::CellIndex center(*ci);
 
-              // tbox::plog << "smooth "
-              //            << sweep << " "
-              //            << center[0] << " "
-              //            << center[1] << " "
-              //            << center[2] << " ";
-
               double delta_R_continuity=p_rhs(center);
               for(int ix=0;ix<3;++ix)
                 {
                   const pdat::SideIndex x(center,ix,pdat::SideIndex::Lower);
                   delta_R_continuity-=(v(x+pp[ix]) - v(x))/Dx[ix];;
-
-                  // tbox::plog << v(x) << " "
-                  //            << v_rhs(x) << " ";
                 }
 
               /* No scaling here, though there should be. */
@@ -191,11 +182,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
               dp(center)=delta_R_continuity*theta_continuity
                 /dRc_dp_3D(pbox,center,cell_viscosity,edge_viscosity,v,Dx,pp);
               p(center)+=dp(center);
-              // tbox::plog << p(center) << " "
-              //            << dp(center) << " "
-              //            << p_rhs(center) << " "
-              //            // << maxres << " "
-              //            << "\n";
             }
         }
 
