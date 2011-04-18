@@ -140,7 +140,7 @@ namespace SAMRAI {
                                                   operator */);
 
     d_adaptation_threshold=database->getDoubleWithDefault("adaption_threshold",
-                                                          0.00001);
+                                                          1.0e-15);
                                                           // 1e1);
 
     /*
