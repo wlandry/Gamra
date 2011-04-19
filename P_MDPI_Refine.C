@@ -99,7 +99,7 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
    gbox_interior.grow(hier::Index::getOneIndex(dim)*(-1));
 
    hier::Box cell_box(hier::Index::getZeroIndex(dim),
-                      hier::Index::getOneIndex(dim)*2);
+                      hier::Index::getOneIndex(dim));
 
    for(pdat::CellIterator ci(fine_box); ci; ci++)
      {
@@ -115,16 +115,16 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
            for(pdat::CellIterator ii(cell_box); ii; ii++)
                {
                  pdat::CellIndex c_fine(center*2);
-                 c_fine+=ii;
+                 c_fine+=(*ii);
                
                  double dRc_dp_weight;
                  if(dim.getValue()==2)
                    {
                      pdat::SideIndex x(c_fine,0,pdat::SideIndex::Lower),
                        y(c_fine,1,pdat::SideIndex::Lower);
-                     dRc_dp_weight=dRc_dp_2D(fine_box,c_fine,x,y,
-                                             cell_viscosity,
-                                             *edge_viscosity2D_ptr,v,Dx[0],Dx[1]);
+                     dRc_dp_weight=dRc_dp_2D(fine_box,c_fine,x,y,cell_viscosity,
+                                             *edge_viscosity2D_ptr,
+                                             v,Dx[0],Dx[1]);
                    }
                  else
                    {
@@ -133,13 +133,14 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
                      dRc_dp_weight=dRc_dp_3D(fine_box,c_fine,cell_viscosity,
                                              *edge_viscosity3D_ptr,v,Dx,pp);
                    }
-
                  if(c_fine==fine)
                    dRc_dp_fine=dRc_dp_weight;
+
                  dRc_dp_total+=dRc_dp_weight;
                }
 
-           p_fine(fine)=p(center)*dRc_dp_total/(4*(dim.getValue()-1)*dRc_dp_fine);
+           p_fine(fine)=
+             p(center)*dRc_dp_total/(4*(dim.getValue()-1)*dRc_dp_fine);
          }
        else
          {
