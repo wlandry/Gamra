@@ -42,6 +42,7 @@ void SAMRAI::geom::Edge_Viscosity_Coarsen::coarsen(hier::Patch& coarse,
   tbox::Pointer<pdat::CellData<double> >
     cell_viscosity_fine_ptr = fine.getPatchData(cell_viscosity_id);
   pdat::CellData<double> &cell_viscosity_fine(*cell_viscosity_fine_ptr);
+  TBOX_ASSERT(!cell_viscosity_fine_ptr.isNull());
 
   tbox::Pointer<pdat::NodeData<double> > edge_viscosity_fine_2D_ptr;
   tbox::Pointer<pdat::EdgeData<double> > edge_viscosity_fine_3D_ptr;
