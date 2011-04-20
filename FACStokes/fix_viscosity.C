@@ -131,10 +131,8 @@ void SAMRAI::FACStokes::fix_viscosity()
               cell_viscosity(c-jp);
               cell_viscosity(c-ip-jp);
               edge_viscosity(e)=
-                1/(1/cell_viscosity(c)
-                   + 1/cell_viscosity(c-ip)
-                   + 1/cell_viscosity(c-jp)
-                   + 1/cell_viscosity(c-ip-jp));
+                pow(cell_viscosity(c)*cell_viscosity(c-ip)
+                    *cell_viscosity(c-jp)*cell_viscosity(c-ip-jp),0.25);
             }
         }
       else
@@ -149,14 +147,14 @@ void SAMRAI::FACStokes::fix_viscosity()
                   pdat::EdgeIndex e=ni();
                   pdat::CellIndex c(e);
                   edge_viscosity(e)=
-                    1/(1/cell_viscosity(c)
-                       + 1/cell_viscosity(c-ip)
-                       + 1/cell_viscosity(c-jp)
-                       + 1/cell_viscosity(c-ip-jp)
-                       + 1/cell_viscosity(c-kp)
-                       + 1/cell_viscosity(c-ip-kp)
-                       + 1/cell_viscosity(c-jp-kp)
-                       + 1/cell_viscosity(c-ip-jp-kp));
+                    pow(cell_viscosity(c)
+                        *cell_viscosity(c-ip)
+                        *cell_viscosity(c-jp)
+                        *cell_viscosity(c-ip-jp)
+                        *cell_viscosity(c-kp)
+                        *cell_viscosity(c-ip-kp)
+                        *cell_viscosity(c-jp-kp)
+                        *cell_viscosity(c-ip-jp-kp),0.125);
                 }
             }
         }
