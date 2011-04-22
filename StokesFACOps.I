@@ -51,19 +51,6 @@ void StokesFACOps::setUseSMG(
 
 /*
  ********************************************************************
- * Set the object specifying the parameters of the Stokes equation *
- ********************************************************************
- */
-
-SAMRAI_INLINE_KEYWORD
-void StokesFACOps::setStokesSpecifications(
-   const StokesSpecifications& spec)
-{
-   d_stokes_spec = spec;
-}
-
-/*
- ********************************************************************
  ********************************************************************
  */
 

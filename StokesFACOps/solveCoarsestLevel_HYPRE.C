@@ -68,7 +68,6 @@ namespace SAMRAI {
 
 #else
 
-      checkInputPatchDataIndices();
       d_hypre_solver.setStoppingCriteria(d_coarse_solver_max_iterations,
                                          d_coarse_solver_tolerance);
       const int solver_ret =

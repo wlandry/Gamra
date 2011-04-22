@@ -53,7 +53,6 @@ void SAMRAI::solv::StokesFACOps::smoothError
 {
   t_smooth_error->start();
 
-  checkInputPatchDataIndices();
   if (d_smoothing_choice == "Gerya") {
     smooth_Gerya(data,residual,ln,num_sweeps,
                  d_residual_tolerance_during_smoothing);

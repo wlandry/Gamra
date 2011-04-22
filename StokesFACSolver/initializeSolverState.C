@@ -95,14 +95,7 @@ void SAMRAI::solv::StokesFACSolver::initializeSolverState
     d_simple_bc.setHierarchy(d_hierarchy,
                              d_ln_min,
                              d_ln_max);
-    if (d_stokes_spec.dIsConstant()) {
-      d_simple_bc.setDiffusionCoefConstant(d_stokes_spec.getDConstant());
-    } else {
-      d_simple_bc.setDiffusionCoefId(d_stokes_spec.getDPatchDataId());
-    }
   }
-
-  d_fac_ops.setStokesSpecifications(d_stokes_spec);
 
   d_fac_ops.set_viscosity_dp_id(cell_viscosity,edge_viscosity,dp);
 

@@ -720,8 +720,7 @@ void StokesHypreSolver::copyFromHypre(
  *************************************************************************
  */
 
-void StokesHypreSolver::setMatrixCoefficients(
-   const StokesSpecifications& spec)
+void StokesHypreSolver::setMatrixCoefficients()
 {
    if (d_physical_bc_coef_strategy == NULL) {
       TBOX_ERROR(
@@ -778,27 +777,6 @@ void StokesHypreSolver::setMatrixCoefficients(
       const hier::Index patch_lo = patch_box.lower();
       const hier::Index patch_up = patch_box.upper();
 
-      if (!spec.cIsZero() && !spec.cIsConstant()) {
-         C_data = patch.getPatchData(spec.getCPatchDataId());
-         if (C_data.isNull()) {
-            TBOX_ERROR(d_object_name << ": Invalid cell variable index "
-                                     << spec.getCPatchDataId()
-                                     << " for the C parameter.  It is not\n"
-                                     << "cell-centered double data.");
-         }
-      }
-
-      if (!spec.dIsConstant()) {
-         D_data = patch.getPatchData(spec.getDPatchDataId());
-         if (D_data.isNull()) {
-            TBOX_ERROR(d_object_name << ": Invalid cell variable index "
-                                     << spec.getDPatchDataId()
-                                     <<
-               " for diffusion coefficient.  It is not\n"
-                                     << "side-centered double data.");
-         }
-      }
-
       Ak0 = patch.getPatchData(d_Ak0_id);
 
       Ak0->fillAll(0.0);
@@ -829,41 +807,22 @@ void StokesHypreSolver::setMatrixCoefficients(
        * These off-diagonal entries are simply D/(h*h), according
        * to our central difference formula.
        */
-      if (spec.dIsConstant()) {
-         for (i = 0; i < d_dim.getValue(); ++i) {
-            double dhh = spec.getDConstant() / (h[i] * h[i]);
-            pdat::ArrayData<double>& off_diag_array(off_diagonal.getArrayData(i));
-            off_diag_array.fill(dhh);
-         }
-      } else {
-         for (i = 0; i < d_dim.getValue(); ++i) {
-            hier::Box sbox(patch_box);
-            sbox.growUpper(i, 1);
-            array_math.scale(off_diagonal.getArrayData(i),
-               1.0 / (h[i] * h[i]),
-               D_data->getArrayData(i),
-               sbox);
-         }
+      for (i = 0; i < d_dim.getValue(); ++i) {
+        hier::Box sbox(patch_box);
+        sbox.growUpper(i, 1);
+        array_math.scale(off_diagonal.getArrayData(i),
+                         1.0 / (h[i] * h[i]),
+                         D_data->getArrayData(i),
+                         sbox);
       }
 
       /*
        * Compute diagonal entries using off-diagonal contributions.
        */
-      if (spec.cIsZero()) {
-         computeDiagonalEntries(diagonal,
-            off_diagonal,
-            patch_box);
-      } else if (spec.cIsConstant()) {
-         computeDiagonalEntries(diagonal,
-            spec.getCConstant(),
-            off_diagonal,
-            patch_box);
-      } else {
-         computeDiagonalEntries(diagonal,
-            *C_data,
-            off_diagonal,
-            patch_box);
-      }
+      computeDiagonalEntries(diagonal,
+                             *C_data,
+                             off_diagonal,
+                             patch_box);
 
       /*
        * Walk physical domain boundaries and adjust off-diagonals

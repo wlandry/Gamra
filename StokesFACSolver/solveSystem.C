@@ -99,7 +99,6 @@ bool SAMRAI::solv::StokesFACSolver::solveSystem
   if (d_enable_logging) {
     tbox::plog << "StokesFACSolver::solveSystem (" << d_object_name
                << ")\n";
-    d_stokes_spec.printClassData(tbox::plog);
   }
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (d_solver_is_initialized) {

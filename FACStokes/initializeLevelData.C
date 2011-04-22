@@ -8,18 +8,7 @@
  *
  ************************************************************************/
 #include "FACStokes.h"
-
-#include "SAMRAI/hier/IntVector.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
-#include "SAMRAI/geom/CartesianPatchGeometry.h"
-#include "SAMRAI/solv/SimpleCellRobinBcCoefs.h"
-#include "SAMRAI/pdat/CellData.h"
-#include "SAMRAI/math/HierarchyCellDataOpsReal.h"
-#include "SAMRAI/pdat/SideData.h"
-#include "StokesSpecifications.h"
-#include "SAMRAI/tbox/Utilities.h"
-#include "SAMRAI/hier/Variable.h"
-#include "SAMRAI/hier/VariableDatabase.h"
 
 /*
 *************************************************************************
@@ -57,7 +46,7 @@ void SAMRAI::FACStokes::initializeLevelData
   }
 
   // const double inclusion_radius=0.5;
-  const double inclusion_viscosity=1;
+  const double inclusion_viscosity=1e2;
   const double background_viscosity=1;
 
   const double background_density(1), block_density(1);

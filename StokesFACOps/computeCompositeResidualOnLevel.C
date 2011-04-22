@@ -9,7 +9,6 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
 
   t_compute_composite_residual->start();
 
-  checkInputPatchDataIndices();
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (residual.getPatchHierarchy() != d_hierarchy
       || solution.getPatchHierarchy() != d_hierarchy

@@ -16,7 +16,6 @@
 #include "SAMRAI/solv/FACOperatorStrategy.h"
 #include "StokesHypreSolver.h"
 #include "SAMRAI/solv/SAMRAIVectorReal.h"
-#include "StokesSpecifications.h"
 #include "SAMRAI/math/HierarchyCellDataOpsReal.h"
 #include "SAMRAI/math/HierarchySideDataOpsReal.h"
 #include "SAMRAI/pdat/CellData.h"
@@ -139,13 +138,6 @@ public:
     * Deallocate internal data.
     */
    ~StokesFACOps(void) {}
-
-   /*!
-    * @brief Set the scalar Stokes equation specifications.
-    */
-   void
-   setStokesSpecifications(
-      const StokesSpecifications& spec);
 
    /*!
     * @brief Enable logging.
@@ -330,25 +322,6 @@ public:
    // setPhysicalBcCoefObject(
    //    const RobinBcCoefStrategy* physical_bc_coef);
 
-   //@{
-
-   /*!
-    * @name Functions for checking validity and correctness of state.
-    */
-
-   /*!
-    * @brief Check validity and correctness of input patch data indices.
-    *
-    * Descriptors checked:
-    * -# Diffusion coefficient (see setDiffcoefId())
-    * -# Flux (see setFluxId())
-    * -# Source (see setScalarFieldId())
-    */
-   void
-   checkInputPatchDataIndices() const;
-
-   //@}
-
    /*!
     * @brief Set weight appropriate for computing vector norms.
     *
@@ -391,43 +364,6 @@ public:
    void
    setPreconditioner(
       const FACPreconditioner* preconditioner);
-
-   /*!
-    * @brief function to compute flux, using general diffusion
-    * coefficient data.
-    *
-    * Recall that this solver class discretizes the PDE
-    * @f[ \nabla \cdot D \nabla u + C u = f @f] on an AMR grid.  This member
-    * function allows users of this solver class to compute gradient
-    * terms, @f[ D \nabla w @f], in their code in a manner consistent with the
-    * solver discretization.   In particular, when solving PDE systems, it may
-    * be necessary to discretize the gradient operator appearing in equations
-    * not treated by the solver class in the same way as those treated by this
-    * class.  These funtions allow users to do this easily.  The divergence
-    * operator used in this solver is the standard sum of centered differences
-    * involving flux terms on the cell sides computed by these routines.
-    *
-    * Note that the patch must exist on a level in an AMR hierarchy so that
-    * the discretization can be computed properly at the coarse-fine interface.
-    * Stokes coefficients C and D must exist on the patch, if they are variable.
-    * Also, calling this function does not affect the internal solver state in any
-    * way.  However, the solver must be fully initialized before it is called and care
-    * should be exercised to pass arguments so that the solver solution quantity and
-    * other internal solver quantities are not adversely affected.
-    *
-    * @param patch patch on which computation will take place
-    * @param ratio_to_coarser_level refinement ratio from coarser level to level
-    *                               on which patch lives; if current patch level
-    *                               is level zero, this is ignored
-    * @param w_data cell-centered data
-    * @param Dgradw_data side-centered flux data (i.e., D (grad w))
-    */
-   void
-   computeFluxOnPatch(
-      const hier::Patch& patch,
-      const hier::IntVector& ratio_to_coarser_level,
-      const pdat::CellData<double>& w_data,
-      pdat::SideData<double>& Dgradw_data) const;
 
    //@{ @name FACOperatorStrategy virtuals
 
@@ -690,33 +626,6 @@ private:
       int ln);
 
    /*!
-    * @brief Fix flux per Ewing's coarse-fine boundary treatment.
-    *
-    * Ewing's coarse-fine boundary treatment can be implemented
-    * using a constant refinement into the fine-grid ghost boundary,
-    * naively computing the flux using the constant-refined data then
-    * fixing up the flux to correct the error.
-    *
-    * To use this function
-    * -# you must use constant refinement to fill the fine level ghost cells
-    * -# the flux must first be computed and stored
-    *
-    * @param patch patch
-    * @param soln_data cell-centered solution data
-    * @param flux_data side-centered flux data
-    * @param diffcoef_data side-centered diffusion coefficient data
-    * @param cfb coarse-fine boundary object for the level
-    *        in which patch resides
-    * @param ratio_to_coarser Refinement ratio to the next coarser level.
-    */
-   void
-   ewingFixFlux(
-      const hier::Patch& patch,
-      const pdat::CellData<double>& soln_data,
-      pdat::SideData<double>& flux_data,
-      const hier::IntVector& ratio_to_coarser) const;
-
-   /*!
     * @brief AMR-unaware function to red or black smoothing on a single patch,
     * for variable diffusion coefficient and variable scalar field.
     *
@@ -938,12 +847,6 @@ private:
    /*!
     * @name Private state variables for solution process.
     */
-
-   /*!
-    * @brief Scalar Stokes equations specifications.
-    * @see setStokesSpecifications().
-    */
-   StokesSpecifications d_stokes_spec;
 
    /*!
     * @brief Smoothing choice.

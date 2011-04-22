@@ -14,7 +14,6 @@
 
 #include "SAMRAI/solv/FACPreconditioner.h"
 #include "StokesFACOps.h"
-#include "StokesSpecifications.h"
 #include "SAMRAI/solv/SimpleCellRobinBcCoefs.h"
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/tbox/Pointer.h"
@@ -615,11 +614,6 @@ private:
     * @brief Object name.
     */
    std::string d_object_name;
-
-   /*!
-    * @brief Object holding the specifications of the Stokes equation.
-    */
-   StokesSpecifications d_stokes_spec;
 
    /*!
     * @brief FAC operator implementation corresponding to cell-centered

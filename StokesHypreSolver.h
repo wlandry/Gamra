@@ -30,7 +30,6 @@
 
 #include "SAMRAI/solv/GhostCellRobinBcCoefs.h"
 #include "SAMRAI/solv/RobinBcCoefStrategy.h"
-#include "StokesSpecifications.h"
 #include "SAMRAI/solv/SimpleCellRobinBcCoefs.h"
 #include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/pdat/SideData.h"
@@ -144,8 +143,7 @@ public:
     * This method must be called before solveSystem().
     */
    void
-   setMatrixCoefficients(
-      const StokesSpecifications& spec);
+   setMatrixCoefficients();
 
    /*!
     * @brief Set default depth of the solution data involved in the solve.

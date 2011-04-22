@@ -54,8 +54,6 @@ int SAMRAI::solv::StokesFACOps::solveCoarsestLevel
 {
   t_solve_coarsest->start();
 
-  checkInputPatchDataIndices();
-
   int return_value = 0;
 
   if (d_coarse_solver_choice == "Tackley"

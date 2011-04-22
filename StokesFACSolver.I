@@ -11,38 +11,6 @@ namespace SAMRAI {
 namespace solv {
 
 SAMRAI_INLINE_KEYWORD
-void StokesFACSolver::setDPatchDataId(
-   int id) {
-   d_stokes_spec.setDPatchDataId(id);
-}
-
-SAMRAI_INLINE_KEYWORD
-void StokesFACSolver::setDConstant(
-   double scalar) {
-   d_stokes_spec.setDConstant(scalar);
-}
-
-SAMRAI_INLINE_KEYWORD
-void StokesFACSolver::setCPatchDataId(
-   int id) {
-   d_stokes_spec.setCPatchDataId(id);
-}
-
-SAMRAI_INLINE_KEYWORD
-void StokesFACSolver::setCConstant(
-   double scalar) {
-// Disable Intel warning on real comparison
-#ifdef __INTEL_COMPILER
-#pragma warning (disable:1572)
-#endif
-   if (scalar == 0.0) {
-      d_stokes_spec.setCZero();
-   } else {
-      d_stokes_spec.setCConstant(scalar);
-   }
-}
-
-SAMRAI_INLINE_KEYWORD
 void StokesFACSolver::set_P_ProlongationMethod(
    const std::string& p_prolongation_method)
 {

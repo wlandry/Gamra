@@ -20,8 +20,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
     v_id(solution.getComponentDescriptorIndex(1)),
     v_rhs_id(residual.getComponentDescriptorIndex(1));
 
-  checkInputPatchDataIndices();
-
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (solution.getPatchHierarchy() != d_hierarchy
       || residual.getPatchHierarchy() != d_hierarchy)

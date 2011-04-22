@@ -16,7 +16,6 @@
 #include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/math/HierarchyCellDataOpsReal.h"
 #include "SAMRAI/pdat/SideData.h"
-#include "StokesSpecifications.h"
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/hier/Variable.h"
 #include "SAMRAI/hier/VariableDatabase.h"

@@ -59,7 +59,6 @@ namespace SAMRAI {
                                      tbox::Pointer<tbox::Database> database):
       d_dim(dim),
       d_object_name(object_name),
-      d_stokes_spec(object_name + "::stokes_spec"),
       d_fac_ops(d_dim, object_name + "::fac_ops",database),
       d_fac_precond(object_name + "::fac_precond", d_fac_ops),
       d_bc_object(NULL),

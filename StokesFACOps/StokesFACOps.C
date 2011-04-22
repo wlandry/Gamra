@@ -75,7 +75,6 @@ namespace SAMRAI {
       d_ln_min(-1),
       d_ln_max(-1),
       d_cf_boundary(),
-      d_stokes_spec(object_name + "::Stokes specs"),
       d_smoothing_choice("Tackley"),
       d_coarse_solver_choice(
 #ifdef HAVE_HYPRE
@@ -215,12 +214,6 @@ namespace SAMRAI {
                                        d_enable_logging);
 
       }
-
-      /*
-       * Check input validity and correctness.
-       */
-      checkInputPatchDataIndices();
-
     }
 
   }
