@@ -1059,62 +1059,44 @@ private:
 
    //! @brief Error prolongation (refinement) operator.
    tbox::Pointer<xfer::RefineOperator> p_prolongation_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> p_prolongation_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
    p_prolongation_refine_schedules;
 
    tbox::Pointer<xfer::RefineOperator> v_prolongation_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> v_prolongation_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
    v_prolongation_refine_schedules;
 
    //! @brief Solution restriction (coarsening) operator.
    tbox::Pointer<xfer::CoarsenOperator> p_urestriction_coarsen_operator;
-   tbox::Pointer<xfer::CoarsenAlgorithm> p_urestriction_coarsen_algorithm;
    tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
    p_urestriction_coarsen_schedules;
 
    tbox::Pointer<xfer::CoarsenOperator> v_urestriction_coarsen_operator;
-   tbox::Pointer<xfer::CoarsenAlgorithm> v_urestriction_coarsen_algorithm;
    tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
    v_urestriction_coarsen_schedules;
 
    //! @brief Residual restriction (coarsening) operator.
    tbox::Pointer<xfer::CoarsenOperator> p_rrestriction_coarsen_operator;
-   tbox::Pointer<xfer::CoarsenAlgorithm> p_rrestriction_coarsen_algorithm;
    tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
    p_rrestriction_coarsen_schedules;
 
    tbox::Pointer<xfer::CoarsenOperator> v_rrestriction_coarsen_operator;
-   tbox::Pointer<xfer::CoarsenAlgorithm> v_rrestriction_coarsen_algorithm;
    tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
    v_rrestriction_coarsen_schedules;
 
-   //! @brief Coarsen operator for outerflux-to-flux
-   tbox::Pointer<xfer::CoarsenOperator> d_flux_coarsen_operator;
-   tbox::Pointer<xfer::CoarsenAlgorithm> d_flux_coarsen_algorithm;
-   tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
-   d_flux_coarsen_schedules;
-
    //! @brief Refine operator for data from coarser level.
    tbox::Pointer<xfer::RefineOperator> p_ghostfill_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> p_ghostfill_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
    p_ghostfill_refine_schedules;
 
    tbox::Pointer<xfer::RefineOperator> v_ghostfill_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> v_ghostfill_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
    v_ghostfill_refine_schedules;
 
    //! @brief Refine operator for data from same level.
-   tbox::Pointer<xfer::RefineOperator> p_nocoarse_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> p_nocoarse_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
    p_nocoarse_refine_schedules;
 
-   tbox::Pointer<xfer::RefineOperator> v_nocoarse_refine_operator;
-   tbox::Pointer<xfer::RefineAlgorithm> v_nocoarse_refine_algorithm;
    tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
    v_nocoarse_refine_schedules;
 

@@ -9,37 +9,6 @@
  ************************************************************************/
 #include "StokesFACOps.h"
 
-#include IOMANIP_HEADER_FILE
-
-#include "SAMRAI/hier/BoundaryBoxUtils.h"
-#include "SAMRAI/geom/CartesianGridGeometry.h"
-#include "SAMRAI/geom/CartesianPatchGeometry.h"
-#include "SAMRAI/hier/Index.h"
-#include "SAMRAI/hier/Variable.h"
-#include "SAMRAI/hier/VariableDatabase.h"
-#include "SAMRAI/pdat/CellDoubleConstantRefine.h"
-#include "SAMRAI/pdat/CellVariable.h"
-#include "SAMRAI/pdat/OutersideData.h"
-#include "SAMRAI/pdat/OutersideVariable.h"
-#include "SAMRAI/hier/PatchData.h"
-#include "SAMRAI/pdat/SideVariable.h"
-#include "SAMRAI/solv/FACPreconditioner.h"
-#include "StokesHypreSolver.h"
-#include "SAMRAI/tbox/Array.h"
-#include "SAMRAI/tbox/MathUtilities.h"
-#include "SAMRAI/tbox/StartupShutdownManager.h"
-#include "SAMRAI/tbox/Timer.h"
-#include "SAMRAI/tbox/TimerManager.h"
-#include "SAMRAI/tbox/Utilities.h"
-#include "SAMRAI/tbox/MathUtilities.h"
-#include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
-#include "SAMRAI/xfer/CoarsenSchedule.h"
-#include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
-#include "SAMRAI/xfer/RefineSchedule.h"
-#include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
-
 void SAMRAI::solv::StokesFACOps::xeqScheduleRRestriction(int p_dst, int p_src,
                                                          int v_dst, int v_src,
                                                          int dest_ln)
@@ -51,13 +20,9 @@ void SAMRAI::solv::StokesFACOps::xeqScheduleRRestriction(int p_dst, int p_src,
     }
 
     xfer::CoarsenAlgorithm coarsener(d_dim);
-    coarsener.registerCoarsen(p_dst,
-                              p_src,
-                              p_rrestriction_coarsen_operator);
+    coarsener.registerCoarsen(p_dst,p_src,p_rrestriction_coarsen_operator);
     coarsener.resetSchedule(p_rrestriction_coarsen_schedules[dest_ln]);
     p_rrestriction_coarsen_schedules[dest_ln]->coarsenData();
-    p_rrestriction_coarsen_algorithm->
-      resetSchedule(p_rrestriction_coarsen_schedules[dest_ln]);
   }
 
   /* v */
@@ -67,12 +32,8 @@ void SAMRAI::solv::StokesFACOps::xeqScheduleRRestriction(int p_dst, int p_src,
     }
 
     xfer::CoarsenAlgorithm coarsener(d_dim);
-    coarsener.registerCoarsen(v_dst,
-                              v_src,
-                              v_rrestriction_coarsen_operator);
+    coarsener.registerCoarsen(v_dst,v_src,v_rrestriction_coarsen_operator);
     coarsener.resetSchedule(v_rrestriction_coarsen_schedules[dest_ln]);
     v_rrestriction_coarsen_schedules[dest_ln]->coarsenData();
-    v_rrestriction_coarsen_algorithm->
-      resetSchedule(v_rrestriction_coarsen_schedules[dest_ln]);
   }
 }
