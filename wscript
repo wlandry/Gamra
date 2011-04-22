@@ -57,7 +57,6 @@ def build(bld):
                         'StokesFACOps/solveCoarsestLevel_HYPRE.C',
                         'StokesFACOps/smooth_V_2D.C',
                         'StokesFACOps/smooth_V_3D.C',
-                        'StokesFACOps/xeqScheduleFluxCoarsen.C',
                         'StokesFACOps/xeqScheduleGhostFill.C',
                         'StokesFACOps/xeqScheduleGhostFillNoCoarse.C',
                         'StokesFACOps/xeqScheduleProlongation.C',
