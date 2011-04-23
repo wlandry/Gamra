@@ -11,13 +11,13 @@ void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
   const pdat::CellOverlap* t_overlap =
     dynamic_cast<const pdat::CellOverlap *>(&overlap);
   const hier::BoxList& boxes = t_overlap->getDestinationBoxList();
+  const tbox::Dimension& dimension(getDim());
+  const int dim(dimension.getValue());
+
   for (hier::BoxList::Iterator b(boxes); b; b++)
     {
       hier::Box &overlap_box=b();
-
-      const tbox::Dimension& dimension(getDim());
-      TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);
-      const int dim(dimension.getValue());
+      TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension,fine,coarse,overlap_box,ratio);
 
       tbox::Pointer<pdat::CellData<double> >
         p = coarse.getPatchData(src_component);
@@ -30,10 +30,8 @@ void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
       TBOX_ASSERT(p->getDepth() == 1);
 #endif
 
-      hier::Box coarse_box=coarse.getBox();
       hier::Box fine_box=fine.getBox();
       hier::Box gbox=p_fine->getGhostBox();
-      hier::Box coarse_gbox=p->getGhostBox();
 
       /* We have to infer where the boundary is from the boxes */
       int boundary_direction;
@@ -60,7 +58,6 @@ void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
           p_min[d]=std::max(overlap_box.lower(d),gbox.lower(d));
           p_max[d]=std::min(overlap_box.upper(d),gbox.upper(d));
         }
-      hier::Box box(p_min,p_max);
 
       hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
       ip[0]=1;
