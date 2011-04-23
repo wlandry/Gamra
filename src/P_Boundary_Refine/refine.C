@@ -1,23 +1,4 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Linear refine operator for cell-centered double data on
- *                a Cartesian mesh. 
- *
- ************************************************************************/
-
 #include "P_Boundary_Refine.h"
-
-#include <float.h>
-#include <math.h>
-#include "SAMRAI/geom/CartesianPatchGeometry.h"
-#include "SAMRAI/hier/Index.h"
-#include "SAMRAI/pdat/CellData.h"
-#include "SAMRAI/pdat/CellIndex.h"
-#include "SAMRAI/tbox/Utilities.h"
 
 void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
                                              const hier::Patch& coarse,
@@ -89,22 +70,27 @@ void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
 
       if(dim==2)
         {
-          for(int j=p_min[1]; j<=p_max[1]; ++j)
-            for(int i=p_min[0]; i<=p_max[0]; ++i)
+          /* This odd stride is because we handle all of the fine
+           * boundary cells in a coarse cell at once.  However,
+           * sometimes there is only one fine cell in a coarse cell,
+           * so the starting point does not align with the coarse
+           * cell.  The stride ensures that, if we start not aligned,
+           * the next step will be aligned. */
+
+          for(int j=p_min[1]; j<=p_max[1]; j=(j/2)*2+2)
+            for(int i=p_min[0]; i<=p_max[0]; i=(i/2)*2+2)
               {
                 pdat::CellIndex fine(hier::Index(i,j));
         
                 switch(boundary_direction)
                   {
                   case 0:
-                    if(j<p_max[1])
-                      Update_P_2D(fine,boundary_positive ? ip : -ip,jp,j,
-                                  p,p_fine);
+                    Update_P_2D(fine,boundary_positive ? ip : -ip,jp,j,p_max[1],
+                                *p,*p_fine);
                     break;
                   case 1:
-                    if(i<p_max[0])
-                      Update_P_2D(fine,boundary_positive ? jp : -jp,ip,i,
-                                  p,p_fine);
+                    Update_P_2D(fine,boundary_positive ? jp : -jp,ip,i,p_max[0],
+                                *p,*p_fine);
                     break;
                   }
               }
@@ -119,21 +105,18 @@ void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
         
                   switch(boundary_direction)
                     {
-                      // case 0:
-                      //   if(j<p_max[1] && k<p_max[2])
-                      //     Update_P_3D(fine,boundary_positive ? ip : -ip,jp,kp,j,
-                      //                 p,p_fine);
-                      //   break;
-                      // case 1:
-                      //   if(i<p_max[0] && k<p_max[2])
-                      //     Update_P_3D(fine,boundary_positive ? jp : -jp,kp,ip,k,
-                      //                 p,p_fine);
-                      //   break;
-                      // case 1:
-                      //   if(i<p_max[0] && j<p_max[1])
-                      //     Update_P_3D(fine,boundary_positive ? kp : -kp,ip,jp,i,
-                      //                 p,p_fine);
-                      //   break;
+                    case 0:
+                      Update_P_3D(fine,boundary_positive ? ip : -ip,jp,kp,
+                                  j,k,p_max[1],p_max[2],*p,*p_fine);
+                      break;
+                    case 1:
+                      Update_P_3D(fine,boundary_positive ? jp : -jp,kp,ip,
+                                  k,i,p_max[2],p_max[0],*p,*p_fine);
+                      break;
+                    case 2:
+                      Update_P_3D(fine,boundary_positive ? kp : -kp,ip,jp,
+                                  i,j,p_max[0],p_max[1],*p,*p_fine);
+                      break;
                     }
                 }
         }

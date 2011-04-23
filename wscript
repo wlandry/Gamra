@@ -26,6 +26,7 @@ def build(bld):
                         'src/V_Coarsen/coarsen_3D.C',
                         'src/P_Boundary_Refine/refine.C',
                         'src/P_Boundary_Refine/Update_P_2D.C',
+                        'src/P_Boundary_Refine/Update_P_3D.C',
                         'src/V_Boundary_Refine/refine.C',
                         'src/V_Boundary_Refine/Update_V.C',
                         'src/V_Coarsen_Patch_Strategy/postprocessCoarsen_2D.C',

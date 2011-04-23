@@ -119,9 +119,17 @@ private:
 
   void Update_P_2D(const pdat::CellIndex &fine,
                    const hier::Index &ip, const hier::Index &jp,
-                   int &j,
-                   tbox::Pointer<SAMRAI::pdat::CellData<double> > &p,
-                   tbox::Pointer<SAMRAI::pdat::CellData<double> > &p_fine)
+                   const int &j, const int &j_max,
+                   SAMRAI::pdat::CellData<double> &p,
+                   SAMRAI::pdat::CellData<double> &p_fine)
+    const;
+
+  void Update_P_3D(const pdat::CellIndex &fine,
+                   const hier::Index &ip, const hier::Index &jp,
+                   const hier::Index &kp,
+                   const int &j, const int &k, const int &j_max, const int &k_max,
+                   SAMRAI::pdat::CellData<double> &p,
+                   SAMRAI::pdat::CellData<double> &p_fine)
     const;
 };
 

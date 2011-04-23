@@ -1,33 +1,37 @@
 #include "P_Boundary_Refine.h"
-#include "quad_offset_interpolate.h"
 
 /* Interpolate the pressure from the coarse (C) to the fine (f+/-)
    coordinates using the intermediate fine points (F+/-, F_).
 
-   i-1      i       i+1
+         i-1      i       i+1
 
-   ------- -------
-   |       |       |
+       ------- -------
+       |       |       |
    j-1 |  C    |   C   |   C
-   |       |       |
-   ------- -------
-   |       |f- F-  |
+       |       |       |
+       ------- -------
+       |       |f- F-  |
    j   |   C   |F_ C   |   C
-   |       |f+ F+  |
-   ------- -------
-   |       |       |
+       |       |f+ F+  |
+       ------- -------
+       |       |       |
    j+1 |   C   |   C   |   C
-   |       |       |
-   ------- -------
+       |       |       |
+       ------- -------
 
-   F+/- = interpolate(C(i,j-1),C(i,j),C(i,j+1))
-   F_   = interpolate(C(i-1,j),C(i,j),C(i+1,j))
+   C= a + b*x + c*x^2 + d*y + e*y^2 + f*x*y
 
-   then
+   C(0,0)=a
+   C(+,0)=a+b+c
+   C(-,0)=a-b+c
+   C(0,+)=a+d+e
+   C(0,-)=a-d+e
+   C(-,-)=a-b+c-d+e+f
 
-   f+/- = F+/- + F_ - C(i,j) 
-   + (C(i-1,j-1) + C(i,j) + C(i-1,j) + C(i,j-1))/16
-
+   f(-,-) = a - b/4 + c/16 - d/4 + e/16 + f/16
+          = C(-,-)/16 + (15/16)*C(0,0)
+            + (3/32)*(-C(+,0) - C(0,+) + C(-,0) + C(0,-))
+   
    This example show a boundary in the positive x direction.  To reverse
    the direction, pass in ip -> -ip.  To do the y direction, switch ip
    and jp, and replace j with i.
@@ -38,63 +42,33 @@
 void SAMRAI::geom::P_Boundary_Refine::Update_P_2D
 (const pdat::CellIndex &fine,
  const hier::Index &ip, const hier::Index &jp,
- int &j,
- tbox::Pointer<SAMRAI::pdat::CellData<double> > &p,
- tbox::Pointer<SAMRAI::pdat::CellData<double> > &p_fine) const
+ const int &j, const int &j_max,
+ SAMRAI::pdat::CellData<double> &p,
+ SAMRAI::pdat::CellData<double> &p_fine) const
 {
-  double p_plus, p_minus, p_offset;
   pdat::CellIndex center(fine);
   center.coarsen(hier::Index(2,2));
 
-  quad_offset_interpolate((*p)(center+jp),(*p)(center),(*p)(center-jp),
-                          p_plus,p_minus);
-  p_offset=
-    quad_offset_interpolate((*p)(center-ip),(*p)(center),(*p)(center+ip));
-
-  const double p_low=p_minus + p_offset - (*p)(center)
-    + ((*p)(center-ip-jp) + (*p)(center)
-       - (*p)(center-ip) - (*p)(center-jp))/16;
-
-  const double p_high=p_plus + p_offset - (*p)(center)
-    + ((*p)(center-ip+jp) + (*p)(center)
-       - (*p)(center-ip) - (*p)(center+jp))/16;
-
-
+    
   /* If we are at an even index, update both of the elements in the cell */
   if(j%2==0)
     {
-      (*p_fine)(fine)=p_low;
-
-      (*p_fine)(fine+jp)=p_high;
-
-      /* Since we update two points on j at once, we increment j again.
-         This is ok, since the box in the 'i' direction is defined to be
-         only one cell wide */
-      ++j;
+      const double p_low=p(center-ip-jp)/16 + (15.0/16)*p(center)
+        + (3.0/32)*(-p(center+ip) - p(center+jp) + p(center-ip) + p(center-jp));
+      p_fine(fine)=p_low;
+      if(j<j_max)
+        {
+          const double p_high=p(center-ip+jp)/16 + (15.0/16)*p(center)
+            + (3.0/32)*(-p(center+ip) - p(center-jp)
+                        + p(center-ip) + p(center+jp));
+          p_fine(fine+jp)=p_high;
+        }
     }
   else
     {
-      (*p_fine)(fine)=p_high;
+      const double p_high=p(center-ip+jp)/16 + (15.0/16)*p(center)
+        + (3.0/32)*(-p(center+ip) - p(center-jp)
+                    + p(center-ip) + p(center+jp));
+      p_fine(fine)=p_high;
     }
-
-  // tbox::plog << "p bc "
-  //            << fine[0] << " "
-  //            << fine[1] << " "
-  //            << center[0] << " "
-  //            << center[1] << " "
-  //            << jp[0] << " "
-  //            << jp[1] << " "
-  //            << (*p_fine)(fine) << " "
-  //            << (*p_fine)(fine+jp) << " "
-  //            << p_minus << " "
-  //            << p_plus << " "
-  //            << p_offset << " "
-  //            << (*p)(center+jp) << " "
-  //            << (*p)(center) << " "
-  //            << (*p)(center-jp) << " "
-  //            << (*p)(center+ip) << " "
-  //            << (*p)(center-ip) << " "
-  //            << (*p)(center-ip+jp) << " "
-  //            << (*p)(center-ip-jp) << " "
-  //            << "\n";
 }
