@@ -30,8 +30,7 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
          to skip these since we are guaranteed to have valid data for
          those "past the end" points since they are needed for
          pressure refinement.  */
-      // if(j==j_max || (j==j_min && j%2!=0))
-      if(j==j_max)
+      if(j==j_max || (j==j_min && j%2!=0))
         return;
       /* Compute the derivative at the nearest three coarse points and
          then interpolate */
