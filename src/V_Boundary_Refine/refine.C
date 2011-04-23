@@ -11,14 +11,6 @@
 
 #include "V_Boundary_Refine.h"
 
-#include <float.h>
-#include <math.h>
-#include "SAMRAI/geom/CartesianPatchGeometry.h"
-#include "SAMRAI/hier/Index.h"
-#include "SAMRAI/pdat/SideData.h"
-#include "SAMRAI/pdat/SideVariable.h"
-#include "SAMRAI/tbox/Utilities.h"
-
 void SAMRAI::geom::V_Boundary_Refine::refine(
    hier::Patch& fine,
    const hier::Patch& coarse,
@@ -50,8 +42,9 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
                                              const hier::IntVector& ratio,
                                              const int &axis) const
 {
-   const tbox::Dimension& dim(getDim());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, fine, coarse, overlap_box, ratio);
+   const tbox::Dimension& dimension(getDim());
+   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);
+   const int dim(dimension.getValue());
 
    tbox::Pointer<pdat::SideData<double> >
    v = coarse.getPatchData(src_component);
@@ -64,109 +57,92 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
    TBOX_ASSERT(v->getDepth() == 1);
 #endif
 
-   hier::Box coarse_box=coarse.getBox();
    hier::Box fine_box=fine.getBox();
 
    /* We have to infer where the boundary is from the boxes */
    int boundary_direction;
    bool boundary_positive(false);
-   if(std::abs(overlap_box.lower(0)-overlap_box.upper(0))==(axis==0 ? 1 : 0))
+
+   for(int d=0;d<dim;++d)
      {
-       boundary_direction=0;
-       if(fine_box.upper(0)<=overlap_box.lower(0))
-         boundary_positive=true;
-       else if(fine_box.lower(0)>=overlap_box.upper(0))
-         boundary_positive=false;
-       else
-         abort();
+       if(std::abs(overlap_box.lower(d)-overlap_box.upper(d))==(axis==d ? 1 : 0))
+         {
+           boundary_direction=d;
+           if(fine_box.upper(d)<=overlap_box.lower(d))
+             boundary_positive=true;
+           else if(fine_box.lower(d)>=overlap_box.upper(d))
+             boundary_positive=false;
+           else
+             abort();
+           break;
+         }
      }
-   else if(std::abs(overlap_box.lower(1)-overlap_box.upper(1))==
-           (axis==1 ? 1 : 0))
+
+   hier::Index p_min(overlap_box.lower()), p_max(overlap_box.upper());
+
+   if(boundary_direction==axis)
      {
-       boundary_direction=1;
-       if(fine_box.upper(1)<=overlap_box.lower(1))
-         boundary_positive=true;
-       else if(fine_box.lower(1)>=overlap_box.upper(1))
-         boundary_positive=false;
+       if(boundary_positive)
+         {
+           p_min[axis]=p_max[axis];
+         }
        else
-         abort();
+         {
+           p_max[axis]=p_min[axis];
+         }
+     }
+
+   hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+   ip[0]=1;
+   jp[1]=1;
+   if(dim>2)
+     kp[2]=1;
+   // hier::Index pp[]={ip,jp,kp};
+
+   if(dim==2)
+     {
+       for(int j=p_min[1]; j<=p_max[1]; ++j)
+         for(int i=p_min[0]; i<=p_max[0]; ++i)
+           {
+             pdat::SideIndex fine(hier::Index(i,j),axis,pdat::SideIndex::Lower);
+             switch(axis)
+               {
+               case 0:
+                 Update_V_2D(axis,boundary_direction,boundary_positive,fine,
+                             ip,jp,i,j,p_max[0],p_min[1],p_max[1],v,v_fine);
+                 break;
+               case 1:
+                 Update_V_2D(axis,boundary_direction,boundary_positive,fine,
+                             jp,ip,j,i,p_max[1],p_min[0],p_max[0],v,v_fine);
+                 break;
+               default:
+                 abort();
+                 break;
+               }
+         }
      }
    else
      {
-       abort();
+       for(int k=p_min[2]; k<=p_max[2]; k=(k/2)*2+2)
+         for(int j=p_min[1]; j<=p_max[1]; j=(j/2)*2+2)
+           for(int i=p_min[0]; i<=p_max[0]; i=(i/2)*2+2)
+             {
+               pdat::SideIndex fine(hier::Index(i,j,k),axis,
+                                    pdat::SideIndex::Lower);
+               switch(axis)
+                 {
+                 case 0:
+                   // Update_V_3D(axis,boundary_direction,boundary_positive,fine,
+                   //             ip,jp,i,j,p_max[0],p_max[1],v,v_fine);
+                   break;
+                 case 1:
+                   // Update_V_3D(axis,boundary_direction,boundary_positive,fine,
+                   //             jp,ip,j,i,p_max[1],p_max[0],v,v_fine);
+                   break;
+                 default:
+                   abort();
+                   break;
+                 }
+             }
      }
-
-   int i_min(overlap_box.lower(0)), i_max(overlap_box.upper(0)),
-     j_min(overlap_box.lower(1)), j_max(overlap_box.upper(1));
-   if(axis==0)
-     {
-       if(boundary_direction==0)
-         {
-           if(boundary_positive)
-             {
-               i_min=i_max;
-             }
-           else
-             {
-               i_max=i_min;
-             }
-         }
-     }
-   else if(axis==1)
-     {
-       if(boundary_direction==1)
-         {
-           if(boundary_positive)
-             {
-               j_min=j_max;
-             }
-           else
-             {
-               j_max=j_min;
-             }
-         }
-     }
-
-   // tbox::plog << "VBR "
-   //            << fine.getPatchLevelNumber() << " "
-   //            << axis << " "
-   //            << boundary_direction << " "
-   //            << std::boolalpha
-   //            << boundary_positive << " "
-   //            << coarse_box.lower(0) << " "
-   //            << coarse_box.upper(0) << " "
-   //            << coarse_box.lower(1) << " "
-   //            << coarse_box.upper(1) << " "
-   //            << fine_box.lower(0) << " "
-   //            << fine_box.upper(0) << " "
-   //            << fine_box.lower(1) << " "
-   //            << fine_box.upper(1) << " "
-
-   //            << overlap_box.lower(0) << " "
-   //            << overlap_box.upper(0) << " "
-   //            << overlap_box.lower(1) << " "
-   //            << overlap_box.upper(1) << " "
-   //            << i_min << " "
-   //            << i_max << " "
-   //            << j_min << " "
-   //            << j_max << " "
-   //            << "\n";
-
-   for(int j=j_min; j<=j_max; ++j)
-     for(int i=i_min; i<=i_max; ++i)
-       {
-         pdat::SideIndex fine(hier::Index(i,j),axis,pdat::SideIndex::Lower);
-         hier::Index ip(1,0), jp(0,1);
-
-         if(axis==0)
-           {
-             Update_V(axis,boundary_direction,boundary_positive,fine,
-                      ip,jp,i,j,i_max,j_max,v,v_fine);
-           }
-         else if(axis==1)
-           {
-             Update_V(axis,boundary_direction,boundary_positive,fine,
-                      jp,ip,j,i,j_max,i_max,v,v_fine);
-           }
-       }
 }

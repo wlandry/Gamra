@@ -133,7 +133,7 @@ public:
 private:
   std::string d_name_id;
 
-  void Update_V
+  void Update_V_2D
   (const int &axis,
    const int &boundary_direction,
    const bool &boundary_positive,
@@ -142,6 +142,7 @@ private:
    int &i,
    int &j,
    const int &i_max,
+   const int &j_min,
    const int &j_max,
    tbox::Pointer<pdat::SideData<double> > &v,
    tbox::Pointer<pdat::SideData<double> > &v_fine) const;
