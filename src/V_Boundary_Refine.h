@@ -139,13 +139,12 @@ private:
    const bool &boundary_positive,
    const pdat::SideIndex &fine,
    const hier::Index &ip, const hier::Index &jp,
-   int &i,
-   int &j,
+   int &i, int &j,
    const int &i_max,
    const int &j_min,
    const int &j_max,
-   tbox::Pointer<pdat::SideData<double> > &v,
-   tbox::Pointer<pdat::SideData<double> > &v_fine) const;
+   pdat::SideData<double> &v,
+   pdat::SideData<double> &v_fine) const;
 
 };
 

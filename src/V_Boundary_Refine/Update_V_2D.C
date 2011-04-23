@@ -10,13 +10,12 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
  const bool &boundary_positive,
  const pdat::SideIndex &fine,
  const hier::Index &ip, const hier::Index &jp,
- int &i,
- int &j,
+ int &i, int &j,
  const int &i_max,
  const int &j_min,
  const int &j_max,
- tbox::Pointer<SAMRAI::pdat::SideData<double> > &v,
- tbox::Pointer<SAMRAI::pdat::SideData<double> > &v_fine) const
+ SAMRAI::pdat::SideData<double> &v,
+ SAMRAI::pdat::SideData<double> &v_fine) const
 {
   pdat::SideIndex center(fine);
   center.coarsen(hier::Index(2,2));
@@ -35,32 +34,23 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
       /* Compute the derivative at the nearest three coarse points and
          then interpolate */
 
-      const double dv_plus=(*v)(center+jp+ip)-(*v)(center+jp-ip);
-      const double dv_minus=(*v)(center-jp+ip)-(*v)(center-jp-ip);
-      const double dv_center=(*v)(center+ip)-(*v)(center-ip);
+      hier::Index ip_s(boundary_positive ? ip : -ip);
+
+      const double dv_plus=v(center+jp+ip_s)-v(center+jp-ip_s);
+      const double dv_minus=v(center-jp+ip_s)-v(center-jp-ip_s);
+      const double dv_center=v(center+ip_s)-v(center-ip_s);
 
       double dv_fine_minus, dv_fine_plus;
 
       quad_offset_interpolate(dv_plus,dv_minus,dv_center,
                               dv_fine_plus,dv_fine_minus);
 
-      hier::Index offset(ip);
+      hier::Index offset(ip_s*2);
 
-      if(boundary_positive)
-        {
-          offset[axis]=2;
-        }
-      else
-        {
-          offset[axis]=-2;
-          dv_fine_minus=-dv_fine_minus;
-          dv_fine_plus=-dv_fine_plus;
-        }
-        
       if(j%2==0)
         {
-          (*v_fine)(fine)=(*v_fine)(fine-offset) + dv_fine_minus/2;
-          (*v_fine)(fine+jp)=(*v_fine)(fine-offset+jp) + dv_fine_plus/2;
+          v_fine(fine)=v_fine(fine-offset) + dv_fine_minus/2;
+          v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_plus/2;
           /* Since we update two points on j at once, we increment j
              again.  This is ok, since the box in the 'i' direction is
              defined to be only one cell wide */
@@ -68,7 +58,7 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
         }
       else
         {
-          (*v_fine)(fine)=(*v_fine)(fine-offset) + dv_fine_plus/2;
+          v_fine(fine)=v_fine(fine-offset) + dv_fine_plus/2;
         }          
     }
   /* Set the value for the tangential direction */
@@ -77,17 +67,17 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
       double v_center, v_plus;
 
       v_center=
-        quad_offset_interpolate((*v)(center-jp),(*v)(center),(*v)(center+jp));
+        quad_offset_interpolate(v(center-jp),v(center),v(center+jp));
 
       if(i%2==0)
         {
-          (*v_fine)(fine)=v_center;
+          v_fine(fine)=v_center;
 
           if(i<i_max)
             {
-              v_plus=quad_offset_interpolate((*v)(center+ip-jp),(*v)(center+ip),
-                                             (*v)(center+ip+jp));
-              (*v_fine)(fine+ip)=(v_center+v_plus)/2;
+              v_plus=quad_offset_interpolate(v(center+ip-jp),v(center+ip),
+                                             v(center+ip+jp));
+              v_fine(fine+ip)=(v_center+v_plus)/2;
 
               /* Since we update two points on 'i' at once, we increment 'i' again.
                  This is ok, since the box in the 'j' direction is defined to be
@@ -97,9 +87,9 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
         }
       else
         {
-          v_plus=quad_offset_interpolate((*v)(center+ip-jp),(*v)(center+ip),
-                                         (*v)(center+ip+jp));
-          (*v_fine)(fine)=(v_center+v_plus)/2;
+          v_plus=quad_offset_interpolate(v(center+ip-jp),v(center+ip),
+                                         v(center+ip+jp));
+          v_fine(fine)=(v_center+v_plus)/2;
         }
     }
 }
