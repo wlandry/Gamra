@@ -302,7 +302,7 @@ int main(
       {
             tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
             for (int ln = 0; ln < tag_buffer.getSize(); ++ln) {
-               tag_buffer[ln] = 2;
+               tag_buffer[ln] = 1;
             }
             gridding_algorithm->regridAllFinerLevels(
                0,

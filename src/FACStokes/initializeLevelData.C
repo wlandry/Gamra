@@ -46,11 +46,11 @@ void SAMRAI::FACStokes::initializeLevelData
   }
 
   // const double inclusion_radius=0.5;
-  const double inclusion_viscosity=1e2;
+  const double inclusion_viscosity=2;
   const double background_viscosity=1;
 
-  const double background_density(1), block_density(1);
-  // const double background_density(1), block_density(1.03);
+  // const double background_density(1), block_density(1);
+  const double background_density(1), block_density(1.03);
 
   static double viscosity[129][129];
   static int max_x(0), max_y(0);

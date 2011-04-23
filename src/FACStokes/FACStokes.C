@@ -139,8 +139,8 @@ namespace SAMRAI {
                                                   operator */);
 
     d_adaptation_threshold=database->getDoubleWithDefault("adaption_threshold",
-                                                          1.0e-15);
-                                                          // 1e1);
+                                                          // 1.0e-15);
+                                                          2e-3);
 
     /*
      * Specify an implementation of solv::RobinBcCoefStrategy for the
