@@ -19,6 +19,8 @@ inline void quad_offset_interpolate(const double &plus, const double &center,
   fine_minus=center + (5*d_minus - 3*d_plus)/32;
 }
 
+/* Interpolate to only the fine point closest to the "plus" coarse point. */
+
 inline double quad_offset_interpolate(const double &plus, const double &center,
                                       const double &minus)
 {
