@@ -20,7 +20,34 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
   pdat::SideIndex center(fine);
   center.coarsen(hier::Index(2,2));
 
-  /* Set the derivative for the normal direction */
+  /* Set the derivative for the normal direction
+
+         i-1      i       i+1
+
+        ------- -------
+       |   f   f   F   |
+   j-1 C       C       C
+       |   f   f   F   |
+        ------- -------
+       |   f   f   F   |
+   j   C       C       C
+       |   f   f   F   |
+        ------- -------
+       |   f   f   F   |
+   j+1 C       C       C
+       |   f   f   F   |
+        ------- -------
+               |
+               |
+               |
+        Coarse-Fine Boundary
+
+    So we need to set F such that the derivative at the coarse-fine
+    boundary is coorrect.  We can compute the derivative at the coarse
+    points on the boundary, and then use quadratic interpolation to
+    get the derivative at the fine points on the boundary.
+
+ */
   if(boundary_direction==axis)
     {
       /* Return early if we are at j==j_max, because that is a corner
@@ -61,7 +88,32 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
           v_fine(fine)=v_fine(fine-offset) + dv_fine_plus/2;
         }          
     }
-  /* Set the value for the tangential direction */
+  /* Set the value for the tangential direction
+
+         i-1      i       i+1
+
+        -f-C-f- -F-C---    C
+       |       |       |
+   j-1 |       |       |    
+       |       |       |
+        -f-C-f- -F-C---    C
+       |       |       |
+   j   |       |       |    
+       |       |       |
+        -f-C-f- -F-C---    C
+       |       |       |
+   j+1 |       |       |    
+       |       |       |
+        -f-C-f- -F-C---    C
+               |
+               |
+               |
+        Coarse-Fine Boundary
+
+    C are the coarse velocities, f are the interior fine velocities,
+    and F are the boundary fine velocities that we need to set.  So we
+    use quadratic interpolation from C to F.
+ */
   else
     {
       double v_center, v_plus;
