@@ -65,9 +65,10 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
   else
     {
       double v_center, v_plus;
+      hier::Index jp_s(boundary_positive ? jp : -jp);
 
       v_center=
-        quad_offset_interpolate(v(center-jp),v(center),v(center+jp));
+        quad_offset_interpolate(v(center-jp_s),v(center),v(center+jp_s));
 
       if(i%2==0)
         {
@@ -75,8 +76,12 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
 
           if(i<i_max)
             {
-              v_plus=quad_offset_interpolate(v(center+ip-jp),v(center+ip),
-                                             v(center+ip+jp));
+              /* This is a bit inefficient, because we compute v_plus
+               * twice.  Once for the in-between point, and again
+               * later for the actual point. */
+
+              v_plus=quad_offset_interpolate(v(center+ip-jp_s),v(center+ip),
+                                             v(center+ip+jp_s));
               v_fine(fine+ip)=(v_center+v_plus)/2;
 
               /* Since we update two points on 'i' at once, we increment 'i' again.
@@ -87,8 +92,8 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
         }
       else
         {
-          v_plus=quad_offset_interpolate(v(center+ip-jp),v(center+ip),
-                                         v(center+ip+jp));
+          v_plus=quad_offset_interpolate(v(center+ip-jp_s),v(center+ip),
+                                         v(center+ip+jp_s));
           v_fine(fine)=(v_center+v_plus)/2;
         }
     }
