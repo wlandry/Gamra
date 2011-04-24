@@ -97,7 +97,6 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
    jp[1]=1;
    if(dim>2)
      kp[2]=1;
-   // hier::Index pp[]={ip,jp,kp};
 
    if(dim==2)
      {
@@ -123,26 +122,15 @@ void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
      }
    else
      {
-       for(int k=p_min[2]; k<=p_max[2]; k=(k/2)*2+2)
-         for(int j=p_min[1]; j<=p_max[1]; j=(j/2)*2+2)
-           for(int i=p_min[0]; i<=p_max[0]; i=(i/2)*2+2)
+       hier::Index pp[]={ip,jp,kp};
+       hier::Index ijk(dimension);
+       for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]=(ijk[2]/2)*2+2)
+         for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]=(ijk[1]/2)*2+2)
+           for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]=(ijk[0]/2)*2+2)
              {
-               pdat::SideIndex fine(hier::Index(i,j,k),axis,
-                                    pdat::SideIndex::Lower);
-               switch(axis)
-                 {
-                 case 0:
-                   // Update_V_3D(axis,boundary_direction,boundary_positive,fine,
-                   //             ip,jp,i,j,p_max[0],p_max[1],v,v_fine);
-                   break;
-                 case 1:
-                   // Update_V_3D(axis,boundary_direction,boundary_positive,fine,
-                   //             jp,ip,j,i,p_max[1],p_max[0],v,v_fine);
-                   break;
-                 default:
-                   abort();
-                   break;
-                 }
+               pdat::SideIndex fine(ijk,axis,pdat::SideIndex::Lower);
+               Update_V_3D(axis,boundary_direction,boundary_positive,fine,
+                           pp,ijk,p_min,p_max,*v,*v_fine);
              }
      }
 }

@@ -146,6 +146,17 @@ private:
    pdat::SideData<double> &v,
    pdat::SideData<double> &v_fine) const;
 
+  void Update_V_3D
+  (const int &axis,
+   const int &boundary_direction,
+   const bool &boundary_positive,
+   const pdat::SideIndex &fine,
+   const hier::Index pp[],
+   const hier::Index &ijk,
+   const hier::Index &p_min, const hier::Index &p_max,
+   SAMRAI::pdat::SideData<double> &v,
+   SAMRAI::pdat::SideData<double> &v_fine) const;
+
 };
 
 }
