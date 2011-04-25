@@ -43,25 +43,82 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
       for(pdat::CellIterator ci(gbox); ci; ci++)
         {
           pdat::CellIndex center(*ci);
-          for(int ix=0; ix<dim; ++ix)
+          const int ix(0), iy(1), iz(2);
+          hier::Index ip(zero), jp(ip), kp(ip);
+
+          /* Check if we are at a boundary.  If it is a Neumann
+           * boundary and not on a corner, then use Neumann
+           * conditions.  Otherwise use extrapolation */
+
+          bool neumann_boundary(false), at_boundary(false);
+          if(center[ix]<pbox.lower(ix)
+             && geom->getTouchesRegularBoundary(ix,0))
             {
-              if(center[ix]<pbox.lower(ix)
-                 && geom->getTouchesRegularBoundary(ix,0))
+              ip[ix]=1;
+              if(!lower_dirichlet[ix])
+                neumann_boundary=true;
+              else
+                at_boundary=true;
+            }
+          else if(center[ix]>pbox.upper(ix)
+                  && geom->getTouchesRegularBoundary(ix,1))
+            {
+              ip[ix]=-1;
+              if(!upper_dirichlet[ix])
+                neumann_boundary=true;
+              else
+                at_boundary=true;
+            }
+
+          if(center[iy]<pbox.lower(iy)
+             && geom->getTouchesRegularBoundary(iy,0))
+            {
+              jp[iy]=1;
+              if(!lower_dirichlet[ix])
+                neumann_boundary=true;
+              else
+                at_boundary=true;
+            }
+          else if(center[iy]>pbox.upper(iy)
+                  && geom->getTouchesRegularBoundary(iy,1))
+            {
+              jp[iy]=-1;
+              if(!upper_dirichlet[ix])
+                neumann_boundary=true;
+              else
+                at_boundary=true;
+            }
+
+          if(dim>2)
+            {
+              if(center[iz]<pbox.lower(iz)
+                 && geom->getTouchesRegularBoundary(iz,0))
                 {
-                  p(center)=2*p(center+pp[ix])-p(center+pp[ix]*2);
+                  kp[iz]=1;
                   if(!lower_dirichlet[ix])
-                    p(center)=p(center+pp[ix]);
+                    neumann_boundary=true;
+                  else
+                    at_boundary=true;
                 }
-              else if(center[ix]>pbox.upper(ix)
-                      && geom->getTouchesRegularBoundary(ix,1))
+              else if(center[iz]>pbox.upper(iz)
+                      && geom->getTouchesRegularBoundary(iz,1))
                 {
-                  p(center)=2*p(center-pp[ix])-p(center-pp[ix]*2);
+                  kp[iz]=-1;
                   if(!upper_dirichlet[ix])
-                    {
-                      // p(center)=p(center-pp[ix]);
-                      p(center)=0;
-                    }
+                    neumann_boundary=true;
+                  else
+                    at_boundary=true;
                 }
+            }
+
+          /* Actually apply the BC */
+          if(neumann_boundary && !at_boundary)
+            {
+              p(center)=p(center+ip+jp+kp);
+            }
+          else if(at_boundary)
+            {
+              p(center)=2*p(center+ip+jp+kp)-p(center+(ip+jp+kp)*2);
             }
         }
     }
