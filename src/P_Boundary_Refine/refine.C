@@ -98,7 +98,7 @@ void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
             for(int j=p_min[1]; j<=p_max[1]; ++j)
               for(int i=p_min[0]; i<=p_max[0]; ++i)
                 {
-                  pdat::CellIndex fine(hier::Index(i,j));
+                  pdat::CellIndex fine(hier::Index(i,j,k));
         
                   switch(boundary_direction)
                     {

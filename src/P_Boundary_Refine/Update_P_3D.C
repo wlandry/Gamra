@@ -55,7 +55,7 @@ void SAMRAI::geom::P_Boundary_Refine::Update_P_3D
  SAMRAI::pdat::CellData<double> &p_fine) const
 {
   pdat::CellIndex center(fine);
-  center.coarsen(hier::Index(2,2));
+  center.coarsen(hier::Index(2,2,2));
 
   const double p_mmm=p(center-ip-jp-kp)/64 + (63.0/64)*p(center)
     - (3.0/32) * (p(center+ip) + p(center+jp) + p(center+kp))
