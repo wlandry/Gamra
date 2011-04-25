@@ -28,19 +28,20 @@ FACStokes {
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
+    adaption_threshold = 1.0e-4
     fac_solver {
         // This is the input for the cell-centered Stokes FAC solver
         // class in the SAMRAI library.
         enable_logging = TRUE   // Bool flag to switch logging on/off
-        max_cycles = 3         // Max number of FAC cycles to use
+        max_cycles = 10         // Max number of FAC cycles to use
         residual_tol = 1e-3     // Residual tolerance to solve for
-        num_pre_sweeps = 3      // Number of presmoothing sweeps to use
-        num_post_sweeps = 3     // Number of postsmoothing sweeps to use
+        num_pre_sweeps = 5      // Number of presmoothing sweeps to use
+        num_post_sweeps = 5     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         // smoothing_choice = "Gerya"
         // coarse_solver_choice = "Gerya"
-        coarse_solver_max_iterations = 3
+        coarse_solver_max_iterations = 25
         coarse_solver_tolerance = 1e-5
         p_prolongation_method = "P_MDPI_REFINE"
         // p_prolongation_method = "P_REFINE"
@@ -118,7 +119,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 3
+    max_levels = 4
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2
