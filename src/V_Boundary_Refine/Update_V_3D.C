@@ -15,9 +15,6 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_3D
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
-  pdat::SideIndex center(fine);
-  center.coarsen(hier::Index(2,2,2));
-
   /* Set the derivative for the normal direction.
 
      We set the derivative on the i=constant plane.  If we look at a
@@ -70,6 +67,9 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_3D
       const hier::Index ip(boundary_positive ? pp[axis] : -pp[axis]),
         jp(pp[(axis+1)%3]), kp(pp[(axis+2)%3]);
 
+      pdat::SideIndex center(fine-ip);
+      center.coarsen(hier::Index(2,2,2));
+
       const double dv_mm=v(center-jp-kp+ip) - v(center-jp-kp-ip);
       const double dv_m0=v(center-jp+ip) - v(center-jp-ip);
       const double dv_mp=v(center-jp+kp+ip) - v(center-jp+kp-ip);
@@ -103,14 +103,18 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_3D
           if(ijk[axis3]%2==0)
             {
               v_fine(fine)=v_fine(fine-offset) + dv_fine_mm/2;
-              v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pm/2;
-              v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_mp/2;
-              v_fine(fine+jp+kp)=v_fine(fine-offset+jp+kp) + dv_fine_pp/2;
+              if(ijk[axis2]<p_max[axis2])
+                v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pm/2;
+              if(ijk[axis3]<p_max[axis3])
+                v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_mp/2;
+              if(ijk[axis2]<p_max[axis2] && ijk[axis3]<p_max[axis3])
+                v_fine(fine+jp+kp)=v_fine(fine-offset+jp+kp) + dv_fine_pp/2;
             }
           else
             {
               v_fine(fine)=v_fine(fine-offset) + dv_fine_mp/2;
-              v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pp/2;
+              if(ijk[axis2]<p_max[axis2])
+                v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pp/2;
             }
         }
       else
@@ -118,7 +122,8 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_3D
           if(ijk[axis3]%2==0)
             {
               v_fine(fine)=v_fine(fine-offset) + dv_fine_pm/2;
-              v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_pp/2;
+              if(ijk[axis3]<p_max[axis3])
+                v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_pp/2;
             }
           else
             {
@@ -165,6 +170,9 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_3D
         jp(boundary_positive ? pp[boundary_direction] : -pp[boundary_direction]),
         kp(pp[axis3]);
 
+      pdat::SideIndex center(fine);
+      center.coarsen(hier::Index(2,2,2));
+
       double v_minus=v(center-jp-kp)/16 + (15.0/16)*v(center)
         + (3.0/32)*(-v(center+jp) - v(center+kp) + v(center-jp) + v(center-kp));
       
@@ -179,7 +187,8 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_3D
           if(ijk[axis3]%2==0)
             {
               v_fine(fine)=v_minus;
-              v_fine(fine+kp)=v_plus;
+              if(ijk[axis3]<p_max[axis3])
+                v_fine(fine+kp)=v_plus;
               if(ijk[axis]<p_max[axis])
                 {
                   double v_minus_off=v(center-jp-kp+ip)/16
@@ -193,7 +202,8 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_3D
                                 + v(center-jp+ip) + v(center+kp+ip));
 
                   v_fine(fine+ip)=(v_minus+v_minus_off)/2;
-                  v_fine(fine+ip+kp)=(v_plus+v_plus_off)/2;
+                  if(ijk[axis3]<p_max[axis3])
+                    v_fine(fine+ip+kp)=(v_plus+v_plus_off)/2;
                 }
             }
           else
@@ -225,7 +235,8 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_3D
                             + v(center-jp+ip) + v(center+kp+ip));
 
               v_fine(fine)=(v_minus+v_minus_off)/2;
-              v_fine(fine+kp)=(v_plus+v_plus_off)/2;
+              if(ijk[axis3]<p_max[axis3])
+                v_fine(fine+kp)=(v_plus+v_plus_off)/2;
             }
           else
             {
