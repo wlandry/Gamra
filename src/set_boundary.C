@@ -44,7 +44,7 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
         {
           pdat::CellIndex center(*ci);
           const int ix(0), iy(1), iz(2);
-          hier::Index ip(zero), jp(ip), kp(ip);
+          hier::Index ip(zero), jp(zero), kp(zero);
 
           /* Check if we are at a boundary.  If it is a Neumann
            * boundary and not on a corner, then use Neumann
@@ -74,7 +74,7 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
              && geom->getTouchesRegularBoundary(iy,0))
             {
               jp[iy]=1;
-              if(!lower_dirichlet[ix])
+              if(!lower_dirichlet[iy])
                 neumann_boundary=true;
               else
                 at_boundary=true;
@@ -83,7 +83,7 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                   && geom->getTouchesRegularBoundary(iy,1))
             {
               jp[iy]=-1;
-              if(!upper_dirichlet[ix])
+              if(!upper_dirichlet[iy])
                 neumann_boundary=true;
               else
                 at_boundary=true;
@@ -95,7 +95,7 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                  && geom->getTouchesRegularBoundary(iz,0))
                 {
                   kp[iz]=1;
-                  if(!lower_dirichlet[ix])
+                  if(!lower_dirichlet[iz])
                     neumann_boundary=true;
                   else
                     at_boundary=true;
@@ -104,7 +104,7 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                       && geom->getTouchesRegularBoundary(iz,1))
                 {
                   kp[iz]=-1;
-                  if(!upper_dirichlet[ix])
+                  if(!upper_dirichlet[iz])
                     neumann_boundary=true;
                   else
                     at_boundary=true;
@@ -136,9 +136,6 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
             {
               pdat::SideIndex x(*si);
 
-              // double pos_x=geom->getXLower()[0]
-              //   + geom->getDx()[0]*(x[0]-pbox.lower()[0]);
-
               /* Set a sentinel value for normal components */
               if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
                 {
@@ -168,7 +165,8 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                 {
                   v(x)=upper_boundary[ix];
                 }
-              /* Set derivatives for tangential component */
+              /* Set derivatives for tangential component.  The edges
+                 and corners are incorrect for now.  */
               else
                 {
                   for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
@@ -177,28 +175,78 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                          && geom->getTouchesRegularBoundary(iy,0))
                         {
                           v(x)=v(x+pp[iy]);
-
-                          // if(ix==0 && iy==1)
-                          //   {
-                          //     if(pos_x<0.1 || rhs)
-                          //       {
-                          //         v(x)=-v(x+pp[iy]);
-                          //       }
-                          //     else
-                          //       {
-                          //         v(x)=-v(x+pp[iy]) + 2*upper_boundary[0];
-                          //       }
-                          //   }
                         }
                       else if(x[iy]>pbox.upper(iy)
                               && geom->getTouchesRegularBoundary(iy,1))
                         {
                           v(x)=v(x-pp[iy]);
+                        }
+                    }
+                }
+            }
+          /* Fix up the edges.  This has to be done in a different
+             loop, because the values on the faces will be used to
+             compute values in the edges and corners.  In 2D, I am not
+             sure that this is needed.  It is certainly not needed if
+             we have dirichlet conditions on the boundary.  It is
+             definitely needed in 3D.  We use the d/dx conditions
+             here, though we could use the d/dy conditions and get the
+             same number, as long as we have pure Neumann boundary
+             conditions, and not Robin. */
 
-                          // if(ix==1 && iy==0)
-                          //   {
-                          //     v(x)=-v(x-pp[iy]);
-                          //   }
+          for(pdat::SideIterator si(gbox,ix); si; si++)
+            {
+              pdat::SideIndex x(*si);
+              if((x[ix]<pbox.lower(ix)
+                  && geom->getTouchesRegularBoundary(ix,0)
+                  && !lower_dirichlet[ix])
+                 || (x[ix]>pbox.upper(ix)+1
+                     && geom->getTouchesRegularBoundary(ix,1)
+                     && !upper_dirichlet[ix]))
+                {
+                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                    {
+                      if(x[iy]<pbox.lower(iy) 
+                         && geom->getTouchesRegularBoundary(iy,0))
+                        {
+                          v(x)=v(x+pp[iy]);
+                        }
+                      else if(x[iy]>pbox.upper(iy) 
+                              && geom->getTouchesRegularBoundary(iy,1))
+                        {
+                          v(x)=v(x-pp[iy]);
+                        }
+                    }
+                }
+            }
+          /* In 3D, fix the corners.  I am not sure that this is
+             needed. */
+          if(dim==3)
+            {
+              const int iy((ix+1)%dim), iz((iy+1)%dim);
+              for(pdat::SideIterator si(gbox,ix); si; si++)
+                {
+                  pdat::SideIndex x(*si);
+                  if(((x[ix]<pbox.lower(ix)
+                       && geom->getTouchesRegularBoundary(ix,0)
+                       && !lower_dirichlet[ix])
+                      || (x[ix]>pbox.upper(ix)+1
+                          && geom->getTouchesRegularBoundary(ix,1)
+                          && !upper_dirichlet[ix]))
+                     && ((x[iy]<pbox.lower(iy)
+                          && geom->getTouchesRegularBoundary(iy,0))
+                         || (x[iy]>pbox.upper(iy) 
+                             && geom->getTouchesRegularBoundary(iy,1))))
+                    {
+                      if(x[iz]<pbox.lower(iz) 
+                         && geom->getTouchesRegularBoundary(iz,0))
+                        {
+                          v(x)=v(x+pp[iz]);
+                        }
+                      else if(x[iz]>pbox.upper(iz) 
+                              && geom->getTouchesRegularBoundary(iz,1))
+                        {
+                          v(x)=v(x-pp[iz]);
                         }
                     }
                 }
