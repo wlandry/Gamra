@@ -28,6 +28,7 @@ FACStokes {
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
+    adaption_threshold = 2.0e-3
     fac_solver {
         // This is the input for the cell-centered Stokes FAC solver
         // class in the SAMRAI library.
