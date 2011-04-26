@@ -121,7 +121,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
                         }
                     }
               }
-            set_boundaries(p_id,v_id,level,true);
+            set_boundaries(invalid_id,v_id,level,true);
           }
 
       /* p sweep
@@ -182,7 +182,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
               p(center)+=dp(center);
             }
         }
-
+      set_boundaries(p_id,invalid_id,level,true);
 
       /* fix v sweep */
       xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
@@ -240,8 +240,11 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
                     }
                 }
             }
-          set_boundaries(p_id,v_id,level,true);
         }
+      /* This is probably not necessary, since everyone always makes
+         sure that everything is set before use. */
+      set_boundaries(invalid_id,v_id,level,true);
+
       // if (residual_tolerance >= 0.0) {
         /*
          * Check for early end of sweeps due to convergence

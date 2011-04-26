@@ -119,7 +119,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                     }
                 }
             }
-          set_boundaries(p_id,v_id,level,true);
+          set_boundaries(invalid_id,v_id,level,true);
         }
 
 
@@ -173,7 +173,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                     }
                 }
             }
-          set_boundaries(p_id,v_id,level,true);
+          set_boundaries(invalid_id,v_id,level,true);
         }
 
 
@@ -236,7 +236,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
               p(center)+=dp(center);
             }
         }
-      set_boundaries(p_id,v_id,level,true);
+      set_boundaries(p_id,invalid_id,level,true);
 
 
       /* fix v sweep */
@@ -298,7 +298,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
                 }
             }
         }
-      set_boundaries(p_id,v_id,level,true);
+      set_boundaries(invalid_id,v_id,level,true);
 
       // if (residual_tolerance >= 0.0) {
         /*
