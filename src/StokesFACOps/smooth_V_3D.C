@@ -29,7 +29,7 @@ void SAMRAI::solv::StokesFACOps::smooth_V_3D
   const pdat::EdgeIndex edge_y(center,iy,pdat::EdgeIndex::LowerLeft),
     edge_z(center,iz,pdat::EdgeIndex::LowerLeft);
     
-  /* If at the 'x' boundaries, leave vx as is */
+  /* If at a Dirichlet 'x' boundary, leave vx as is */
   if(!((center[ix]==pbox.lower(ix) && v(x-pp[ix])==boundary_value)
        || (center[ix]==pbox.upper(ix)+1 && v(x+pp[ix])==boundary_value)))
     {

@@ -30,7 +30,7 @@ void SAMRAI::solv::StokesFACOps::smooth_V_2D
     y(center,off_axis,pdat::SideIndex::Lower);
   const pdat::NodeIndex edge(center,pdat::NodeIndex::LowerLeft);
     
-  /* If at the 'x' boundaries, leave vx as is */
+  /* If at a Dirichlet 'x' boundary, leave vx as is */
   if(!((center[axis]==pbox.lower(axis) && v(x-ip)==boundary_value)
        || (center[axis]==pbox.upper(axis)+1 && v(x+ip)==boundary_value)))
     {
