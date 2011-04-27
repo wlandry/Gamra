@@ -17,9 +17,6 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
-  pdat::SideIndex center(fine);
-  center.coarsen(hier::Index(2,2));
-
   /* Set the derivative for the normal direction
 
          i-1      i       i+1
@@ -62,6 +59,9 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
          then interpolate */
 
       hier::Index ip_s(boundary_positive ? ip : -ip);
+
+      pdat::SideIndex center(fine-ip_s);
+      center.coarsen(hier::Index(2,2));
 
       const double dv_plus=v(center+jp+ip_s)-v(center+jp-ip_s);
       const double dv_minus=v(center-jp+ip_s)-v(center-jp-ip_s);
@@ -116,6 +116,9 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
  */
   else
     {
+      pdat::SideIndex center(fine);
+      center.coarsen(hier::Index(2,2));
+
       double v_center, v_plus;
       hier::Index jp_s(boundary_positive ? jp : -jp);
 
