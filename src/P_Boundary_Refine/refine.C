@@ -14,6 +14,9 @@ void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
   const tbox::Dimension& dimension(getDim());
   const int dim(dimension.getValue());
 
+  const int invalid_id(-1);
+  set_boundary(coarse,src_component,invalid_id,true);
+
   for (hier::BoxList::Iterator b(boxes); b; b++)
     {
       hier::Box &overlap_box=b();
