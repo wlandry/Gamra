@@ -1,6 +1,6 @@
 #include "V_Boundary_Refine.h"
 #include "quad_offset_interpolate.h"
-#include "Boundary.h"
+#include "Constants.h"
 
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */

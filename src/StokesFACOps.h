@@ -951,8 +951,6 @@ private:
     */
   int d_cell_scratch_id, d_side_scratch_id;
 
-  const int invalid_id;
-
    //@}
 
    //@{

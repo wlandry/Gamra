@@ -5,7 +5,7 @@
 #include "SAMRAI/pdat/NodeData.h"
 #include "SAMRAI/pdat/SideData.h"
 #include "dRm_dv.h"
-#include "Boundary.h"
+#include "Constants.h"
 
 /* These two functions should really have a more similar API */
 

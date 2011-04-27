@@ -17,7 +17,7 @@
 #include "SAMRAI/hier/CoarseFineBoundary.h"
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/CellIndex.h"
-#include "Boundary.h"
+#include "Constants.h"
 #include "set_boundary.h"
 
 namespace SAMRAI {
@@ -64,7 +64,7 @@ public:
                     const hier::Box& ,
                     const hier::IntVector& )
   {
-    set_boundary(fine,-1,v_id,true);
+    set_boundary(fine,invalid_id,v_id,true);
   }
 
    virtual void

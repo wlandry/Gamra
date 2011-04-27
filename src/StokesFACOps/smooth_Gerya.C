@@ -1,5 +1,5 @@
 #include "StokesFACOps.h"
-#include "Boundary.h"
+#include "Constants.h"
 /* Smooth the error using a red-black Gauss-Seidel smoother inspired
    by Introduction to Numerical Geodynamic Modelling, Taras Gerya,
    2010

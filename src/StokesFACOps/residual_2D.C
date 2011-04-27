@@ -1,5 +1,5 @@
 #include "StokesFACOps.h"
-#include "Boundary.h"
+#include "Constants.h"
 
 void SAMRAI::solv::StokesFACOps::residual_2D
 (pdat::CellData<double> &p,

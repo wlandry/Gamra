@@ -40,7 +40,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-#include "Boundary.h"
+#include "Constants.h"
 #include "set_boundary.h"
 
 /* Set the physical boundaries for the velocity. */

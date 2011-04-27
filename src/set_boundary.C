@@ -1,5 +1,5 @@
 #include "set_boundary.h"
-#include "Boundary.h"
+#include "Constants.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/CellData.h"
@@ -33,7 +33,7 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
   bool upper_dirichlet[]={true,true,true};
   double upper_boundary[]={0,0,0};
 
-  if(p_id!=-1)
+  if(p_id!=invalid_id)
     {
       tbox::Pointer<pdat::CellData<double> > p_ptr = patch.getPatchData(p_id);
       pdat::CellData<double> &p(*p_ptr);
@@ -124,7 +124,7 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
     }
 
 
-  if(v_id!=-1)
+  if(v_id!=invalid_id)
     {
       tbox::Pointer<pdat::SideData<double> > v_ptr = patch.getPatchData(v_id);
       pdat::SideData<double> &v(*v_ptr);

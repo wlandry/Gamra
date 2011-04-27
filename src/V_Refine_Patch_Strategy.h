@@ -16,7 +16,7 @@
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/CellIndex.h"
-#include "Boundary.h"
+#include "Constants.h"
 #include "set_boundary.h"
 
 namespace SAMRAI {
@@ -72,7 +72,7 @@ public:
                     const hier::Box& ,
                     const hier::IntVector& )
   {
-    set_boundary(coarse,-1,v_id,true);
+    set_boundary(coarse,invalid_id,v_id,true);
   }
 
    virtual void

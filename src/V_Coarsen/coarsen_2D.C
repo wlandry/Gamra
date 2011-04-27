@@ -21,7 +21,7 @@
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/tbox/Utilities.h"
-#include "Boundary.h"
+#include "Constants.h"
 
 using namespace SAMRAI;
 
