@@ -11,6 +11,7 @@
 
 #include "V_Boundary_Refine.h"
 #include "set_boundary.h"
+#include "Constants.h"
 
 void SAMRAI::geom::V_Boundary_Refine::refine(
    hier::Patch& fine,
@@ -25,7 +26,6 @@ void SAMRAI::geom::V_Boundary_Refine::refine(
 
    TBOX_ASSERT(t_overlap != NULL);
 
-   const int invalid_id(-1);
    set_boundary(coarse,invalid_id,src_component,true);
 
    for(int axis=0; axis<getDim().getValue(); ++axis)
