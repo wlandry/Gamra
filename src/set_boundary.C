@@ -63,7 +63,9 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                   pp[ix][ix]=1;
                   if(!lower_dirichlet[ix])
                     {
-                      p(center)=-p(center+pp[ix]) + 2*p_lower[ix];
+                      p(center)=-p(center+pp[ix]);
+                      if(rhs)
+                        p(center)+=2*p_lower[ix];
                     }
                   else
                     dirichlet_boundary=true;
@@ -74,7 +76,9 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                   pp[ix][ix]=-1;
                   if(!upper_dirichlet[ix])
                     {
-                      p(center)=-p(center+pp[ix]) + 2*p_upper[ix];
+                      p(center)=-p(center+pp[ix]);
+                      if(rhs)
+                        p(center)+=2*p_upper[ix];
                     }
                   else
                     dirichlet_boundary=true;
