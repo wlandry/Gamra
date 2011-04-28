@@ -46,7 +46,19 @@ int SAMRAI::FACStokes::solveStokes()
       tbox::Pointer<hier::Patch> patch = *ip;
       tbox::Pointer<pdat::CellData<double> >
         p = patch->getPatchData(p_id);
-      p->fill(0.0);
+
+      tbox::Pointer<geom::CartesianPatchGeometry>
+        geom = patch->getPatchGeometry();
+      hier::Box pbox = p->getBox();
+      for(pdat::CellIterator ci(p->getGhostBox()); ci; ci++)
+        {
+          pdat::CellIndex c=ci();
+          double y=geom->getXLower()[1]
+            + geom->getDx()[1]*(c[1]-pbox.lower()[1] + 0.5);
+          (*p)(c)=-y;
+        }
+      // p->fill(0.0);
+
       tbox::Pointer<pdat::SideData<double> >
         v = patch->getPatchData(v_id);
       v->fill(0.0);
