@@ -37,22 +37,24 @@ inline double dRc_dp_2D(const SAMRAI::hier::Box &pbox,
   double result(0);
 
   if(!(center[0]==pbox.lower(0) && v(x-ip)==boundary_value))
-    result+=dRc_dvx_p * dRm_dp_xp/dRm_dv_2D(cell_viscosity,edge_viscosity,
-                                            center+ip,
-                                            center,up_e+ip,center_e+ip,dx,dy);
+    result+=dRc_dvx_m * dRm_dp_xm/dRm_dv_2D(cell_viscosity,edge_viscosity,
+                                            center,center-ip,up_e,center_e,
+                                            dx,dy);
 
   if(!(center[0]==pbox.upper(0)+1 && v(x+ip)==boundary_value))
-    result+=dRc_dvx_m * dRm_dp_xm/dRm_dv_2D(cell_viscosity,edge_viscosity,
-                                            center,center-ip,up_e,center_e,dx,dy);
-
+    result+=dRc_dvx_p * dRm_dp_xp/dRm_dv_2D(cell_viscosity,edge_viscosity,
+                                            center+ip,center,up_e+ip,
+                                            center_e+ip,dx,dy);
   if(!(center[1]==pbox.lower(1) && v(y-jp)==boundary_value))
-    result+=dRc_dvy_p * dRm_dp_yp/dRm_dv_2D(cell_viscosity,edge_viscosity,center+jp,
-                                            center,right_e+jp,center_e+jp,dy,dx);
+    result+=dRc_dvy_m * dRm_dp_ym/dRm_dv_2D(cell_viscosity,edge_viscosity,
+                                            center,center-jp,right_e,center_e,
+                                            dy,dx);
 
   if(!(center[1]==pbox.upper(1)+1 && v(y+jp)==boundary_value))
-    result+=dRc_dvy_m * dRm_dp_ym/dRm_dv_2D(cell_viscosity,edge_viscosity,center,
-                                            center-jp,right_e,center_e,dy,dx);
-
+    result+=dRc_dvy_p * dRm_dp_yp/dRm_dv_2D(cell_viscosity,edge_viscosity,
+                                            center+jp,center,right_e+jp,
+                                            center_e+jp,dy,dx);
+                                            
   return result;
 }
 
