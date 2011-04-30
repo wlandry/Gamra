@@ -91,5 +91,6 @@ inline double dRc_dp_3D(const SAMRAI::hier::Box &pbox,
                                 Dx[ix],Dx[iy],Dx[iz])
                       * Dx[ix]*Dx[ix]);
     }
+  return result;
 }
 #endif
