@@ -1,0 +1,99 @@
+// A test input to make sure that MDPI pressure interpolation is
+// working correctly.  This is a flipped version of MDPI.input, so you
+// have to set the v_rhs(y) to -1.  On the fine level, the pressure
+// should the same as MDPI.input, but in reverse order.  It is not
+// exactly the same because the red-black sweeps break the symmetry.
+// The results are
+//
+// 0.314102 0.194681 0.201706 0.292173 
+// 0.252227 0.180541 0.190052 0.239130 
+// -0.266160 -0.192277 -0.197931 -0.252446 
+// -0.455134 -0.297653 -0.308749 -0.442016 
+
+// To get these numbers, we have to change background_density and
+// block_density to -1 in FACStokes/initializeLevelData.C, and the
+// initial guess of pressure to 0 in FACStokes/solveStokes.C
+
+Main {
+    dim = 2
+    base_name = "MDPI_flipped"
+    log_all_nodes = TRUE
+    vis_writer = "Vizamrai", "VisIt"
+}
+
+FACStokes {
+    adaption_threshold = -1
+
+    viscosity_ijk= 4, 4
+    viscosity_coord_min= 0.125, 0.125
+    viscosity_coord_max= .875, .875
+    viscosity_data= 2.5, 2.4, 2.3, 2.2,
+                    2.1, 2, 1.9, 1.8,
+                    1.7, 1.6, 1.5, 1.4,
+                    1.3, 1.2, 1.1, 1
+    fac_solver {
+        enable_logging = TRUE   // Bool flag to switch logging on/off
+        max_cycles = 1         // Max number of FAC cycles to use
+        residual_tol = 1e-3     // Residual tolerance to solve for
+        num_pre_sweeps = 0      // Number of presmoothing sweeps to use
+        num_post_sweeps = 0     // Number of postsmoothing sweeps to use
+        smoothing_choice = "Tackley"
+        coarse_solver_choice = "Tackley"
+        coarse_solver_max_iterations = 10000
+        coarse_solver_tolerance = 1e-8
+        p_prolongation_method = "P_MDPI_REFINE"
+        // p_prolongation_method = "P_REFINE"
+        v_prolongation_method = "V_REFINE"
+    }
+    bc_coefs {
+        boundary_0 = "value", "0"
+        boundary_1 = "value", "0"
+        boundary_2 = "value", "0"
+        boundary_3 = "value", "0"
+    }
+}
+
+CartesianGridGeometry {
+    domain_boxes = [(0,0), (1,1)]
+    x_lo         = 0, 0
+    x_up         = 1, 1
+}
+
+StandardTagAndInitialize {
+    tagging_method = "GRADIENT_DETECTOR"
+}
+
+PatchHierarchy {
+    max_levels = 2
+    proper_nesting_buffer = 2, 2, 2, 2, 2, 2
+    ratio_to_coarser {
+        level_1            = 2, 2
+        level_2            = 2, 2
+        level_3            = 2, 2
+        level_4            = 2, 2
+    }
+    largest_patch_size {
+        level_0 = -1, -1
+    }
+}
+
+GriddingAlgorithm {
+    enforce_proper_nesting = TRUE
+    extend_to_domain_boundary = FALSE
+    proper_nesting_buffer = 2, 2, 2, 2, 2, 2
+    efficiency_tolerance = 0.80
+    combine_efficiency = 0.75
+    check_nonrefined_tags = "ERROR"
+    check_overlapping_patches = "ERROR"
+    extend_tags_to_bdry = TRUE
+    sequentialize_patch_indices = TRUE
+    barrier_before_regrid = TRUE
+    barrier_before_find_refinement = TRUE
+    barrier_before_cluster = TRUE
+    barrier_before_nest = TRUE
+    barrier_before_limit = TRUE
+    barrier_before_extend = TRUE
+    barrier_before_balance = TRUE
+    barrier_after_find_refinement = TRUE
+    coalesce_boxes = FALSE
+}
