@@ -139,8 +139,15 @@ namespace SAMRAI {
                                                   operator */);
 
     d_adaptation_threshold=database->getDoubleWithDefault("adaption_threshold",
-                                                          // 1.0e-15);
-                                                          2e-3);
+                                                          1.0e-15);
+
+    if(database->keyExists("viscosity_data"))
+      {
+        viscosity_ijk=database->getIntegerArray("viscosity_ijk");
+        viscosity_xyz_min=database->getDoubleArray("viscosity_coord_min");
+        viscosity_xyz_max=database->getDoubleArray("viscosity_coord_max");
+        viscosity=database->getDoubleArray("viscosity_data");
+      }
 
     /*
      * Specify an implementation of solv::RobinBcCoefStrategy for the

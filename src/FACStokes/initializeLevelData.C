@@ -46,54 +46,11 @@ void SAMRAI::FACStokes::initializeLevelData
   }
 
   // const double inclusion_radius=0.5;
-  const double inclusion_viscosity=2;
+  const double inclusion_viscosity=1e2;
   const double background_viscosity=1;
 
   // const double background_density(1), block_density(1);
   const double background_density(1), block_density(1.03);
-
-  static double viscosity[129][129];
-  static int max_x(0), max_y(0);
-
-  double max_viscosity(.1), min_viscosity(0.0001);
-  // double max_viscosity(100), min_viscosity(0);
-
-  max_x=127;
-  // max_y=127;
-  max_y=31;
-
-  double scale_x(0.21615179018), scale_y(0.04);
-  // double scale_x(1), scale_y(1);
-
-  if(viscosity[128][128]!=boundary_value)
-    {
-      viscosity[128][128]=boundary_value;
-      std::ifstream infile("viscosity");
-      // int i, j;
-      // infile >> i >> j;
-      double x, y;
-      infile >> x >> y;
-      while(infile)
-        {
-          // max_x=std::max(i,max_x);
-          // max_y=std::max(j,max_y);
-          double visc;
-          infile >> visc;
-          int i(static_cast<int>(max_x*x/scale_x + 0.05)),
-            j(static_cast<int>(max_y*y/scale_y + 0.05));
-          // viscosity[i][j]=1;
-          viscosity[i][j]=std::max(min_viscosity,std::min(max_viscosity,visc));
-          // std::cout << "viscosity "
-          //           << i << " " << j << " "
-          //           << (max_x*x/scale_x) << " "
-          //           << (max_y*y/scale_y) << " "
-          //           << visc << " "
-          //           << viscosity[i][j] << " "
-          //           << "\n";
-          infile >> x >> y;
-        }
-    }
-
 
   /*
    * Initialize data in all patches in the level.
@@ -122,116 +79,59 @@ void SAMRAI::FACStokes::initializeLevelData
         double y=geom->getXLower()[1]
           + geom->getDx()[1]*(c[1]-cell_visc_box.lower()[1] + 0.5);
 
-        // int i(static_cast<int>(x*max_x/scale_x)),
-        //   j(static_cast<int>(y*max_y/scale_y));
-        // i=std::max(0,std::min(max_x,i));
-        // j=std::max(0,std::min(max_y,j));
-              
-        // cell_viscosity(c)=viscosity[i][j];
-
-        // if(x*x + y*y < inclusion_radius*inclusion_radius)
-        //   cell_viscosity(c)=inclusion_viscosity;
-        // else
-        //   cell_viscosity(c)=background_viscosity;
-
-        if(d_dim.getValue()==2)
+        if(!viscosity.empty())
           {
-            if(x<1.0/3 || x>2.0/3 || y<1.0/3 || y>2.0/3)
-              cell_viscosity(c)=background_viscosity;
+            int i(static_cast<int>(x*(viscosity_ijk[0]-1)
+                                   /(viscosity_xyz_max[0]-viscosity_xyz_min[0]))),
+              j(static_cast<int>(y*(viscosity_ijk[1]-1)
+                                 /(viscosity_xyz_max[1]-viscosity_xyz_min[1])));
+            i=std::max(0,std::min(viscosity_ijk[0]-1,i));
+            j=std::max(0,std::min(viscosity_ijk[1]-1,j));
+
+            if(d_dim.getValue()==2)
+              cell_viscosity(c)=viscosity[i+viscosity_ijk[0]*j];
             else
-              cell_viscosity(c)=inclusion_viscosity;
+              {
+                double z=geom->getXLower()[2]
+                  + geom->getDx()[2]*(c[2]-cell_visc_box.lower()[2] + 0.5);
+                int k(static_cast<int>(z*(viscosity_ijk[2]-1)
+                                       /(viscosity_xyz_max[2]
+                                         - viscosity_xyz_min[2])));
+                k=std::max(0,std::min(viscosity_ijk[2]-1,k));
+                cell_viscosity(c)=
+                  viscosity[i+viscosity_ijk[0]*(j+viscosity_ijk[1]*k)];
+              }
           }
         else
           {
-            double z=geom->getXLower()[2]
-              + geom->getDx()[2]*(c[2]-cell_visc_box.lower()[2] + 0.5);
-            if(x<1.0/3 || x>2.0/3 || y<1.0/3 || y>2.0/3 || z<1.0/3 || z>2.0/3)
-              cell_viscosity(c)=background_viscosity;
-            else
-              cell_viscosity(c)=inclusion_viscosity;
-          }
-      }
-
-    if(d_dim.getValue()==2)
-      {
-        tbox::Pointer<pdat::NodeData<double> > edge_viscosity_ptr =
-          patch->getPatchData(edge_viscosity_id);
-        pdat::NodeData<double> &edge_viscosity(*edge_viscosity_ptr);
-        hier::Box edge_visc_box = edge_viscosity.getBox();
-
-        for(pdat::NodeIterator ei(edge_viscosity.getGhostBox()); ei; ei++)
-          {
-            pdat::NodeIndex e=ei();
-            double x=geom->getXLower()[0]
-              + geom->getDx()[0]*(e[0]-edge_visc_box.lower()[0]);
-            double y=geom->getXLower()[1]
-              + geom->getDx()[1]*(e[1]-edge_visc_box.lower()[1]);
-
-            // int i(static_cast<int>(x*max_x/scale_x)),
-            //   j(static_cast<int>(y*max_y/scale_y));
-            // i=std::max(0,std::min(max_x,i));
-            // j=std::max(0,std::min(max_y,j));
-              
-            // edge_viscosity(e)=viscosity[i][j];
-
             // if(x*x + y*y < inclusion_radius*inclusion_radius)
-            //   edge_viscosity(e)=inclusion_viscosity;
+            //   cell_viscosity(c)=inclusion_viscosity;
             // else
-            //   edge_viscosity(e)=background_viscosity;
+            //   cell_viscosity(c)=background_viscosity;
 
-            if(x<1.0/3 || x>2.0/3 || y<1.0/3 || y>2.0/3)
-              edge_viscosity(e)=background_viscosity;
+            if(d_dim.getValue()==2)
+              {
+                if(x<1.0/3 || x>2.0/3 || y<1.0/3 || y>2.0/3)
+                  cell_viscosity(c)=background_viscosity;
+                else
+                  cell_viscosity(c)=inclusion_viscosity;
+              }
             else
-              edge_viscosity(e)=inclusion_viscosity;
+              {
+                double z=geom->getXLower()[2]
+                  + geom->getDx()[2]*(c[2]-cell_visc_box.lower()[2] + 0.5);
+                if(x<1.0/3 || x>2.0/3 || y<1.0/3 || y>2.0/3 || z<1.0/3 || z>2.0/3)
+                  cell_viscosity(c)=background_viscosity;
+                else
+                  cell_viscosity(c)=inclusion_viscosity;
+              }
           }
-      }
-    else if(d_dim.getValue()==3)
-      {
-        tbox::Pointer<pdat::EdgeData<double> > edge_viscosity_ptr =
-          patch->getPatchData(edge_viscosity_id);
-        pdat::EdgeData<double> &edge_viscosity(*edge_viscosity_ptr);
-        hier::Box edge_visc_box = edge_viscosity.getBox();
-
-        for(int ix=0;ix<3;++ix)
-          for(pdat::EdgeIterator ei(edge_viscosity.getGhostBox(),ix); ei; ei++)
-            {
-              pdat::EdgeIndex e=ei();
-              double dx(0);
-              if(ix==0)
-                dx=0.5;
-              double dy(0);
-              if(ix==1)
-                dy=0.5;
-              double dz(0);
-              if(ix==2)
-                dz=0.5;
-              double x=geom->getXLower()[0]
-                + geom->getDx()[0]*(e[0]-edge_visc_box.lower()[0] + dx);
-              double y=geom->getXLower()[1]
-                + geom->getDx()[1]*(e[1]-edge_visc_box.lower()[1] + dy);
-              double z=geom->getXLower()[2]
-                + geom->getDx()[2]*(e[2]-edge_visc_box.lower()[2] + dz);
-
-              // int i(static_cast<int>(x*max_x)), j(static_cast<int>(y*max_y));
-              // edge_viscosity(e)=viscosity[i][j];
-
-              // if(x*x + y*y < inclusion_radius*inclusion_radius)
-              //   edge_viscosity(e)=inclusion_viscosity;
-              // else
-              //   edge_viscosity(e)=background_viscosity;
-
-
-            if(x<1.0/3 || x>2.0/3 || y<1.0/3 || y>2.0/3 || z<1.0/3 || z>2.0/3)
-              edge_viscosity(e)=background_viscosity;
-            else
-              edge_viscosity(e)=inclusion_viscosity;
-            }
       }
 
     tbox::Pointer<pdat::CellData<double> > dp_data =
       patch->getPatchData(dp_id);
 
-    /* This is mostly so that the outer boundaries are set properly. */
+    /* I do not think this is actually necessary. */
     dp_data->fill(0.0);
 
     tbox::Pointer<pdat::CellData<double> > p_rhs_data =

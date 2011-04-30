@@ -187,6 +187,9 @@ namespace SAMRAI {
     int p_id, cell_viscosity_id, edge_viscosity_id, dp_id, p_exact_id,
       p_rhs_id, v_id, v_rhs_id;
 
+    tbox::Array<double> viscosity;
+    tbox::Array<int> viscosity_ijk;
+    tbox::Array<double> viscosity_xyz_max, viscosity_xyz_min;
     //@}
 
   };
