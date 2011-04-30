@@ -33,7 +33,7 @@ FACStokes {
         // This is the input for the cell-centered Stokes FAC solver
         // class in the SAMRAI library.
         enable_logging = TRUE   // Bool flag to switch logging on/off
-        max_cycles = 5         // Max number of FAC cycles to use
+        max_cycles = 100         // Max number of FAC cycles to use
         residual_tol = 1e-3     // Residual tolerance to solve for
         num_pre_sweeps = 5      // Number of presmoothing sweeps to use
         num_post_sweeps = 5     // Number of postsmoothing sweeps to use
