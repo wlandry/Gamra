@@ -26,16 +26,16 @@ inline double dRm_dv_3D(SAMRAI::pdat::CellData<double> &cell_viscosity,
                         SAMRAI::pdat::EdgeData<double> &edge_viscosity,
                         const SAMRAI::pdat::CellIndex &center,
                         const SAMRAI::pdat::CellIndex &left,
-                        const SAMRAI::pdat::EdgeIndex &up_y,
+                        const SAMRAI::pdat::EdgeIndex &front_y,
                         const SAMRAI::pdat::EdgeIndex &center_y,
-                        const SAMRAI::pdat::EdgeIndex &front_z,
+                        const SAMRAI::pdat::EdgeIndex &up_z,
                         const SAMRAI::pdat::EdgeIndex &center_z,
                         const double &dx,
                         const double &dy,
                         const double &dz)
 {
-  return dRm_dv_2D(cell_viscosity,edge_viscosity,center,left,up_y,center_y,dx,dy)
-    - (edge_viscosity(front_z) + edge_viscosity(center_z))/(dz*dz);
+  return dRm_dv_2D(cell_viscosity,edge_viscosity,center,left,front_y,center_y,dx,dz)
+    - (edge_viscosity(up_z) + edge_viscosity(center_z))/(dy*dy);
 }
 
 

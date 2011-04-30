@@ -234,8 +234,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
                                && v(x+pp[ix])==boundary_value)))
                         v(x)+=(dp(center) - dp(center-pp[ix]))
                           /(Dx[ix]*dRm_dv_3D(cell_viscosity,edge_viscosity,center,
-                                             center-pp[ix],edge_y+pp[ix],edge_y,
-                                             edge_z+pp[ix],edge_z,
+                                             center-pp[ix],edge_y+pp[iz],edge_y,
+                                             edge_z+pp[iy],edge_z,
                                              Dx[ix],Dx[iy],Dx[iz]));
                     }
                 }

@@ -52,7 +52,7 @@ void SAMRAI::solv::StokesFACOps::smooth_V_3D
         }
 
       double C_vx=dRm_dv_3D(cell_viscosity,edge_viscosity,center,center-pp[ix],
-                            edge_y+pp[iy],edge_y,edge_z+pp[iz],edge_z,
+                            edge_y+pp[iz],edge_y,edge_z+pp[iy],edge_z,
                             Dx[ix],Dx[iy],Dx[iz]);
 
       double delta_Rx=v_rhs(x)
