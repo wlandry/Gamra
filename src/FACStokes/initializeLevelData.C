@@ -62,41 +62,28 @@ void SAMRAI::FACStokes::initializeLevelData
     const double *dx=geom->getDx();
 
     /* Initialize cell viscosity */
-    tbox::Pointer<pdat::CellData<double> > cell_viscosity_ptr =
+    tbox::Pointer<pdat::CellData<double> > cell_viscosity =
       patch->getPatchData(cell_viscosity_id);
-    pdat::CellData<double> &cell_viscosity(*cell_viscosity_ptr);
 
-    hier::Box cell_visc_box = cell_viscosity.getBox();
-    for(pdat::CellIterator ci(cell_viscosity.getGhostBox()); ci; ci++)
+    hier::Box cell_visc_box = cell_viscosity->getBox();
+    for(pdat::CellIterator ci(cell_viscosity->getGhostBox()); ci; ci++)
       {
         pdat::CellIndex c=ci();
-        double x=geom->getXLower()[0]
-          + geom->getDx()[0]*(c[0]-cell_visc_box.lower()[0] + 0.5);
-        double y=geom->getXLower()[1]
-          + geom->getDx()[1]*(c[1]-cell_visc_box.lower()[1] + 0.5);
+        double xyz[dim];
+        for(int d=0;d<dim;++d)
+          xyz[d]=geom->getXLower()[d]
+            + dx[d]*(c[d]-cell_visc_box.lower()[d] + 0.5);
 
-        int i(static_cast<int>(x*(viscosity_ijk[0]-1)
-                               /(viscosity_xyz_max[0]-viscosity_xyz_min[0]))),
-          j(static_cast<int>(y*(viscosity_ijk[1]-1)
-                             /(viscosity_xyz_max[1]-viscosity_xyz_min[1])));
-        i=std::max(0,std::min(viscosity_ijk[0]-1,i));
-        j=std::max(0,std::min(viscosity_ijk[1]-1,j));
-
-        if(dim==2)
+        int ijk(0), factor(1);
+        for(int d=0;d<dim;++d)
           {
-            cell_viscosity(c)=viscosity[i+viscosity_ijk[0]*j];
+            int i=static_cast<int>(xyz[d]*(viscosity_ijk[d]-1)
+                                   /(viscosity_xyz_max[d]-viscosity_xyz_min[d]));
+            i=std::max(0,std::min(viscosity_ijk[d]-1,i));
+            ijk+=i*factor;
+            factor*=viscosity_ijk[d];
           }
-        else
-          {
-            double z=geom->getXLower()[2]
-              + geom->getDx()[2]*(c[2]-cell_visc_box.lower()[2] + 0.5);
-            int k(static_cast<int>(z*(viscosity_ijk[2]-1)
-                                   /(viscosity_xyz_max[2]
-                                     - viscosity_xyz_min[2])));
-            k=std::max(0,std::min(viscosity_ijk[2]-1,k));
-            cell_viscosity(c)=
-              viscosity[i+viscosity_ijk[0]*(j+viscosity_ijk[1]*k)];
-          }
+        (*cell_viscosity)(c)=viscosity[ijk];
       }
 
     /* I do not think this is actually necessary. */
@@ -128,7 +115,7 @@ void SAMRAI::FACStokes::initializeLevelData
             for(pdat::SideIterator si(pbox,ix); si; si++)
               {
                 pdat::SideIndex s=si();
-                double xyz[]={0,0,0};
+                double xyz[dim];
                 for(int d=0;d<dim;++d)
                   xyz[d]=geom->getXLower()[d]
                     + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
