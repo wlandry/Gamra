@@ -65,14 +65,15 @@ void SAMRAI::FACStokes::applyGradientDetector
           //            << (estimate_data(cell_index) > d_adaptation_threshold)
           //            << " "
           //            << "\n";
-          if (estimate_data(cell_index) > d_adaptation_threshold)
+          if (estimate_data(cell_index) > d_adaption_threshold
+              || ln<min_full_refinement_level)
             {
               tag_cell_data(cell_index) = 1;
               ++ntag;
             }
         }
     }
-  tbox::plog << "Adaption threshold is " << d_adaptation_threshold << "\n";
+  tbox::plog << "Adaption threshold is " << d_adaption_threshold << "\n";
   tbox::plog << "Number of cells tagged on level " << ln << " is "
              << ntag << "/" << ntotal << "\n";
   tbox::plog << "Max estimate is " << maxestimate << "\n";

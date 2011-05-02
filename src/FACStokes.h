@@ -182,14 +182,17 @@ namespace SAMRAI {
      * These are initialized in the constructor and never change.
      */
 
-    double d_adaptation_threshold;
+    double d_adaption_threshold;
+    int min_full_refinement_level;
   public:
     int p_id, cell_viscosity_id, edge_viscosity_id, dp_id, p_exact_id,
       p_rhs_id, v_id, v_rhs_id;
 
-    tbox::Array<double> viscosity;
+    tbox::Array<double> viscosity, viscosity_xyz_max, viscosity_xyz_min;
     tbox::Array<int> viscosity_ijk;
-    tbox::Array<double> viscosity_xyz_max, viscosity_xyz_min;
+
+    tbox::Array<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
+    tbox::Array<int> v_rhs_ijk;
     //@}
 
   };

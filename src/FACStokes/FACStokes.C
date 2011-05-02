@@ -63,16 +63,17 @@ namespace SAMRAI {
      */
 
     tbox::Pointer<pdat::CellVariable<double> >
-      p(new pdat::CellVariable<double>(dim, object_name + ":p", 1));
-    p_id = vdb->registerVariableAndContext(p, d_context, hier::IntVector(dim, 1)
+      p_ptr(new pdat::CellVariable<double>(dim, object_name + ":p", 1));
+    p_id = vdb->registerVariableAndContext(p_ptr, d_context,
+                                           hier::IntVector(dim, 1)
                                            /* ghost cell width is 1 for
                                               stencil widths */);
 
     tbox::Pointer<pdat::CellVariable<double> >
-      cell_viscosity(new pdat::CellVariable<double>(dim,
-                                                    object_name
-                                                    + ":cell_viscosity"));
-    cell_viscosity_id = vdb->registerVariableAndContext(cell_viscosity,
+      cell_viscosity_ptr(new pdat::CellVariable<double>(dim,
+                                                        object_name
+                                                        + ":cell_viscosity"));
+    cell_viscosity_id = vdb->registerVariableAndContext(cell_viscosity_ptr,
                                                         d_context,
                                                         hier::IntVector(dim, 1)
                                                         /* ghost cell width is
@@ -81,11 +82,11 @@ namespace SAMRAI {
     if(dim.getValue()==2)
       {
         tbox::Pointer<pdat::NodeVariable<double> >
-          edge_viscosity(new pdat::NodeVariable<double>(dim,
-                                                        object_name
-                                                        + ":edge_viscosity"));
+          edge_viscosity_ptr(new pdat::NodeVariable<double>(dim,
+                                                            object_name
+                                                            + ":edge_viscosity"));
         edge_viscosity_id =
-          vdb->registerVariableAndContext(edge_viscosity,d_context,
+          vdb->registerVariableAndContext(edge_viscosity_ptr,d_context,
                                           hier::IntVector(dim,1)
                                           /* ghost cell width is 1 in
                                              case needed */);
@@ -93,53 +94,56 @@ namespace SAMRAI {
     else if(dim.getValue()==3)
       {
         tbox::Pointer<pdat::EdgeVariable<double> >
-          edge_viscosity(new pdat::EdgeVariable<double>(dim,
-                                                        object_name
-                                                        + ":edge_viscosity"));
+          edge_viscosity_ptr(new pdat::EdgeVariable<double>(dim,
+                                                            object_name
+                                                            + ":edge_viscosity"));
         edge_viscosity_id =
-          vdb->registerVariableAndContext(edge_viscosity,d_context,
+          vdb->registerVariableAndContext(edge_viscosity_ptr,d_context,
                                           hier::IntVector(dim,1)
                                           /* ghost cell width is 1 in
                                              case needed */);
       }
 
     tbox::Pointer<pdat::CellVariable<double> >
-      dp(new pdat::CellVariable<double>(dim, object_name + ":dp"));
-    dp_id = vdb->registerVariableAndContext(dp,d_context,
+      dp_ptr(new pdat::CellVariable<double>(dim, object_name + ":dp"));
+    dp_id = vdb->registerVariableAndContext(dp_ptr,d_context,
                                             hier::IntVector(dim, 1)
                                             /* ghost cell width is
                                                     1 in case needed */);
 
     tbox::Pointer<pdat::CellVariable<double> >
-      p_exact(new pdat::CellVariable<double>(dim, object_name + ":p exact"));
-    p_exact_id = vdb->registerVariableAndContext(p_exact,d_context,
+      p_exact_ptr(new pdat::CellVariable<double>(dim, object_name + ":p exact"));
+    p_exact_id = vdb->registerVariableAndContext(p_exact_ptr,d_context,
                                                  hier::IntVector(dim, 1)
                                                  /* ghost cell width is
                                                     1 in case needed */);
 
     tbox::Pointer<pdat::CellVariable<double> >
-      p_rhs(new pdat::CellVariable<double>(dim,object_name
-                                           + ":p right hand side"));
-    p_rhs_id = vdb->registerVariableAndContext(p_rhs,d_context,
+      p_rhs_ptr(new pdat::CellVariable<double>(dim,object_name
+                                               + ":p right hand side"));
+    p_rhs_id = vdb->registerVariableAndContext(p_rhs_ptr,d_context,
                                                hier::IntVector(dim, 1));
 
     tbox::Pointer<pdat::SideVariable<double> >
-      v(new pdat::SideVariable<double>(dim, object_name + ":v", 1));
-    v_id = vdb->registerVariableAndContext(v, d_context, hier::IntVector(dim, 1)
+      v_ptr(new pdat::SideVariable<double>(dim, object_name + ":v", 1));
+    v_id = vdb->registerVariableAndContext(v_ptr, d_context,
+                                           hier::IntVector(dim, 1)
                                            /* ghost cell width is 1 for
                                               stencil widths */);
 
     tbox::Pointer<pdat::SideVariable<double> >
-      v_rhs(new pdat::SideVariable<double>(dim,object_name
-                                           + ":v right hand side"));
-    v_rhs_id = vdb->registerVariableAndContext(v_rhs,d_context,
+      v_rhs_ptr(new pdat::SideVariable<double>(dim,object_name
+                                               + ":v right hand side"));
+    v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,
                                                hier::IntVector(dim, 1)
                                                /* ghost cell width is
                                                   1 for coarsening
                                                   operator */);
 
-    d_adaptation_threshold=database->getDoubleWithDefault("adaption_threshold",
-                                                          1.0e-15);
+    d_adaption_threshold=database->getDoubleWithDefault("adaption_threshold",
+                                                        1.0e-15);
+    min_full_refinement_level
+      =database->getIntegerWithDefault("min_full_refinement_level",0);
 
     if(database->keyExists("viscosity_data"))
       {
@@ -147,6 +151,14 @@ namespace SAMRAI {
         viscosity_xyz_min=database->getDoubleArray("viscosity_coord_min");
         viscosity_xyz_max=database->getDoubleArray("viscosity_coord_max");
         viscosity=database->getDoubleArray("viscosity_data");
+      }
+
+    if(database->keyExists("v_rhs_data"))
+      {
+        v_rhs_ijk=database->getIntegerArray("v_rhs_ijk");
+        v_rhs_xyz_min=database->getDoubleArray("v_rhs_coord_min");
+        v_rhs_xyz_max=database->getDoubleArray("v_rhs_coord_max");
+        v_rhs=database->getDoubleArray("v_rhs_data");
       }
 
     /*
