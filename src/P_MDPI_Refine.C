@@ -56,8 +56,9 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
    const hier::Box& fine_box,
    const hier::IntVector& ratio) const
 {
-   const tbox::Dimension& dim(getDim());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, fine_patch, coarse_patch,
+   const tbox::Dimension& dimension(getDim());
+   const int dim(dimension.getValue());
+   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine_patch, coarse_patch,
                                    fine_box, ratio);
 
    tbox::Pointer<pdat::CellData<double> >
@@ -74,7 +75,7 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
    pdat::CellData<double> &cell_viscosity(*cell_viscosity_ptr);
    tbox::Pointer<pdat::NodeData<double> > edge_viscosity2D_ptr;
    tbox::Pointer<pdat::EdgeData<double> > edge_viscosity3D_ptr;
-   if(dim.getValue()==2)
+   if(dim==2)
      edge_viscosity2D_ptr = fine_patch.getPatchData(edge_viscosity_id);
    else
      edge_viscosity3D_ptr = fine_patch.getPatchData(edge_viscosity_id);
@@ -85,66 +86,67 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
    TBOX_ASSERT(p.getDepth() == p_fine.getDepth());
 #endif
 
-   hier::Box coarse_box=coarse_patch.getBox();
    tbox::Pointer<geom::CartesianPatchGeometry>
-     geom = coarse_patch.getPatchGeometry();
+     geom = fine_patch.getPatchGeometry();
 
-   hier::Box gbox=p_fine.getGhostBox();
+   const double *Dx=geom->getDx();
 
-   double Dx[dim.getValue()];
-   for(int d=0;d<dim.getValue();++d)
-     Dx[d]=geom->getDx()[d];
+   hier::Box interior(p_fine.getBox());
 
-   hier::Box gbox_interior(gbox);
-   gbox_interior.grow(hier::Index::getOneIndex(dim)*(-1));
+   const hier::Box coarse_box
+     (hier::Box::coarsen(fine_box,hier::IntVector::getOne(dimension)*2));
 
-   hier::Box cell_box(hier::Index::getZeroIndex(dim),
-                      hier::Index::getOneIndex(dim));
+   hier::Box cell_box(hier::Index::getZeroIndex(dimension),
+                      hier::Index::getOneIndex(dimension));
 
-   for(pdat::CellIterator ci(fine_box); ci; ci++)
+   for(pdat::CellIterator ci(coarse_box); ci; ci++)
      {
-       pdat::CellIndex fine(*ci);
-       pdat::CellIndex
-         center(hier::Index::coarsen(fine,hier::Index::getOneIndex(dim)*2));
+       pdat::CellIndex coarse(*ci);
+       pdat::CellIndex fine(coarse*2);
 
-       if(gbox_interior.contains(fine))
+       if(interior.contains(fine))
          {
-           double dRc_dp_total(0), dRc_dp_fine(0);
-           /* This is horribly inefficient */
+           pdat::CellData<double>
+             dRc_dp(cell_box,1,hier::Index::getZeroIndex(dimension));
+           double dRc_dp_total(0);
 
            for(pdat::CellIterator ii(cell_box); ii; ii++)
-               {
-                 pdat::CellIndex c_fine(center*2);
-                 c_fine+=(*ii);
+             {
+               pdat::CellIndex c_fine(fine+*ii);
                
-                 double dRc_dp_weight;
-                 if(dim.getValue()==2)
-                   {
-                     pdat::SideIndex x(c_fine,0,pdat::SideIndex::Lower),
-                       y(c_fine,1,pdat::SideIndex::Lower);
-                     dRc_dp_weight=dRc_dp_2D(fine_box,c_fine,x,y,cell_viscosity,
-                                             *edge_viscosity2D_ptr,
-                                             v,Dx[0],Dx[1]);
-                   }
-                 else
-                   {
-                     const hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
-                     const hier::Index pp[]={ip,jp,kp};
-                     dRc_dp_weight=dRc_dp_3D(fine_box,c_fine,cell_viscosity,
-                                             *edge_viscosity3D_ptr,v,Dx,pp);
-                   }
-                 if(c_fine==fine)
-                   dRc_dp_fine=dRc_dp_weight;
+               if(dim==2)
+                 {
+                   pdat::SideIndex x(c_fine,0,pdat::SideIndex::Lower),
+                     y(c_fine,1,pdat::SideIndex::Lower);
+                   dRc_dp(*ii)=dRc_dp_2D(fine_box,c_fine,x,y,cell_viscosity,
+                                         *edge_viscosity2D_ptr,v,Dx[0],Dx[1]);
+                 }
+               else
+                 {
+                   const hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
+                   const hier::Index pp[]={ip,jp,kp};
+                   dRc_dp(*ii)=dRc_dp_3D(fine_box,c_fine,cell_viscosity,
+                                         *edge_viscosity3D_ptr,v,Dx,pp);
+                 }
+               dRc_dp_total+=dRc_dp(*ii,0);
+             }
 
-                 dRc_dp_total+=dRc_dp_weight;
-               }
-
-           p_fine(fine)=
-             p(center)*dRc_dp_total/(4*(dim.getValue()-1)*dRc_dp_fine);
+           for(pdat::CellIterator ii(cell_box); ii; ii++)
+             {
+               pdat::CellIndex c_fine(fine+*ii);
+               p_fine(c_fine)=p(coarse)*dRc_dp_total
+                 /(4*(dim-1)*dRc_dp(*ii));
+             }
          }
        else
          {
-           p_fine(fine)=p(center);
+           /* This should never be used as a real value, so we put in
+            * a bad value so that we will notice when it happens */
+           for(pdat::CellIterator ii(cell_box); ii; ii++)
+             {
+               pdat::CellIndex c_fine(fine+*ii);
+               p_fine(c_fine)=boundary_value;
+             }
          }
      }
 }
