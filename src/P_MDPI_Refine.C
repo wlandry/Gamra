@@ -145,7 +145,8 @@ void SAMRAI::geom::P_MDPI_Refine::refine(
            for(pdat::CellIterator ii(cell_box); ii; ii++)
              {
                pdat::CellIndex c_fine(fine+*ii);
-               p_fine(c_fine)=boundary_value;
+               if(fine_box.contains(c_fine))
+                 p_fine(c_fine)=boundary_value;
              }
          }
      }
