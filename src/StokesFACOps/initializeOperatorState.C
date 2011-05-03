@@ -207,9 +207,11 @@ void SAMRAI::solv::StokesFACOps::initializeOperatorState
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_urestriction_coarsen_operator =
-    p_rrestriction_coarsen_operator =
     geometry->lookupCoarsenOperator(variable,
                                     "CONSERVATIVE_COARSEN");
+  p_rrestriction_coarsen_operator =
+    geometry->lookupCoarsenOperator(variable,
+                                   p_rrestriction_method);
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_urestriction_coarsen_operator =

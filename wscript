@@ -22,6 +22,7 @@ def build(bld):
                         'src/P_Refine.C',
                         'src/P_MDPI_Refine.C',
                         'src/V_Refine.C',
+                        'src/Resid_Coarsen.C',
                         'src/V_Coarsen/coarsen_2D.C',
                         'src/V_Coarsen/coarsen_3D.C',
                         'src/P_Boundary_Refine/refine.C',

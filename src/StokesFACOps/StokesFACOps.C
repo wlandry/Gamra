@@ -56,6 +56,7 @@ namespace SAMRAI {
       d_cf_discretization("Ewing"),
       p_prolongation_method("P_REFINE"),
       v_prolongation_method("V_REFINE"),
+      p_rrestriction_method("CONSERVATIVE_COARSEN"),
       d_coarse_solver_tolerance(1.e-8),
       d_coarse_solver_max_iterations(10),
       d_residual_tolerance_during_smoothing(-1.0),
@@ -176,6 +177,10 @@ namespace SAMRAI {
         v_prolongation_method =
           database->getStringWithDefault("v_prolongation_method",
                                          v_prolongation_method);
+
+        p_rrestriction_method =
+          database->getStringWithDefault("p_rrestriction_method",
+                                         p_rrestriction_method);
 
         d_enable_logging =
           database->getBoolWithDefault("enable_logging",
