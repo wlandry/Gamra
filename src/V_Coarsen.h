@@ -94,13 +94,9 @@ public:
     return 0;
   }
 
-  /**
-   * The stencil width of the weighted averaging operator is the vector of
-   * zeros.  That is, its stencil does not extend outside the fine box.
-   */
   hier::IntVector getStencilWidth() const
   {
-    return hier::IntVector::getZero(getDim());
+    return hier::IntVector::getOne(getDim());
   }
 
   /**
