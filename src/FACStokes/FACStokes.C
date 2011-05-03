@@ -31,23 +31,23 @@ namespace SAMRAI {
                          const int num_components=1)
   {
     if(ijk.size()!=dim)
-      tbox::perr << "Bad number of elements in " << name << "_ijk.  Expected "
-                 << dim << " but got " << ijk.size() << "\n";
+      TBOX_ERROR("Bad number of elements in " << name << "_ijk.  Expected "
+                 << dim << " but got " << ijk.size());
     if(min.size()!=dim)
-      tbox::perr << "Bad number of elements in "
+      TBOX_ERROR("Bad number of elements in "
                  << name << "_coord_min.  Expected "
-                 << dim << " but got " << min.size() << "\n";
+                 << dim << " but got " << min.size());
     if(max.size()!=dim)
-      tbox::perr << "Bad number of elements in "
+      TBOX_ERROR("Bad number of elements in "
                  << name << "_coord_max.  Expected "
-                 << dim << " but got " << max.size() << "\n";
+                 << dim << " but got " << max.size());
     int data_size(1);
     for(int d=0; d<dim; ++d)
       data_size*=ijk[d];
     if(data.size()!=data_size*num_components)
-      tbox::perr << "Bad number of elements in "
+      TBOX_ERROR("Bad number of elements in "
                  << name << "_data.  Expected "
-                 << data_size << " but got " << data.size() << "\n";
+                 << data_size << " but got " << data.size());
   }
   /*
 *************************************************************************
