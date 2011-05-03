@@ -193,6 +193,9 @@ namespace SAMRAI {
 
     tbox::Array<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
     tbox::Array<int> v_rhs_ijk;
+
+    tbox::Array<double> p_initial, p_initial_xyz_max, p_initial_xyz_min;
+    tbox::Array<int> p_initial_ijk;
     //@}
 
   };

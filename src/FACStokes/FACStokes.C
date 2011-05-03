@@ -161,6 +161,14 @@ namespace SAMRAI {
         v_rhs=database->getDoubleArray("v_rhs_data");
       }
 
+    if(database->keyExists("p_initial_data"))
+      {
+        p_initial_ijk=database->getIntegerArray("p_initial_ijk");
+        p_initial_xyz_min=database->getDoubleArray("p_initial_coord_min");
+        p_initial_xyz_max=database->getDoubleArray("p_initial_coord_max");
+        p_initial=database->getDoubleArray("p_initial_data");
+      }
+
     /*
      * Specify an implementation of solv::RobinBcCoefStrategy for the
      * solver to use.  We use the implementation

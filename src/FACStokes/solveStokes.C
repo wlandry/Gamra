@@ -49,15 +49,79 @@ int SAMRAI::FACStokes::solveStokes()
 
       tbox::Pointer<geom::CartesianPatchGeometry>
         geom = patch->getPatchGeometry();
-      hier::Box pbox = p->getBox();
-      for(pdat::CellIterator ci(p->getGhostBox()); ci; ci++)
+
+      if(p_initial.empty())
         {
-          pdat::CellIndex c=ci();
-          double y=geom->getXLower()[1]
-            + geom->getDx()[1]*(c[1]-pbox.lower()[1] + 0.5);
-          (*p)(c)=-y;
+          p->fill(0.0);
         }
-      // p->fill(0.0);
+      else
+        {
+          const int dim=d_dim.getValue();
+          const double *dx=geom->getDx();
+          double dx_p[dim];
+          for(int d=0;d<dim;++d)
+            dx_p[d]=(p_initial_xyz_max[d]
+                     - p_initial_xyz_min[d])/(p_initial_ijk[d]-1);
+          int di[dim];
+          di[0]=1;
+          for(int d=1;d<dim;++d)
+            di[d]=di[d-1]*p_initial_ijk[d-1];
+
+          hier::Box pbox = p->getBox();
+          for(pdat::CellIterator ci(p->getGhostBox()); ci; ci++)
+            {
+              pdat::CellIndex c=ci();
+              double xyz[dim], weight[dim][2];
+              for(int d=0;d<dim;++d)
+                xyz[d]=geom->getXLower()[d]
+                  + dx[d]*(c[d]-pbox.lower()[d] + 0.5);
+
+              int ijk(0);
+              int ddi[dim];
+              for(int d=0;d<dim;++d)
+                {
+                  int i=static_cast<int>(xyz[d]*(p_initial_ijk[d]-1)
+                                         /(p_initial_xyz_max[d]
+                                           - p_initial_xyz_min[d]));
+                  i=std::max(0,std::min(p_initial_ijk[d]-1,i));
+                  ijk+=i*di[d];
+
+                  if(i==p_initial_ijk[d]-1)
+                    {
+                      weight[d][0]=1;
+                      weight[d][1]=0;
+                      ddi[d]=0;
+                    }
+                  else
+                    {
+                      weight[d][1]=
+                        (xyz[d]-(i*dx_p[d] + p_initial_xyz_min[d]))/dx_p[d];
+                      weight[d][0]=1-weight[d][1];
+                      ddi[d]=di[d];
+                    }
+                }
+
+              if(dim==2)
+                {
+                  (*p)(c)=p_initial[ijk]*weight[0][0]*weight[1][0]
+                    + p_initial[ijk+ddi[0]]*weight[0][1]*weight[1][0]
+                    + p_initial[ijk+ddi[1]]*weight[0][0]*weight[1][1]
+                    + p_initial[ijk+ddi[0]+ddi[1]]*weight[0][1]*weight[1][1];
+                }
+              else
+                {
+                  (*p)(c)=p_initial[ijk]*weight[0][0]*weight[1][0]*weight[2][0]
+                    + p_initial[ijk+ddi[0]]*weight[0][1]*weight[1][0]*weight[2][0]
+                    + p_initial[ijk+ddi[1]]*weight[0][0]*weight[1][1]*weight[2][0]
+                    + p_initial[ijk+ddi[0]+ddi[1]]*weight[0][1]*weight[1][1]*weight[2][0]
+                    
+                    + p_initial[ijk+ddi[2]]*weight[0][0]*weight[1][0]*weight[2][1]
+                    + p_initial[ijk+ddi[0]+ddi[2]]*weight[0][1]*weight[1][0]*weight[2][1]
+                    + p_initial[ijk+ddi[1]+ddi[2]]*weight[0][0]*weight[1][1]*weight[2][1]
+                    + p_initial[ijk+ddi[0]+ddi[1]+ddi[2]]*weight[0][1]*weight[1][1]*weight[2][1];
+                }
+            }
+        }
 
       tbox::Pointer<pdat::SideData<double> >
         v = patch->getPatchData(v_id);
