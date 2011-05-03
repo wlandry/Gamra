@@ -109,8 +109,8 @@ void SAMRAI::FACStokes::initializeLevelData
         int ix_offset(0);
         for(int ix=0;ix<dim;++ix)
           {
-            double offset[]={0,0,0};
-            offset[ix]=0.5;
+            double offset[]={0.5,0.5,0.5};
+            offset[ix]=0;
 
             for(pdat::SideIterator si(pbox,ix); si; si++)
               {
