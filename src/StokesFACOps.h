@@ -876,6 +876,7 @@ private:
     */
    std::string p_prolongation_method;
    std::string v_prolongation_method;
+   std::string p_rrestriction_method;
 
    /*!
     * @brief Tolerance specified to coarse solver
