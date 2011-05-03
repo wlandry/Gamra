@@ -104,44 +104,44 @@ void SAMRAI::geom::V_Coarsen::coarsen_2D(hier::Patch& coarse,
      V_Coarsen_Patch_Strategy::postprocessCoarsen.
   */
   hier::Index ip(1,0), jp(0,1);
-   for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
-     for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
-       {
-         if(directions(0) && j!=coarse_box.upper(1)+1)
-           {
-             pdat::SideIndex coarse(hier::Index(i,j),0,
-                                    pdat::SideIndex::Lower);
-             pdat::SideIndex center(coarse*2);
-             if((i==coarse_box.lower(0)
-                 && cgeom->getTouchesRegularBoundary(0,0))
-                || (i==coarse_box.upper(0)+1
-                    && cgeom->getTouchesRegularBoundary(0,1)))
-               {
-                 (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
-               }
-             else
-               {
-                 coarsen_point_2D(coarse,ip,jp,v,v_fine);
-               }
-           }
-         if(directions(1) && i!=coarse_box.upper(0)+1)
-           {
-             pdat::SideIndex coarse(hier::Index(i,j),1,
-                                    pdat::SideIndex::Lower);
-             pdat::SideIndex center(coarse*2);
-             if((j==coarse_box.lower(1)
-                 && cgeom->getTouchesRegularBoundary(1,0))
-                || (j==coarse_box.upper(1)+1
-                    && cgeom->getTouchesRegularBoundary(1,1)))
-               {
-                 (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
-               }
-             else
-               {
-                 coarsen_point_2D(coarse,jp,ip,v,v_fine);
-               }
-           }
-       }
+  for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
+    for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
+      {
+        if(directions(0) && j!=coarse_box.upper(1)+1)
+          {
+            pdat::SideIndex coarse(hier::Index(i,j),0,
+                                   pdat::SideIndex::Lower);
+            pdat::SideIndex center(coarse*2);
+            if((i==coarse_box.lower(0)
+                && cgeom->getTouchesRegularBoundary(0,0))
+               || (i==coarse_box.upper(0)+1
+                   && cgeom->getTouchesRegularBoundary(0,1)))
+              {
+                (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
+              }
+            else
+              {
+                coarsen_point_2D(coarse,ip,jp,v,v_fine);
+              }
+          }
+        if(directions(1) && i!=coarse_box.upper(0)+1)
+          {
+            pdat::SideIndex coarse(hier::Index(i,j),1,
+                                   pdat::SideIndex::Lower);
+            pdat::SideIndex center(coarse*2);
+            if((j==coarse_box.lower(1)
+                && cgeom->getTouchesRegularBoundary(1,0))
+               || (j==coarse_box.upper(1)+1
+                   && cgeom->getTouchesRegularBoundary(1,1)))
+              {
+                (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
+              }
+            else
+              {
+                coarsen_point_2D(coarse,jp,ip,v,v_fine);
+              }
+          }
+      }
 }
 
 #endif
