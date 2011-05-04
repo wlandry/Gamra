@@ -17,7 +17,6 @@ void SAMRAI::geom::Resid_Coarsen::coarsen(hier::Patch& coarse,
 {
   const tbox::Dimension& dimension(getDim());
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, coarse, fine, coarse_box, ratio);
-  const int dim(dimension.getValue());
   
   tbox::Pointer<pdat::CellData<double> >
     r_fine_ptr = fine.getPatchData(src_component);
@@ -26,10 +25,7 @@ void SAMRAI::geom::Resid_Coarsen::coarsen(hier::Patch& coarse,
     r_ptr = coarse.getPatchData(dst_component);
   pdat::CellData<double> &r(*r_ptr);
   tbox::Pointer<pdat::CellData<double> >
-    cell_viscosity_ptr = coarse.getPatchData(dst_component);
-  pdat::CellData<double> &cell_viscosity(*cell_viscosity_ptr);
-  tbox::Pointer<pdat::CellData<double> >
-    cell_viscosity_fine_ptr = fine.getPatchData(dst_component);
+    cell_viscosity_fine_ptr = fine.getPatchData(cell_viscosity_id);
   pdat::CellData<double> &cell_viscosity_fine(*cell_viscosity_fine_ptr);
 
   TBOX_ASSERT(!r_ptr.isNull());
@@ -44,12 +40,14 @@ void SAMRAI::geom::Resid_Coarsen::coarsen(hier::Patch& coarse,
     {
       pdat::CellIndex coarse(*ci);
       pdat::CellIndex fine(coarse*2);
-      double temp(0);
+      double temp(0), viscosity_sum(0);
+
       for(pdat::CellIterator ii(cell_box); ii; ii++)
         {
           pdat::CellIndex i(*ii);
           temp+=r_fine(fine+i)*cell_viscosity_fine(fine+i);
+          viscosity_sum+=cell_viscosity_fine(fine+i);
         }
-      r(coarse)=temp/(4*(dim-1)*cell_viscosity(coarse));
+      r(coarse)=temp/viscosity_sum;
     }
 }
