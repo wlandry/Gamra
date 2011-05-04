@@ -69,7 +69,7 @@ void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
 
       double dv_fine_minus, dv_fine_plus;
 
-      quad_offset_interpolate(dv_plus,dv_minus,dv_center,
+      quad_offset_interpolate(dv_plus,dv_center,dv_minus,
                               dv_fine_plus,dv_fine_minus);
 
       hier::Index offset(ip_s*2);
