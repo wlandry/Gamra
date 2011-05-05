@@ -110,6 +110,7 @@ void SAMRAI::FACStokes::fix_viscosity()
   jp[1]=1;
   if(d_dim.getValue()>2)
     kp[2]=1;
+  hier::Index pp[]={ip,jp,kp};
 
   for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln)
     {
@@ -147,19 +148,15 @@ void SAMRAI::FACStokes::fix_viscosity()
               pdat::EdgeData<double> &edge_viscosity(*edge_viscosity_ptr);
               for(int axis=0;axis<3;++axis)
                 {
+                  const int axis2((axis+1)%3), axis3((axis+2)%3);
                   for(pdat::EdgeIterator ni(edge_viscosity.getBox(),axis); ni; ni++)
                     {
                       pdat::EdgeIndex e=ni();
                       pdat::CellIndex c(e);
                       edge_viscosity(e)=
-                        pow(cell_viscosity(c)
-                            *cell_viscosity(c-ip)
-                            *cell_viscosity(c-jp)
-                            *cell_viscosity(c-ip-jp)
-                            *cell_viscosity(c-kp)
-                            *cell_viscosity(c-ip-kp)
-                            *cell_viscosity(c-jp-kp)
-                            *cell_viscosity(c-ip-jp-kp),0.125);
+                        pow(cell_viscosity(c)*cell_viscosity(c-pp[axis2])
+                            *cell_viscosity(c-pp[axis3])
+                            *cell_viscosity(c-pp[axis2]-pp[axis3]),0.25);
                     }
                 }
             }
