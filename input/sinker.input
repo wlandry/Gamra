@@ -28,7 +28,7 @@ FACStokes {
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
-    adaption_threshold = 1.0e-4
+    adaption_threshold = 1.0e-3
     min_full_refinement_level = 1
 
     viscosity_ijk= 11, 11
@@ -49,29 +49,6 @@ FACStokes {
     v_rhs_ijk= 11, 11
     v_rhs_coord_min= -0.001, -0.001
     v_rhs_coord_max= 1.001, 1.001
-    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1.03, 1.03, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1.03, 1.03, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-
     // v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -83,23 +60,46 @@ FACStokes {
     // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1.03, 1.03, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1.03, 1.03, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0.03, 0.03, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0.03, 0.03, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
-    p_initial_ijk= 2, 2
-    p_initial_coord_min= 0, 0
-    p_initial_coord_max= 1, 1
-    p_initial_data= 1,1,0,0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0.03, 0.03, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0.03, 0.03, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+    // p_initial_ijk= 2, 2
+    // p_initial_coord_min= 0, 0
+    // p_initial_coord_max= 1, 1
+    // p_initial_data= 1,1,0,0
 
     fac_solver {
         // This is the input for the cell-centered Stokes FAC solver
@@ -107,17 +107,18 @@ FACStokes {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
         residual_tol = 1e-3     // Residual tolerance to solve for
-        num_pre_sweeps = 5      // Number of presmoothing sweeps to use
-        num_post_sweeps = 5     // Number of postsmoothing sweeps to use
+        num_pre_sweeps = 8      // Number of presmoothing sweeps to use
+        num_post_sweeps = 8     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         // smoothing_choice = "Gerya"
         // coarse_solver_choice = "Gerya"
-        coarse_solver_max_iterations = 25
+        coarse_solver_max_iterations = 32
         coarse_solver_tolerance = 1e-5
         // p_prolongation_method = "P_MDPI_REFINE"
         p_prolongation_method = "P_REFINE"
         v_prolongation_method = "V_REFINE"
+        p_rrestriction_method = "RESID_COARSEN"
     }
     bc_coefs {
         // These are the boundary condition specifications.  The number
@@ -191,7 +192,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 4
+    max_levels = 5
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
