@@ -33,8 +33,6 @@ def build(bld):
                         'src/V_Boundary_Refine/Update_V_3D.C',
                         'src/V_Coarsen_Patch_Strategy/postprocessCoarsen_2D.C',
                         'src/V_Coarsen_Patch_Strategy/postprocessCoarsen_3D.C',
-                        'src/Cell_Viscosity_Coarsen.C',
-                        'src/Edge_Viscosity_Coarsen.C',
                         'src/set_boundary.C',
                         'src/StokesFACOps/StokesFACOps.C',
                         'src/StokesFACOps/computeCompositeResidualOnLevel.C',
