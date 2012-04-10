@@ -113,7 +113,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
 
                       /* Update v */
                       smooth_V_2D(0,pbox,geom,center,ip,jp,
-                                  p,v,v_rhs,maxres,dx,dy,cell_moduli,
+                                  v,v_rhs,maxres,dx,dy,cell_moduli,
                                   edge_moduli,theta_momentum);
                     }
                 }
@@ -167,7 +167,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
 
                       /* Update v */
                       smooth_V_2D(1,pbox,geom,center,jp,ip,
-                                  p,v,v_rhs,maxres,dy,dx,cell_moduli,
+                                  v,v_rhs,maxres,dy,dx,cell_moduli,
                                   edge_moduli,theta_momentum);
                     }
                 }

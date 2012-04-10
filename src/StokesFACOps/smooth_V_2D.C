@@ -14,7 +14,6 @@ void SAMRAI::solv::StokesFACOps::smooth_V_2D
  const pdat::CellIndex &center,
  const hier::Index &ip,
  const hier::Index &jp,
- pdat::CellData<double> &p,
  pdat::SideData<double> &v,
  pdat::SideData<double> &v_rhs,
  double &maxres,
@@ -57,7 +56,7 @@ void SAMRAI::solv::StokesFACOps::smooth_V_2D
                             edge+jp,edge,dx,dy);
 
       double delta_Rx=v_rhs(x)
-        - v_operator_2D(v,p,cell_moduli,edge_moduli,center,
+        - v_operator_2D(v,cell_moduli,edge_moduli,center,
                         edge,x,y,ip,jp,dx,dy);
 
       /* No scaling here, though there should be. */

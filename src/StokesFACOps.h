@@ -499,7 +499,6 @@ void smooth_V_2D(const int &axis,
 	const pdat::CellIndex &center,
 	const hier::Index &ip,
 	const hier::Index &jp,
-	pdat::CellData<double> &p,
 	pdat::SideData<double> &v,
 	pdat::SideData<double> &v_rhs,
 	double &maxres,
@@ -524,10 +523,17 @@ void smooth_V_2D(const int &axis,
                     const double &dx,
                     const double &dy)
   {
+    return 
+	     edge_moduli(edge+jp,1)*(v(x+jp)-v(x   ))/(dy*dy)
+          -  edge_moduli(edge   ,1)*(v(x   )-v(x-jp))/(dy*dy)
+            + (edge_moduli(edge+jp,0)+edge_moduli(edge+jp,1))*(v(y+jp)-v(y+jp-ip))/(dx*dy) 
+            - (edge_moduli(edge   ,0)+edge_moduli(edge   ,1))*(v(y   )-v(y-ip   ))/(dx*dy);
+	  /*
     return ((v(x+jp)-v(x))/(dy*dy)
-            + (v(y+jp)-v(y+jp-ip))/(dx*dy)) * edge_moduli(edge+jp)
-      - ((v(x)-v(x-jp))/(dy*dy)
-         + (v(y)-v(y-ip))/(dx*dy)) * edge_moduli(edge);
+            + (v(y+jp)-v(y+jp-ip))/(dx*dy)) * edge_moduli(edge+jp,1)
+           - ((v(x)-v(x-jp))/(dy*dy)
+           + (v(y)-v(y-ip))/(dx*dy)) * edge_moduli(edge,1);
+	    */
   }
 
   /* The action of the velocity operator. It is written from the
@@ -535,7 +541,6 @@ void smooth_V_2D(const int &axis,
      etc. to get vy. */
 
   double v_operator_2D(pdat::SideData<double> &v,
-                       pdat::CellData<double> &p,
                        pdat::CellData<double> &cell_moduli,
                        pdat::NodeData<double> &edge_moduli,
                        const pdat::CellIndex &center,
@@ -547,12 +552,11 @@ void smooth_V_2D(const int &axis,
                        const double &dx,
                        const double &dy)
   {
-    double dtau_xx_dx=2*((v(x+ip)-v(x))*cell_moduli(center)
-                         - (v(x)-v(x-ip))*cell_moduli(center-ip))/(dx*dx);
+    double dtau_xx_dx=( (v(x+ip)-v(x   ))*(cell_moduli(center   ,0)+2*cell_moduli(center   ,1))
+                       -(v(x   )-v(x-ip))*(cell_moduli(center-ip,0)+2*cell_moduli(center-ip,1)))/(dx*dx);
     double dtau_xy_dy=dtau_mixed(v,edge_moduli,x,y,edge,ip,jp,dx,dy);
-    double dp_dx=(p(center)-p(center-ip))/dx;
 
-    return dtau_xx_dx + dtau_xy_dy - dp_dx;
+    return dtau_xx_dx + dtau_xy_dy;
   }
 
   double v_operator_3D(pdat::SideData<double> &v,

@@ -18,8 +18,9 @@ double dRm_dv_2D(SAMRAI::pdat::CellData<double> &cell_moduli,
                  const double &dx,
                  const double &dy)
 {
-  return -2*(cell_moduli(center) + cell_moduli(left))/(dx*dx)
-    - (edge_moduli(up_e) + edge_moduli(center_e))/(dy*dy);
+  return -(   (cell_moduli(center,0) + cell_moduli(left,0))
+           +2*(cell_moduli(center,1) + cell_moduli(left,1)))/(dx*dx)
+         -(edge_moduli(up_e,1) + edge_moduli(center_e,1))/(dy*dy);
 }
 
 #endif

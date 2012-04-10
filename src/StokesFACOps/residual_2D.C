@@ -57,7 +57,7 @@ void SAMRAI::solv::StokesFACOps::residual_2D
           else
             {
               v_resid(x)=v_rhs(x)
-                - v_operator_2D(v,p,cell_moduli,edge_moduli,center,
+                - v_operator_2D(v,cell_moduli,edge_moduli,center,
                                 edge,x,y,ip,jp,dx,dy);
             }
         }
@@ -74,7 +74,7 @@ void SAMRAI::solv::StokesFACOps::residual_2D
           else
             {
               v_resid(y)=v_rhs(y)
-                - v_operator_2D(v,p,cell_moduli,edge_moduli,center,
+                - v_operator_2D(v,cell_moduli,edge_moduli,center,
                                 edge,y,x,jp,ip,dy,dx);
             }
         }
