@@ -10,6 +10,33 @@
 #include "FACStokes.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
 
+double gauss(double x, double sigma)
+{
+	const double pi2 = atan(1.0)*8;
+	return exp(-0.5*(x/sigma)*(x/sigma))/sqrt(pi2)/sigma;
+}
+
+double omega(double x, double beta)
+{
+  double pi=4*atan(1);
+
+  if (fabs(x) <= (1-2*beta)/(1-beta)/2)
+    {
+      return 1;
+    }
+  else
+    {
+      if (fabs(x) < 1./(2.*(1.-beta)))
+        {
+          return pow(cos(pi*((1.-beta)*fabs(x)-0.5+beta)/(2.*beta)),2.);
+        }
+      else
+        {
+        return 0;
+        }
+    }
+}
+
 /*
 *************************************************************************
 * Initialize data on a level.                                           *
@@ -141,16 +168,48 @@ void SAMRAI::FACStokes::initializeLevelData
                   xyz[d]=geom->getXLower()[d]
                     + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
             
-                int ijk(0), factor(1);
-                for(int d=0;d<dim;++d)
-                  {
-                    int i=static_cast<int>(xyz[d]*(v_rhs_ijk[d]-1)
-                                           /(v_rhs_xyz_max[d]-v_rhs_xyz_min[d]));
-                    i=std::max(0,std::min(v_rhs_ijk[d]-1,i));
-                    ijk+=i*factor;
-                    factor*=v_rhs_ijk[d];
-                  }
-                (*v_rhs_data)(s)=v_rhs[ijk+ix_offset];
+		double x(xyz[0]),y(xyz[1]);
+
+		double xr(0.5),yr(0.5);
+		double g0m0(1.),g0p0(1.),g00p(1.),g00m(1.);
+		double L(0.3),cdip(1.),sdip(0.);
+
+		double beta=0.2;
+		double n[]={0,cdip,sdip};
+		double b[]={0,-sdip,+cdip};
+
+		double temp1=gauss(x-xr,dx[0]);
+		double temp2=1.0;
+		double temp3=omega((y-yr)/L,beta);
+		double sourc=(+(g0p0*gauss(x+dx[0]-xr,0.005)-g0m0*gauss(x-xr,0.005))*n[1]/dx[0]
+                              +(g00p*gauss(x+dx[0]-xr,0.005)-g00m*gauss(x-xr,0.005))*n[2]/dx[1] )
+			*temp2 
+			*temp3;
+
+		double dipcs=temp1 
+			*temp2 
+			*(+(g0p0*omega((y+dx[1]-yr)/L,beta)-g0m0*omega((y-yr)/L,beta))*b[1]/dx[0]
+			  +(g00p*omega((y+dx[1]-yr)/L,beta)-g00m*omega((y-yr)/L,beta))*b[2]/dx[1] );
+
+       		// force update
+		switch (ix)
+		{
+			case 0:{
+				// f_2
+				double f2=-cdip*dipcs-sdip*sourc;
+				       //std::cout << x << " " << y << " "<< omega((y-yr)/L,beta)<< " " << temp2 << " " << dipcs << "\n";
+                		(*v_rhs_data)(s)=+10*f2;
+				break;
+			       }
+			case 1:{
+			       // f_3
+				double f3=+cdip*sourc-sdip*dipcs;
+
+                		(*v_rhs_data)(s)=-10*f3;
+				break;
+			       }
+		}
+
               }
             int i=1;
             for(int d=0;d<dim;++d)
