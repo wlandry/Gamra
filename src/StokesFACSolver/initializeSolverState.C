@@ -30,8 +30,8 @@
 
 void SAMRAI::solv::StokesFACSolver::initializeSolverState
 (const int p,
- const int cell_viscosity,
- const int edge_viscosity,
+ const int cell_moduli,
+ const int edge_moduli,
  const int dp,
  const int p_rhs,
  const int v,
@@ -97,7 +97,7 @@ void SAMRAI::solv::StokesFACSolver::initializeSolverState
                              d_ln_max);
   }
 
-  d_fac_ops.set_viscosity_dp_id(cell_viscosity,edge_viscosity,dp);
+  d_fac_ops.set_moduli_id(cell_moduli,edge_moduli);
 
   createVectorWrappers(p, p_rhs, v, v_rhs);
 

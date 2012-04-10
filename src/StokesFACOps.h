@@ -290,12 +290,10 @@ public:
     * flux and you would like that to be used, set flux id to the
     * patch data index of that space.
     */
-  void set_viscosity_dp_id(const int &cell_viscosity,
-                           const int &edge_viscosity, const int &dp)
+  void set_moduli_id(const int &cell_moduli, const int &edge_moduli)
   {
-    cell_viscosity_id=cell_viscosity;
-    edge_viscosity_id=edge_viscosity;
-    dp_id=dp;
+    cell_moduli_id=cell_moduli;
+    edge_moduli_id=edge_moduli;
   }
    //@}
 
@@ -408,7 +406,7 @@ public:
   void residual_2D
   (pdat::CellData<double> &p,
    pdat::SideData<double> &v,
-   pdat::CellData<double> &cell_viscosity,
+   pdat::CellData<double> &cell_moduli,
    pdat::CellData<double> &p_rhs,
    pdat::SideData<double> &v_rhs,
    pdat::CellData<double> &p_resid,
@@ -420,7 +418,7 @@ public:
   void residual_3D
   (pdat::CellData<double> &p,
    pdat::SideData<double> &v,
-   pdat::CellData<double> &cell_viscosity,
+   pdat::CellData<double> &cell_moduli,
    pdat::CellData<double> &p_rhs,
    pdat::SideData<double> &v_rhs,
    pdat::CellData<double> &p_resid,
@@ -488,69 +486,36 @@ private:
     * @param residual_tolerance the maximum residual considered to be
     *        converged
     */
-   void
-   smooth_Tackley_2D(
+   void smooth_Tackley_2D(
       SAMRAIVectorReal<double>& error,
       const SAMRAIVectorReal<double>& residual,
       int ln,
       int num_sweeps,
       double residual_tolerance = -1.0);
 
-   void
-   smooth_Tackley_3D(
-      SAMRAIVectorReal<double>& error,
-      const SAMRAIVectorReal<double>& residual,
-      int ln,
-      int num_sweeps,
-      double residual_tolerance = -1.0);
-
-   void
-   smooth_Gerya(
-      SAMRAIVectorReal<double>& error,
-      const SAMRAIVectorReal<double>& residual,
-      int ln,
-      int num_sweeps,
-      double residual_tolerance = -1.0);
-
-  void smooth_V_2D
-  (const int &axis,
-   const hier::Box &pbox,
-   tbox::Pointer<geom::CartesianPatchGeometry> &geom,
-   const pdat::CellIndex &center,
-   const hier::Index &ip,
-   const hier::Index &jp,
-   pdat::CellData<double> &p,
-   pdat::SideData<double> &v,
-   pdat::SideData<double> &v_rhs,
-   double &maxres,
-   const double &dx,
-   const double &dy,
-   pdat::CellData<double> &cell_viscosity,
-   pdat::NodeData<double> &edge_viscosity,
-   const double &theta_momentum);
-
-  void smooth_V_3D
-  (const int &ix,
-   const hier::Box &pbox,
-   tbox::Pointer<geom::CartesianPatchGeometry> &geom,
-   pdat::CellData<double> &p,
-   pdat::SideData<double> &v,
-   pdat::SideData<double> &v_rhs,
-   pdat::CellData<double> &cell_viscosity,
-   pdat::EdgeData<double> &edge_viscosity,
-   const pdat::CellIndex &center,
-   const double dx[3],
-   const double &theta_momentum,
-   const hier::Index pp[3],
-   double &maxres);
+void smooth_V_2D(const int &axis,
+	const hier::Box &pbox,
+	tbox::Pointer<geom::CartesianPatchGeometry> &geom,
+	const pdat::CellIndex &center,
+	const hier::Index &ip,
+	const hier::Index &jp,
+	pdat::CellData<double> &p,
+	pdat::SideData<double> &v,
+	pdat::SideData<double> &v_rhs,
+	double &maxres,
+	const double &dx,
+	const double &dy,
+	pdat::CellData<double> &cell_moduli,
+	pdat::NodeData<double> &edge_moduli,
+	const double &theta_momentum);
 
   /* The mixed derivative of the stress.  We have to use a template
-     because 2D uses Node's for the edge viscosity, while 3D uses
+     because 2D uses Node's for the edge moduli, while 3D uses
      Edge's.  Written as if it is dtau_xy_dy. */
 
   template<class E_data, class E_index>
   double dtau_mixed(pdat::SideData<double> &v,
-                    const E_data &edge_viscosity,
+                    const E_data &edge_moduli,
                     const pdat::SideIndex &x,
                     const pdat::SideIndex &y,
                     const E_index &edge,
@@ -560,9 +525,9 @@ private:
                     const double &dy)
   {
     return ((v(x+jp)-v(x))/(dy*dy)
-            + (v(y+jp)-v(y+jp-ip))/(dx*dy)) * edge_viscosity(edge+jp)
+            + (v(y+jp)-v(y+jp-ip))/(dx*dy)) * edge_moduli(edge+jp)
       - ((v(x)-v(x-jp))/(dy*dy)
-         + (v(y)-v(y-ip))/(dx*dy)) * edge_viscosity(edge);
+         + (v(y)-v(y-ip))/(dx*dy)) * edge_moduli(edge);
   }
 
   /* The action of the velocity operator. It is written from the
@@ -571,8 +536,8 @@ private:
 
   double v_operator_2D(pdat::SideData<double> &v,
                        pdat::CellData<double> &p,
-                       pdat::CellData<double> &cell_viscosity,
-                       pdat::NodeData<double> &edge_viscosity,
+                       pdat::CellData<double> &cell_moduli,
+                       pdat::NodeData<double> &edge_moduli,
                        const pdat::CellIndex &center,
                        const pdat::NodeIndex &edge,
                        const pdat::SideIndex &x,
@@ -582,9 +547,9 @@ private:
                        const double &dx,
                        const double &dy)
   {
-    double dtau_xx_dx=2*((v(x+ip)-v(x))*cell_viscosity(center)
-                         - (v(x)-v(x-ip))*cell_viscosity(center-ip))/(dx*dx);
-    double dtau_xy_dy=dtau_mixed(v,edge_viscosity,x,y,edge,ip,jp,dx,dy);
+    double dtau_xx_dx=2*((v(x+ip)-v(x))*cell_moduli(center)
+                         - (v(x)-v(x-ip))*cell_moduli(center-ip))/(dx*dx);
+    double dtau_xy_dy=dtau_mixed(v,edge_moduli,x,y,edge,ip,jp,dx,dy);
     double dp_dx=(p(center)-p(center-ip))/dx;
 
     return dtau_xx_dx + dtau_xy_dy - dp_dx;
@@ -592,8 +557,8 @@ private:
 
   double v_operator_3D(pdat::SideData<double> &v,
                        pdat::CellData<double> &p,
-                       pdat::CellData<double> &cell_viscosity,
-                       pdat::EdgeData<double> &edge_viscosity,
+                       pdat::CellData<double> &cell_moduli,
+                       pdat::EdgeData<double> &edge_moduli,
                        const pdat::CellIndex &center,
                        const pdat::EdgeIndex &edge_y,
                        const pdat::EdgeIndex &edge_z,
@@ -607,10 +572,10 @@ private:
                        const double &dy,
                        const double &dz)
   {
-    double dtau_xx_dx=2*((v(x+ip)-v(x))*cell_viscosity(center)
-                         - (v(x)-v(x-ip))*cell_viscosity(center-ip))/(dx*dx);
-    double dtau_xy_dy=dtau_mixed(v,edge_viscosity,x,y,edge_z,ip,jp,dx,dy);
-    double dtau_xz_dz=dtau_mixed(v,edge_viscosity,x,z,edge_y,ip,kp,dx,dz);
+    double dtau_xx_dx=2*((v(x+ip)-v(x))*cell_moduli(center)
+                         - (v(x)-v(x-ip))*cell_moduli(center-ip))/(dx*dx);
+    double dtau_xy_dy=dtau_mixed(v,edge_moduli,x,y,edge_z,ip,jp,dx,dy);
+    double dtau_xz_dz=dtau_mixed(v,edge_moduli,x,z,edge_y,ip,kp,dx,dz);
     double dp_dx=(p(center)-p(center-ip))/dx;
 
     return dtau_xx_dx + dtau_xy_dy + dtau_xz_dz - dp_dx;
@@ -906,11 +871,11 @@ private:
    double d_residual_tolerance_during_smoothing;
 
    /*!
-    * @brief Id of viscosity and dp.
+    * @brief Id of moduli and dp.
     *
-    * @see set_viscosity_dp_id.
+    * @see set_moduli_dp_id.
     */
-  int cell_viscosity_id, edge_viscosity_id, dp_id;
+  int cell_moduli_id, edge_moduli_id, dp_id;
 
 #ifdef HAVE_HYPRE
    /*!

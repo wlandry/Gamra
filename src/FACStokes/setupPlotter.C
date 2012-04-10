@@ -39,15 +39,22 @@ namespace SAMRAI {
     plotter.registerPlotQuantity("Pressure",
                                  "SCALAR",
                                  p_id);
-    plotter.registerDerivedPlotQuantity("Error",
-                                        "SCALAR",
+    plotter.registerDerivedPlotQuantity("Displacement",
+                                        "VECTOR",
+                                        (appu::VisDerivedDataStrategy *)this);
+    plotter.registerDerivedPlotQuantity("Equivalent body force",
+                                        "VECTOR",
                                         (appu::VisDerivedDataStrategy *)this);
     plotter.registerPlotQuantity("Exact solution",
                                  "SCALAR",
                                  p_exact_id);
-    plotter.registerPlotQuantity("Cell Viscosity",
+    plotter.registerPlotQuantity("Cell lambda",
                                  "SCALAR",
-                                 cell_viscosity_id);
+                                 cell_moduli_id,0);
+		// this, below, doesn't seem to work.
+    plotter.registerPlotQuantity("Cell mu",
+                                 "SCALAR",
+                                 cell_moduli_id,1);
     plotter.registerPlotQuantity("Stokes source",
                                  "SCALAR",
                                  p_rhs_id);

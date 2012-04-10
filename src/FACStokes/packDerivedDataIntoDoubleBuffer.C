@@ -35,30 +35,48 @@ namespace SAMRAI {
                                                   variable_name,
                                                   int depth_id) const
   {
-    (void)depth_id;
+	pdat::CellData<double>::Iterator icell(region);
+	const hier::Index ip(1,0), jp(0,1);
 
-    pdat::CellData<double>::Iterator icell(region);
+	tbox::Pointer<pdat::SideData<double> > v_ptr;
+	if (variable_name == "Displacement") {
+		v_ptr = patch.getPatchData(v_id);
+	}
+	else if ("Equivalent body force" == variable_name)
+	{
+		v_ptr = patch.getPatchData(v_rhs_id);
+	}
+	else
+	{
+		// Did not register this name.
+		TBOX_ERROR(
+		"Unregistered variable name '" << variable_name << "' in\n"
+		<<
+		"FACStokesX::packDerivedDataIntoDoubleBuffer");
+	}
 
-    if (variable_name == "Error") {
-      tbox::Pointer<pdat::CellData<double> > current_solution_ =
-        patch.getPatchData(p_id);
-      tbox::Pointer<pdat::CellData<double> > exact_solution_ =
-        patch.getPatchData(p_exact_id);
-      pdat::CellData<double>& current_solution = *current_solution_;
-      pdat::CellData<double>& exact_solution = *exact_solution_;
-      for ( ; icell; icell++) {
-        double diff = (current_solution(*icell) - exact_solution(*icell));
-        *buffer = diff;
-        buffer = buffer + 1;
-      }
-    } else {
-      // Did not register this name.
-      TBOX_ERROR(
-                 "Unregistered variable name '" << variable_name << "' in\n"
-                 <<
-                 "FACStokesX::packDerivedDataIntoDoubleBuffer");
+	pdat::SideData<double>& v = *v_ptr;
+	for ( ; icell; icell++) {
 
-    }
+		pdat::CellIndex center(*icell);
+		const pdat::SideIndex
+		x(center,0,pdat::SideIndex::Lower),
+		y(center,1,pdat::SideIndex::Lower);
+	
+		/* Update p */
+		double vx=(v(x+ip) + v(x))/2.;
+		double vy=(v(y+jp) + v(y))/2.;
+
+		if (0==depth_id)
+		{
+        		*buffer = vx;
+		}
+		else
+		{
+        		*buffer = vy;
+		}
+        	buffer = buffer + 1;
+	}
     // Return true if this patch has derived data on it.
     // False otherwise.
     return true;

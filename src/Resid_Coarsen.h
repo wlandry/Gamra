@@ -9,11 +9,11 @@ namespace SAMRAI {
 namespace geom {
 
 /**
- * Coarsens using the viscosities as weights.  So in 2D
-   resid_coarse = (resid(i,j)*viscosity(i,j)
-                   + resid(i,j+1)*viscosity(i,j+1)
-                   + resid(i+1,j)*viscosity(i+1,j)
-                   + resid(i+1,j+1)*viscosity(i+1,j+1))/(4*viscosity_coarse)
+ * Coarsens using the moduli as weights.  So in 2D
+   resid_coarse = (resid(i,j)*moduli(i,j)
+                   + resid(i,j+1)*moduli(i,j+1)
+                   + resid(i+1,j)*moduli(i+1,j)
+                   + resid(i+1,j+1)*moduli(i+1,j+1))/(4*moduli_coarse)
  * @see xfer::CoarsenOperator
  */
 
@@ -22,9 +22,9 @@ class Resid_Coarsen:
 {
 public:
   explicit Resid_Coarsen(const tbox::Dimension& dim,
-                         const int &cell_viscosity):
+                         const int &cell_moduli):
     xfer::CoarsenOperator(dim, "RESID_COARSEN"),
-    cell_viscosity_id(cell_viscosity)
+    cell_moduli_id(cell_moduli)
   {
     d_name_id = "RESID_COARSEN";
   }
@@ -68,7 +68,7 @@ public:
 
 private:
   std::string d_name_id;
-  const int cell_viscosity_id;
+  const int cell_moduli_id;
 };
 
 }

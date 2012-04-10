@@ -48,8 +48,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
     xeqScheduleGhostFill(p_id, v_id, ln);
   }
 
-  double theta_momentum=0.7;
-  double theta_continuity=1.0;
+  double theta_momentum=1.0;
 
   /*
    * Smooth the number of sweeps specified or until
@@ -90,11 +89,11 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
               pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
               tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-                = patch->getPatchData(cell_viscosity_id);
-              pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+                = patch->getPatchData(cell_moduli_id);
+              pdat::CellData<double> &cell_moduli(*cell_visc_ptr);
               tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
-                = patch->getPatchData(edge_viscosity_id);
-              pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
+                = patch->getPatchData(edge_moduli_id);
+              pdat::NodeData<double> &edge_moduli(*edge_visc_ptr);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -114,8 +113,8 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
 
                       /* Update v */
                       smooth_V_2D(0,pbox,geom,center,ip,jp,
-                                  p,v,v_rhs,maxres,dx,dy,cell_viscosity,
-                                  edge_viscosity,theta_momentum);
+                                  p,v,v_rhs,maxres,dx,dy,cell_moduli,
+                                  edge_moduli,theta_momentum);
                     }
                 }
             }
@@ -144,11 +143,11 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
               pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
               tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-                = patch->getPatchData(cell_viscosity_id);
-              pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+                = patch->getPatchData(cell_moduli_id);
+              pdat::CellData<double> &cell_moduli(*cell_visc_ptr);
               tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
-                = patch->getPatchData(edge_viscosity_id);
-              pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
+                = patch->getPatchData(edge_moduli_id);
+              pdat::NodeData<double> &edge_moduli(*edge_visc_ptr);
 
               hier::Box pbox=patch->getBox();
               tbox::Pointer<geom::CartesianPatchGeometry>
@@ -168,137 +167,13 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_2D
 
                       /* Update v */
                       smooth_V_2D(1,pbox,geom,center,jp,ip,
-                                  p,v,v_rhs,maxres,dy,dx,cell_viscosity,
-                                  edge_viscosity,theta_momentum);
+                                  p,v,v_rhs,maxres,dy,dx,cell_moduli,
+                                  edge_moduli,theta_momentum);
                     }
                 }
             }
           set_boundaries(invalid_id,v_id,level,true);
         }
-
-
-
-      /* p sweep
-         No need for red-black, because dp does not depend on
-         the pressure. */
-      xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
-
-      for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
-        {
-          tbox::Pointer<hier::Patch> patch = *pi;
-
-          tbox::Pointer<pdat::CellData<double> > p_ptr =
-            patch->getPatchData(p_id);
-          pdat::CellData<double> &p(*p_ptr);
-          tbox::Pointer<pdat::CellData<double> > dp_ptr =
-            patch->getPatchData(dp_id);
-          pdat::CellData<double> &dp(*dp_ptr);
-          tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
-            patch->getPatchData(p_rhs_id);
-          pdat::CellData<double> &p_rhs(*p_rhs_ptr);
-                
-          tbox::Pointer<pdat::SideData<double> > v_ptr =
-            patch->getPatchData(v_id);
-          pdat::SideData<double> &v(*v_ptr);
-                
-          tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-            = patch->getPatchData(cell_viscosity_id);
-          pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-          tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
-            = patch->getPatchData(edge_viscosity_id);
-          pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
-
-          hier::Box pbox=patch->getBox();
-          tbox::Pointer<geom::CartesianPatchGeometry>
-            geom = patch->getPatchGeometry();
-          double dx = geom->getDx()[0];
-          double dy = geom->getDx()[1];
-
-          for(pdat::CellIterator ci(pbox); ci; ci++)
-            {
-              pdat::CellIndex center(*ci);
-              const pdat::SideIndex
-                x(center,0,pdat::SideIndex::Lower),
-                y(center,1,pdat::SideIndex::Lower);
-
-              /* Update p */
-              double dvx_dx=(v(x+ip) - v(x))/dx;
-              double dvy_dy=(v(y+jp) - v(y))/dy;
-
-              double delta_R_continuity=
-                p_rhs(center) - dvx_dx - dvy_dy;
-
-              /* No scaling here, though there should be. */
-              maxres=std::max(maxres,std::fabs(delta_R_continuity));
-
-              dp(center)=delta_R_continuity*theta_continuity
-                /dRc_dp_2D(pbox,center,x,y,cell_viscosity,edge_viscosity,v,dx,dy);
-              p(center)+=dp(center);
-            }
-        }
-      set_boundaries(p_id,invalid_id,level,true);
-
-
-      /* fix v sweep */
-      xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
-
-      for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
-        {
-          tbox::Pointer<hier::Patch> patch = *pi;
-
-          tbox::Pointer<pdat::CellData<double> > dp_ptr =
-            patch->getPatchData(dp_id);
-          pdat::CellData<double> &dp(*dp_ptr);
-                
-          tbox::Pointer<pdat::SideData<double> > v_ptr =
-            patch->getPatchData(v_id);
-          pdat::SideData<double> &v(*v_ptr);
-                
-          tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-            = patch->getPatchData(cell_viscosity_id);
-          pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-          tbox::Pointer<pdat::NodeData<double> > edge_visc_ptr
-            = patch->getPatchData(edge_viscosity_id);
-          pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
-
-          hier::Box pbox=patch->getBox();
-          tbox::Pointer<geom::CartesianPatchGeometry>
-            geom = patch->getPatchGeometry();
-          double dx = geom->getDx()[0];
-          double dy = geom->getDx()[1];
-
-          pbox.growUpper(hier::IntVector::getOne(d_dim));
-
-          for(pdat::CellIterator ci(pbox); ci; ci++)
-            {
-              pdat::CellIndex center(*ci);
-
-              const pdat::SideIndex x(center,0,pdat::SideIndex::Lower),
-                y(center,1,pdat::SideIndex::Lower);
-              const pdat::NodeIndex edge(center,pdat::NodeIndex::LowerLeft);
-
-              /* Update v */
-              if(center[1]<pbox.upper(1))
-                {
-                  if(!((center[0]==pbox.lower(0) && v(x-ip)==boundary_value)
-                       || (center[0]==pbox.upper(0)
-                           && v(x+ip)==boundary_value)))
-                    v(x)+=(dp(center) - dp(center-ip))
-                      /(dx*dRm_dv_2D(cell_viscosity,edge_viscosity,center,
-                                     center-ip,edge+jp,edge,dx,dy));
-                }
-              if(center[0]<pbox.upper(0))
-                {
-                  if(!((center[1]==pbox.lower(1) && v(y-jp)==boundary_value)
-                       || (center[1]==pbox.upper(1)
-                           && v(y+jp)==boundary_value)))
-                    v(y)+=(dp(center) - dp(center-jp))
-                      /(dy*dRm_dv_2D(cell_viscosity,edge_viscosity,center,
-                                     center-jp,edge+ip,edge,dy,dx));
-                }
-            }
-        }
-      set_boundaries(invalid_id,v_id,level,true);
 
       // if (residual_tolerance >= 0.0) {
         /*

@@ -96,11 +96,12 @@ namespace SAMRAI {
                                            /* ghost cell width is 1 for
                                               stencil widths */);
 
+	int depth=2;
     tbox::Pointer<pdat::CellVariable<double> >
-      cell_viscosity_ptr(new pdat::CellVariable<double>(d_dim,
+      cell_moduli_ptr(new pdat::CellVariable<double>(d_dim,
                                                         object_name
-                                                        + ":cell_viscosity"));
-    cell_viscosity_id = vdb->registerVariableAndContext(cell_viscosity_ptr,
+                                                        + ":cell_moduli",depth));
+    cell_moduli_id = vdb->registerVariableAndContext(cell_moduli_ptr,
                                                         d_context,
                                                         hier::IntVector(d_dim, 1)
                                                         /* ghost cell width is
@@ -109,11 +110,11 @@ namespace SAMRAI {
     if(dim==2)
       {
         tbox::Pointer<pdat::NodeVariable<double> >
-          edge_viscosity_ptr(new pdat::NodeVariable<double>(d_dim,
+          edge_moduli_ptr(new pdat::NodeVariable<double>(d_dim,
                                                             object_name
-                                                            + ":edge_viscosity"));
-        edge_viscosity_id =
-          vdb->registerVariableAndContext(edge_viscosity_ptr,d_context,
+                                                            + ":edge_moduli",depth));
+        edge_moduli_id =
+          vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                           hier::IntVector(d_dim,1)
                                           /* ghost cell width is 1 in
                                              case needed */);
@@ -121,11 +122,11 @@ namespace SAMRAI {
     else if(dim==3)
       {
         tbox::Pointer<pdat::EdgeVariable<double> >
-          edge_viscosity_ptr(new pdat::EdgeVariable<double>(d_dim,
+          edge_moduli_ptr(new pdat::EdgeVariable<double>(d_dim,
                                                             object_name
-                                                            + ":edge_viscosity"));
-        edge_viscosity_id =
-          vdb->registerVariableAndContext(edge_viscosity_ptr,d_context,
+                                                            + ":edge_moduli",depth));
+        edge_moduli_id =
+          vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                           hier::IntVector(d_dim,1)
                                           /* ghost cell width is 1 in
                                              case needed */);
@@ -172,14 +173,24 @@ namespace SAMRAI {
     min_full_refinement_level
       =database->getIntegerWithDefault("min_full_refinement_level",0);
 
-    if(database->keyExists("viscosity_data"))
+    if(database->keyExists("lambda_data"))
       {
-        viscosity_ijk=database->getIntegerArray("viscosity_ijk");
-        viscosity_xyz_min=database->getDoubleArray("viscosity_coord_min");
-        viscosity_xyz_max=database->getDoubleArray("viscosity_coord_max");
-        viscosity=database->getDoubleArray("viscosity_data");
-        check_array_sizes(viscosity_ijk,viscosity_xyz_min,viscosity_xyz_max,
-                          viscosity,dim,"viscosity");
+        lambda_ijk=database->getIntegerArray("lambda_ijk");
+        lambda_xyz_min=database->getDoubleArray("lambda_coord_min");
+        lambda_xyz_max=database->getDoubleArray("lambda_coord_max");
+        lambda=database->getDoubleArray("lambda_data");
+        check_array_sizes(lambda_ijk,lambda_xyz_min,lambda_xyz_max,
+                          lambda,dim,"lambda");
+      }
+
+    if(database->keyExists("mu_data"))
+      {
+        mu_ijk=database->getIntegerArray("mu_ijk");
+        mu_xyz_min=database->getDoubleArray("mu_coord_min");
+        mu_xyz_max=database->getDoubleArray("mu_coord_max");
+        mu=database->getDoubleArray("mu_data");
+        check_array_sizes(mu_ijk,mu_xyz_min,mu_xyz_max,
+                          mu,dim,"mu");
       }
 
     if(database->keyExists("v_rhs_data"))

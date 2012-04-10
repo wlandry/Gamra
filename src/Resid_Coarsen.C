@@ -1,11 +1,11 @@
 #include "Resid_Coarsen.h"
 
 /**
- * Coarsens using the viscosities as weights.  So in 2D
-   resid_coarse = (resid(i,j)*viscosity(i,j)
-                   + resid(i,j+1)*viscosity(i,j+1)
-                   + resid(i+1,j)*viscosity(i+1,j)
-                   + resid(i+1,j+1)*viscosity(i+1,j+1))/(4*viscosity_coarse)
+ * Coarsens using the moduli as weights.  So in 2D
+   resid_coarse = (resid(i,j)*moduli(i,j)
+                   + resid(i,j+1)*moduli(i,j+1)
+                   + resid(i+1,j)*moduli(i+1,j)
+                   + resid(i+1,j+1)*moduli(i+1,j+1))/(4*moduli_coarse)
  */
 
 void SAMRAI::geom::Resid_Coarsen::coarsen(hier::Patch& coarse,
@@ -25,8 +25,8 @@ void SAMRAI::geom::Resid_Coarsen::coarsen(hier::Patch& coarse,
     r_ptr = coarse.getPatchData(dst_component);
   pdat::CellData<double> &r(*r_ptr);
   tbox::Pointer<pdat::CellData<double> >
-    cell_viscosity_fine_ptr = fine.getPatchData(cell_viscosity_id);
-  pdat::CellData<double> &cell_viscosity_fine(*cell_viscosity_fine_ptr);
+    cell_moduli_fine_ptr = fine.getPatchData(cell_moduli_id);
+  pdat::CellData<double> &cell_moduli_fine(*cell_moduli_fine_ptr);
 
   TBOX_ASSERT(!r_ptr.isNull());
   TBOX_ASSERT(!r_fine_ptr.isNull());
@@ -40,14 +40,14 @@ void SAMRAI::geom::Resid_Coarsen::coarsen(hier::Patch& coarse,
     {
       pdat::CellIndex coarse(*ci);
       pdat::CellIndex fine(coarse*2);
-      double temp(0), viscosity_sum(0);
+      double temp(0), moduli_sum(0);
 
       for(pdat::CellIterator ii(cell_box); ii; ii++)
         {
           pdat::CellIndex i(*ii);
-          temp+=r_fine(fine+i)*cell_viscosity_fine(fine+i);
-          viscosity_sum+=cell_viscosity_fine(fine+i);
+          temp+=r_fine(fine+i)*(cell_moduli_fine(fine+i,0)+cell_moduli_fine(fine+i,1));
+          moduli_sum+=(cell_moduli_fine(fine+i,0)+cell_moduli_fine(fine+i,1));
         }
-      r(coarse)=temp/viscosity_sum;
+      r(coarse)=temp/moduli_sum;
     }
 }

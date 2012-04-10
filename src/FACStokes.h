@@ -141,7 +141,7 @@ namespace SAMRAI {
 #endif
 
   private:
-    void fix_viscosity();
+    void fix_moduli();
     std::string d_object_name;
 
     const tbox::Dimension d_dim;
@@ -185,11 +185,14 @@ namespace SAMRAI {
     double d_adaption_threshold;
     int min_full_refinement_level;
   public:
-    int p_id, cell_viscosity_id, edge_viscosity_id, dp_id, p_exact_id,
+    int p_id, cell_moduli_id, edge_moduli_id, dp_id, p_exact_id,
       p_rhs_id, v_id, v_rhs_id;
 
-    tbox::Array<double> viscosity, viscosity_xyz_max, viscosity_xyz_min;
-    tbox::Array<int> viscosity_ijk;
+    tbox::Array<double> lambda, lambda_xyz_max, lambda_xyz_min;
+    tbox::Array<int> lambda_ijk;
+
+    tbox::Array<double> mu, mu_xyz_max, mu_xyz_min;
+    tbox::Array<int> mu_ijk;
 
     tbox::Array<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
     tbox::Array<int> v_rhs_ijk;

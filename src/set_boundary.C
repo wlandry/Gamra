@@ -36,65 +36,6 @@ void set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
   bool upper_dirichlet[]={true,true,true};
   double upper_boundary[]={0,0,0};
 
-  if(p_id!=invalid_id)
-    {
-      tbox::Pointer<pdat::CellData<double> > p_ptr = patch.getPatchData(p_id);
-      pdat::CellData<double> &p(*p_ptr);
-
-      hier::Box gbox=p.getGhostBox();
-      
-      for(pdat::CellIterator ci(gbox); ci; ci++)
-        {
-          pdat::CellIndex center(*ci);
-          hier::Index ip(zero), jp(zero), kp(zero);
-          hier::Index pp[]={ip,jp,kp};
-
-          /* Check if we are at a boundary.  If it is a Neumann
-           * boundary and not on a corner, then use Neumann
-           * conditions.  Otherwise use extrapolation */
-
-          bool dirichlet_boundary(false);
-
-          for(int ix=0;ix<dim;++ix)
-            {
-              if(center[ix]<pbox.lower(ix)
-                 && geom->getTouchesRegularBoundary(ix,0))
-                {
-                  pp[ix][ix]=1;
-                  if(!lower_dirichlet[ix])
-                    {
-                      p(center)=-p(center+pp[ix]);
-                      if(rhs)
-                        p(center)+=2*p_lower[ix];
-                    }
-                  else
-                    dirichlet_boundary=true;
-                }
-              else if(center[ix]>pbox.upper(ix)
-                      && geom->getTouchesRegularBoundary(ix,1))
-                {
-                  pp[ix][ix]=-1;
-                  if(!upper_dirichlet[ix])
-                    {
-                      p(center)=-p(center+pp[ix]);
-                      if(rhs)
-                        p(center)+=2*p_upper[ix];
-                    }
-                  else
-                    dirichlet_boundary=true;
-                }
-            }
-
-          /* Actually apply the BC for Dirichlet velocities. */
-          if(dirichlet_boundary)
-            {
-              p(center)=
-                2*p(center+pp[0]+pp[1]+pp[2])-p(center+(pp[0]+pp[1]+pp[2])*2);
-            }
-        }
-    }
-
-
   if(v_id!=invalid_id)
     {
       tbox::Pointer<pdat::SideData<double> > v_ptr = patch.getPatchData(v_id);

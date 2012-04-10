@@ -37,8 +37,8 @@ void SAMRAI::FACStokes::initializeLevelData
 
   if (allocate_data) {
     level->allocatePatchData(p_id);
-    level->allocatePatchData(cell_viscosity_id);
-    level->allocatePatchData(edge_viscosity_id);
+    level->allocatePatchData(cell_moduli_id);
+    level->allocatePatchData(edge_moduli_id);
     level->allocatePatchData(dp_id);
     level->allocatePatchData(p_rhs_id);
     level->allocatePatchData(p_exact_id);
@@ -61,29 +61,50 @@ void SAMRAI::FACStokes::initializeLevelData
       geom = patch->getPatchGeometry();
     const double *dx=geom->getDx();
 
-    /* Initialize cell viscosity */
-    tbox::Pointer<pdat::CellData<double> > cell_viscosity =
-      patch->getPatchData(cell_viscosity_id);
+    /* Initialize cell moduli */
+    tbox::Pointer<pdat::CellData<double> > cell_moduli =
+      patch->getPatchData(cell_moduli_id);
 
-    hier::Box cell_visc_box = cell_viscosity->getBox();
-    for(pdat::CellIterator ci(cell_viscosity->getGhostBox()); ci; ci++)
+    hier::Box cell_moduli_box = cell_moduli->getBox();
+
+    for(pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
       {
         pdat::CellIndex c=ci();
         double xyz[dim];
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
-            + dx[d]*(c[d]-cell_visc_box.lower()[d] + 0.5);
+            + dx[d]*(c[d]-cell_moduli_box.lower()[d] + 0.5);
 
         int ijk(0), factor(1);
         for(int d=0;d<dim;++d)
           {
-            int i=static_cast<int>(xyz[d]*(viscosity_ijk[d]-1)
-                                   /(viscosity_xyz_max[d]-viscosity_xyz_min[d]));
-            i=std::max(0,std::min(viscosity_ijk[d]-1,i));
+            int i=static_cast<int>(xyz[d]*(lambda_ijk[d]-1)
+                                   /(lambda_xyz_max[d]-lambda_xyz_min[d]));
+            i=std::max(0,std::min(lambda_ijk[d]-1,i));
             ijk+=i*factor;
-            factor*=viscosity_ijk[d];
+            factor*=lambda_ijk[d];
           }
-        (*cell_viscosity)(c)=viscosity[ijk];
+        (*cell_moduli)(c,0)=lambda[ijk];
+      }
+
+    for(pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
+      {
+        pdat::CellIndex c=ci();
+        double xyz[dim];
+        for(int d=0;d<dim;++d)
+          xyz[d]=geom->getXLower()[d]
+            + dx[d]*(c[d]-cell_moduli_box.lower()[d] + 0.5);
+
+        int ijk(0), factor(1);
+        for(int d=0;d<dim;++d)
+          {
+            int i=static_cast<int>(xyz[d]*(mu_ijk[d]-1)
+                                   /(mu_xyz_max[d]-mu_xyz_min[d]));
+            i=std::max(0,std::min(mu_ijk[d]-1,i));
+            ijk+=i*factor;
+            factor*=mu_ijk[d];
+          }
+        (*cell_moduli)(c,1)=mu[ijk];
       }
 
     /* I do not think this is actually necessary. */

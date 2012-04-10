@@ -60,8 +60,8 @@ namespace SAMRAI {
       d_coarse_solver_tolerance(1.e-8),
       d_coarse_solver_max_iterations(10),
       d_residual_tolerance_during_smoothing(-1.0),
-      cell_viscosity_id(invalid_id),
-      edge_viscosity_id(invalid_id),
+      cell_moduli_id(invalid_id),
+      edge_moduli_id(invalid_id),
       dp_id(invalid_id),
 #ifdef HAVE_HYPRE
       d_hypre_solver(dim,

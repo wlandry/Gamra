@@ -72,7 +72,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
     tbox::Pointer<pdat::SideData<double> >
       v_ptr = solution.getComponentPatchData(1, *patch);
     tbox::Pointer<pdat::CellData<double> >
-      cell_viscosity_ptr = patch->getPatchData(cell_viscosity_id);
+      cell_moduli_ptr = patch->getPatchData(cell_moduli_id);
     tbox::Pointer<pdat::CellData<double> >
       p_rhs_ptr = rhs.getComponentPatchData(0, *patch);
     tbox::Pointer<pdat::SideData<double> >
@@ -90,11 +90,7 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
     switch(d_dim.getValue())
       {
       case 2:
-        residual_2D(*p_ptr,*v_ptr,*cell_viscosity_ptr,*p_rhs_ptr,*v_rhs_ptr,
-                    *p_resid_ptr,*v_resid_ptr,*patch,pbox,*geom);
-        break;
-      case 3:
-        residual_3D(*p_ptr,*v_ptr,*cell_viscosity_ptr,*p_rhs_ptr,*v_rhs_ptr,
+        residual_2D(*p_ptr,*v_ptr,*cell_moduli_ptr,*p_rhs_ptr,*v_rhs_ptr,
                     *p_resid_ptr,*v_resid_ptr,*patch,pbox,*geom);
         break;
       default:

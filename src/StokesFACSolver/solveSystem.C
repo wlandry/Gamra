@@ -82,8 +82,8 @@ bool SAMRAI::solv::StokesFACSolver::solveSystem(const int p,
 
 bool SAMRAI::solv::StokesFACSolver::solveSystem
 (const int p,
- const int cell_viscosity,
- const int edge_viscosity,
+ const int cell_moduli,
+ const int edge_moduli,
  const int dp,
  const int p_rhs,
  const int v,
@@ -116,7 +116,7 @@ bool SAMRAI::solv::StokesFACSolver::solveSystem
                << "specified.\n");
   }
 #endif
-  initializeSolverState(p, cell_viscosity, edge_viscosity, dp, p_rhs, v, v_rhs,
+  initializeSolverState(p, cell_moduli, edge_moduli, dp, p_rhs, v, v_rhs,
                         hierarchy, coarse_ln, fine_ln);
 
   bool solver_rval;

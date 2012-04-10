@@ -20,8 +20,8 @@ void SAMRAI::solv::StokesFACOps::smooth_V_2D
  double &maxres,
  const double &dx,
  const double &dy,
- pdat::CellData<double> &cell_viscosity,
- pdat::NodeData<double> &edge_viscosity,
+ pdat::CellData<double> &cell_moduli,
+ pdat::NodeData<double> &edge_moduli,
  const double &theta_momentum)
 {
   const int off_axis=(axis==0) ? 1 : 0;
@@ -53,11 +53,11 @@ void SAMRAI::solv::StokesFACOps::smooth_V_2D
           dv_upper=v(x+offset) - v(x);
         }
 
-      double C_vx=dRm_dv_2D(cell_viscosity,edge_viscosity,center,center-ip,
+      double C_vx=dRm_dv_2D(cell_moduli,edge_moduli,center,center-ip,
                             edge+jp,edge,dx,dy);
 
       double delta_Rx=v_rhs(x)
-        - v_operator_2D(v,p,cell_viscosity,edge_viscosity,center,
+        - v_operator_2D(v,p,cell_moduli,edge_moduli,center,
                         edge,x,y,ip,jp,dx,dy);
 
       /* No scaling here, though there should be. */

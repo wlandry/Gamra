@@ -179,8 +179,8 @@ public:
    bool
    solveSystem(
       const int p,
-      const int cell_viscosity,
-      const int edge_viscosity,
+      const int cell_moduli,
+      const int edge_moduli,
       const int dp,
       const int p_rhs,
       const int v,
@@ -509,8 +509,8 @@ public:
     */
    void
    initializeSolverState(const int p,
-                         const int cell_viscosity,
-                         const int edge_viscosity,
+                         const int cell_moduli,
+                         const int edge_moduli,
                          const int dp,
                          const int p_rhs,
                          const int v,

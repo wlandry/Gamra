@@ -130,10 +130,10 @@ int SAMRAI::FACStokes::solveStokes()
     d_stokes_fac_solver.set_boundaries(p_id,v_id,level,false);
   }
 
-  fix_viscosity();
+  fix_moduli();
 
   d_stokes_fac_solver.initializeSolverState
-    (p_id,cell_viscosity_id,edge_viscosity_id,dp_id,p_rhs_id,v_id,v_rhs_id,
+    (p_id,cell_moduli_id,edge_moduli_id,dp_id,p_rhs_id,v_id,v_rhs_id,
      d_hierarchy,0,d_hierarchy->getFinestLevelNumber());
 
   tbox::plog << "solving..." << std::endl;
