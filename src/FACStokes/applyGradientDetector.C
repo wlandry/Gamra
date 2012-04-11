@@ -47,6 +47,8 @@ void SAMRAI::FACStokes::applyGradientDetector
       pdat::SideData<double>& v = *soln_side_data_;
       pdat::CellData<int>& tag_cell_data = *tag_cell_data_;
                               
+      tbox::Pointer<geom::CartesianPatchGeometry> geom = patch.getPatchGeometry();
+
       tag_cell_data.fill(0);
       for (pdat::CellIterator ci(patch.getBox()); ci; ci++)
         {
@@ -60,10 +62,23 @@ void SAMRAI::FACStokes::applyGradientDetector
               const hier::Index ip(1,0), jp(0,1);
               const hier::Index pp[]={ip,jp};
 
+              if(cell_index[ix]==patch.getBox().lower(ix)
+                 && geom->getTouchesRegularBoundary(ix,0))
+	      {
+	      curve=std::max(curve,std::abs(v(x+pp[ix]+pp[ix])-2*v(x+pp[ix])+v(x)));
+	      } else if(cell_index[ix]==patch.getBox().upper(ix)
+                 && geom->getTouchesRegularBoundary(ix,1))
+	      {
+	      curve=std::max(curve,std::abs(v(x+pp[ix])-2*v(x)+v(x-pp[ix])));
+	      }
+	      else
+	      {
 	      curve=std::max(curve,std::abs(v(x+pp[ix]+pp[ix])-v(x+pp[ix])-v(x)+v(x-pp[ix])));
+	      }
 	    }
 	  }
-          tbox::plog << "estimate "
+          /*
+	   * tbox::plog << "estimate "
                      << cell_index << " "
                      << d_adaption_threshold << " "
                      << curve << " "
@@ -71,6 +86,7 @@ void SAMRAI::FACStokes::applyGradientDetector
                      << (curve > d_adaption_threshold)
                      << " "
                      << "\n";
+		     */
 
           if (maxestimate < curve)
                maxestimate=curve;

@@ -28,7 +28,7 @@ FACStokes {
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
-    adaption_threshold = 1.0e-2
+    adaption_threshold = 1.0e-1
     min_full_refinement_level = 3
 
     lambda_ijk= 2, 2
@@ -191,7 +191,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 6
+    max_levels = 5
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
