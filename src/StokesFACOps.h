@@ -513,7 +513,7 @@ void smooth_V_2D(const int &axis,
      Edge's.  Written as if it is dtau_xy_dy. */
 
   template<class E_data, class E_index>
-  double dtau_mixed(pdat::SideData<double> &v,
+  double shear_noncell(const pdat::SideData<double> &v,
                     const E_data &edge_moduli,
                     const pdat::SideIndex &x,
                     const pdat::SideIndex &y,
@@ -525,24 +525,42 @@ void smooth_V_2D(const int &axis,
   {
     return 
 	     edge_moduli(edge+jp,1)*(v(x+jp)-v(x   ))/(dy*dy)
-          -  edge_moduli(edge   ,1)*(v(x   )-v(x-jp))/(dy*dy)
-            + (edge_moduli(edge+jp,0)+edge_moduli(edge+jp,1))*(v(y+jp)-v(y+jp-ip))/(dx*dy) 
-            - (edge_moduli(edge   ,0)+edge_moduli(edge   ,1))*(v(y   )-v(y-ip   ))/(dx*dy);
-	  /*
-    return ((v(x+jp)-v(x))/(dy*dy)
-            + (v(y+jp)-v(y+jp-ip))/(dx*dy)) * edge_moduli(edge+jp,1)
-           - ((v(x)-v(x-jp))/(dy*dy)
-           + (v(y)-v(y-ip))/(dx*dy)) * edge_moduli(edge,1);
-	    */
+            -edge_moduli(edge   ,1)*(v(x   )-v(x-jp))/(dy*dy)
+            +edge_moduli(edge+jp,1)*(v(y+jp)-v(y+jp-ip))/(dx*dy) 
+            -edge_moduli(edge   ,1)*(v(y   )-v(y-ip   ))/(dx*dy);
   }
 
   /* The action of the velocity operator. It is written from the
      perspective of vx, but pass in different values for center_x
      etc. to get vy. */
 
-  double v_operator_2D(pdat::SideData<double> &v,
-                       pdat::CellData<double> &cell_moduli,
-                       pdat::NodeData<double> &edge_moduli,
+  double aligned_terms(const pdat::SideData<double> &v,
+                       const pdat::CellData<double> &cell_moduli,
+                       const pdat::CellIndex &center,
+                       const pdat::SideIndex &x,
+                       const hier::Index &ip,
+                       const double &dx)
+  {
+    return ( (v(x+ip)-v(x   ))*(cell_moduli(center   ,0)+2*cell_moduli(center   ,1))
+            -(v(x   )-v(x-ip))*(cell_moduli(center-ip,0)+2*cell_moduli(center-ip,1)))/(dx*dx);
+  }
+
+  double lame_mixed(const pdat::SideData<double> &v,
+                       const pdat::CellData<double> &cell_moduli,
+                       const pdat::CellIndex &center,
+                       const pdat::SideIndex &y,
+                       const hier::Index &ip,
+                       const hier::Index &jp,
+                       const double &dx,
+                       const double &dy)
+  {
+    return (+ cell_moduli(center   ,0)*(v(y+jp   )-v(y   ))/dy
+            - cell_moduli(center-ip,0)*(v(y+jp-ip)-v(y-ip))/dy)/dx;
+  }
+
+  double v_operator_2D(const pdat::SideData<double> &v,
+                       const pdat::CellData<double> &cell_moduli,
+                       const pdat::NodeData<double> &edge_moduli,
                        const pdat::CellIndex &center,
                        const pdat::NodeIndex &edge,
                        const pdat::SideIndex &x,
@@ -551,18 +569,15 @@ void smooth_V_2D(const int &axis,
                        const hier::Index &jp,
                        const double &dx,
                        const double &dy)
-  {
-    double dtau_xx_dx=( (v(x+ip)-v(x   ))*(cell_moduli(center   ,0)+2*cell_moduli(center   ,1))
-                       -(v(x   )-v(x-ip))*(cell_moduli(center-ip,0)+2*cell_moduli(center-ip,1)))/(dx*dx);
-    double dtau_xy_dy=dtau_mixed(v,edge_moduli,x,y,edge,ip,jp,dx,dy);
-
-    return dtau_xx_dx + dtau_xy_dy;
+ {
+    return aligned_terms(v,cell_moduli,center,x,ip,dx)
+	  +lame_mixed(v,cell_moduli,center,y,ip,jp,dx,dy)
+	  +shear_noncell(v,edge_moduli,x,y,edge,ip,jp,dx,dy);
   }
 
-  double v_operator_3D(pdat::SideData<double> &v,
-                       pdat::CellData<double> &p,
-                       pdat::CellData<double> &cell_moduli,
-                       pdat::EdgeData<double> &edge_moduli,
+  double v_operator_3D(const pdat::SideData<double> &v,
+                       const pdat::CellData<double> &cell_moduli,
+                       const pdat::EdgeData<double> &edge_moduli,
                        const pdat::CellIndex &center,
                        const pdat::EdgeIndex &edge_y,
                        const pdat::EdgeIndex &edge_z,
@@ -576,13 +591,11 @@ void smooth_V_2D(const int &axis,
                        const double &dy,
                        const double &dz)
   {
-    double dtau_xx_dx=2*((v(x+ip)-v(x))*cell_moduli(center)
-                         - (v(x)-v(x-ip))*cell_moduli(center-ip))/(dx*dx);
-    double dtau_xy_dy=dtau_mixed(v,edge_moduli,x,y,edge_z,ip,jp,dx,dy);
-    double dtau_xz_dz=dtau_mixed(v,edge_moduli,x,z,edge_y,ip,kp,dx,dz);
-    double dp_dx=(p(center)-p(center-ip))/dx;
-
-    return dtau_xx_dx + dtau_xy_dy + dtau_xz_dz - dp_dx;
+    return aligned_terms(v,cell_moduli,center,x,ip,dx)
+	  +lame_mixed(v,cell_moduli,center,y,ip,jp,dx,dy)
+	  +lame_mixed(v,cell_moduli,center,z,ip,kp,dx,dz)
+	  +shear_noncell(v,edge_moduli,x,y,edge_y,ip,jp,dx,dy)
+	  +shear_noncell(v,edge_moduli,x,z,edge_z,ip,kp,dx,dz);
   }
 
    /*!
