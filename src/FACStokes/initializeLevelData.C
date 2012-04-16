@@ -10,6 +10,21 @@
 #include "FACStokes.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
 
+double rotate(double cstrike, double sstrike, double cdip, double sdip, 
+	      double x1, double x2, double x3, 
+	      double * x1s, double * x1i, double * x2s, double * x3s, double * x3i)
+{
+
+	double x2r(cstrike*x1-sstrike*x2);
+
+        (*x1s)= cdip*x2r-sdip*x3;
+        (*x1i)= cdip*x2r+sdip*x3;
+        (*x2s)= sstrike*x1+cstrike*x2;
+        (*x3s)= sdip*x2r+cdip*x3;
+        (*x3i)=-sdip*x2r+cdip*x3;
+
+}
+
 double gauss(double x, double sigma)
 {
 	const double pi2 = atan(1.0)*8;
@@ -153,6 +168,29 @@ void SAMRAI::FACStokes::initializeLevelData
       }
     else
       {
+        double L(0.2),W(0.25);
+        double cdip(0.707107),sdip(0.707107);
+        //double cdip(0.),sdip(1.);
+        double cstrike(0.),sstrike(1.);
+        double cr(0.),sr(1.);
+        double delta(0.003);
+        double x(0.5),y(0.5),z(0.5);
+        double beta(0.2);
+	double scale(-10.);
+
+	typedef struct {
+		double x1s,x1i,x2s,x3s,x3i;
+	} rpoint;
+
+	rpoint xp00,xm00,x0p0,x0m0,x00p,x00m;
+	double xr,yr,zr;
+        double x2r;
+
+	x2r= cstrike*x  -sstrike*y;
+	xr = cdip   *x2r-sdip   *z;
+	yr = sstrike*x  +cstrike*y;
+	zr = sdip   *x2r+cdip   *z;
+
         hier::Box pbox = v_rhs_data->getBox();
         int ix_offset(0);
         for(int ix=0;ix<dim;++ix)
@@ -168,45 +206,117 @@ void SAMRAI::FACStokes::initializeLevelData
                   xyz[d]=geom->getXLower()[d]
                     + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
             
-		double x(xyz[0]),y(xyz[1]);
+		double x1,x2,x3;
+		double dx1,dx2,dx3;
 
-		double xr(0.5),yr(0.5);
-		double g0m0(1.),g0p0(1.),g00p(1.),g00m(1.);
-		double L(0.3),cdip(1.),sdip(0.);
+		if (2==d_dim.getValue())
+		{
+			x1=0;
+			x2=xyz[0];
+			x3=xyz[1];
+			dx1=dx[0];
+			dx2=dx[0];
+			dx3=dx[1];
+		} else if (3==d_dim.getValue())
+		{
+                        x1=xyz[0];
+			x2=xyz[1];
+			x3=xyz[2];
+			dx1=dx[0];
+			dx2=dx[1];
+			dx3=dx[2];
+		}
 
-		double beta=0.2;
-		double n[]={0,cdip,sdip};
-		double b[]={0,-sdip,+cdip};
+		double g0m0(1.),g0p0(1.),g00p(1.),g00m(1.),gm00(1.),gp00(1.);
+		double x1s,x1i,x2s,x3s,x3i;
 
-		double temp1=gauss(x-xr,dx[0]);
-		double temp2=1.0;
-		double temp3=omega((y-yr)/L,beta);
-		double sourc=(+(g0p0*gauss(x+dx[0]-xr,0.005)-g0m0*gauss(x-xr,0.005))*n[1]/dx[0]
-                              +(g00p*gauss(x+dx[0]-xr,0.005)-g00m*gauss(x-xr,0.005))*n[2]/dx[1] )
+                x2r= cstrike*x1-sstrike*x2;
+                x1s= cdip*x2r-sdip*x3;
+                x1i= cdip*x2r+sdip*x3;
+                x2s= sstrike*x1+cstrike*x2;
+                x3s= sdip*x2r+cdip*x3;
+                x3i=-sdip*x2r+cdip*x3;
+
+		double n[]={cdip*cstrike,-cdip*sstrike,-sdip};
+		double b[]={sstrike*cr+cstrike*sdip*sr,cstrike*cr-sstrike*sdip*sr,+cdip*sr};
+
+		rotate(cstrike,sstrike,cdip,sdip,x1+dx1/2.,x2,x3,&(xp00.x1s),&(xp00.x1i),&(xp00.x2s),&(xp00.x3s),&(xp00.x3i));
+		rotate(cstrike,sstrike,cdip,sdip,x1-dx1/2.,x2,x3,&(xm00.x1s),&(xm00.x1i),&(xm00.x2s),&(xm00.x3s),&(xm00.x3i));
+		rotate(cstrike,sstrike,cdip,sdip,x1,x2+dx2/2.,x3,&(x0p0.x1s),&(x0p0.x1i),&(x0p0.x2s),&(x0p0.x3s),&(x0p0.x3i));
+		rotate(cstrike,sstrike,cdip,sdip,x1,x2-dx2/2.,x3,&(x0m0.x1s),&(x0m0.x1i),&(x0m0.x2s),&(x0m0.x3s),&(x0m0.x3i));
+		rotate(cstrike,sstrike,cdip,sdip,x1,x2,x3+dx3/2.,&(x00p.x1s),&(x00p.x1i),&(x00p.x2s),&(x00p.x3s),&(x00p.x3i));
+		rotate(cstrike,sstrike,cdip,sdip,x1,x2,x3-dx3/2.,&(x00m.x1s),&(x00m.x1i),&(x00m.x2s),&(x00m.x3s),&(x00m.x3i));
+
+		double temp1=gauss(x1s-xr,delta);
+		double temp2(1.0);
+		if (3==d_dim.getValue())
+		{
+			temp2=omega((x2s-yr)/L,beta);
+		}
+		double temp3=omega((x3s-zr)/W,beta);
+		double sourc=(+(gp00*gauss(xp00.x1s-xr,delta)-gm00*gauss(xm00.x1s-xr,delta))*n[0]/dx1
+                              +(g0p0*gauss(x0p0.x1s-xr,delta)-g0m0*gauss(x0m0.x1s-xr,delta))*n[1]/dx2
+                              +(g00p*gauss(x00p.x1s-xr,delta)-g00m*gauss(x00m.x1s-xr,delta))*n[2]/dx3 )
 			*temp2 
 			*temp3;
 
+                double dblcp=temp1 
+                       *( (gp00*omega((xp00.x2s-yr)/L,beta)-gm00*omega((xm00.x2s-yr)/L,beta))*b[0]/dx1
+                         +(g0p0*omega((x0p0.x2s-yr)/L,beta)-g0m0*omega((x0m0.x2s-yr)/L,beta))*b[1]/dx2
+                         +(g00p*omega((x00p.x2s-yr)/L,beta)-g00m*omega((x00m.x2s-yr)/L,beta))*b[2]/dx3 ) 
+                       *temp3;
+
 		double dipcs=temp1 
 			*temp2 
-			*(+(g0p0*omega((y+dx[1]-yr)/L,beta)-g0m0*omega((y-yr)/L,beta))*b[1]/dx[0]
-			  +(g00p*omega((y+dx[1]-yr)/L,beta)-g00m*omega((y-yr)/L,beta))*b[2]/dx[1] );
+			*(+(gp00*omega((xp00.x3s-zr)/W,beta)-gm00*omega((xm00.x3s-zr)/W,beta))*b[0]/dx1
+			  +(g0p0*omega((x0p0.x3s-zr)/W,beta)-g0m0*omega((x0m0.x3s-zr)/W,beta))*b[1]/dx2
+			  +(g00p*omega((x00p.x3s-zr)/W,beta)-g00m*omega((x00m.x3s-zr)/W,beta))*b[2]/dx3 );
 
+                temp1=gauss(x1i-xr,delta);
+                temp3=omega((x3i+zr)/W,beta);
+                double image=( (gp00*gauss(xp00.x1i-xr,delta)-gm00*gauss(xm00.x1i-xr,delta))*n[0]/dx1
+                              +(g0p0*gauss(x0p0.x1i-xr,delta)-g0m0*gauss(x0m0.x1i-xr,delta))*n[1]/dx2
+                              +(g00p*gauss(x00p.x1i-xr,delta)-g00m*gauss(x00m.x1i-xr,delta))*n[2]/dx3 )
+                     *temp2 
+                     *temp3;
+                double cplei=temp1 
+                            *( (gp00*omega((xp00.x2s-yr)/L,beta)-gm00*omega((xp00.x2s-yr)/L,beta))*b[0]/dx1
+                              +(g0p0*omega((x0p0.x2s-yr)/L,beta)-g0m0*omega((x0p0.x2s-yr)/L,beta))*b[1]/dx2
+                              +(g00p*omega((x00p.x2s-yr)/L,beta)-g00m*omega((x00p.x2s-yr)/L,beta))*b[2]/dx3 ) 
+                            *temp3;
+                double dipci=temp1 
+                            *temp2 
+                            *( (gp00*omega((xp00.x3i+zr)/W,beta)-gm00*omega((xm00.x3i+zr)/W,beta))*b[0]/dx1
+                              +(g0p0*omega((x0p0.x3i+zr)/W,beta)-g0m0*omega((x0m0.x3i+zr)/W,beta))*b[1]/dx2
+                              +(g00p*omega((x00p.x3i+zr)/W,beta)-g00m*omega((x00m.x3i+zr)/W,beta))*b[2]/dx3 );
+ 
        		// force update
-		switch (ix)
+		switch (d_dim.getValue()-ix-1)
 		{
-			case 0:{
-				// f_2
-				double f2=-cdip*dipcs-sdip*sourc;
-				       //std::cout << x << " " << y << " "<< omega((y-yr)/L,beta)<< " " << temp2 << " " << dipcs << "\n";
-                		(*v_rhs_data)(s)=+10*f2;
+			case 2:{
+				// f_1
+				double f1=+cr*sstrike*sourc
+					  +cr*cdip*cstrike*dblcp
+					  +sr*cdip*cstrike*dipcs
+					  +sr*sdip*cstrike*sourc;
+                		(*v_rhs_data)(s)=-f1*scale;
 				break;
 			       }
 			case 1:{
-			       // f_3
-				double f3=+cdip*sourc-sdip*dipcs;
-
-                		(*v_rhs_data)(s)=-10*f3;
+			       // f_2
+				double f2=+cr*cstrike*sourc
+					  -cr*cdip*sstrike*dblcp
+					  -sr*cdip*sstrike*dipcs
+					  -sr*sdip*sstrike*sourc;
+                		(*v_rhs_data)(s)=-f2*scale;
 				break;
+			       }
+			case 0:{
+				// f_3
+				double f3=-cr*sdip*dblcp
+					  +sr*cdip*sourc
+					  -sr*sdip*dipcs;
+				(*v_rhs_data)(s)=-f3*scale;
 			       }
 		}
 
