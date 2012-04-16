@@ -59,8 +59,16 @@ void SAMRAI::FACStokes::applyGradientDetector
 	  {
             const pdat::SideIndex x(cell_index,ix,pdat::SideIndex::Lower);
 	    for (int d=0; d<d_dim.getValue(); ++d){
-              const hier::Index ip(1,0), jp(0,1);
-              const hier::Index pp[]={ip,jp};
+		    hier::Index ip(d_dim,0),
+			        jp(d_dim,0),
+			        kp(d_dim,0);
+		    ip(0)=1;
+		    jp(1)=1;
+		    if (3==d_dim.getValue())
+		    {
+			kp(2)=1;
+		    }
+              const hier::Index pp[]={ip,jp,kp};
 
               if(cell_index[ix]==patch.getBox().lower(ix)
                  && geom->getTouchesRegularBoundary(ix,0))
