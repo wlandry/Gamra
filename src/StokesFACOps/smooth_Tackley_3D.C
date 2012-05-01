@@ -49,7 +49,6 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
   }
 
   double theta_momentum=0.7;
-  double theta_continuity=1.0;
 
   /*
    * Smooth the number of sweeps specified or until
@@ -93,11 +92,11 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
                 pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
                 tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-                  = patch->getPatchData(cell_viscosity_id);
-                pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+                  = patch->getPatchData(cell_moduli_id);
+                pdat::CellData<double> &cell_moduli(*cell_visc_ptr);
                 tbox::Pointer<pdat::EdgeData<double> > edge_visc_ptr
-                  = patch->getPatchData(edge_viscosity_id);
-                pdat::EdgeData<double> &edge_viscosity(*edge_visc_ptr);
+                  = patch->getPatchData(edge_moduli_id);
+                pdat::EdgeData<double> &edge_moduli(*edge_visc_ptr);
 
                 hier::Box pbox=patch->getBox();
                 tbox::Pointer<geom::CartesianPatchGeometry>
@@ -115,135 +114,14 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
                           pdat::CellIndex center(hier::Index(i,j,k));
 
                           /* Update v */
-                          smooth_V_3D(ix,pbox,geom,p,v,v_rhs,cell_viscosity,
-                                      edge_viscosity,center,
+                          smooth_V_3D(ix,pbox,geom,v,v_rhs,cell_moduli,
+                                      edge_moduli,center,
                                       Dx,theta_momentum,pp,maxres);
                         }
                     }
               }
             set_boundaries(invalid_id,v_id,level,true);
           }
-
-      /* p sweep
-         No need for red-black, because dp does not depend on
-         the pressure. */
-      xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
-
-      for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
-        {
-          tbox::Pointer<hier::Patch> patch = *pi;
-
-          tbox::Pointer<pdat::CellData<double> > p_ptr =
-            patch->getPatchData(p_id);
-          pdat::CellData<double> &p(*p_ptr);
-          tbox::Pointer<pdat::CellData<double> > dp_ptr =
-            patch->getPatchData(dp_id);
-          pdat::CellData<double> &dp(*dp_ptr);
-          tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
-            patch->getPatchData(p_rhs_id);
-          pdat::CellData<double> &p_rhs(*p_rhs_ptr);
-                
-          tbox::Pointer<pdat::SideData<double> > v_ptr =
-            patch->getPatchData(v_id);
-          pdat::SideData<double> &v(*v_ptr);
-
-          // tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
-          //   patch->getPatchData(v_rhs_id);
-          // pdat::SideData<double> &v_rhs(*v_rhs_ptr);
-                
-          tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-            = patch->getPatchData(cell_viscosity_id);
-          pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-          tbox::Pointer<pdat::EdgeData<double> > edge_visc_ptr
-            = patch->getPatchData(edge_viscosity_id);
-          pdat::EdgeData<double> &edge_viscosity(*edge_visc_ptr);
-
-          hier::Box pbox=patch->getBox();
-          tbox::Pointer<geom::CartesianPatchGeometry>
-            geom = patch->getPatchGeometry();
-          const double *Dx = geom->getDx();
-
-          for(pdat::CellIterator ci(pbox); ci; ci++)
-            {
-              pdat::CellIndex center(*ci);
-
-              double delta_R_continuity=p_rhs(center);
-              for(int ix=0;ix<3;++ix)
-                {
-                  const pdat::SideIndex x(center,ix,pdat::SideIndex::Lower);
-                  delta_R_continuity-=(v(x+pp[ix]) - v(x))/Dx[ix];;
-                }
-
-              /* No scaling here, though there should be. */
-              maxres=std::max(maxres,std::fabs(delta_R_continuity));
-
-              dp(center)=delta_R_continuity*theta_continuity
-                /dRc_dp_3D(pbox,center,cell_viscosity,edge_viscosity,v,Dx,pp);
-              p(center)+=dp(center);
-            }
-        }
-      set_boundaries(p_id,invalid_id,level,true);
-
-      /* fix v sweep */
-      xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
-
-      for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
-        {
-          tbox::Pointer<hier::Patch> patch = *pi;
-
-          tbox::Pointer<pdat::CellData<double> > dp_ptr =
-            patch->getPatchData(dp_id);
-          pdat::CellData<double> &dp(*dp_ptr);
-                
-          tbox::Pointer<pdat::SideData<double> > v_ptr =
-            patch->getPatchData(v_id);
-          pdat::SideData<double> &v(*v_ptr);
-                
-          tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-            = patch->getPatchData(cell_viscosity_id);
-          pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-          tbox::Pointer<pdat::EdgeData<double> > edge_visc_ptr
-            = patch->getPatchData(edge_viscosity_id);
-          pdat::EdgeData<double> &edge_viscosity(*edge_visc_ptr);
-
-          hier::Box pbox=patch->getBox();
-          tbox::Pointer<geom::CartesianPatchGeometry>
-            geom = patch->getPatchGeometry();
-          const double *Dx=geom->getDx();
-
-          pbox.growUpper(hier::IntVector::getOne(d_dim));
-
-          for(pdat::CellIterator ci(pbox); ci; ci++)
-            {
-              pdat::CellIndex center(*ci);
-
-              /* Update v */
-              for(int ix=0;ix<3;++ix)
-                {
-                  const int iy((ix+1)%3), iz((ix+2)%3);
-                  if(center[iy]<pbox.upper(iy) && center[iz]<pbox.upper(iz))
-                    {
-                      const pdat::SideIndex x(center,ix,pdat::SideIndex::Lower);
-                      const pdat::EdgeIndex
-                        edge_y(center,iy,pdat::EdgeIndex::LowerLeft),
-                        edge_z(center,iz,pdat::EdgeIndex::LowerLeft);
-
-                      if(!((center[ix]==pbox.lower(ix)
-                            && v(x-pp[ix])==boundary_value)
-                           || (center[ix]==pbox.upper(ix)
-                               && v(x+pp[ix])==boundary_value)))
-                        v(x)+=(dp(center) - dp(center-pp[ix]))
-                          /(Dx[ix]*dRm_dv_3D(cell_viscosity,edge_viscosity,center,
-                                             center-pp[ix],edge_y+pp[iz],edge_y,
-                                             edge_z+pp[iy],edge_z,
-                                             Dx[ix],Dx[iy],Dx[iz]));
-                    }
-                }
-            }
-        }
-      /* This is probably not necessary, since everyone always makes
-         sure that everything is set before use. */
-      set_boundaries(invalid_id,v_id,level,true);
 
       // if (residual_tolerance >= 0.0) {
         /*

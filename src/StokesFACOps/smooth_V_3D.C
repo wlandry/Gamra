@@ -11,7 +11,6 @@ void SAMRAI::solv::StokesFACOps::smooth_V_3D
 (const int &ix,
  const hier::Box &pbox,
  tbox::Pointer<geom::CartesianPatchGeometry> &geom,
- pdat::CellData<double> &p,
  pdat::SideData<double> &v,
  pdat::SideData<double> &v_rhs,
  pdat::CellData<double> &cell_viscosity,
@@ -56,7 +55,7 @@ void SAMRAI::solv::StokesFACOps::smooth_V_3D
                             Dx[ix],Dx[iy],Dx[iz]);
 
       double delta_Rx=v_rhs(x)
-        - v_operator_3D(v,p,cell_viscosity,edge_viscosity,center,edge_y,edge_z,
+        - v_operator_3D(v,cell_viscosity,edge_viscosity,center,edge_y,edge_z,
                         x,y,z,pp[ix],pp[iy],pp[iz],Dx[ix],Dx[iy],Dx[iz]);
 
       /* No scaling here, though there should be. */

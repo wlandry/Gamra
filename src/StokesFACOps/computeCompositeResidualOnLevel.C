@@ -93,6 +93,10 @@ void SAMRAI::solv::StokesFACOps::computeCompositeResidualOnLevel
         residual_2D(*p_ptr,*v_ptr,*cell_moduli_ptr,*p_rhs_ptr,*v_rhs_ptr,
                     *p_resid_ptr,*v_resid_ptr,*patch,pbox,*geom);
         break;
+      case 3:
+        residual_3D(*p_ptr,*v_ptr,*cell_moduli_ptr,*p_rhs_ptr,*v_rhs_ptr,
+                    *p_resid_ptr,*v_resid_ptr,*patch,pbox,*geom);
+        break;
       default:
         abort();
       }

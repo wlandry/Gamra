@@ -493,6 +493,13 @@ private:
       int num_sweeps,
       double residual_tolerance = -1.0);
 
+   void smooth_Tackley_3D
+            (SAMRAIVectorReal<double>& solution,
+             const SAMRAIVectorReal<double>& residual,
+             int ln,
+             int num_sweeps,
+             double residual_tolerance = -1.0);
+
 void smooth_V_2D(const int &axis,
 	const hier::Box &pbox,
 	tbox::Pointer<geom::CartesianPatchGeometry> &geom,
@@ -507,6 +514,19 @@ void smooth_V_2D(const int &axis,
 	pdat::CellData<double> &cell_moduli,
 	pdat::NodeData<double> &edge_moduli,
 	const double &theta_momentum);
+
+void smooth_V_3D(const int &ix,
+  const hier::Box &pbox,
+  tbox::Pointer<geom::CartesianPatchGeometry> &geom,
+  pdat::SideData<double> &v,
+  pdat::SideData<double> &v_rhs,
+  pdat::CellData<double> &cell_viscosity,
+  pdat::EdgeData<double> &edge_viscosity,
+  const pdat::CellIndex &center,
+  const double Dx[3],
+  const double &theta_momentum,
+  const hier::Index pp[3],
+  double &maxres);
 
   /* The mixed derivative of the stress.  We have to use a template
      because 2D uses Node's for the edge moduli, while 3D uses

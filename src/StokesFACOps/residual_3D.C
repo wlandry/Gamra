@@ -4,7 +4,7 @@
 void SAMRAI::solv::StokesFACOps::residual_3D
 (pdat::CellData<double> &p,
  pdat::SideData<double> &v,
- pdat::CellData<double> &cell_viscosity,
+ pdat::CellData<double> &cell_moduli,
  pdat::CellData<double> &p_rhs,
  pdat::SideData<double> &v_rhs,
  pdat::CellData<double> &p_resid,
@@ -14,8 +14,8 @@ void SAMRAI::solv::StokesFACOps::residual_3D
  const geom::CartesianPatchGeometry &geom)
 {
   tbox::Pointer<pdat::EdgeData<double> >
-    edge_viscosity_ptr = patch.getPatchData(edge_viscosity_id);
-  pdat::EdgeData<double> &edge_viscosity(*edge_viscosity_ptr);
+    edge_moduli_ptr = patch.getPatchData(edge_moduli_id);
+  pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
 
   const double *Dx = geom.getDx();
   const hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
@@ -38,15 +38,7 @@ void SAMRAI::solv::StokesFACOps::residual_3D
       if(center[0]!=pbox.upper(0) && center[1]!=pbox.upper(1)
          && center[2]!=pbox.upper(2))
         {
-          const pdat::SideIndex
-            x(center,0,pdat::SideIndex::Lower),
-            y(center,1,pdat::SideIndex::Lower),
-            z(center,2,pdat::SideIndex::Lower);
-
-          double dvx_dx=(v(x+ip) - v(x))/Dx[0];
-          double dvy_dy=(v(y+jp) - v(y))/Dx[1];
-          double dvz_dz=(v(z+kp) - v(z))/Dx[2];
-          p_resid(center)=p_rhs(center) - dvx_dx - dvy_dy - dvz_dz;
+          p_resid(center)=0;
         }
 
       for(int ix=0;ix<3;++ix)
@@ -70,7 +62,7 @@ void SAMRAI::solv::StokesFACOps::residual_3D
               else
                 {
                   v_resid(x)=v_rhs(x)
-                    - v_operator_3D(v,p,cell_viscosity,edge_viscosity,
+                    - v_operator_3D(v,cell_moduli,edge_moduli,
                                     center,edge_y,edge_z,x,y,z,
                                     pp[ix],pp[iy],pp[iz],Dx[ix],Dx[iy],Dx[iz]);
                 }
