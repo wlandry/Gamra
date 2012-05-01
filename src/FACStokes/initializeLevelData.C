@@ -10,7 +10,7 @@
 #include "FACStokes.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
 
-double rotate(double cstrike, double sstrike, double cdip, double sdip, 
+void rotate(double cstrike, double sstrike, double cdip, double sdip, 
 	      double x1, double x2, double x3, 
 	      double * x1s, double * x1i, double * x2s, double * x3s, double * x3i)
 {
