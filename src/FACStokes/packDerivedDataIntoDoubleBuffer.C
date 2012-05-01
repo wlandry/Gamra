@@ -36,7 +36,6 @@ namespace SAMRAI {
                                                   int depth_id) const
   {
 	pdat::CellData<double>::Iterator icell(region);
-	const hier::Index ip(1,0), jp(0,1);
 
 	tbox::Pointer<pdat::SideData<double> > v_ptr;
 	if (variable_name == "Displacement") {
@@ -56,27 +55,60 @@ namespace SAMRAI {
 	}
 
 	pdat::SideData<double>& v = *v_ptr;
-	for ( ; icell; icell++) {
+        if(d_dim.getValue()==2)
+          {
+            const hier::Index ip(1,0), jp(0,1);
+            for ( ; icell; icell++) {
 
-		pdat::CellIndex center(*icell);
-		const pdat::SideIndex
+              pdat::CellIndex center(*icell);
+              const pdat::SideIndex
 		x(center,0,pdat::SideIndex::Lower),
 		y(center,1,pdat::SideIndex::Lower);
 	
-		/* Update p */
-		double vx=(v(x+ip) + v(x))/2.;
-		double vy=(v(y+jp) + v(y))/2.;
+              double vx=(v(x+ip) + v(x))/2.;
+              double vy=(v(y+jp) + v(y))/2.;
 
-		if (0==depth_id)
+              if (0==depth_id)
 		{
-        		*buffer = vx;
+                  *buffer = vx;
 		}
-		else
+              else
 		{
-        		*buffer = vy;
+                  *buffer = vy;
 		}
-        	buffer = buffer + 1;
-	}
+              buffer = buffer + 1;
+            }
+          }
+        else
+          {
+            const hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
+            for ( ; icell; icell++) {
+
+              pdat::CellIndex center(*icell);
+              const pdat::SideIndex
+		x(center,0,pdat::SideIndex::Lower),
+		y(center,1,pdat::SideIndex::Lower),
+		z(center,2,pdat::SideIndex::Lower);
+	
+              double vx=(v(x+ip) + v(x))/2.;
+              double vy=(v(y+jp) + v(y))/2.;
+              double vz=(v(z+kp) + v(z))/2.;
+
+              if (0==depth_id)
+		{
+                  *buffer = vx;
+		}
+              else if (1==depth_id)
+		{
+                  *buffer = vy;
+		}
+              else
+                {
+                  *buffer = vz;
+                }
+              buffer = buffer + 1;
+            }
+          }
     // Return true if this patch has derived data on it.
     // False otherwise.
     return true;
