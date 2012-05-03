@@ -69,7 +69,7 @@ void SAMRAI::FACStokes::fix_moduli()
   hier::Index pp[]={ip,jp,kp};
 
   for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln)
-{
+    {
       tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
       hier::PatchLevel::Iterator i_p(*level);
       for ( ; i_p; i_p++)
@@ -86,21 +86,21 @@ void SAMRAI::FACStokes::fix_moduli()
 
               for(pdat::NodeIterator ni(edge_moduli.getBox()); ni; ni++)
                 {
-			for (int m=0;m<2;++m)
-			{
-				pdat::NodeIndex e=ni();
-				pdat::CellIndex c(e);
-				cell_moduli(c,m);
-				cell_moduli(c-ip,m);
-				cell_moduli(c-jp,m);
-				cell_moduli(c-ip-jp,m);
-				edge_moduli(e,m)=
-		                    pow(cell_moduli(c,m)*cell_moduli(c-ip,m)
-                		        *cell_moduli(c-jp,m)*cell_moduli(c-ip-jp,m),0.25);
-			}
+                  for (int m=0;m<2;++m)
+                    {
+                      pdat::NodeIndex e=ni();
+                      pdat::CellIndex c(e);
+                      cell_moduli(c,m);
+                      cell_moduli(c-ip,m);
+                      cell_moduli(c-jp,m);
+                      cell_moduli(c-ip-jp,m);
+                      edge_moduli(e,m)=
+                        pow(cell_moduli(c,m)*cell_moduli(c-ip,m)
+                            *cell_moduli(c-jp,m)*cell_moduli(c-ip-jp,m),0.25);
+                    }
 		}
-	}
-	else
+            }
+          else
             {
               tbox::Pointer<pdat::EdgeData<double> >
                 edge_moduli_ptr = patch->getPatchData(edge_moduli_id);
@@ -108,17 +108,20 @@ void SAMRAI::FACStokes::fix_moduli()
               for(int axis=0;axis<3;++axis)
                 {
                   const int axis2((axis+1)%3), axis3((axis+2)%3);
-                  for(pdat::EdgeIterator ni(edge_moduli.getBox(),axis); ni; ni++)
+                  hier::Box pbox=patch->getBox();
+                  pbox.grow(axis,edge_moduli.getGhostCellWidth()[axis]);
+
+                  for(pdat::EdgeIterator ni(pbox,axis); ni; ni++)
                     {
                       pdat::EdgeIndex e=ni();
                       pdat::CellIndex c(e);
 		      for (int m=0;m<2;++m)
-		      {
-                      edge_moduli(e,m)=
-                        pow(cell_moduli(c,m)*cell_moduli(c-pp[axis2],m)
-                            *cell_moduli(c-pp[axis3],m)
-                            *cell_moduli(c-pp[axis2]-pp[axis3],m),0.25);
-		      }
+                        {
+                          edge_moduli(e,m)=
+                            pow(cell_moduli(c,m)*cell_moduli(c-pp[axis2],m)
+                                *cell_moduli(c-pp[axis3],m)
+                                *cell_moduli(c-pp[axis2]-pp[axis3],m),0.25);
+                        }
                     }
                 }
             }
