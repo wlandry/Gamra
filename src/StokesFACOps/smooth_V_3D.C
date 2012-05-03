@@ -13,8 +13,8 @@ void SAMRAI::solv::StokesFACOps::smooth_V_3D
  tbox::Pointer<geom::CartesianPatchGeometry> &geom,
  pdat::SideData<double> &v,
  pdat::SideData<double> &v_rhs,
- pdat::CellData<double> &cell_viscosity,
- pdat::EdgeData<double> &edge_viscosity,
+ pdat::CellData<double> &cell_moduli,
+ pdat::EdgeData<double> &edge_moduli,
  const pdat::CellIndex &center,
  const double Dx[3],
  const double &theta_momentum,
@@ -50,12 +50,12 @@ void SAMRAI::solv::StokesFACOps::smooth_V_3D
           dv_upper=v(x+offset) - v(x);
         }
 
-      double C_vx=dRm_dv_3D(cell_viscosity,edge_viscosity,center,center-pp[ix],
+      double C_vx=dRm_dv_3D(cell_moduli,edge_moduli,center,center-pp[ix],
                             edge_y+pp[iz],edge_y,edge_z+pp[iy],edge_z,
                             Dx[ix],Dx[iy],Dx[iz]);
 
       double delta_Rx=v_rhs(x)
-        - v_operator_3D(v,cell_viscosity,edge_viscosity,center,edge_y,edge_z,
+        - v_operator_3D(v,cell_moduli,edge_moduli,center,edge_y,edge_z,
                         x,y,z,pp[ix],pp[iy],pp[iz],Dx[ix],Dx[iy],Dx[iz]);
 
       /* No scaling here, though there should be. */
