@@ -34,11 +34,11 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
      calculating a new pressure update requires computing in the ghost
      region so that the update for the velocity inside the box will be
      correct. */
+  p_refine_patch_strategy.setTargetDataId(p_id);
+  v_refine_patch_strategy.setTargetDataId(v_id);
   set_boundaries(p_id,v_id,level,true);
   xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
 
-  p_refine_patch_strategy.setTargetDataId(p_id);
-  v_refine_patch_strategy.setTargetDataId(v_id);
   if (ln > d_ln_min) {
     /*
      * Perform a one-time transfer of data from coarser level,
@@ -48,7 +48,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
     xeqScheduleGhostFill(p_id, v_id, ln);
   }
 
-  double theta_momentum=0.7;
+  double theta_momentum=1.0;
 
   /*
    * Smooth the number of sweeps specified or until
