@@ -105,7 +105,10 @@ void SAMRAI::FACStokes::fix_viscosity()
               for(int axis=0;axis<3;++axis)
                 {
                   const int axis2((axis+1)%3), axis3((axis+2)%3);
-                  for(pdat::EdgeIterator ni(edge_viscosity.getBox(),axis); ni; ni++)
+                  hier::Box pbox=patch->getBox();
+                  pbox.grow(axis,edge_viscosity.getGhostCellWidth()[axis]);
+
+                  for(pdat::EdgeIterator ni(pbox,axis); ni; ni++)
                     {
                       pdat::EdgeIndex e=ni();
                       pdat::CellIndex c(e);
