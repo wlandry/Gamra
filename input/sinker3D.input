@@ -28,8 +28,8 @@ FACStokes {
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
-    adaption_threshold = -1.0e-3
-    min_full_refinement_level = 4
+    adaption_threshold = 1.0e-3
+    min_full_refinement_level = 1
 
     lambda_ijk= 2, 2, 2
     lambda_coord_min= -0.001, -0.001, -0.001
@@ -852,14 +852,14 @@ FACStokes {
         // class in the SAMRAI library.
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
-        residual_tol = 1e+6     // Residual tolerance to solve for
-        num_pre_sweeps =  0      // Number of presmoothing sweeps to use
-        num_post_sweeps =  0     // Number of postsmoothing sweeps to use
+        residual_tol = 1e-3     // Residual tolerance to solve for
+        num_pre_sweeps =  8      // Number of presmoothing sweeps to use
+        num_post_sweeps =  8     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         // smoothing_choice = "Gerya"
         // coarse_solver_choice = "Gerya"
-        coarse_solver_max_iterations =  1
+        coarse_solver_max_iterations =  32
         coarse_solver_tolerance = 1e-12
         // p_prolongation_method = "P_MDPI_REFINE"
         p_prolongation_method = "P_REFINE"
@@ -938,7 +938,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 4
+    max_levels = 6
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2
