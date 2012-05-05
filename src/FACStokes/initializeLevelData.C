@@ -33,7 +33,7 @@ double gauss(double x, double sigma)
 
 double omega(double x, double beta)
 {
-  double pi=4*atan(1);
+  const double pi=4*atan(1);
 
   if (fabs(x) <= (1-2*beta)/(1-beta)/2)
     {
@@ -178,6 +178,54 @@ void SAMRAI::FACStokes::initializeLevelData
         double beta(0.2);
 	double scale(-10.);
 
+        hier::Box pbox = v_rhs_data->getBox();
+        for(int ix=0;ix<dim;++ix)
+          {
+            double offset[]={0.5,0.5,0.5};
+            offset[ix]=0;
+
+            for(pdat::SideIterator si(pbox,ix); si; si++)
+              {
+                pdat::SideIndex s=si();
+                double xyz[dim];
+                for(int d=0;d<dim;++d)
+                  xyz[d]=geom->getXLower()[d]
+                    + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
+
+                (*v_rhs_data)(s)=0;
+                int sign(0);
+                if(xyz[0]<=x && xyz[0]+dx[0]>x)
+                  sign=1;
+                else if(xyz[0]>x && xyz[0]-dx[0]<=x)
+                  sign=-1;
+                if(sign!=0)
+                  {
+                    switch(ix)
+                      {
+                      case 0:
+                        if(xyz[1]<=y+L/2 && xyz[1]+dx[1]>y+L/2)
+                          sign=-1;
+                        else if(xyz[1]<=y-L/2 && xyz[1]+dx[1]>y-L/2)
+                          sign=1;
+                        else
+                          sign=0;
+                        (*v_rhs_data)(s)=scale*sign/(dx[0]*dx[1]);
+                        break;
+                      case 1:
+                        if(sign!=0 && xyz[1]<=y+L/2 && xyz[1]>y-L/2)
+                          (*v_rhs_data)(s)=scale*sign/(dx[0]*dx[0]);
+                        break;
+                      case 2:
+                        break;
+                      default:
+                        break;
+                      }
+                  }
+              }
+          }
+        if(0)
+          {
+
 	typedef struct {
 		double x1s,x1i,x2s,x3s,x3i;
 	} rpoint;
@@ -192,7 +240,6 @@ void SAMRAI::FACStokes::initializeLevelData
 	zr = sdip   *x2r+cdip   *z;
 
         hier::Box pbox = v_rhs_data->getBox();
-        int ix_offset(0);
         for(int ix=0;ix<dim;++ix)
           {
             double offset[]={0.5,0.5,0.5};
@@ -324,7 +371,7 @@ void SAMRAI::FACStokes::initializeLevelData
             int i=1;
             for(int d=0;d<dim;++d)
               i*=v_rhs_ijk[d];
-            ix_offset+=i;
+          }
           }
       }
   }    // End patch loop.
