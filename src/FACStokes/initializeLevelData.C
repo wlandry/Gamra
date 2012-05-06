@@ -9,6 +9,14 @@
  ************************************************************************/
 #include "FACStokes.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
+#include "FTensor.hpp"
+
+bool intersect_fault(const FTensor::Tensor1<double,3> &c0,
+                     const FTensor::Tensor1<double,3> &c1, const double &L)
+{
+  double y((c1(1)*c0(0) -  c1(0)*c0(1))/(c1(0) - c0(0)));
+  return y<=L/2 && y>-L/2;
+}
 
 void rotate(double cstrike, double sstrike, double cdip, double sdip, 
 	      double x1, double x2, double x3, 
@@ -91,10 +99,10 @@ void SAMRAI::FACStokes::initializeLevelData
   /*
    * Initialize data in all patches in the level.
    */
-  hier::PatchLevel::Iterator pi(*level);
-  for (pi.initialize(*level); pi; pi++) {
+  hier::PatchLevel::Iterator p_i(*level);
+  for (p_i.initialize(*level); p_i; p_i++) {
 
-    tbox::Pointer<hier::Patch> patch = *pi;
+    tbox::Pointer<hier::Patch> patch = *p_i;
     if (patch.isNull()) {
       TBOX_ERROR(d_object_name
                  << ": Cannot find patch.  Null patch pointer.");
@@ -178,6 +186,26 @@ void SAMRAI::FACStokes::initializeLevelData
         double beta(0.2);
 	double scale(-10.);
 
+        const double pi=4*atan(1);
+        const double theta(pi/4);
+        const FTensor::Tensor1<double,3> center(x,y,z);
+        const FTensor::Tensor2<double,3,3> rot(std::cos(theta),std::sin(theta),0,
+                                               -std::sin(theta),cos(theta),0,
+                                               0,0,1);
+        FTensor::Tensor1<double,3> Dx[dim];
+        for(int d0=0;d0<dim;++d0)
+          {
+            for(int d1=0;d1<dim;++d1)
+              Dx[d0](d1)=0;
+            
+            Dx[d0](d0)=dx[d0];
+          }
+        FTensor::Tensor1<double,3> slip(0,scale,0);
+        FTensor::Index<'a',3> a;
+        FTensor::Index<'b',3> b;
+        FTensor::Tensor1<double,3> jump;
+        jump(a)=slip(b)*rot(b,a);
+
         hier::Box pbox = v_rhs_data->getBox();
         for(int ix=0;ix<dim;++ix)
           {
@@ -187,40 +215,187 @@ void SAMRAI::FACStokes::initializeLevelData
             for(pdat::SideIterator si(pbox,ix); si; si++)
               {
                 pdat::SideIndex s=si();
-                double xyz[dim];
+                (*v_rhs_data)(s)=0;
+
+                FTensor::Tensor1<double,3> xyz(0,0,0);
                 for(int d=0;d<dim;++d)
-                  xyz[d]=geom->getXLower()[d]
+                  xyz(d)=geom->getXLower()[d]
                     + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
 
-                (*v_rhs_data)(s)=0;
-                int sign(0);
-                if(xyz[0]<=x && xyz[0]+dx[0]>x)
-                  sign=1;
-                else if(xyz[0]>x && xyz[0]-dx[0]<=x)
-                  sign=-1;
-                if(sign!=0)
+                FTensor::Tensor1<double,3> ntt;
+                FTensor::Tensor1<double,3> ntt_dp[dim], ntt_dm[dim];
+                ntt(a)=rot(a,b)*(xyz(b)-center(b));
+                for(int d=0;d<dim;++d)
                   {
-                    switch(ix)
+                    ntt_dp[d](a)=rot(a,b)*(xyz(b)+Dx[d](b)-center(b));
+                    ntt_dm[d](a)=rot(a,b)*(xyz(b)-Dx[d](b)-center(b));
+                  }
+
+                /* d/dx^2, d/dy^2, d/dz^2 */
+                for(int d=0;d<dim;++d)
+                  {
+                    int sign(0);
+                    if(ntt(0)<=0 && ntt_dp[d](0)>0
+                       && intersect_fault(ntt,ntt_dp[d],L))
+                      sign=1;
+                    else if(ntt(0)>0 && ntt_dp[d](0)<=0
+                            && intersect_fault(ntt,ntt_dp[d],L))
+                      sign=-1;
+                    else if(ntt(0)<=0 && ntt_dm[d](0)>0
+                            && intersect_fault(ntt,ntt_dm[d],L))
+                      sign=1;
+                    else if(ntt(0)>0 && ntt_dm[d](0)<=0
+                            && intersect_fault(ntt,ntt_dm[d],L))
+                      sign=-1;
+
+                    if(sign!=0)
                       {
-                      case 0:
-                        if(xyz[1]<=y+L/2 && xyz[1]+dx[1]>y+L/2)
-                          sign=-1;
-                        else if(xyz[1]<=y-L/2 && xyz[1]+dx[1]>y-L/2)
-                          sign=1;
-                        else
-                          sign=0;
-                        (*v_rhs_data)(s)=scale*sign/(dx[0]*dx[1]);
-                        break;
-                      case 1:
-                        if(sign!=0 && xyz[1]<=y+L/2 && xyz[1]>y-L/2)
-                          (*v_rhs_data)(s)=scale*sign/(dx[0]*dx[0]);
-                        break;
-                      case 2:
-                        break;
-                      default:
-                        break;
+                        if(level_number==4)
+                        tbox::pout << "ddv "
+                                   << ix << " "
+                                   << d << " "
+                                   << sign << " "
+                                   << jump(ix) << " "
+                                   << ntt(0) << " "
+                                   << ntt(1) << " "
+                                   << ntt_dp[d](0) << " "
+                                   << ntt_dp[d](1) << " "
+                                   << ntt_dm[d](0) << " "
+                                   << ntt_dm[d](1) << " "
+                                   << "\n";
+
+                        const double lambda_here(1), mu_here(1);
+                        double factor(mu_here);
+                        if(ix==d)
+                          factor=lambda_here+2*mu_here;
+                        (*v_rhs_data)(s)+=sign*factor*jump(ix)/(dx[d]*dx[d]);
                       }
                   }
+
+                /* d/dxy */
+
+                FTensor::Tensor1<double,3> ntt_dxy[2][2];
+                ntt_dxy[0][0](a)=
+                  rot(a,b)*(xyz(b)+Dx[0](b)/2+Dx[1](b)/2-center(b));
+                ntt_dxy[0][1](a)=
+                  rot(a,b)*(xyz(b)+Dx[0](b)/2-Dx[1](b)/2-center(b));
+                ntt_dxy[1][0](a)=
+                  rot(a,b)*(xyz(b)-Dx[0](b)/2+Dx[1](b)/2-center(b));
+                ntt_dxy[1][1](a)=
+                  rot(a,b)*(xyz(b)-Dx[0](b)/2-Dx[1](b)/2-center(b));
+
+                const double lambda_here(1), mu_here(1);
+                int l(0), m(0);
+                double j(0);
+
+                if(ntt_dxy[0][0](0)<=0 && ntt_dxy[1][0](0)>0
+                   && intersect_fault(ntt_dxy[0][0],ntt_dxy[1][0],L))
+                  m-=1;
+                if(ntt_dxy[0][0](0)>0 && ntt_dxy[1][0](0)<=0
+                   && intersect_fault(ntt_dxy[0][0],ntt_dxy[1][0],L))
+                  m+=1;
+                if(ntt_dxy[0][1](0)<=0 && ntt_dxy[1][1](0)>0
+                   && intersect_fault(ntt_dxy[0][1],ntt_dxy[1][1],L))
+                  m+=1;
+                if(ntt_dxy[0][1](0)>0 && ntt_dxy[1][1](0)<=0
+                   && intersect_fault(ntt_dxy[0][1],ntt_dxy[1][1],L))
+                  m-=1;
+
+                if(ntt_dxy[0][0](0)<=0 && ntt_dxy[0][1](0)>0
+                   && intersect_fault(ntt_dxy[0][0],ntt_dxy[0][1],L))
+                  l-=1;
+                if(ntt_dxy[0][0](0)>0 && ntt_dxy[0][1](0)<=0
+                   && intersect_fault(ntt_dxy[0][0],ntt_dxy[0][1],L))
+                  l+=1;
+                if(ntt_dxy[1][0](0)<=0 && ntt_dxy[1][1](0)>0
+                   && intersect_fault(ntt_dxy[1][0],ntt_dxy[1][1],L))
+                  l+=1;
+                if(ntt_dxy[1][0](0)>0 && ntt_dxy[1][1](0)<=0
+                   && intersect_fault(ntt_dxy[1][0],ntt_dxy[1][1],L))
+                  l-=1;
+
+                switch(ix)
+                  {
+                  case 0:
+                    j=l*lambda_here + m*mu_here;
+                    break;
+                  case 1:
+                    j=m*lambda_here + l*mu_here;
+                    break;
+                  default:
+                    abort();
+                  }
+
+                if(j!=0)
+                  {
+                    (*v_rhs_data)(s)+=j*jump((ix+1)%dim) / (dx[0]*dx[1]);
+
+                    tbox::pout << "intersect "
+                               << level_number << " "
+                               << ix << " "
+                               << xyz(0) << " "
+                               << xyz(1) << " "
+                               << ntt(0) << " "
+                               << ntt(1) << " "
+                               << ntt_dxy[0][0](0) << " "
+                               << ntt_dxy[0][0](1) << " "
+                               << j << " "
+                               << l << " "
+                               << m << " "
+                               << jump((ix+1)%dim) << " "
+                               << (*v_rhs_data)(s) << " "
+                               << "\n";
+                  }                  
+
+                // for(int dir0=0;dir0<2;++dir0)
+                //   for(int dir1=0;dir1<2;++dir1)
+                //     {
+
+                //       if((ntt(0)<=0 && ntt_dxy[dir0][dir1](0)>0)
+                //          || (ntt(0)>0 && ntt_dxy[dir0][dir1](0)<=0)
+                //          && intersect_fault(ntt,ntt_dxy[dir0][dir1],L))
+                //         {
+                //           (*v_rhs_data)(s)+=(2*dir0-1)*(2*dir1-1)
+                //             *jump((ix+1)%dim) / (dx[0]*dx[1]);
+
+                //           tbox::pout << "intersect "
+                //                      << level_number << " "
+                //                      << ix << " "
+                //                      << dir0 << " "
+                //                      << dir1 << " "
+                //                      << xyz(0) << " "
+                //                      << xyz(1) << " "
+                //                      << ntt(0) << " "
+                //                      << ntt(1) << " "
+                //                      << ntt_dxy[dir0][dir1](0) << " "
+                //                      << ntt_dxy[dir0][dir1](1) << " "
+                //                      << (*v_rhs_data)(s) << " "
+                //                      << "\n";
+
+                //         }
+                //     }
+
+                  //   switch(ix)
+                  //     {
+                  //     case 0:
+                  //       if(ntt(1)<=L/2 && ntt_dp[1](1)>L/2)
+                  //         sign=-1;
+                  //       else if(ntt(1)<=-L/2 && ntt_dp[1](1)>-L/2)
+                  //         sign=1;
+                  //       else
+                  //         sign=0;
+                  //       (*v_rhs_data)(s)=scale*sign/(dx[0]*dx[1]);
+                  //       break;
+                  //     case 1:
+                  //       if(sign!=0 && ntt(1)<=L/2 && ntt(1)>-L/2)
+                  //         (*v_rhs_data)(s)=scale*sign/(dx[0]*dx[0]);
+                  //       break;
+                  //     case 2:
+                  //       break;
+                  //     default:
+                  //       break;
+                  //     }
+                  // }
               }
           }
         if(0)
@@ -321,21 +496,21 @@ void SAMRAI::FACStokes::initializeLevelData
 
                 temp1=gauss(x1i-xr,delta);
                 temp3=omega((x3i+zr)/W,beta);
-                double image=( (gp00*gauss(xp00.x1i-xr,delta)-gm00*gauss(xm00.x1i-xr,delta))*n[0]/dx1
-                              +(g0p0*gauss(x0p0.x1i-xr,delta)-g0m0*gauss(x0m0.x1i-xr,delta))*n[1]/dx2
-                              +(g00p*gauss(x00p.x1i-xr,delta)-g00m*gauss(x00m.x1i-xr,delta))*n[2]/dx3 )
-                     *temp2 
-                     *temp3;
-                double cplei=temp1 
-                            *( (gp00*omega((xp00.x2s-yr)/L,beta)-gm00*omega((xp00.x2s-yr)/L,beta))*b[0]/dx1
-                              +(g0p0*omega((x0p0.x2s-yr)/L,beta)-g0m0*omega((x0p0.x2s-yr)/L,beta))*b[1]/dx2
-                              +(g00p*omega((x00p.x2s-yr)/L,beta)-g00m*omega((x00p.x2s-yr)/L,beta))*b[2]/dx3 ) 
-                            *temp3;
-                double dipci=temp1 
-                            *temp2 
-                            *( (gp00*omega((xp00.x3i+zr)/W,beta)-gm00*omega((xm00.x3i+zr)/W,beta))*b[0]/dx1
-                              +(g0p0*omega((x0p0.x3i+zr)/W,beta)-g0m0*omega((x0m0.x3i+zr)/W,beta))*b[1]/dx2
-                              +(g00p*omega((x00p.x3i+zr)/W,beta)-g00m*omega((x00m.x3i+zr)/W,beta))*b[2]/dx3 );
+                // double image=( (gp00*gauss(xp00.x1i-xr,delta)-gm00*gauss(xm00.x1i-xr,delta))*n[0]/dx1
+                //               +(g0p0*gauss(x0p0.x1i-xr,delta)-g0m0*gauss(x0m0.x1i-xr,delta))*n[1]/dx2
+                //               +(g00p*gauss(x00p.x1i-xr,delta)-g00m*gauss(x00m.x1i-xr,delta))*n[2]/dx3 )
+                //      *temp2 
+                //      *temp3;
+                // double cplei=temp1 
+                //             *( (gp00*omega((xp00.x2s-yr)/L,beta)-gm00*omega((xp00.x2s-yr)/L,beta))*b[0]/dx1
+                //               +(g0p0*omega((x0p0.x2s-yr)/L,beta)-g0m0*omega((x0p0.x2s-yr)/L,beta))*b[1]/dx2
+                //               +(g00p*omega((x00p.x2s-yr)/L,beta)-g00m*omega((x00p.x2s-yr)/L,beta))*b[2]/dx3 ) 
+                //             *temp3;
+                // double dipci=temp1 
+                //             *temp2 
+                //             *( (gp00*omega((xp00.x3i+zr)/W,beta)-gm00*omega((xm00.x3i+zr)/W,beta))*b[0]/dx1
+                //               +(g0p0*omega((x0p0.x3i+zr)/W,beta)-g0m0*omega((x0m0.x3i+zr)/W,beta))*b[1]/dx2
+                //               +(g00p*omega((x00p.x3i+zr)/W,beta)-g00m*omega((x00m.x3i+zr)/W,beta))*b[2]/dx3 );
  
        		// force update
 		switch (d_dim.getValue()-ix-1)
