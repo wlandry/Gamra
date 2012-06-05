@@ -4,7 +4,7 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Main program for FAC Stokes example 
+ * Description:   Main program for FAC Elastic example 
  *
  ************************************************************************/
 #include "SAMRAI/SAMRAI_config.h"
@@ -36,7 +36,7 @@ using namespace std;
 #include "V_Coarsen.h"
 #include "Resid_Coarsen.h"
 
-#include "FACStokes.h"
+#include "FACElastic.h"
 
 using namespace SAMRAI;
 
@@ -44,20 +44,20 @@ using namespace SAMRAI;
 ************************************************************************
 *                                                                      *
 * This is the driver program to demonstrate                            *
-* how to use the FAC Stokes solver.                                   *
+* how to use the FAC Elastic solver.                                   *
 *                                                                      *
 * We set up the simple problem                                         *
 *          u + div(grad(u)) = sin(x)*sin(y)                            *
 * in the domain [0:1]x[0:1], with u=0 on the                           *
 * boundary.                                                            *
 *                                                                      *
-* FACStokes is the primary object used to                             *
+* FACElastic is the primary object used to                             *
 * set up and solve the system.  It maintains                           *
 * the data for the computed solution u, the                            *
 * exact solution, and the right hand side.                             *
 *                                                                      *
 * The hierarchy created to solve this problem                          *
-* has only one level.  (The FAC Stokes solver                         *
+* has only one level.  (The FAC Elastic solver                         *
 * is a single-level solver.)                                           *
 *                                                                      *
 *************************************************************************
@@ -177,21 +177,22 @@ int main(
                        input_db->getDatabase("PatchHierarchy")));
 
     /*
-     * The FACStokes object is the main user object specific to the
+     * The FACElastic object is the main user object specific to the
      * problem being solved.  It provides the implementations for setting
      * up the grid and plotting data.  It also wraps up the solve
      * process that includes making the initial guess, specifying the
      * boundary conditions and call the solver.
      */
-    FACStokes fac_stokes(base_name + "::FACStokes",
-                         dim,
-                         input_db->isDatabase("FACStokes") ?
-                         input_db->getDatabase("FACStokes") :
-                         tbox::Pointer<tbox::Database>(NULL));
+
+    FACElastic fac_elastic(base_name + "::FACElastic",
+                           dim,
+                           input_db->isDatabase("FACElastic") ?
+                           input_db->getDatabase("FACElastic") :
+                           tbox::Pointer<tbox::Database>(NULL));
 
     grid_geometry->addSpatialCoarsenOperator
       (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
-       (new SAMRAI::geom::Resid_Coarsen(dim,fac_stokes.cell_moduli_id)));
+       (new SAMRAI::geom::Resid_Coarsen(dim,fac_elastic.cell_moduli_id)));
 
     /*
      * Create the tag-and-initializer, box-generator and load-balancer
@@ -202,7 +203,7 @@ int main(
                           (dim,
                            "CellTaggingMethod",
                            tbox::Pointer<mesh::StandardTagAndInitStrategy>
-                           (&fac_stokes, false),
+                           (&fac_elastic, false),
                            input_db->getDatabase("StandardTagAndInitialize")
                            ));
     tbox::Pointer<mesh::BergerRigoutsos>
@@ -244,7 +245,7 @@ int main(
 
     /*
      * Set up the plotter for the hierarchy just created.
-     * The FACStokes object handles the data and has the
+     * The FACElastic object handles the data and has the
      * function setupExternalPlotter to register its data
      * with the plotter.
      */
@@ -265,7 +266,7 @@ int main(
       visit_writer = new appu::VisItDataWriter(dim,
                                                "Visit Writer",
                                                vis_filename + ".visit");
-      fac_stokes.setupPlotter(*visit_writer);
+      fac_elastic.setupPlotter(*visit_writer);
     }
 #endif
 
@@ -282,7 +283,7 @@ int main(
     /*
      * Solve.
      */
-    fac_stokes.solveStokes();
+    fac_elastic.solveElastic();
 
     bool done(false);
     for (int lnum = 0;
@@ -303,7 +304,7 @@ int main(
       // gridding_algorithm->makeFinerLevel(0.0,true,0);
       // tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
       done = !(patch_hierarchy->finerLevelExists(lnum));
-      fac_stokes.solveStokes();
+      fac_elastic.solveElastic();
     }
     // {
     //     tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
