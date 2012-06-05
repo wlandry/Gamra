@@ -135,20 +135,20 @@ void SAMRAI::geom::V_Coarsen::coarsen_2D(hier::Patch& coarse,
                 coarsen_point_2D(coarse,ip,jp,v,v_fine);
 
 
-                tbox::pout << "coarsen "
-                           << coarse << " "
-                           << xyz(0) << " "
-                           << xyz(1) << " "
-                           << dx[0] << " "
-                           << fine << " "
-                           << (*v)(coarse) << " "
-                           << (*v_fine)(fine) << " "
-                           << (*v_fine)(fine+ip) << " "
-                           << (*v_fine)(fine-ip) << " "
-                           << (*v_fine)(fine+jp) << " "
-                           << (*v_fine)(fine+jp+ip) << " "
-                           << (*v_fine)(fine+jp-ip) << " "
-                           << "\n";
+                // tbox::pout << "coarsen "
+                //            << coarse << " "
+                //            << xyz(0) << " "
+                //            << xyz(1) << " "
+                //            << dx[0] << " "
+                //            << fine << " "
+                //            << (*v)(coarse) << " "
+                //            << (*v_fine)(fine) << " "
+                //            << (*v_fine)(fine+ip) << " "
+                //            << (*v_fine)(fine-ip) << " "
+                //            << (*v_fine)(fine+jp) << " "
+                //            << (*v_fine)(fine+jp+ip) << " "
+                //            << (*v_fine)(fine+jp-ip) << " "
+                //            << "\n";
               }
           }
         if(directions(1) && i!=coarse_box.upper(0)+1)
