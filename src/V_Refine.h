@@ -20,7 +20,9 @@
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/pdat/SideVariable.h"
+#include "SAMRAI/geom/CartesianPatchGeometry.h"
 
+#include "FTensor.hpp"
 #include <string>
 
 namespace SAMRAI {
@@ -132,6 +134,17 @@ public:
               const hier::Box& fine_box,
               const hier::IntVector& ratio,
               const int &axis) const;
+
+  double refine_along_line(pdat::SideData<double> &v,
+                           const int &axis,
+                           const int &dim,
+                           const hier::Index pp[],
+                           const pdat::SideIndex &fine,
+                           const pdat::SideIndex &coarse,
+                           const hier::Box &coarse_box,
+                           const CartesianPatchGeometry &coarse_geom,
+                           const FTensor::Tensor1<double,3> &xyz,
+                           const double *dx) const;
 
 private:
   std::string d_name_id;
