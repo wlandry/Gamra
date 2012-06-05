@@ -59,10 +59,10 @@ void SAMRAI::FACStokes::applyGradientDetector
 
           // tbox::plog << "estimate "
           //            << cell_index << " "
-          //            << d_adaptation_threshold << " "
+          //            << d_adaption_threshold << " "
           //            << estimate_data(cell_index) << " "
           //            << std::boolalpha
-          //            << (estimate_data(cell_index) > d_adaptation_threshold)
+          //            << (estimate_data(cell_index) > d_adaption_threshold)
           //            << " "
           //            << "\n";
           if (estimate_data(cell_index) > d_adaption_threshold
