@@ -1,0 +1,17 @@
+This is Gamra, a 2D/3D code for solid earth modeling.  To build, you
+must build and install SAMRAI separately.  You must get it from the
+CIG repository, because I have patched it to work with Gamra.
+
+  hg clone http://geodynamics.org/hg/cs/AMR/Samrai/
+
+After building SAMRAI, download the FTensor library
+
+  hg clone http://geodynamics.org/hg/cs/AMR/Samrai/
+
+Gamra uses Waf to configure and build.  The configure, at present,
+only looks for a compiler.  So you will have to modify the file
+
+  wscript
+
+to point to where Samrai and FTensor are.  You may also have to change
+the linked in libraries depending on how you built SAMRAI.
