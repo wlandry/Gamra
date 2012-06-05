@@ -73,7 +73,7 @@ def build(bld):
                         'src/StokesFACSolver/solveSystem.C',
                         'src/StokesHypreSolver.C'],
 
-        target       = 'gamr',
+        target       = 'gamra',
         # cxxflags      = ['-O3', '-Wall', '-Wextra', '-Wconversion',
         #                 '-DTESTING=0', '-Drestrict='],
         cxxflags      = ['-g', '-Wall', '-Wextra', '-Wconversion',
