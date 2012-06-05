@@ -1,6 +1,6 @@
 #include "StokesFACOps.h"
 #include "Constants.h"
-#include "dRc_dp.h"
+#include "dRm_dv.h"
 /*
 ********************************************************************
 * Updates one component of the velocity during a red-black *

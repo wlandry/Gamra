@@ -20,7 +20,6 @@ def build(bld):
                         'src/FACStokes/setupPlotter.C',
                         'src/FACStokes/solveStokes.C',
                         'src/P_Refine.C',
-                        'src/P_MDPI_Refine.C',
                         'src/V_Refine.C',
                         'src/Resid_Coarsen.C',
                         'src/V_Coarsen/coarsen_2D.C',
@@ -75,7 +74,7 @@ def build(bld):
                         'src/StokesFACSolver/solveSystem.C',
                         'src/StokesHypreSolver.C'],
 
-        target       = 'gamr',
+        target       = 'gamra',
         # cxxflags      = ['-std=c++0x','-g','-D_GLIBCXX_DEBUG'],
         cxxflags      = ['-g', '-Wall', '-Wextra', '-Wconversion',
                          '-DTESTING=0'],
