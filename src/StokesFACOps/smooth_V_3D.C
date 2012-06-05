@@ -1,6 +1,6 @@
 #include "StokesFACOps.h"
 #include "Constants.h"
-#include "dRm_dv.h"
+#include "Elastic_dRm_dv.h"
 /*
 ********************************************************************
 * Updates one component of the velocity during a red-black *
@@ -51,9 +51,9 @@ void SAMRAI::solv::StokesFACOps::smooth_V_3D
           dv_upper=v(x+offset) - v(x);
         }
 
-      double C_vx=dRm_dv_3D(cell_viscosity,edge_viscosity,center,center-pp[ix],
-                            edge_y+pp[iz],edge_y,edge_z+pp[iy],edge_z,
-                            Dx[ix],Dx[iy],Dx[iz]);
+      double C_vx=Elastic_dRm_dv_3D(cell_viscosity,edge_viscosity,center,center-pp[ix],
+                                    edge_y+pp[iz],edge_y,edge_z+pp[iy],edge_z,
+                                    Dx[ix],Dx[iy],Dx[iz]);
 
       double delta_Rx=v_rhs(x)
         - v_operator_3D(v,p,cell_viscosity,edge_viscosity,center,edge_y,edge_z,

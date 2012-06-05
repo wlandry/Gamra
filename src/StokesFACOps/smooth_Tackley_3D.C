@@ -1,6 +1,6 @@
 #include "StokesFACOps.h"
 #include "Constants.h"
-#include "dRc_dp.h"
+#include "Elastic_dRc_dp.h"
 /*
 ********************************************************************
 * Workhorse function to smooth error using red-black               *
@@ -178,7 +178,7 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
               maxres=std::max(maxres,std::fabs(delta_R_continuity));
 
               dp(center)=delta_R_continuity*theta_continuity
-                /dRc_dp_3D(pbox,center,cell_viscosity,edge_viscosity,v,Dx,pp);
+                /Elastic_dRc_dp_3D(pbox,center,cell_viscosity,edge_viscosity,v,Dx,pp);
               p(center)+=dp(center);
             }
         }
@@ -233,10 +233,10 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
                            || (center[ix]==pbox.upper(ix)
                                && v(x+pp[ix])==boundary_value)))
                         v(x)+=(dp(center) - dp(center-pp[ix]))
-                          /(Dx[ix]*dRm_dv_3D(cell_viscosity,edge_viscosity,center,
-                                             center-pp[ix],edge_y+pp[iz],edge_y,
-                                             edge_z+pp[iy],edge_z,
-                                             Dx[ix],Dx[iy],Dx[iz]));
+                          /(Dx[ix]*Elastic_dRm_dv_3D(cell_viscosity,edge_viscosity,center,
+                                                     center-pp[ix],edge_y+pp[iz],edge_y,
+                                                     edge_z+pp[iy],edge_z,
+                                                     Dx[ix],Dx[iy],Dx[iz]));
                     }
                 }
             }
@@ -246,24 +246,24 @@ void SAMRAI::solv::StokesFACOps::smooth_Tackley_3D
       set_boundaries(invalid_id,v_id,level,true);
 
       // if (residual_tolerance >= 0.0) {
-        /*
-         * Check for early end of sweeps due to convergence
-         * only if it is numerically possible (user gave a
-         * non negative value for residual tolerance).
-         */
-        converged = maxres < residual_tolerance;
-        const tbox::SAMRAI_MPI&
-          mpi(d_hierarchy->getDomainMappedBoxLevel().getMPI());
-        int tmp= converged ? 1 : 0;
-        if (mpi.getSize() > 1)
-          {
-            mpi.AllReduce(&tmp, 1, MPI_MIN);
-          }
-        converged=(tmp==1);
-        // if (d_enable_logging)
-        //   tbox::plog
-        //     // << d_object_name << "\n"
-        //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
+      /*
+       * Check for early end of sweeps due to convergence
+       * only if it is numerically possible (user gave a
+       * non negative value for residual tolerance).
+       */
+      converged = maxres < residual_tolerance;
+      const tbox::SAMRAI_MPI&
+        mpi(d_hierarchy->getDomainMappedBoxLevel().getMPI());
+      int tmp= converged ? 1 : 0;
+      if (mpi.getSize() > 1)
+        {
+          mpi.AllReduce(&tmp, 1, MPI_MIN);
+        }
+      converged=(tmp==1);
+      // if (d_enable_logging)
+      //   tbox::plog
+      //     // << d_object_name << "\n"
+      //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
       // }
     }
 }
