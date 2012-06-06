@@ -23,7 +23,7 @@ Main {
     vis_writer = "Vizamrai", "VisIt"
 }
 
-FACElastic {
+Elastic {
     // The FACStokes class is the "user class" in this example.
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual

@@ -29,14 +29,14 @@ using namespace std;
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/appu/VisItDataWriter.h"
 #include "SAMRAI/xfer/RefineOperator.h"
-#include "P_Refine.h"
-#include "V_Refine.h"
-#include "P_Boundary_Refine.h"
-#include "V_Boundary_Refine.h"
-#include "V_Coarsen.h"
-#include "Resid_Coarsen.h"
+#include "Elastic/P_Refine.h"
+#include "Elastic/V_Refine.h"
+#include "Elastic/P_Boundary_Refine.h"
+#include "Elastic/V_Boundary_Refine.h"
+#include "Elastic/V_Coarsen.h"
+#include "Elastic/Resid_Coarsen.h"
 
-#include "FACElastic.h"
+#include "Elastic/FAC.h"
 
 using namespace SAMRAI;
 
@@ -51,7 +51,7 @@ using namespace SAMRAI;
 * in the domain [0:1]x[0:1], with u=0 on the                           *
 * boundary.                                                            *
 *                                                                      *
-* FACElastic is the primary object used to                             *
+* Elastic::FAC is the primary object used to                             *
 * set up and solve the system.  It maintains                           *
 * the data for the computed solution u, the                            *
 * exact solution, and the right hand side.                             *
@@ -177,18 +177,18 @@ int main(
                        input_db->getDatabase("PatchHierarchy")));
 
     /*
-     * The FACElastic object is the main user object specific to the
+     * The Elastic::FAC object is the main user object specific to the
      * problem being solved.  It provides the implementations for setting
      * up the grid and plotting data.  It also wraps up the solve
      * process that includes making the initial guess, specifying the
      * boundary conditions and call the solver.
      */
 
-    FACElastic fac_elastic(base_name + "::FACElastic",
-                           dim,
-                           input_db->isDatabase("FACElastic") ?
-                           input_db->getDatabase("FACElastic") :
-                           tbox::Pointer<tbox::Database>(NULL));
+    Elastic::FAC fac_elastic(base_name + "::Elastic::FAC",
+                             dim,
+                             input_db->isDatabase("Elastic") ?
+                             input_db->getDatabase("Elastic") :
+                             tbox::Pointer<tbox::Database>(NULL));
 
     grid_geometry->addSpatialCoarsenOperator
       (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
@@ -245,7 +245,7 @@ int main(
 
     /*
      * Set up the plotter for the hierarchy just created.
-     * The FACElastic object handles the data and has the
+     * The Elastic::FAC object handles the data and has the
      * function setupExternalPlotter to register its data
      * with the plotter.
      */
@@ -283,7 +283,7 @@ int main(
     /*
      * Solve.
      */
-    fac_elastic.solveElastic();
+    fac_elastic.solve();
 
     bool done(false);
     for (int lnum = 0;
@@ -304,7 +304,7 @@ int main(
       // gridding_algorithm->makeFinerLevel(0.0,true,0);
       // tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
       done = !(patch_hierarchy->finerLevelExists(lnum));
-      fac_elastic.solveElastic();
+      fac_elastic.solve();
     }
     // {
     //     tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
