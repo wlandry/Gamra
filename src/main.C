@@ -29,14 +29,14 @@ using namespace std;
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/appu/VisItDataWriter.h"
 #include "SAMRAI/xfer/RefineOperator.h"
-#include "P_Refine.h"
-#include "V_Refine.h"
-#include "P_Boundary_Refine.h"
-#include "V_Boundary_Refine.h"
-#include "V_Coarsen.h"
-#include "Resid_Coarsen.h"
+#include "Stokes/P_Refine.h"
+#include "Stokes/V_Refine.h"
+#include "Stokes/P_Boundary_Refine.h"
+#include "Stokes/V_Boundary_Refine.h"
+#include "Stokes/V_Coarsen.h"
+#include "Stokes/Resid_Coarsen.h"
 
-#include "FACStokes.h"
+#include "Stokes/FAC.h"
 
 using namespace SAMRAI;
 
@@ -51,7 +51,7 @@ using namespace SAMRAI;
 * in the domain [0:1]x[0:1], with u=0 on the                           *
 * boundary.                                                            *
 *                                                                      *
-* FACStokes is the primary object used to                             *
+* Stokes::FAC is the primary object used to                             *
 * set up and solve the system.  It maintains                           *
 * the data for the computed solution u, the                            *
 * exact solution, and the right hand side.                             *
@@ -177,21 +177,21 @@ int main(
                        input_db->getDatabase("PatchHierarchy")));
 
     /*
-     * The FACStokes object is the main user object specific to the
+     * The Stokes::FAC object is the main user object specific to the
      * problem being solved.  It provides the implementations for setting
      * up the grid and plotting data.  It also wraps up the solve
      * process that includes making the initial guess, specifying the
      * boundary conditions and call the solver.
      */
-    FACStokes fac_stokes(base_name + "::FACStokes",
-                         dim,
-                         input_db->isDatabase("FACStokes") ?
-                         input_db->getDatabase("FACStokes") :
-                         tbox::Pointer<tbox::Database>(NULL));
+    Stokes::FAC fac_stokes(base_name + "::Stokes::FAC",
+                           dim,
+                           input_db->isDatabase("Stokes") ?
+                           input_db->getDatabase("Stokes") :
+                           tbox::Pointer<tbox::Database>(NULL));
 
     grid_geometry->addSpatialCoarsenOperator
       (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
-       (new SAMRAI::geom::Resid_Coarsen(dim,fac_stokes.cell_viscosity_id)));
+       (new SAMRAI::geom::Stokes::Resid_Coarsen(dim,fac_stokes.cell_viscosity_id)));
 
     /*
      * Create the tag-and-initializer, box-generator and load-balancer
@@ -244,7 +244,7 @@ int main(
 
     /*
      * Set up the plotter for the hierarchy just created.
-     * The FACStokes object handles the data and has the
+     * The Stokes::FAC object handles the data and has the
      * function setupExternalPlotter to register its data
      * with the plotter.
      */
@@ -282,7 +282,7 @@ int main(
     /*
      * Solve.
      */
-    fac_stokes.solveStokes();
+    fac_stokes.solve();
 
     bool done(false);
     for (int lnum = 0;
@@ -303,7 +303,7 @@ int main(
       // gridding_algorithm->makeFinerLevel(0.0,true,0);
       // tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
       done = !(patch_hierarchy->finerLevelExists(lnum));
-      fac_stokes.solveStokes();
+      fac_stokes.solve();
     }
     // {
     //     tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
