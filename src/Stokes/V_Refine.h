@@ -9,8 +9,8 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_V_Refine
-#define included_geom_V_Refine
+#ifndef GAMRA_STOKES_V_REFINE_H
+#define GAMRA_STOKES_V_REFINE_H
 
 #include "SAMRAI/SAMRAI_config.h"
 
@@ -25,6 +25,7 @@
 
 namespace SAMRAI {
 namespace geom {
+namespace Stokes {
 
 /**
  * Class V_Refine implements linear
@@ -138,6 +139,7 @@ private:
 
 };
 
+}
 }
 }
 #endif

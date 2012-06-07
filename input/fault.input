@@ -16,35 +16,34 @@
 Main {
     dim = 2
     // Base name for output files.
-    base_name = "sinker"
+    base_name = "fault"
     // Whether to log all nodes in a parallel run.
     log_all_nodes = TRUE
     // Visualization writers to write files for.
     vis_writer = "Vizamrai", "VisIt"
 }
 
-Stokes {
+Elastic {
     // The FACStokes class is the "user class" in this example.
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
-    adaption_threshold = 1.0e-3
+    adaption_threshold = 1.0e-1
     min_full_refinement_level = 1
 
-    viscosity_ijk= 11, 11
-    viscosity_coord_min= -0.001, -0.001
-    viscosity_coord_max= 1.001, 1.001
-    viscosity_data= 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1e2, 1e2, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1e2, 1e2, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    lambda_ijk= 2, 2
+    lambda_coord_min= -0.001, -0.001
+    lambda_coord_max= 1.001, 1.001
+    lambda_data= 
+    1, 1,
+    1, 1
+
+    mu_ijk= 3, 3
+    mu_coord_min= -0.001, -0.001
+    mu_coord_max= 1.001, 1.001
+    mu_data= 1, 1, 1,
+    1, 1, 1,
+    1, 1, 1
 
     v_rhs_ijk= 11, 11
     v_rhs_coord_min= -0.001, -0.001
@@ -91,8 +90,8 @@ Stokes {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0.03, 0.03, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0.03, 0.03, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 3, -3, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 3, -3, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
@@ -199,6 +198,8 @@ PatchHierarchy {
         level_2            = 2, 2
         level_3            = 2, 2
         level_4            = 2, 2
+        level_5            = 2, 2
+        level_6            = 2, 2
     }
     largest_patch_size {
         // level_0 = 32, 32

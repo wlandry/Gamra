@@ -7,8 +7,8 @@
  * Description:   High-level solver (wrapper) for scalar stokes equation. 
  *
  ************************************************************************/
-#ifndef included_solv_StokesFACSolver
-#define included_solv_StokesFACSolver
+#ifndef GAMRA_STOKES_FACSOLVER_H
+#define GAMRA_STOKES_FACSOLVER_H
 
 #include "SAMRAI/SAMRAI_config.h"
 

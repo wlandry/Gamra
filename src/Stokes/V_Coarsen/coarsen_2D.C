@@ -9,9 +9,6 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_V_Coarsen_C
-#define included_geom_V_Coarsen_C
-
 #include "Stokes/V_Coarsen.h"
 
 #include <float.h>
@@ -37,12 +34,13 @@ inline void coarsen_point_2D(const pdat::SideIndex &coarse,
 }
 
 
-void SAMRAI::geom::V_Coarsen::coarsen_2D(hier::Patch& coarse,
-                                         const hier::Patch& fine,
-                                         const int dst_component,
-                                         const int src_component,
-                                         const hier::Box& coarse_box,
-                                         const hier::IntVector& ratio) const
+void SAMRAI::geom::Stokes::V_Coarsen::coarsen_2D
+(hier::Patch& coarse,
+ const hier::Patch& fine,
+ const int dst_component,
+ const int src_component,
+ const hier::Box& coarse_box,
+ const hier::IntVector& ratio) const
 {
   const tbox::Dimension& dim(getDim());
 
@@ -143,5 +141,3 @@ void SAMRAI::geom::V_Coarsen::coarsen_2D(hier::Patch& coarse,
           }
       }
 }
-
-#endif

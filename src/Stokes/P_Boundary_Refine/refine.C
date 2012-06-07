@@ -2,13 +2,13 @@
 #include "Stokes/set_boundary.h"
 #include "Constants.h"
 
-void SAMRAI::geom::P_Boundary_Refine::refine(hier::Patch& fine,
-                                             const hier::Patch& coarse,
-                                             const int dst_component,
-                                             const int src_component,
-                                             const hier::BoxOverlap& overlap,
-                                             const hier::IntVector& ratio)
-  const
+void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
+(hier::Patch& fine,
+ const hier::Patch& coarse,
+ const int dst_component,
+ const int src_component,
+ const hier::BoxOverlap& overlap,
+ const hier::IntVector& ratio) const
 {
   const pdat::CellOverlap* t_overlap =
     dynamic_cast<const pdat::CellOverlap *>(&overlap);

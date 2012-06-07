@@ -1,5 +1,5 @@
-#ifndef GAMR_VISCOSITY_COARSEN_H
-#define GAMR_VISCOSITY_COARSEN_H
+#ifndef GAMR_STOKES_VISCOSITY_COARSEN_H
+#define GAMR_STOKES_VISCOSITY_COARSEN_H
 
 /* This uses both the cell-centered and node-centered viscosities to
    coarsen the viscosity.  In 2D, if you rotate the grid 45 degrees,

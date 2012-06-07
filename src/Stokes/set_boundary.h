@@ -1,5 +1,5 @@
-#ifndef SET_V_BOUNDARY_H
-#define SET_V_BOUNDARY_H
+#ifndef GAMRA_STOKES_SET_BOUNDARY_H
+#define GAMRA_STOKES_SET_BOUNDARY_H
 
 #include "SAMRAI/hier/Patch.h"
 

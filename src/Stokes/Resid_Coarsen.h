@@ -1,5 +1,5 @@
-#ifndef included_geom_Stokes_Resid_Coarsen
-#define included_geom_Stokes_Resid_Coarsen
+#ifndef GAMRA_STOKES_STOKES_RESID_COARSEN_H
+#define GAMRA_STOKES_STOKES_RESID_COARSEN_H
 
 #include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/pdat/CellVariable.h"

@@ -39,7 +39,7 @@
 */
      
 
-void SAMRAI::geom::P_Boundary_Refine::Update_P_2D
+void SAMRAI::geom::Stokes::P_Boundary_Refine::Update_P_2D
 (const pdat::CellIndex &fine,
  const hier::Index &ip, const hier::Index &jp,
  const int &j, const int &j_max,

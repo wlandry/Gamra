@@ -1,5 +1,5 @@
-#ifndef QUAD_OFFSET_INTERPOLATE_H
-#define QUAD_OFFSET_INTERPOLATE_H
+#ifndef GAMRA_QUAD_OFFSET_INTERPOLATE_H
+#define GAMRA_QUAD_OFFSET_INTERPOLATE_H
 
 /* Interpolate up to quadratic order from three coarse points (C) to
    two fine points (f) with the setup

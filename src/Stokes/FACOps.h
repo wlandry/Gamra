@@ -7,8 +7,8 @@
  * Description:   Operator class for cell-centered scalar Stokes using FAC 
  *
  ************************************************************************/
-#ifndef included_solv_StokesFACOps
-#define included_solv_StokesFACOps
+#ifndef GAMRA_STOKES_FACOPS_H
+#define GAMRA_STOKES_FACOPS_H
 
 #include "SAMRAI/SAMRAI_config.h"
 
@@ -41,9 +41,9 @@
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/tbox/Timer.h"
-#include "P_Refine_Patch_Strategy.h"
-#include "V_Refine_Patch_Strategy.h"
-#include "V_Coarsen_Patch_Strategy.h"
+#include "Stokes/P_Refine_Patch_Strategy.h"
+#include "Stokes/V_Refine_Patch_Strategy.h"
+#include "Stokes/V_Coarsen_Patch_Strategy.h"
 
 #include <string>
 

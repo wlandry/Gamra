@@ -9,9 +9,6 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_V_Refine_C
-#define included_geom_V_Refine_C
-
 #include "V_Refine.h"
 
 #include <float.h>
@@ -23,136 +20,134 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/pdat/CellData.h"
 
-void SAMRAI::geom::V_Refine::refine(
-   hier::Patch& fine,
-   const hier::Patch& coarse,
-   const int dst_component,
-   const int src_component,
-   const hier::BoxOverlap& fine_overlap,
-   const hier::IntVector& ratio) const
+void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
+                                            const hier::Patch& coarse,
+                                            const int dst_component,
+                                            const int src_component,
+                                            const hier::BoxOverlap& fine_overlap,
+                                            const hier::IntVector& ratio) const
 {
-   const pdat::SideOverlap* t_overlap =
-      dynamic_cast<const pdat::SideOverlap *>(&fine_overlap);
+  const pdat::SideOverlap* t_overlap =
+    dynamic_cast<const pdat::SideOverlap *>(&fine_overlap);
 
-   TBOX_ASSERT(t_overlap != NULL);
+  TBOX_ASSERT(t_overlap != NULL);
 
-   for(int axis=0; axis<getDim().getValue(); ++axis)
-     {
-       const hier::BoxList& boxes = t_overlap->getDestinationBoxList(axis);
-       for (hier::BoxList::Iterator b(boxes); b; b++)
-         {
-           refine(fine,coarse,dst_component,src_component,b(),ratio,axis);
-         }
-     }
+  for(int axis=0; axis<getDim().getValue(); ++axis)
+    {
+      const hier::BoxList& boxes = t_overlap->getDestinationBoxList(axis);
+      for (hier::BoxList::Iterator b(boxes); b; b++)
+        {
+          refine(fine,coarse,dst_component,src_component,b(),ratio,axis);
+        }
+    }
 }
 
-void SAMRAI::geom::V_Refine::refine(hier::Patch& fine,
-                                    const hier::Patch& coarse,
-                                    const int dst_component,
-                                    const int src_component,
-                                    const hier::Box& fine_box,
-                                    const hier::IntVector& ratio,
-                                    const int &axis) const
+void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
+                                            const hier::Patch& coarse,
+                                            const int dst_component,
+                                            const int src_component,
+                                            const hier::Box& fine_box,
+                                            const hier::IntVector& ratio,
+                                            const int &axis) const
 {
-   const tbox::Dimension& dimension(getDim());
-   const int dim(dimension.getValue());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, fine_box, ratio);
+  const tbox::Dimension& dimension(getDim());
+  const int dim(dimension.getValue());
+  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, fine_box, ratio);
 
-   tbox::Pointer<pdat::SideData<double> >
-   v_ptr = coarse.getPatchData(src_component);
-   pdat::SideData<double> &v(*v_ptr);
-   tbox::Pointer<pdat::SideData<double> >
-   v_fine_ptr = fine.getPatchData(dst_component);
-   pdat::SideData<double> &v_fine(*v_fine_ptr);
+  tbox::Pointer<pdat::SideData<double> >
+    v_ptr = coarse.getPatchData(src_component);
+  pdat::SideData<double> &v(*v_ptr);
+  tbox::Pointer<pdat::SideData<double> >
+    v_fine_ptr = fine.getPatchData(dst_component);
+  pdat::SideData<double> &v_fine(*v_fine_ptr);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(!v_ptr.isNull());
-   TBOX_ASSERT(!v_fine_ptr.isNull());
-   TBOX_ASSERT(v.getDepth() == v_fine.getDepth());
-   TBOX_ASSERT(v.getDepth() == 1);
+  TBOX_ASSERT(!v_ptr.isNull());
+  TBOX_ASSERT(!v_fine_ptr.isNull());
+  TBOX_ASSERT(v.getDepth() == v_fine.getDepth());
+  TBOX_ASSERT(v.getDepth() == 1);
 #endif
 
-   hier::Box coarse_box=coarse.getBox();
-   tbox::Pointer<geom::CartesianPatchGeometry>
-     geom = coarse.getPatchGeometry();
+  hier::Box coarse_box=coarse.getBox();
+  tbox::Pointer<geom::CartesianPatchGeometry>
+    geom = coarse.getPatchGeometry();
 
-   hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
-   ip[0]=1;
-   jp[1]=1;
-   if(dim>2)
-     kp[2]=1;
-   hier::Index pp[]={ip,jp,kp};
+  hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+  ip[0]=1;
+  jp[1]=1;
+  if(dim>2)
+    kp[2]=1;
+  hier::Index pp[]={ip,jp,kp};
 
-   for(pdat::CellIterator ci(fine_box); ci; ci++)
-     {
-       pdat::SideIndex fine(*ci,axis,pdat::SideIndex::Lower);
+  for(pdat::CellIterator ci(fine_box); ci; ci++)
+    {
+      pdat::SideIndex fine(*ci,axis,pdat::SideIndex::Lower);
 
-       pdat::SideIndex center(fine);
-       center.coarsen(hier::Index::getOneIndex(dimension)*2);
+      pdat::SideIndex center(fine);
+      center.coarsen(hier::Index::getOneIndex(dimension)*2);
 
-       /* This assumes that the levels are always properly nested, so
-          that we always have an extra grid space for interpolation.
-          So we only have to have a special case for physical
-          boundaries, where we do not have an extra grid space. */
+      /* This assumes that the levels are always properly nested, so
+         that we always have an extra grid space for interpolation.
+         So we only have to have a special case for physical
+         boundaries, where we do not have an extra grid space. */
 
-       double dvx_dy;
+      double dvx_dy;
 
-       if(fine[axis]%2==0)
-         {
-           /* Maybe this has to be fixed when dvx/dy != 0 on the
-              outer boundary because the approximation to the
-              derivative is not accurate enough? */
+      if(fine[axis]%2==0)
+        {
+          /* Maybe this has to be fixed when dvx/dy != 0 on the
+             outer boundary because the approximation to the
+             derivative is not accurate enough? */
 
-           /* Maybe in 3D we should include cross derivatives? */
+          /* Maybe in 3D we should include cross derivatives? */
 
-           v_fine(fine)=v(center);
+          v_fine(fine)=v(center);
 
-           for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
-             {
-               if(center[d]==coarse_box.lower(d)
-                  && geom->getTouchesRegularBoundary(d,0))
-                 {
-                   dvx_dy=(v(center+pp[d])-v(center))/4;
-                 }
-               else if(center[d]==coarse_box.upper(d)
-                       && geom->getTouchesRegularBoundary(d,1))
-                 {
-                   dvx_dy=(v(center)-v(center-pp[d]))/4;
-                 }
-               else
-                 {
-                   dvx_dy=(v(center+pp[d])-v(center-pp[d]))/8;
-                 }
-               v_fine(fine)+=((fine[d]%2==0) ? (-dvx_dy) : dvx_dy);
-             }
-         }
-       else
-         {
-           v_fine(fine)=(v(center) + v(center+pp[axis]))/2;
+          for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
+            {
+              if(center[d]==coarse_box.lower(d)
+                 && geom->getTouchesRegularBoundary(d,0))
+                {
+                  dvx_dy=(v(center+pp[d])-v(center))/4;
+                }
+              else if(center[d]==coarse_box.upper(d)
+                      && geom->getTouchesRegularBoundary(d,1))
+                {
+                  dvx_dy=(v(center)-v(center-pp[d]))/4;
+                }
+              else
+                {
+                  dvx_dy=(v(center+pp[d])-v(center-pp[d]))/8;
+                }
+              v_fine(fine)+=((fine[d]%2==0) ? (-dvx_dy) : dvx_dy);
+            }
+        }
+      else
+        {
+          v_fine(fine)=(v(center) + v(center+pp[axis]))/2;
 
-           for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
-             {
-               if(center[d]==coarse_box.lower(d)
-                  && geom->getTouchesRegularBoundary(d,0))
-                 {
-                   dvx_dy=(v(center+pp[d])-v(center)
-                           + v(center+pp[d]+pp[axis])-v(center+pp[axis]))/8;
-                 }
-               else if(center[d]==coarse_box.upper(d)
-                       && geom->getTouchesRegularBoundary(d,1))
-                 {
-                   dvx_dy=(v(center)-v(center-pp[d])
-                           + v(center+pp[axis])-v(center-pp[d]+pp[axis]))/8;
-                 }
-               else
-                 {
-                   dvx_dy=
-                     (v(center+pp[d])-v(center-pp[d])
-                      + v(center+pp[d]+pp[axis])-v(center-pp[d]+pp[axis]))/16;
-                 }
-               v_fine(fine)+=((fine[d]%2==0) ? (-dvx_dy) : dvx_dy);
-             }
-         }
-     }
+          for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
+            {
+              if(center[d]==coarse_box.lower(d)
+                 && geom->getTouchesRegularBoundary(d,0))
+                {
+                  dvx_dy=(v(center+pp[d])-v(center)
+                          + v(center+pp[d]+pp[axis])-v(center+pp[axis]))/8;
+                }
+              else if(center[d]==coarse_box.upper(d)
+                      && geom->getTouchesRegularBoundary(d,1))
+                {
+                  dvx_dy=(v(center)-v(center-pp[d])
+                          + v(center+pp[axis])-v(center-pp[d]+pp[axis]))/8;
+                }
+              else
+                {
+                  dvx_dy=
+                    (v(center+pp[d])-v(center-pp[d])
+                     + v(center+pp[d]+pp[axis])-v(center-pp[d]+pp[axis]))/16;
+                }
+              v_fine(fine)+=((fine[d]%2==0) ? (-dvx_dy) : dvx_dy);
+            }
+        }
+    }
 }
-#endif

@@ -1,5 +1,5 @@
-#ifndef GAMR_DRM_DV
-#define GAMR_DRM_DV
+#ifndef GAMR_STOKES_DRM_DV_H
+#define GAMR_STOKES_DRM_DV_H
 
 #include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/pdat/EdgeData.h"

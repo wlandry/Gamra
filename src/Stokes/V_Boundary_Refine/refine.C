@@ -13,13 +13,13 @@
 #include "Stokes/set_boundary.h"
 #include "Constants.h"
 
-void SAMRAI::geom::V_Boundary_Refine::refine(
-   hier::Patch& fine,
-   const hier::Patch& coarse,
-   const int dst_component,
-   const int src_component,
-   const hier::BoxOverlap& fine_overlap,
-   const hier::IntVector& ratio) const
+void SAMRAI::geom::Stokes::V_Boundary_Refine::refine
+(hier::Patch& fine,
+ const hier::Patch& coarse,
+ const int dst_component,
+ const int src_component,
+ const hier::BoxOverlap& fine_overlap,
+ const hier::IntVector& ratio) const
 {
    const pdat::SideOverlap* t_overlap =
       dynamic_cast<const pdat::SideOverlap *>(&fine_overlap);
@@ -38,13 +38,14 @@ void SAMRAI::geom::V_Boundary_Refine::refine(
      }
 }
 
-void SAMRAI::geom::V_Boundary_Refine::refine(hier::Patch& fine,
-                                             const hier::Patch& coarse,
-                                             const int dst_component,
-                                             const int src_component,
-                                             const hier::Box& overlap_box,
-                                             const hier::IntVector& ratio,
-                                             const int &axis) const
+void SAMRAI::geom::Stokes::V_Boundary_Refine::refine
+(hier::Patch& fine,
+ const hier::Patch& coarse,
+ const int dst_component,
+ const int src_component,
+ const hier::Box& overlap_box,
+ const hier::IntVector& ratio,
+ const int &axis) const
 {
    const tbox::Dimension& dimension(getDim());
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);

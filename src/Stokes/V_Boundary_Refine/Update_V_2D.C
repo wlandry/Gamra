@@ -4,7 +4,7 @@
 
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
-void SAMRAI::geom::V_Boundary_Refine::Update_V_2D
+void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_2D
 (const int &axis,
  const int &boundary_direction,
  const bool &boundary_positive,

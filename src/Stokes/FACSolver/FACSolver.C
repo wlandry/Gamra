@@ -7,9 +7,6 @@
  * Description:   High-level solver (wrapper) for scalar stokes equation. 
  *
  ************************************************************************/
-#ifndef included_solv_StokesFACSolver_C
-#define included_solv_StokesFACSolver_C
-
 #include "SAMRAI/pdat/CellVariable.h"
 #include "Stokes/FACSolver.h"
 #include "SAMRAI/tbox/PIO.h"
@@ -159,4 +156,3 @@ namespace SAMRAI {
 
   }
 }
-#endif

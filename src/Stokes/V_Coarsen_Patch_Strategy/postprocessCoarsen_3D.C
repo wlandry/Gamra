@@ -1,7 +1,7 @@
 #include "Stokes/V_Coarsen_Patch_Strategy.h"
 
 void
-SAMRAI::solv::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
+SAMRAI::solv::Stokes::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
 (hier::Patch& coarse,
  const hier::Patch& fine,
  const hier::Box& ,

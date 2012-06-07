@@ -1,5 +1,5 @@
-#ifndef GAMR_DRC_DP
-#define GAMR_DRC_DP
+#ifndef GAMR_STOKES_DRC_DP_H
+#define GAMR_STOKES_DRC_DP_H
 
 #include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/pdat/NodeData.h"

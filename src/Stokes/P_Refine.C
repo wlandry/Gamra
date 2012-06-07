@@ -9,9 +9,6 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_P_Refine_C
-#define included_geom_P_Refine_C
-
 #include "P_Refine.h"
 
 #include <float.h>
@@ -22,7 +19,7 @@
 #include "SAMRAI/pdat/CellVariable.h"
 #include "SAMRAI/tbox/Utilities.h"
 
-void SAMRAI::geom::P_Refine::refine(
+void SAMRAI::geom::Stokes::P_Refine::refine(
    hier::Patch& fine,
    const hier::Patch& coarse,
    const int dst_component,
@@ -46,7 +43,7 @@ void SAMRAI::geom::P_Refine::refine(
    }
 }
 
-void SAMRAI::geom::P_Refine::refine(
+void SAMRAI::geom::Stokes::P_Refine::refine(
    hier::Patch& fine_patch,
    const hier::Patch& coarse_patch,
    const int dst_component,
@@ -116,4 +113,3 @@ void SAMRAI::geom::P_Refine::refine(
          }           
        }
 }
-#endif

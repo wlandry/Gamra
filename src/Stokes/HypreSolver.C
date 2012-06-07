@@ -7,9 +7,6 @@
  * Description:   Hypre solver interface for diffusion-like elliptic problems. 
  *
  ************************************************************************/
-#ifndef included_solv_StokesHypreSolver_C
-#define included_solv_StokesHypreSolver_C
-
 #include "Stokes/HypreSolver.h"
 
 #ifdef HAVE_HYPRE
@@ -1545,5 +1542,4 @@ Stokes::HypreSolver::finalizeCallback()
 }
 }
 
-#endif
 #endif

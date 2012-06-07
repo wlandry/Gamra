@@ -26,6 +26,7 @@
 
 namespace SAMRAI {
 namespace geom {
+namespace Stokes {
 
 /**
  * Class V_Boundary_Refine implements the special interpolation needed
@@ -159,6 +160,7 @@ private:
 
 };
 
+}
 }
 }
 #endif

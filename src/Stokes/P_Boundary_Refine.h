@@ -9,8 +9,8 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_P_Boundary_Refine
-#define included_geom_P_Boundary_Refine
+#ifndef GAMRA_STOKES_P_BOUNDARY_REFINE_H
+#define GAMRA_STOKES_P_BOUNDARY_REFINE_H
 
 #include "SAMRAI/SAMRAI_config.h"
 
@@ -26,6 +26,7 @@
 
 namespace SAMRAI {
 namespace geom {
+namespace Stokes {
 
 /**
  * Class P_Boundary_Refine implements the special interpolation needed
@@ -133,6 +134,7 @@ private:
     const;
 };
 
+}
 }
 }
 #endif

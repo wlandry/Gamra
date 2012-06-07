@@ -9,8 +9,8 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_V_Coarsen
-#define included_geom_V_Coarsen
+#ifndef GAMRA_STOKES_V_COARSEN_H
+#define GAMRA_STOKES_V_COARSEN_H
 
 #include "SAMRAI/SAMRAI_config.h"
 
@@ -25,6 +25,7 @@
 
 namespace SAMRAI {
 namespace geom {
+namespace Stokes {
 
 /**
  * Class V_Coarsen implements averaging 
@@ -142,6 +143,7 @@ private:
 
 };
 
+}
 }
 }
 #endif

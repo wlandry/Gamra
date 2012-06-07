@@ -9,8 +9,8 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_P_Refine
-#define included_geom_P_Refine
+#ifndef GAMRA_STOKES_P_REFINE_H
+#define GAMRA_STOKES_P_REFINE_H
 
 #include "SAMRAI/SAMRAI_config.h"
 
@@ -25,7 +25,7 @@
 
 namespace SAMRAI {
 namespace geom {
-
+namespace Stokes {
 /**
  * Class P_Refine implements linear
  * interpolation for cell-centered double patch data defined over a Cartesian
@@ -137,6 +137,7 @@ private:
 
 };
 
+}
 }
 }
 #endif

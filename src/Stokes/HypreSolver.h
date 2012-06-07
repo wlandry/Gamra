@@ -7,14 +7,14 @@
  * Description:   Hypre solver interface for diffusion-like elliptic problems. 
  *
  ************************************************************************/
-#ifndef included_solv_StokesHypreSolver
-#define included_solv_StokesHypreSolver
+#ifndef GAMRA_STOKES_HYPRESOLVER_H
+#define GAMRA_STOKES_HYPRESOLVER_H
 
 #include "SAMRAI/SAMRAI_config.h"
 
 #ifdef HAVE_HYPRE
 
-#ifndef included_HYPRE_struct_ls
+#ifndef GAMRA_STOKES_HYPRE_STRUCT_LS
 /*
  * This might break things if F77_FUNC_ is different for hypre vs
  * SAMRAI autoconf detection.  But then C/C++ macros are totally
@@ -25,7 +25,7 @@
 #undef F77_FUNC_
 #endif
 #include "HYPRE_struct_ls.h"
-#define included_HYPRE_struct_ls
+#define GAMRA_STOKES_HYPRE_STRUCT_LS
 #endif
 
 #include "SAMRAI/solv/GhostCellRobinBcCoefs.h"

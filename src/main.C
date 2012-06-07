@@ -4,7 +4,7 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Main program for FAC Stokes example 
+ * Description:   Main program
  *
  ************************************************************************/
 #include "SAMRAI/SAMRAI_config.h"
@@ -35,8 +35,17 @@ using namespace std;
 #include "Stokes/V_Boundary_Refine.h"
 #include "Stokes/V_Coarsen.h"
 #include "Stokes/Resid_Coarsen.h"
+#include "Elastic/P_Refine.h"
+#include "Elastic/V_Refine.h"
+#include "Elastic/P_Boundary_Refine.h"
+#include "Elastic/V_Boundary_Refine.h"
+#include "Elastic/V_Coarsen.h"
+#include "Elastic/Resid_Coarsen.h"
 
 #include "Stokes/FAC.h"
+#include "Elastic/FAC.h"
+
+#include "solve_system.h"
 
 using namespace SAMRAI;
 
@@ -44,20 +53,20 @@ using namespace SAMRAI;
 ************************************************************************
 *                                                                      *
 * This is the driver program to demonstrate                            *
-* how to use the FAC Stokes solver.                                   *
+* how to use the Stokes and Elastic FAC solver.                                   *
 *                                                                      *
 * We set up the simple problem                                         *
 *          u + div(grad(u)) = sin(x)*sin(y)                            *
 * in the domain [0:1]x[0:1], with u=0 on the                           *
 * boundary.                                                            *
 *                                                                      *
-* Stokes::FAC is the primary object used to                             *
+* Stokes::FAC and Elastic::FAC are the primary objects used to         *
 * set up and solve the system.  It maintains                           *
 * the data for the computed solution u, the                            *
 * exact solution, and the right hand side.                             *
 *                                                                      *
 * The hierarchy created to solve this problem                          *
-* has only one level.  (The FAC Stokes solver                         *
+* has only one level.  (The Stokes::FAC and Elastic::FAC solver        *
 * is a single-level solver.)                                           *
 *                                                                      *
 *************************************************************************
@@ -149,188 +158,84 @@ int main(
      * for this application, see comments at top of file.
      */
 
-    tbox::Pointer<geom::CartesianGridGeometry>
-      grid_geometry(new geom::CartesianGridGeometry
-                    (dim,
-                     base_name + "CartesianGridGeometry",
+    SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianGridGeometry>
+      grid_geometry(new SAMRAI::geom::CartesianGridGeometry
+                    (dim, base_name + "CartesianGridGeometry",
                      input_db->getDatabase("CartesianGridGeometry")));
-    grid_geometry->addSpatialRefineOperator
-      (tbox::Pointer<SAMRAI::xfer::RefineOperator>
-       (new SAMRAI::geom::P_Refine(dim)));
-    grid_geometry->addSpatialRefineOperator
-      (tbox::Pointer<SAMRAI::xfer::RefineOperator>
-       (new SAMRAI::geom::V_Refine(dim)));
-    grid_geometry->addSpatialRefineOperator
-      (tbox::Pointer<SAMRAI::xfer::RefineOperator>
-       (new SAMRAI::geom::P_Boundary_Refine(dim)));
-    grid_geometry->addSpatialRefineOperator
-      (tbox::Pointer<SAMRAI::xfer::RefineOperator>
-       (new SAMRAI::geom::V_Boundary_Refine(dim)));
-    grid_geometry->addSpatialCoarsenOperator
-      (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
-       (new SAMRAI::geom::V_Coarsen(dim)));
 
-    tbox::Pointer<hier::PatchHierarchy>
-      patch_hierarchy(new hier::PatchHierarchy
+    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy>
+      patch_hierarchy(new SAMRAI::hier::PatchHierarchy
                       (base_name + "::PatchHierarchy",
                        grid_geometry,
                        input_db->getDatabase("PatchHierarchy")));
 
     /*
-     * The Stokes::FAC object is the main user object specific to the
-     * problem being solved.  It provides the implementations for setting
-     * up the grid and plotting data.  It also wraps up the solve
-     * process that includes making the initial guess, specifying the
-     * boundary conditions and call the solver.
+     * The Stokes::FAC and Elastic::FAC objects is the main user
+     * object specific to the problem being solved.  It provides the
+     * implementations for setting up the grid and plotting data.  It
+     * also wraps up the solve process that includes making the
+     * initial guess, specifying the boundary conditions and call the
+     * solver.
      */
-    Stokes::FAC fac_stokes(base_name + "::Stokes::FAC",
-                           dim,
-                           input_db->isDatabase("Stokes") ?
-                           input_db->getDatabase("Stokes") :
-                           tbox::Pointer<tbox::Database>(NULL));
 
-    grid_geometry->addSpatialCoarsenOperator
-      (tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
-       (new SAMRAI::geom::Stokes::Resid_Coarsen(dim,fac_stokes.cell_viscosity_id)));
-
-    /*
-     * Create the tag-and-initializer, box-generator and load-balancer
-     * object references required by the gridding_algorithm object.
-     */
-    tbox::Pointer<mesh::StandardTagAndInitialize>
-      tag_and_initializer(new mesh::StandardTagAndInitialize
-                          (dim,
-                           "CellTaggingMethod",
-                           tbox::Pointer<mesh::StandardTagAndInitStrategy>
-                           (&fac_stokes, false),
-                           input_db->getDatabase("StandardTagAndInitialize")
-                           ));
-    tbox::Pointer<mesh::BergerRigoutsos>
-      box_generator(new mesh::BergerRigoutsos(dim));
-    tbox::Pointer<mesh::TreeLoadBalancer>
-      load_balancer(new mesh::TreeLoadBalancer
-                    (dim,
-                     "load balancer",
-                     tbox::Pointer<tbox::Database>()));
-    load_balancer->setSAMRAI_MPI(SAMRAI::tbox::SAMRAI_MPI::getSAMRAIWorld());
-
-    /*
-     * Create the gridding algorithm used to generate the SAMR grid
-     * and create the grid.
-     */
-    tbox::Pointer<mesh::GriddingAlgorithm> gridding_algorithm;
-    gridding_algorithm =
-      new mesh::GriddingAlgorithm(patch_hierarchy,
-                                  "Gridding Algorithm",
-                                  input_db->getDatabase("GriddingAlgorithm"),
-                                  tag_and_initializer,
-                                  box_generator,
-                                  load_balancer);
-    // tbox::plog << "Gridding algorithm:" << endl;
-    // gridding_algorithm->printClassData(tbox::plog);
-
-    /*
-     * Make the coarsest patch level where we will be solving.
-     */
-    gridding_algorithm->makeCoarsestLevel(0.0);
-    // bool done = false;
-    // for (int lnum = 0;
-    //      patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++) {
-    //   tbox::plog << "Adding finner levels with lnum = " << lnum << endl;
-    //   gridding_algorithm->makeFinerLevel(0.0,true,0);
-    //   tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
-    //   done = !(patch_hierarchy->finerLevelExists(lnum));
-    // }
-
-    /*
-     * Set up the plotter for the hierarchy just created.
-     * The Stokes::FAC object handles the data and has the
-     * function setupExternalPlotter to register its data
-     * with the plotter.
-     */
-    tbox::Array<string> vis_writer(1);
-    vis_writer[0] = "Visit";
-    if (main_db->keyExists("vis_writer")) {
-      vis_writer = main_db->getStringArray("vis_writer");
-    }
-    bool use_visit = false;
-    for (int i = 0; i < vis_writer.getSize(); i++) {
-      if (vis_writer[i] == "VisIt") use_visit = true;
-    }
-#ifdef HAVE_HDF5
-    tbox::Pointer<appu::VisItDataWriter> visit_writer;
-    string vis_filename =
-      main_db->getStringWithDefault("vis_filename", base_name);
-    if (use_visit) {
-      visit_writer = new appu::VisItDataWriter(dim,
-                                               "Visit Writer",
-                                               vis_filename + ".visit");
-      fac_stokes.setupPlotter(*visit_writer);
-    }
-#endif
-
-    /*
-     * After creating all objects and initializing their state,
-     * we print the input database and variable database contents
-     * to the log file.
-     */
-    tbox::plog << "\nCheck input data and variables before simulation:"
-               << endl;
-    tbox::plog << "Input database..." << endl;
-    input_db->printClassData(tbox::plog);
-
-    /*
-     * Solve.
-     */
-    fac_stokes.solve();
-
-    bool done(false);
-    for (int lnum = 0;
-         patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++)
+    if(input_db->isDatabase("Stokes"))
       {
-            tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
-            for (int ln = 0; ln < tag_buffer.getSize(); ++ln) {
-               tag_buffer[ln] = 1;
-            }
-            gridding_algorithm->regridAllFinerLevels(
-               0,
-               0.0,
-               tag_buffer);
-            tbox::plog << "Newly adapted hierarchy\n";
+        Stokes::FAC fac_stokes(base_name + "::Stokes::FAC", dim,
+                               input_db->getDatabase("Stokes"));
+        grid_geometry->addSpatialRefineOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+           (new SAMRAI::geom::Stokes::P_Refine(dim)));
+        grid_geometry->addSpatialRefineOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+           (new SAMRAI::geom::Stokes::V_Refine(dim)));
+        grid_geometry->addSpatialRefineOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+           (new SAMRAI::geom::Stokes::P_Boundary_Refine(dim)));
+        grid_geometry->addSpatialRefineOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+           (new SAMRAI::geom::Stokes::V_Boundary_Refine(dim)));
+        grid_geometry->addSpatialCoarsenOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+           (new SAMRAI::geom::Stokes::V_Coarsen(dim)));
+        grid_geometry->addSpatialCoarsenOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+           (new SAMRAI::geom::Stokes::Resid_Coarsen(dim,fac_stokes.cell_viscosity_id)));
 
+        solve_system(fac_stokes,main_db,input_db,patch_hierarchy,
+                     base_name,dim);
+      }
+    else
+      {
+        Elastic::FAC fac_elastic(base_name + "::Elastic::FAC", dim,
+                                 input_db->getDatabase("Elastic"));
+        grid_geometry->addSpatialRefineOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+           (new SAMRAI::geom::Elastic::P_Refine(dim)));
+        grid_geometry->addSpatialRefineOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+           (new SAMRAI::geom::Elastic::V_Refine(dim)));
+        grid_geometry->addSpatialRefineOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+           (new SAMRAI::geom::Elastic::P_Boundary_Refine(dim)));
+        grid_geometry->addSpatialRefineOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+           (new SAMRAI::geom::Elastic::V_Boundary_Refine(dim)));
+        grid_geometry->addSpatialCoarsenOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+           (new SAMRAI::geom::Elastic::V_Coarsen(dim)));
+        grid_geometry->addSpatialCoarsenOperator
+          (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+           (new SAMRAI::geom::Elastic::Resid_Coarsen(dim,fac_elastic.cell_moduli_id)));
 
-      // tbox::plog << "Adding finner levels with lnum = " << lnum << endl;
-      // gridding_algorithm->makeFinerLevel(0.0,true,0);
-      // tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
-      done = !(patch_hierarchy->finerLevelExists(lnum));
-      fac_stokes.solve();
-    }
-    // {
-    //     tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
-    //     for (int ln = 0; ln < tag_buffer.getSize(); ++ln) {
-    //       tag_buffer[ln] = 1;
-    //     }
-    //     gridding_algorithm->regridAllFinerLevels(
-    //                                              0,
-    //                                              0.0,
-    //                                              tag_buffer);
-    // }
-#ifdef HAVE_HDF5
-    /*
-     * Plot.
-     */
-    if (use_visit) {
-      visit_writer->writePlotData(patch_hierarchy, 0);
-    }
-#endif
+        solve_system(fac_elastic,main_db,input_db,patch_hierarchy,
+                     base_name,dim);
+      }
 
     /*
      * Deallocate objects when done.
      */
 
-    tbox::TimerManager::getManager()->print(tbox::plog);
   }
-
   /*
    * This print is for the SAMRAI testing framework.  Passing here
    * means application ran.  A better test would actually test the

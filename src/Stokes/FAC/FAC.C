@@ -22,32 +22,34 @@
 
 namespace SAMRAI {
 
-  /* A little utility routine to validate the sizes of input arrays */
-  void check_array_sizes(const tbox::Array<int> ijk,
-                         const tbox::Array<double> min,
-                         const tbox::Array<double> max,
-                         const tbox::Array<double> data,
-                         const int dim, const std::string &name,
-                         const int num_components=1)
-  {
-    if(ijk.size()!=dim)
-      TBOX_ERROR("Bad number of elements in " << name << "_ijk.  Expected "
-                 << dim << " but got " << ijk.size());
-    if(min.size()!=dim)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_coord_min.  Expected "
-                 << dim << " but got " << min.size());
-    if(max.size()!=dim)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_coord_max.  Expected "
-                 << dim << " but got " << max.size());
-    int data_size(1);
-    for(int d=0; d<dim; ++d)
-      data_size*=ijk[d];
-    if(data.size()!=data_size*num_components)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_data.  Expected "
-                 << data_size << " but got " << data.size());
+  namespace Stokes {
+    /* A little utility routine to validate the sizes of input arrays */
+    void check_array_sizes(const tbox::Array<int> ijk,
+                           const tbox::Array<double> min,
+                           const tbox::Array<double> max,
+                           const tbox::Array<double> data,
+                           const int dim, const std::string &name,
+                           const int num_components=1)
+    {
+      if(ijk.size()!=dim)
+        TBOX_ERROR("Bad number of elements in " << name << "_ijk.  Expected "
+                   << dim << " but got " << ijk.size());
+      if(min.size()!=dim)
+        TBOX_ERROR("Bad number of elements in "
+                   << name << "_coord_min.  Expected "
+                   << dim << " but got " << min.size());
+      if(max.size()!=dim)
+        TBOX_ERROR("Bad number of elements in "
+                   << name << "_coord_max.  Expected "
+                   << dim << " but got " << max.size());
+      int data_size(1);
+      for(int d=0; d<dim; ++d)
+        data_size*=ijk[d];
+      if(data.size()!=data_size*num_components)
+        TBOX_ERROR("Bad number of elements in "
+                   << name << "_data.  Expected "
+                   << data_size << " but got " << data.size());
+    }
   }
   /*
 *************************************************************************
