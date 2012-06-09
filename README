@@ -6,7 +6,7 @@ CIG repository, because I have patched it to work with Gamra.
 
 After building SAMRAI, download the FTensor library
 
-  hg clone http://geodynamics.org/hg/cs/AMR/Samrai/
+  hg clone http://geodynamics.org/hg/cs/AMR/FTensor/
 
 Gamra uses Waf to configure and build.  The configure, at present,
 only looks for a compiler.  So you will have to modify the file
