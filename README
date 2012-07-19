@@ -8,8 +8,12 @@ After building SAMRAI, download the FTensor library
 
   hg clone http://geodynamics.org/hg/cs/AMR/FTensor/
 
-Gamra uses Waf to configure and build.  The configure, at present,
-only looks for a compiler.  So you will have to modify the file
+Gamra uses Waf
+
+  http://code.google.com/p/waf/
+
+to configure and build.  The configure, at present, only looks for a
+compiler.  So you will have to modify the file
 
   wscript
 
