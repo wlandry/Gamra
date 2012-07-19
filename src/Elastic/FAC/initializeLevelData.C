@@ -25,48 +25,6 @@ bool intersect_fault(const int &dim,
   return result;
 }
 
-void rotate(double cstrike, double sstrike, double cdip, double sdip, 
-            double x1, double x2, double x3, 
-            double * x1s, double * x1i, double * x2s, double * x3s, double * x3i)
-{
-
-  double x2r(cstrike*x1-sstrike*x2);
-
-  (*x1s)= cdip*x2r-sdip*x3;
-  (*x1i)= cdip*x2r+sdip*x3;
-  (*x2s)= sstrike*x1+cstrike*x2;
-  (*x3s)= sdip*x2r+cdip*x3;
-  (*x3i)=-sdip*x2r+cdip*x3;
-
-}
-
-double gauss(double x, double sigma)
-{
-  const double pi2 = atan(1.0)*8;
-  return exp(-0.5*(x/sigma)*(x/sigma))/sqrt(pi2)/sigma;
-}
-
-double omega(double x, double beta)
-{
-  const double pi=4*atan(1);
-
-  if (fabs(x) <= (1-2*beta)/(1-beta)/2)
-    {
-      return 1;
-    }
-  else
-    {
-      if (fabs(x) < 1./(2.*(1.-beta)))
-        {
-          return pow(cos(pi*((1.-beta)*fabs(x)-0.5+beta)/(2.*beta)),2.);
-        }
-      else
-        {
-          return 0;
-        }
-    }
-}
-
 /*
 *************************************************************************
 * Initialize data on a level.                                           *
@@ -194,8 +152,8 @@ void SAMRAI::Elastic::FAC::initializeLevelData
 	double scale(-10.);
 
         const double pi=4*atan(1);
-        const double theta(0);
-        // const double theta(pi/4);
+        // const double theta(0);
+        const double theta(pi/4);
         const FTensor::Tensor1<double,3> center(x,y,z);
         const FTensor::Tensor2<double,3,3> rot(std::cos(theta),std::sin(theta),0,
                                                -std::sin(theta),cos(theta),0,
@@ -322,156 +280,6 @@ void SAMRAI::Elastic::FAC::initializeLevelData
                   }
               }
           }
-        // if(0)
-        //   {
-
-	// typedef struct {
-	// 	double x1s,x1i,x2s,x3s,x3i;
-	// } rpoint;
-
-	// rpoint xp00,xm00,x0p0,x0m0,x00p,x00m;
-	// double xr,yr,zr;
-        // double x2r;
-
-	// x2r= cstrike*x  -sstrike*y;
-	// xr = cdip   *x2r-sdip   *z;
-	// yr = sstrike*x  +cstrike*y;
-	// zr = sdip   *x2r+cdip   *z;
-
-        // hier::Box pbox = v_rhs_data->getBox();
-        // for(int ix=0;ix<dim;++ix)
-        //   {
-        //     double offset[]={0.5,0.5,0.5};
-        //     offset[ix]=0;
-
-        //     for(pdat::SideIterator si(pbox,ix); si; si++)
-        //       {
-        //         pdat::SideIndex s=si();
-        //         double xyz[dim];
-        //         for(int d=0;d<dim;++d)
-        //           xyz[d]=geom->getXLower()[d]
-        //             + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
-            
-	// 	double x1,x2,x3;
-	// 	double dx1,dx2,dx3;
-
-	// 	if (2==d_dim.getValue())
-	// 	{
-	// 		x1=0;
-	// 		x2=xyz[0];
-	// 		x3=xyz[1];
-	// 		dx1=dx[0];
-	// 		dx2=dx[0];
-	// 		dx3=dx[1];
-	// 	} else if (3==d_dim.getValue())
-	// 	{
-        //                 x1=xyz[0];
-	// 		x2=xyz[1];
-	// 		x3=xyz[2];
-	// 		dx1=dx[0];
-	// 		dx2=dx[1];
-	// 		dx3=dx[2];
-	// 	}
-
-	// 	double g0m0(1.),g0p0(1.),g00p(1.),g00m(1.),gm00(1.),gp00(1.);
-	// 	double x1s,x1i,x2s,x3s,x3i;
-
-        //         x2r= cstrike*x1-sstrike*x2;
-        //         x1s= cdip*x2r-sdip*x3;
-        //         x1i= cdip*x2r+sdip*x3;
-        //         x2s= sstrike*x1+cstrike*x2;
-        //         x3s= sdip*x2r+cdip*x3;
-        //         x3i=-sdip*x2r+cdip*x3;
-
-	// 	double n[]={cdip*cstrike,-cdip*sstrike,-sdip};
-	// 	double b[]={sstrike*cr+cstrike*sdip*sr,cstrike*cr-sstrike*sdip*sr,+cdip*sr};
-
-	// 	rotate(cstrike,sstrike,cdip,sdip,x1+dx1/2.,x2,x3,&(xp00.x1s),&(xp00.x1i),&(xp00.x2s),&(xp00.x3s),&(xp00.x3i));
-	// 	rotate(cstrike,sstrike,cdip,sdip,x1-dx1/2.,x2,x3,&(xm00.x1s),&(xm00.x1i),&(xm00.x2s),&(xm00.x3s),&(xm00.x3i));
-	// 	rotate(cstrike,sstrike,cdip,sdip,x1,x2+dx2/2.,x3,&(x0p0.x1s),&(x0p0.x1i),&(x0p0.x2s),&(x0p0.x3s),&(x0p0.x3i));
-	// 	rotate(cstrike,sstrike,cdip,sdip,x1,x2-dx2/2.,x3,&(x0m0.x1s),&(x0m0.x1i),&(x0m0.x2s),&(x0m0.x3s),&(x0m0.x3i));
-	// 	rotate(cstrike,sstrike,cdip,sdip,x1,x2,x3+dx3/2.,&(x00p.x1s),&(x00p.x1i),&(x00p.x2s),&(x00p.x3s),&(x00p.x3i));
-	// 	rotate(cstrike,sstrike,cdip,sdip,x1,x2,x3-dx3/2.,&(x00m.x1s),&(x00m.x1i),&(x00m.x2s),&(x00m.x3s),&(x00m.x3i));
-
-	// 	double temp1=gauss(x1s-xr,delta);
-	// 	double temp2(1.0);
-	// 	if (3==d_dim.getValue())
-	// 	{
-	// 		temp2=omega((x2s-yr)/L,beta);
-	// 	}
-	// 	double temp3=omega((x3s-zr)/W,beta);
-	// 	double sourc=(+(gp00*gauss(xp00.x1s-xr,delta)-gm00*gauss(xm00.x1s-xr,delta))*n[0]/dx1
-        //                       +(g0p0*gauss(x0p0.x1s-xr,delta)-g0m0*gauss(x0m0.x1s-xr,delta))*n[1]/dx2
-        //                       +(g00p*gauss(x00p.x1s-xr,delta)-g00m*gauss(x00m.x1s-xr,delta))*n[2]/dx3 )
-	// 		*temp2 
-	// 		*temp3;
-
-        //         double dblcp=temp1 
-        //                *( (gp00*omega((xp00.x2s-yr)/L,beta)-gm00*omega((xm00.x2s-yr)/L,beta))*b[0]/dx1
-        //                  +(g0p0*omega((x0p0.x2s-yr)/L,beta)-g0m0*omega((x0m0.x2s-yr)/L,beta))*b[1]/dx2
-        //                  +(g00p*omega((x00p.x2s-yr)/L,beta)-g00m*omega((x00m.x2s-yr)/L,beta))*b[2]/dx3 ) 
-        //                *temp3;
-
-	// 	double dipcs=temp1 
-	// 		*temp2 
-	// 		*(+(gp00*omega((xp00.x3s-zr)/W,beta)-gm00*omega((xm00.x3s-zr)/W,beta))*b[0]/dx1
-	// 		  +(g0p0*omega((x0p0.x3s-zr)/W,beta)-g0m0*omega((x0m0.x3s-zr)/W,beta))*b[1]/dx2
-	// 		  +(g00p*omega((x00p.x3s-zr)/W,beta)-g00m*omega((x00m.x3s-zr)/W,beta))*b[2]/dx3 );
-
-        //         temp1=gauss(x1i-xr,delta);
-        //         temp3=omega((x3i+zr)/W,beta);
-        //         // double image=( (gp00*gauss(xp00.x1i-xr,delta)-gm00*gauss(xm00.x1i-xr,delta))*n[0]/dx1
-        //         //               +(g0p0*gauss(x0p0.x1i-xr,delta)-g0m0*gauss(x0m0.x1i-xr,delta))*n[1]/dx2
-        //         //               +(g00p*gauss(x00p.x1i-xr,delta)-g00m*gauss(x00m.x1i-xr,delta))*n[2]/dx3 )
-        //         //      *temp2 
-        //         //      *temp3;
-        //         // double cplei=temp1 
-        //         //             *( (gp00*omega((xp00.x2s-yr)/L,beta)-gm00*omega((xp00.x2s-yr)/L,beta))*b[0]/dx1
-        //         //               +(g0p0*omega((x0p0.x2s-yr)/L,beta)-g0m0*omega((x0p0.x2s-yr)/L,beta))*b[1]/dx2
-        //         //               +(g00p*omega((x00p.x2s-yr)/L,beta)-g00m*omega((x00p.x2s-yr)/L,beta))*b[2]/dx3 ) 
-        //         //             *temp3;
-        //         // double dipci=temp1 
-        //         //             *temp2 
-        //         //             *( (gp00*omega((xp00.x3i+zr)/W,beta)-gm00*omega((xm00.x3i+zr)/W,beta))*b[0]/dx1
-        //         //               +(g0p0*omega((x0p0.x3i+zr)/W,beta)-g0m0*omega((x0m0.x3i+zr)/W,beta))*b[1]/dx2
-        //         //               +(g00p*omega((x00p.x3i+zr)/W,beta)-g00m*omega((x00m.x3i+zr)/W,beta))*b[2]/dx3 );
- 
-       	// 	// force update
-	// 	switch (d_dim.getValue()-ix-1)
-	// 	{
-	// 		case 2:{
-	// 			// f_1
-	// 			double f1=+cr*sstrike*sourc
-	// 				  +cr*cdip*cstrike*dblcp
-	// 				  +sr*cdip*cstrike*dipcs
-	// 				  +sr*sdip*cstrike*sourc;
-        //         		(*v_rhs_data)(s)=-f1*scale;
-	// 			break;
-	// 		       }
-	// 		case 1:{
-	// 		       // f_2
-	// 			double f2=+cr*cstrike*sourc
-	// 				  -cr*cdip*sstrike*dblcp
-	// 				  -sr*cdip*sstrike*dipcs
-	// 				  -sr*sdip*sstrike*sourc;
-        //         		(*v_rhs_data)(s)=-f2*scale;
-	// 			break;
-	// 		       }
-	// 		case 0:{
-	// 			// f_3
-	// 			double f3=-cr*sdip*dblcp
-	// 				  +sr*cdip*sourc
-	// 				  -sr*sdip*dipcs;
-	// 			(*v_rhs_data)(s)=-f3*scale;
-	// 		       }
-	// 	}
-
-        //       }
-        //     int i=1;
-        //     for(int d=0;d<dim;++d)
-        //       i*=v_rhs_ijk[d];
-        //   }
-        //   }
       }
   }    // End patch loop.
 }
