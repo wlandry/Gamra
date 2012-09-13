@@ -131,22 +131,6 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_2D
                     + dx[d]*(coarse[d]-coarse_box.lower()[d] + 0.5) - offset(d);
 
                 coarsen_point_2D(coarse,ip,jp,v,v_fine);
-
-
-                // tbox::pout << "coarsen "
-                //            << coarse << " "
-                //            << xyz(0) << " "
-                //            << xyz(1) << " "
-                //            << dx[0] << " "
-                //            << fine << " "
-                //            << (*v)(coarse) << " "
-                //            << (*v_fine)(fine) << " "
-                //            << (*v_fine)(fine+ip) << " "
-                //            << (*v_fine)(fine-ip) << " "
-                //            << (*v_fine)(fine+jp) << " "
-                //            << (*v_fine)(fine+jp+ip) << " "
-                //            << (*v_fine)(fine+jp-ip) << " "
-                //            << "\n";
               }
           }
         if(directions(1) && i!=coarse_box.upper(0)+1)
@@ -163,77 +147,7 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_2D
               }
             else
               {
-                const int axis=1;
-                FTensor::Tensor1<double,3> offset(0,0,0);
-                offset(axis)=dx[axis]/2;
-                FTensor::Tensor1<double,3> xyz(0,0,0);
-                for(int d=0;d<Dim.getValue();++d)
-                  xyz(d)=cgeom->getXLower()[d]
-                    + dx[d]*(coarse[d]-coarse_box.lower()[d] + 0.5) - offset(d);
-
-                if(xyz(0)-dx[0]<0.5 && xyz(0)+dx[0]>0.5)
-                  {
-                    /* Interface between coarse and fine+1 */
-                    if((xyz(1)+dx[1]/2>0.6 && xyz(1)<0.6)
-                       || (xyz(1)+dx[1]/2>0.4 && xyz(1)<0.4))
-                      {
-                        // tbox::pout << "coarsen m ";
-                        (*v)(coarse)=(((*v_fine)(fine) + (*v_fine)(fine+ip))*2
-                                      + (*v_fine)(fine-jp) + (*v_fine)(fine+ip-jp))/3;
-                      }
-                    /* Interface between coarse and fine-1 */
-                    else if((xyz(1)-dx[1]/2<0.6 && xyz(1)>0.6)
-                            || (xyz(1)-dx[1]/2<0.4 && xyz(1)>0.4))
-                      {
-                        // tbox::pout << "coarsen p ";
-                        (*v)(coarse)=(((*v_fine)(fine) + (*v_fine)(fine+ip))*2
-                                      + (*v_fine)(fine+jp) + (*v_fine)(fine+ip+jp))/3;
-                      }
-                    else
-                      {
-                        // tbox::pout << "coarsen z ";
-                        coarsen_point_2D(coarse,jp,ip,v,v_fine);
-                      }
-                  }
-                else
-                  {
-                    // tbox::pout << "coarsen   ";
-                    coarsen_point_2D(coarse,jp,ip,v,v_fine);
-                  }
-
-                // /* Interface between coarse and fine-1 */
-                // if(xyz(0)+dx[0]/4>0.5 && xyz(0)<0.5)
-                //   {
-                //     tbox::pout << "coarsen m ";
-                //     (*v)(coarse)=(*v_fine)(fine)/2
-                //       + ((*v_fine)(fine-jp) + (*v_fine)(fine+jp))/4;
-                //   }
-                // /* Interface between coarse and fine+1 */
-                // else if(xyz(0)-dx[0]/4<0.5 && xyz(0)>0.5)
-                //   {
-                //     tbox::pout << "coarsen p ";
-                //     (*v)(coarse)=(*v_fine)(fine+ip)/2
-                //       + ((*v_fine)(fine-jp+ip) + (*v_fine)(fine+jp+ip))/4;
-                //   }
-                // else
-                //   {
-                //     tbox::pout << "coarsen   ";
-                //     coarsen_point_2D(coarse,jp,ip,v,v_fine);
-                //   }
-
-                // tbox::pout << coarse << " "
-                //            << xyz(0) << " "
-                //            << xyz(1) << " "
-                //            << dx[0] << " "
-                //            << fine << " "
-                //            << (*v)(coarse) << " "
-                //            << (*v_fine)(fine) << " "
-                //            << (*v_fine)(fine+jp) << " "
-                //            << (*v_fine)(fine-jp) << " "
-                //            << (*v_fine)(fine+ip) << " "
-                //            << (*v_fine)(fine+ip+jp) << " "
-                //            << (*v_fine)(fine+ip-jp) << " "
-                //            << "\n";
+                coarsen_point_2D(coarse,jp,ip,v,v_fine);
               }
           }
       }
