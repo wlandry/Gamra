@@ -147,13 +147,14 @@ void SAMRAI::Elastic::FAC::initializeLevelData
         double cstrike(0.),sstrike(1.);
         double cr(0.),sr(1.);
         double delta(0.003);
-        double x(0.500001),y(0.5),z(0.5);
+        // double x(0.500001),y(0.5),z(0.5);
+        double x(0.000001),y(0.0),z(0.0);
         double beta(0.2);
 	double scale(-10.);
 
         const double pi=4*atan(1);
-        // const double theta(0);
-        const double theta(pi/4);
+        const double theta(0);
+        // const double theta(pi/4);
         const FTensor::Tensor1<double,3> center(x,y,z);
         const FTensor::Tensor2<double,3,3> rot(std::cos(theta),std::sin(theta),0,
                                                -std::sin(theta),cos(theta),0,
@@ -202,6 +203,75 @@ void SAMRAI::Elastic::FAC::initializeLevelData
                     ntt_dm[d](a)=rot(a,b)*(xyz(b)-Dx[d](b)-center(b));
                   }
 
+//                 /* Correction term */
+//                 for(int sign=-1;sign<=1;sign+=2)
+//                   {
+//                     FTensor::Tensor1<double,3> d_ntt;
+//                     d_ntt(a)=ntt(a);
+//                     d_ntt(1)-=sign*fault[0]/2;
+//                     if(dim==2)
+//                       d_ntt(2)=0;
+//                     else
+//                       d_ntt(2)-=sign*fault[1]/2;
+
+//                     double r2=d_ntt(a)*d_ntt(a);
+//                     double lambda_here(1), mu_here(1), lambda_0(1), mu_0(1);
+//                     // double prefactor((lambda_here + mu_here)*(scale/pi)
+//                     //                  *(mu_0 / (lambda_0 + 2*mu_0))/(r2*r2));
+
+
+//                     // FTensor::Tensor1<double,3> dR(0,0,0);
+//                     // dR(0)=(prefactor/2)*(d_ntt(0)*d_ntt(0) - d_ntt(1)*d_ntt(1));
+//                     // dR(1)=prefactor*d_ntt(0)*d_ntt(1);
+
+// //                     double prefactor(-0.5*(lambda_here + mu_here)*(6*lambda_here*x^2*y^2 - 2*lambda_here*y^4 + mu_here*x^4 + 6*mu_here*x^2*y^2 -
+// // 3*mu_here*y^4)*b/((lambda_here + 2*mu_here)*(x^2 + y^2)^3*pi)
+
+//                     const double x(d_ntt(0)), y(d_ntt(1));
+//                     const double b(scale);
+//                     FTensor::Tensor1<double,3> dR(0,0,0);
+//                     // dR(0)=0.5*(lambda_here + mu_here)
+//                     //   *(6*lambda_here*x*x*y*y - 2*lambda_here*y*y*y*y
+//                     //     + mu_here*x*x*x*x + 6*mu_here*x*x*y*y - 3*mu_here*y*y*y*y)
+//                     //   *b/((lambda_here + 2*mu_here)*r2*r2*r2*pi);
+
+//                     // dR(1)=-(lambda_here + mu_here)
+//                     //   *(2*lambda_here*x*x - 2*lambda_here*y*y
+//                     //     + 3*mu_here*x*x - mu_here*y*y)
+//                     //   *b*x*y/((lambda_here + 2*mu_here)*r2*r2*r2*pi);
+
+
+//                     dR(0)=10.0/3*(x*x*x*x + 12*x*x*y*y - 5*y*y*y*y)/(r2*r2*r2*pi);
+//                     dR(1)=-20/3*(5*x*x - 3*y*y)*x*y/(r2*r2*r2*pi);
+
+//                     // dR(0)=0.5*(lambda_here + mu_here)
+//                     //   *(6*lambda_here*x*x*y*y - 2*lambda_here*y*y*y*y
+//                     //     + mu_here*x*x*x*x + 6*mu_here*x*x*y*y - 3*mu_here*y*y*y*y)
+//                     //   *b/((lambda_here + 2*mu_here)*r2*r2*r2*pi);
+
+//                     // dR(1)=-(lambda_here + mu_here)
+//                     //   *(2*lambda_here*x*x - 2*lambda_here*y*y
+//                     //     + 3*mu_here*x*x - mu_here*y*y)
+//                     //   *b*x*y/((lambda_here + 2*mu_here)*r2*r2*r2*pi);
+
+//                     // // if(r2<1.0/4)
+//                     //   {
+//                     //     tbox::plog << "Resid "
+//                     //                << level_number << " "
+//                     //                << ix << " "
+//                     //                << s << " "
+//                     //                << d_ntt(0) << " "
+//                     //                << d_ntt(1) << " "
+//                     //                // << d_ntt(2) << " "
+//                     //                << r2 << " "
+//                     //                << dR(0) << " " << dR(1) << " "
+//                     //                << sign*dR(a)*rot(a,ix) << " "
+//                     //                << "\n";
+//                     //   }
+
+//                     (*v_rhs_data)(s)-=sign*dR(a)*rot(a,ix);
+//                   }
+
                 /* d/dx^2, d/dy^2, d/dz^2 */
                 for(int d=0;d<dim;++d)
                   {
@@ -230,7 +300,6 @@ void SAMRAI::Elastic::FAC::initializeLevelData
                   }
 
                 /* d/dxy */
-
                 for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                   {
                     FTensor::Tensor1<double,3> ntt_dxy[2][2];
