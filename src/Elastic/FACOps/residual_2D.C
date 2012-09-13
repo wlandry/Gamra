@@ -25,13 +25,6 @@ void SAMRAI::solv::Elastic::FACOps::residual_2D
   for(pdat::CellIterator ci(pbox); ci; ci++)
     {
       pdat::CellIndex center(*ci);
-      pdat::CellIndex up(center), down(center), right(center),
-        left(center);
-
-      ++up[1];
-      --down[1];
-      ++right[0];
-      --left[0];
 
       const pdat::SideIndex
         x(center,0,pdat::SideIndex::Lower),
