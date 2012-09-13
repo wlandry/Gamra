@@ -4,8 +4,45 @@
 def options(opt):
     opt.load('compiler_cxx')
 
+    samrai=opt.add_option_group('SAMRAI Options')
+    samrai.add_option('--samrai-dir',
+                   help='Base directory where samrai is installed')
+    samrai.add_option('--samrai-incdir',
+                   help='Directory where samrai include files are installed')
+    samrai.add_option('--samrai-libdir',
+                   help='Directory where samrai library files are installed')
+    samrai.add_option('--samrai-libs',
+                   help='Names of the samrai libraries without prefix or suffix\n'
+                   '(e.g. "SAMRAI_appu SAMRAI_algs SAMRAI_solv"')
+
 def configure(conf):
     conf.load('compiler_cxx')
+
+    # Find SAMRAI
+    if conf.options.samrai_dir:
+        if not conf.options.samrai_incdir:
+            conf.options.samrai_incdir=conf.options.samrai_dir + "/include"
+        if not conf.options.samrai_libdir:
+            conf.options.samrai_libdir=conf.options.samrai_dir + "/lib"
+    frag="#include \"SAMRAI/SAMRAI_config.h\"\n" + 'int main()"\n' \
+        + "{}\n"
+    if conf.options.samrai_incdir:
+        inc=conf.options.samrai_incdir
+    else:
+        inc='/usr/include'
+
+    conf.check_cxx(msg="Checking for SAMRAI",
+                  header_name='SAMRAI/SAMRAI_config.h',
+                  includes=[inc], uselib_store='samrai',
+                  libpath=[conf.options.samrai_libdir],
+                  rpath=[conf.options.samrai_libdir],
+                  lib=['SAMRAI_appu', 'SAMRAI_algs', 'SAMRAI_solv',
+                       'SAMRAI_geom', 'SAMRAI_mesh', 'SAMRAI_math',
+                       'SAMRAI_pdat', 'SAMRAI_xfer', 'SAMRAI_hier',
+                       'SAMRAI_tbox'])
+    
+
+
 def build(bld):
     bld.program(
         features     = ['cxx','cprogram'],
@@ -94,7 +131,9 @@ def build(bld):
                         'src/Elastic/V_Boundary_Refine/Update_V_3D.C',
                         'src/Elastic/V_Coarsen_Patch_Strategy/postprocessCoarsen_2D.C',
                         'src/Elastic/V_Coarsen_Patch_Strategy/postprocessCoarsen_3D.C',
-                        'src/Elastic/set_boundary.C',
+                        'src/Elastic/set_boundary/set_boundary.C',
+                        'src/Elastic/set_boundary/okada.C',
+                        'src/Elastic/set_boundary/okada_tangent_deriv.C',
                         'src/Elastic/FACOps/FACOps.C',
                         'src/Elastic/FACOps/computeCompositeResidualOnLevel.C',
                         'src/Elastic/FACOps/residual_2D.C',
@@ -140,10 +179,7 @@ def build(bld):
                         '-DTESTING=0', '-Drestrict='],
         # cxxflags      = ['-g', '-Wall', '-Wextra', '-Wconversion',
         #                  '-Drestrict='],
-        lib          = ['SAMRAI_appu', 'SAMRAI_algs', 'SAMRAI_solv',
-                        'SAMRAI_geom', 'SAMRAI_mesh', 'SAMRAI_math',
-                        'SAMRAI_pdat', 'SAMRAI_xfer', 'SAMRAI_hier',
-                        'SAMRAI_tbox', 'petsc', 'hdf5',
+        lib          = ['petsc', 'hdf5',
                         'HYPRE',
                         'HYPRE_sstruct_ls', 'HYPRE_sstruct_mv',
                         'HYPRE_struct_ls', 'HYPRE_struct_mv',
@@ -156,12 +192,13 @@ def build(bld):
                         'dl', 'm', 'gfortranbegin', 'gfortran', 'm',
                         'gfortranbegin', 'gfortran', 'm', 'gfortranbegin',
                         'gfortran', 'm'],
-        libpath      = ['/home/boo/cig/SAMRAI-hg-build/lib',
+        libpath      = ['/home/boo/cig/SAMRAI/opt/lib',
                         '/usr/lib/petsc/linux-gnu-c-opt/lib'],
-        includes = ['src','../FTensor','../../SAMRAI-hg-build/include',
-                    '../../SAMRAI-hg/source',
+        includes = ['src','../FTensor','../../SAMRAI/opt/include',
+                    '../../SAMRAI/SAMRAI-hg/source',
                     '/usr/lib/petsc/include',
                     '/usr/lib/petsc/bmake/linux-gnu-c-opt',
                     '/usr/lib/petsc/src/vec',
-                    '/usr/include']
+                    '/usr/include'],
+        use=['samrai']
         )
