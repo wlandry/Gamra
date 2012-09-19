@@ -58,8 +58,6 @@ namespace SAMRAI {
       d_object_name(object_name),
       d_fac_ops(d_dim, object_name + "::fac_ops",database),
       d_fac_precond(object_name + "::fac_precond", d_fac_ops),
-      d_bc_object(NULL),
-      d_simple_bc(d_dim, object_name + "::bc"),
       d_hierarchy(NULL),
       d_ln_min(-1),
       d_ln_max(-1),

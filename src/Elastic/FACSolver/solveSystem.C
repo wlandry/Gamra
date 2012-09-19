@@ -48,16 +48,6 @@ bool SAMRAI::solv::Elastic::FACSolver::solveSystem(const int p,
     TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
   }
 #endif
-  if (d_bc_object == &d_simple_bc) {
-    /*
-     * Knowing that we are using the SimpelCellRobinBcCoefsX
-     * implementation of RobinBcCoefStrategy, we must save
-     * the ghost data in u before solving.
-     * The solver overwrites it, but SimpleCellRobinBcCoefs
-     * needs to get to access it repeatedly.
-     */
-    d_simple_bc.cacheDirichletData(p);
-  }
 
   createVectorWrappers(p, p_rhs, v, v_rhs);
   bool solver_rval;

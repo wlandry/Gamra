@@ -43,14 +43,6 @@ void SAMRAI::solv::Elastic::FACSolver::initializeSolverState
   TBOX_ASSERT(!hierarchy.isNull());
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
-  if (d_bc_object == NULL) {
-    TBOX_ERROR(
-               d_object_name << ": No BC coefficient strategy object!\n"
-               <<
-               "Use either setBoundaries or setPhysicalBcCoefObject\n"
-               << "to specify the boundary conidition.\n");
-  }
-
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (p < 0 || p_rhs < 0) {
     TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
@@ -90,12 +82,6 @@ void SAMRAI::solv::Elastic::FACSolver::initializeSolverState
                                  s_weight_id[d_dim.getValue() - 1],
                                  d_ln_min,
                                  d_ln_max);
-
-  if (d_bc_object == &d_simple_bc) {
-    d_simple_bc.setHierarchy(d_hierarchy,
-                             d_ln_min,
-                             d_ln_max);
-  }
 
   d_fac_ops.set_moduli_id(cell_moduli,edge_moduli);
 

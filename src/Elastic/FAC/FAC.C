@@ -214,13 +214,5 @@ namespace SAMRAI {
         check_array_sizes(p_initial_ijk,p_initial_xyz_min,p_initial_xyz_max,
                           p_initial,dim,"p_initial");
       }
-
-    /*
-     * Specify an implementation of solv::RobinBcCoefStrategy for the
-     * solver to use.  We use the implementation
-     * solv::LocationIndexRobinBcCoefs, but other implementations are
-     * possible, including user-implemented.
-     */
-    d_elastic_fac_solver.setBcObject(&d_bc_coefs);
   }
 }
