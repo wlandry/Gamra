@@ -1,6 +1,5 @@
 #include "Elastic/FACOps.h"
 #include "Constants.h"
-#include "Elastic/dRc_dp.h"
 /*
 ********************************************************************
 * Workhorse function to smooth error using red-black               *

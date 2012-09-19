@@ -1,6 +1,6 @@
 #include "Elastic/FACOps.h"
 #include "Constants.h"
-#include "Elastic/dRc_dp.h"
+#include "Elastic/dRm_dv.h"
 /*
 ********************************************************************
 * Updates one component of the velocity during a red-black *

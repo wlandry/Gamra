@@ -33,36 +33,25 @@ void SAMRAI::solv::Elastic::FACOps::smooth_V_2D
   if(!((center[axis]==pbox.lower(axis) && v(x-ip)==boundary_value)
        || (center[axis]==pbox.upper(axis)+1 && v(x+ip)==boundary_value)))
     {
-      /* If at the boundary, set things up so that the derivative does
-         not change. */
-      bool set_lower_boundary(false), set_upper_boundary(false);
-      double dv_lower(0), dv_upper(0);
+      // /* If at the boundary, set things up so that the derivative does
+      //    not change. */
+      // bool set_lower_boundary(false), set_upper_boundary(false);
+      // double dv_lower(0), dv_upper(0);
 
-      hier::Index offset(0,0);
-      offset[axis]=1;
-      if(center(off_axis)==pbox.lower(off_axis))
-        {
-          set_lower_boundary=true;
-          dv_lower=v(x-offset) - v(x);
-        }
-      if(center(off_axis)==pbox.upper(off_axis))
-        {
-          set_upper_boundary=true;
-          dv_upper=v(x+offset) - v(x);
-        }
+      // hier::Index offset(0,0);
+      // offset[axis]=2;
 
-      /* Need to fix this for Neumann conditions at a physical boundary */
-      // if(center[axis]==pbox.lower(axis)+1
-      //    && !geom->getTouchesRegularBoundary(axis,0))
+      // /* Need to fix this for Neumann conditions at a physical boundary */
+
+      // if(center[off_axis]==pbox.lower(off_axis)+1)
       //   {
       //     set_lower_boundary=true;
-      //     dv_lower=v(x-2*offset) - v(x);
+      //     dv_lower=v(x-offset) - v(x);
       //   }
-      // if(center[axis]==pbox.upper(axis)
-      //    && !geom->getTouchesRegularBoundary(axis,1))
+      // if(center[off_axis]==pbox.upper(off_axis)-1)
       //   {
       //     set_upper_boundary=true;
-      //     dv_upper=v(x+2*offset) - v(x);
+      //     dv_upper=v(x+offset) - v(x);
       //   }
 
       double C_vx=dRm_dv_2D(cell_moduli,edge_moduli,center,center-ip,
@@ -77,8 +66,8 @@ void SAMRAI::solv::Elastic::FACOps::smooth_V_2D
 
       v(x)+=delta_Rx*theta_momentum/C_vx;
 
-      /* Set the boundary elements so that the derivative is
-         unchanged. */
+      // /* Set the boundary elements so that the derivative is
+      //    unchanged. */
       // if(set_lower_boundary)
       //   {
       //     v(x-offset)=v(x) + dv_lower;
