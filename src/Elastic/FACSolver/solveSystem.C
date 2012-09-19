@@ -28,9 +28,7 @@
 *************************************************************************
 */
 
-bool SAMRAI::solv::Elastic::FACSolver::solveSystem(const int p,
-                                                const int p_rhs,
-                                                const int v, const int v_rhs)
+bool SAMRAI::solv::Elastic::FACSolver::solveSystem(const int v, const int v_rhs)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (!d_solver_is_initialized) {
@@ -44,12 +42,12 @@ bool SAMRAI::solv::Elastic::FACSolver::solveSystem(const int p,
                "solveSystem(int,int,...) to initialize the solver,\n"
                << "solve and deallocate the solver.\n");
   }
-  if (p < 0 || p_rhs < 0 || v < 0 || v_rhs < 0) {
+  if (v < 0 || v_rhs < 0) {
     TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
   }
 #endif
 
-  createVectorWrappers(p, p_rhs, v, v_rhs);
+  createVectorWrappers(v, v_rhs);
   bool solver_rval;
 
   solver_rval = d_fac_precond.solveSystem(*d_uv, *d_fv);
@@ -71,11 +69,8 @@ bool SAMRAI::solv::Elastic::FACSolver::solveSystem(const int p,
 */
 
 bool SAMRAI::solv::Elastic::FACSolver::solveSystem
-(const int p,
- const int cell_moduli,
+(const int cell_moduli,
  const int edge_moduli,
- const int dp,
- const int p_rhs,
  const int v,
  const int v_rhs,
  tbox::Pointer<hier::PatchHierarchy>
@@ -106,11 +101,11 @@ bool SAMRAI::solv::Elastic::FACSolver::solveSystem
                << "specified.\n");
   }
 #endif
-  initializeSolverState(p, cell_moduli, edge_moduli, dp, p_rhs, v, v_rhs,
+  initializeSolverState(cell_moduli, edge_moduli, v, v_rhs,
                         hierarchy, coarse_ln, fine_ln);
 
   bool solver_rval;
-  solver_rval = solveSystem(p, p_rhs, v, v_rhs);
+  solver_rval = solveSystem(v, v_rhs);
 
   deallocateSolverState();
 

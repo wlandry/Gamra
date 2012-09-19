@@ -10,20 +10,8 @@
 #include "Elastic/FACOps.h"
 
 void SAMRAI::solv::Elastic::FACOps::xeqScheduleProlongation
-(int p_dst, int p_src, int p_scr, int v_dst, int v_src, int v_scr,
- int dest_ln)
+(int v_dst, int v_src, int v_scr, int dest_ln)
 {
-  /* p */
-  {
-    if (!p_prolongation_refine_schedules[dest_ln]) {
-      TBOX_ERROR("Expected schedule not found.");
-    }
-    xfer::RefineAlgorithm refiner(d_dim);
-    refiner.registerRefine(p_dst, p_src, p_scr, p_prolongation_refine_operator);
-    refiner.resetSchedule(p_prolongation_refine_schedules[dest_ln]);
-    p_prolongation_refine_schedules[dest_ln]->fillData(0.0,false);
-  }
-
   /* v */
   {
     if (!v_prolongation_refine_schedules[dest_ln]) {

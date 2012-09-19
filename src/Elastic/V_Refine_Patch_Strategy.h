@@ -73,7 +73,7 @@ public:
                     const hier::Box& ,
                     const hier::IntVector& )
   {
-    set_boundary(coarse,invalid_id,v_id,true);
+    set_boundary(coarse,v_id,true);
   }
 
    virtual void

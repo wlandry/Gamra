@@ -4,7 +4,7 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Operator class for cell-centered scalar Elastic using FAC 
+ * Description:   Operator class for staggered scalar Elastic using FAC 
  *
  ************************************************************************/
 #include "Elastic/FACOps.h"
@@ -40,23 +40,6 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
 
 #ifdef DEBUG_CHECK_ASSERTIONS
 
-  // if (d_physical_bc_coef == NULL) {
-  //   /*
-  //    * It's an error not to have bc object set.
-  //    * Note that the bc object cannot be passed in through
-  //    * the argument because the interface is inherited.
-  //    */
-  //   TBOX_ERROR(
-  //              d_object_name << ": No physical bc object in\n"
-  //              <<
-  //              "Elastic::FACOps::initializeOperatorState\n"
-  //              << "You must use "
-  //              <<
-  //              "Elastic::FACOps::setPhysicalBcCoefObject\n"
-  //              <<
-  //              "to set one before calling initializeOperatorState\n");
-  // }
-
   if (solution.getNumberOfComponents() != 1) {
     TBOX_WARNING(d_object_name
                  << ": Solution vector has multiple components.\n"
@@ -82,10 +65,10 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name << ": RHS component does not\n"
                  << "correspond to a variable.\n");
     }
-    tbox::Pointer<pdat::CellVariable<double> > cell_var = var;
-    if (!cell_var) {
+    tbox::Pointer<pdat::SideVariable<double> > side_var = var;
+    if (!side_var) {
       TBOX_ERROR(d_object_name
-                 << ": RHS variable is not cell-centered double\n");
+                 << ": RHS variable is not side-centered double\n");
     }
   }
   {
@@ -95,10 +78,10 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name << ": Solution component does not\n"
                  << "correspond to a variable.\n");
     }
-    tbox::Pointer<pdat::CellVariable<double> > cell_var = var;
-    if (!cell_var) {
+    tbox::Pointer<pdat::SideVariable<double> > side_var = var;
+    if (!side_var) {
       TBOX_ERROR(d_object_name
-                 << ": Solution variable is not cell-centered double\n");
+                 << ": Solution variable is not side-centered double\n");
     }
   }
   for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
@@ -113,10 +96,10 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
         /*
          * Some data checks can only be done if the data already exists.
          */
-        tbox::Pointer<pdat::CellData<double> > cd = fd;
+        tbox::Pointer<pdat::SideData<double> > cd = fd;
         if (!cd) {
           TBOX_ERROR(d_object_name
-                     << ": RHS data is not cell-centered double\n");
+                     << ": RHS data is not side-centered double\n");
         }
         if (cd->getDepth() > 1) {
           TBOX_WARNING(d_object_name
@@ -130,10 +113,10 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
         /*
          * Some data checks can only be done if the data already exists.
          */
-        tbox::Pointer<pdat::CellData<double> > cd = ud;
+        tbox::Pointer<pdat::SideData<double> > cd = ud;
         if (!cd) {
           TBOX_ERROR(d_object_name
-                     << ": Solution data is not cell-centered double\n");
+                     << ": Solution data is not side-centered double\n");
         }
         if (cd->getDepth() > 1) {
           TBOX_WARNING(d_object_name
@@ -195,23 +178,10 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
     d_hierarchy->getGridGeometry();
   tbox::Pointer<hier::Variable> variable;
 
-  vdb->mapIndexToVariable(d_cell_scratch_id, variable);
-  p_prolongation_refine_operator =
-    geometry->lookupRefineOperator(variable,
-                                   p_prolongation_method);
-
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_prolongation_refine_operator =
     geometry->lookupRefineOperator(variable,
                                    v_prolongation_method);
-
-  vdb->mapIndexToVariable(d_cell_scratch_id, variable);
-  p_urestriction_coarsen_operator =
-    geometry->lookupCoarsenOperator(variable,
-                                    "CONSERVATIVE_COARSEN");
-  p_rrestriction_coarsen_operator =
-    geometry->lookupCoarsenOperator(variable,
-                                   p_rrestriction_method);
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_urestriction_coarsen_operator =
@@ -219,44 +189,23 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
     geometry->lookupCoarsenOperator(variable,
                                     "V_COARSEN");
 
-  vdb->mapIndexToVariable(d_cell_scratch_id, variable);
-  p_ghostfill_refine_operator =
-    geometry->lookupRefineOperator(variable,
-                                   "P_BOUNDARY_REFINE");
-
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,
                                    "V_BOUNDARY_REFINE");
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-  if (!p_prolongation_refine_operator) {
-    TBOX_ERROR(d_object_name
-               << ": Cannot find p prolongation refine operator");
-  }
   if (!v_prolongation_refine_operator) {
     TBOX_ERROR(d_object_name
                << ": Cannot find v prolongation refine operator");
-  }
-  if (!p_urestriction_coarsen_operator) {
-    TBOX_ERROR(d_object_name
-               << ": Cannot find p restriction coarsening operator");
   }
   if (!v_urestriction_coarsen_operator) {
     TBOX_ERROR(d_object_name
                << ": Cannot find v restriction coarsening operator");
   }
-  if (!p_rrestriction_coarsen_operator) {
-    TBOX_ERROR(d_object_name
-               << ": Cannot find p restriction coarsening operator");
-  }
   if (!v_rrestriction_coarsen_operator) {
     TBOX_ERROR(d_object_name
                << ": Cannot find v restriction coarsening operator");
-  }
-  if (!p_ghostfill_refine_operator) {
-    TBOX_ERROR(d_object_name
-               << ": Cannot find ghost filling refinement operator");
   }
   if (!v_ghostfill_refine_operator) {
     TBOX_ERROR(d_object_name
@@ -269,26 +218,16 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
    * There is no need to delete the old schedules first
    * because we have deallocated the solver state above.
    */
-  p_prolongation_refine_schedules.resizeArray(d_ln_max + 1);
   v_prolongation_refine_schedules.resizeArray(d_ln_max + 1);
-  p_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
   v_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
-  p_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
   v_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
-  p_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
-  p_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   v_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   v_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
 
-  xfer::RefineAlgorithm p_prolongation_refine_algorithm(d_dim),
-    v_prolongation_refine_algorithm(d_dim),
-    p_ghostfill_refine_algorithm(d_dim),
+  xfer::RefineAlgorithm v_prolongation_refine_algorithm(d_dim),
     v_ghostfill_refine_algorithm(d_dim),
-    p_nocoarse_refine_algorithm(d_dim),
     v_nocoarse_refine_algorithm(d_dim);
-  xfer::CoarsenAlgorithm p_urestriction_coarsen_algorithm(d_dim),
-    p_rrestriction_coarsen_algorithm(d_dim),
-    v_urestriction_coarsen_algorithm(d_dim),
+  xfer::CoarsenAlgorithm v_urestriction_coarsen_algorithm(d_dim),
     v_rrestriction_coarsen_algorithm(d_dim);
 
   /* This is a little confusing.  The only real purpose here is to
@@ -298,51 +237,28 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
      not all that important, because a different refineAlgorithm will
      be used then. */
 
-  p_prolongation_refine_algorithm.
-    registerRefine(d_cell_scratch_id,
-                   solution.getComponentDescriptorIndex(0),
-                   d_cell_scratch_id,
-                   p_prolongation_refine_operator);
   v_prolongation_refine_algorithm.
     registerRefine(d_side_scratch_id,
-                   solution.getComponentDescriptorIndex(1),
+                   solution.getComponentDescriptorIndex(0),
                    d_side_scratch_id,
                    v_prolongation_refine_operator);
-  p_urestriction_coarsen_algorithm.
+  v_urestriction_coarsen_algorithm.
     registerCoarsen(solution.getComponentDescriptorIndex(0),
                     solution.getComponentDescriptorIndex(0),
-                    p_urestriction_coarsen_operator);
-  p_rrestriction_coarsen_algorithm.
-    registerCoarsen(rhs.getComponentDescriptorIndex(0),
-                    rhs.getComponentDescriptorIndex(0),
-                    p_rrestriction_coarsen_operator);
-  v_urestriction_coarsen_algorithm.
-    registerCoarsen(solution.getComponentDescriptorIndex(1),
-                    solution.getComponentDescriptorIndex(1),
                     v_urestriction_coarsen_operator);
   v_rrestriction_coarsen_algorithm.
-    registerCoarsen(rhs.getComponentDescriptorIndex(1),
-                    rhs.getComponentDescriptorIndex(1),
+    registerCoarsen(rhs.getComponentDescriptorIndex(0),
+                    rhs.getComponentDescriptorIndex(0),
                     v_rrestriction_coarsen_operator);
-  p_ghostfill_refine_algorithm.
-    registerRefine(solution.getComponentDescriptorIndex(0),
-                   solution.getComponentDescriptorIndex(0),
-                   solution.getComponentDescriptorIndex(0),
-                   p_ghostfill_refine_operator);
   v_ghostfill_refine_algorithm.
-    registerRefine(solution.getComponentDescriptorIndex(1),
-                   solution.getComponentDescriptorIndex(1),
-                   solution.getComponentDescriptorIndex(1),
-                   v_ghostfill_refine_operator);
-  p_nocoarse_refine_algorithm.
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
-                   tbox::Pointer<xfer::RefineOperator>(0));
+                   v_ghostfill_refine_operator);
   v_nocoarse_refine_algorithm.
-    registerRefine(solution.getComponentDescriptorIndex(1),
-                   solution.getComponentDescriptorIndex(1),
-                   solution.getComponentDescriptorIndex(1),
+    registerRefine(solution.getComponentDescriptorIndex(0),
+                   solution.getComponentDescriptorIndex(0),
+                   solution.getComponentDescriptorIndex(0),
                    tbox::Pointer<xfer::RefineOperator>(0));
 
   /* Refinement and ghost fill operators */
@@ -350,17 +266,6 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
 
     tbox::Pointer<xfer::PatchLevelFullFillPattern>
       fill_pattern(new xfer::PatchLevelFullFillPattern());
-    p_prolongation_refine_schedules[dest_ln] =
-      p_prolongation_refine_algorithm.
-      createSchedule(fill_pattern,
-                     d_hierarchy->getPatchLevel(dest_ln),
-                     tbox::Pointer<hier::PatchLevel>(),
-                     dest_ln - 1,
-                     d_hierarchy);
-    if (!p_prolongation_refine_schedules[dest_ln]) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot create a refine schedule for p prolongation!\n");
-    }
     v_prolongation_refine_schedules[dest_ln] =
       v_prolongation_refine_algorithm.
       createSchedule(fill_pattern,
@@ -372,16 +277,6 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for v prolongation!\n");
     }
-    p_ghostfill_refine_schedules[dest_ln] =
-      p_ghostfill_refine_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     dest_ln - 1,
-                     d_hierarchy,
-                     &p_refine_patch_strategy);
-    if (!p_ghostfill_refine_schedules[dest_ln]) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot create a refine schedule for ghost filling!\n");
-    }
     v_ghostfill_refine_schedules[dest_ln] =
       v_ghostfill_refine_algorithm.
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
@@ -391,13 +286,6 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
     if (!v_ghostfill_refine_schedules[dest_ln]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
-    }
-    p_nocoarse_refine_schedules[dest_ln] =
-      p_nocoarse_refine_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln));
-    if (!p_nocoarse_refine_schedules[dest_ln]) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot create a refine schedule for ghost filling on bottom level!\n");
     }
     v_nocoarse_refine_schedules[dest_ln] =
       v_nocoarse_refine_algorithm.
@@ -410,23 +298,6 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
 
   /* Coarsening operators */
   for (int dest_ln = d_ln_min; dest_ln < d_ln_max; ++dest_ln) {
-    p_urestriction_coarsen_schedules[dest_ln] =
-      p_urestriction_coarsen_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1));
-    if (!p_urestriction_coarsen_schedules[dest_ln]) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot create a coarsen schedule for U p restriction!\n");
-    }
-    p_rrestriction_coarsen_schedules[dest_ln] =
-      p_rrestriction_coarsen_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1));
-    if (!p_rrestriction_coarsen_schedules[dest_ln]) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot create a coarsen schedule for R p restriction!\n");
-    }
-
     v_urestriction_coarsen_schedules[dest_ln] =
       v_urestriction_coarsen_algorithm.
       createSchedule(d_hierarchy->getPatchLevel(dest_ln),
@@ -448,15 +319,6 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
   }
 
   /* Ordinary ghost fill operator on the coarsest level */
-  p_nocoarse_refine_schedules[d_ln_min] =
-    p_nocoarse_refine_algorithm.
-    createSchedule(d_hierarchy->getPatchLevel(d_ln_min));
-  if (!p_nocoarse_refine_schedules[d_ln_min]) {
-    TBOX_ERROR(
-               d_object_name
-               <<
-               ": Cannot create a refine schedule for p ghost filling on bottom level!\n");
-  }
   v_nocoarse_refine_schedules[d_ln_min] =
     v_nocoarse_refine_algorithm.
     createSchedule(d_hierarchy->getPatchLevel(d_ln_min));

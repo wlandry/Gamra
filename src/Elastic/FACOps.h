@@ -41,7 +41,6 @@
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/tbox/Timer.h"
-#include "Elastic/P_Refine_Patch_Strategy.h"
 #include "Elastic/V_Refine_Patch_Strategy.h"
 #include "Elastic/V_Coarsen_Patch_Strategy.h"
 
@@ -243,10 +242,6 @@ namespace SAMRAI {
          *        discretization method.
          */
         void
-        set_P_ProlongationMethod(
-                                 const std::string& prolongation_method);
-
-        void
         set_V_ProlongationMethod(
                                  const std::string& prolongation_method);
 
@@ -405,24 +400,18 @@ namespace SAMRAI {
                                         bool error_equation_indicator);
 
         void residual_2D
-        (pdat::CellData<double> &p,
-         pdat::SideData<double> &v,
+        (pdat::SideData<double> &v,
          pdat::CellData<double> &cell_moduli,
-         pdat::CellData<double> &p_rhs,
          pdat::SideData<double> &v_rhs,
-         pdat::CellData<double> &p_resid,
          pdat::SideData<double> &v_resid,
          hier::Patch &patch,
          const hier::Box &pbox,
          const geom::CartesianPatchGeometry &geom);
 
         void residual_3D
-        (pdat::CellData<double> &p,
-         pdat::SideData<double> &v,
+        (pdat::SideData<double> &v,
          pdat::CellData<double> &cell_moduli,
-         pdat::CellData<double> &p_rhs,
          pdat::SideData<double> &v_rhs,
-         pdat::CellData<double> &p_resid,
          pdat::SideData<double> &v_resid,
          hier::Patch &patch,
          const hier::Box &pbox,
@@ -448,22 +437,21 @@ namespace SAMRAI {
                             const SAMRAIVectorReal<double>& current_soln,
                             const SAMRAIVectorReal<double>& residual);
 
-        void set_boundaries(const int &p_id, const int &v_id, const int &l)
+        void set_boundaries(const int &v_id, const int &l)
         {
-          set_boundaries(p_id,v_id,l,true);
+          set_boundaries(v_id,l,true);
         }
-        void set_boundaries(const int &p_id, const int &v_id, const int &l,
-                            const bool &rhs)
+        void set_boundaries(const int &v_id, const int &l, const bool &rhs)
         {
           tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(l);
-          set_boundaries(p_id,v_id,level,rhs);
+          set_boundaries(v_id,level,rhs);
         }
-        void set_boundaries(const int &p_id, const int &v_id,
+        void set_boundaries(const int &v_id,
                             tbox::Pointer<hier::PatchLevel> &level)
         {
-          set_boundaries(p_id,v_id,level,true);
+          set_boundaries(v_id,level,true);
         }
-        void set_boundaries(const int &p_id, const int &v_id, 
+        void set_boundaries(const int &v_id, 
                             tbox::Pointer<hier::PatchLevel> &level,
                             const bool &rhs);
 
@@ -704,8 +692,7 @@ namespace SAMRAI {
          * @return refinement schedule for prolongation
          */
         void
-        xeqScheduleProlongation(int p_dst, int p_src, int p_scr,
-                                int v_dst, int v_src, int v_scr,
+        xeqScheduleProlongation(int v_dst, int v_src, int v_scr,
                                 int dest_ln);
 
         /*!
@@ -717,8 +704,8 @@ namespace SAMRAI {
          * @return coarsening schedule for restriction
          */
         void
-        xeqScheduleURestriction(int p_dst, int p_src, int v_dst, int v_src,
-                                int dest_ln);
+        xeqScheduleURestriction(int v_dst, int v_src, int dest_ln);
+                                
 
         /*!
          * @brief Execute schedule for restricting residual to the specified
@@ -729,8 +716,7 @@ namespace SAMRAI {
          * @return coarsening schedule for restriction
          */
         void
-        xeqScheduleRRestriction(int p_dst, int p_src, int v_dst, int v_src,
-                                int dest_ln);
+        xeqScheduleRRestriction(int v_dst, int v_src, int dest_ln);
 
         /*!
          * @brief Execute schedule for coarsening flux to the specified
@@ -757,7 +743,7 @@ namespace SAMRAI {
          * and physical bc.
          */
         void
-        xeqScheduleGhostFill(int p_id, int v_id, int dest_ln);
+        xeqScheduleGhostFill(int v_id, int dest_ln);
 
         /*!
          * @brief Execute schedule for filling ghosts on the specified
@@ -774,7 +760,7 @@ namespace SAMRAI {
          * and physical bc.
          */
         void
-        xeqScheduleGhostFillNoCoarse(int p_id, int v_id, int dest_ln);
+        xeqScheduleGhostFillNoCoarse(int v_id, int dest_ln);
 
         //@}
 
@@ -877,9 +863,7 @@ namespace SAMRAI {
          *
          * @see setProlongationMethod()
          */
-        std::string p_prolongation_method;
         std::string v_prolongation_method;
-        std::string p_rrestriction_method;
 
         /*!
          * @brief Tolerance specified to coarse solver
@@ -911,9 +895,9 @@ namespace SAMRAI {
         /*!
          * @brief Id of moduli and dp.
          *
-         * @see set_moduli_dp_id.
+         * @see set_moduli_id.
          */
-        int cell_moduli_id, edge_moduli_id, dp_id;
+        int cell_moduli_id, edge_moduli_id;
 
 #ifdef HAVE_HYPRE
         /*!
@@ -963,45 +947,26 @@ namespace SAMRAI {
          */
 
         //! @brief Error prolongation (refinement) operator.
-        tbox::Pointer<xfer::RefineOperator> p_prolongation_refine_operator;
-        tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
-        p_prolongation_refine_schedules;
-
         tbox::Pointer<xfer::RefineOperator> v_prolongation_refine_operator;
         tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
         v_prolongation_refine_schedules;
 
         //! @brief Solution restriction (coarsening) operator.
-        tbox::Pointer<xfer::CoarsenOperator> p_urestriction_coarsen_operator;
-        tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
-        p_urestriction_coarsen_schedules;
-
         tbox::Pointer<xfer::CoarsenOperator> v_urestriction_coarsen_operator;
         tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
         v_urestriction_coarsen_schedules;
 
         //! @brief Residual restriction (coarsening) operator.
-        tbox::Pointer<xfer::CoarsenOperator> p_rrestriction_coarsen_operator;
-        tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
-        p_rrestriction_coarsen_schedules;
-
         tbox::Pointer<xfer::CoarsenOperator> v_rrestriction_coarsen_operator;
         tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
         v_rrestriction_coarsen_schedules;
 
         //! @brief Refine operator for data from coarser level.
-        tbox::Pointer<xfer::RefineOperator> p_ghostfill_refine_operator;
-        tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
-        p_ghostfill_refine_schedules;
-
         tbox::Pointer<xfer::RefineOperator> v_ghostfill_refine_operator;
         tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
         v_ghostfill_refine_schedules;
 
         //! @brief Refine operator for data from same level.
-        tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
-        p_nocoarse_refine_schedules;
-
         tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
         v_nocoarse_refine_schedules;
 
@@ -1022,7 +987,6 @@ namespace SAMRAI {
          * to set and whether we are setting data with homogeneous
          * boundary condition.
          */
-        P_Refine_Patch_Strategy p_refine_patch_strategy;
         V_Refine_Patch_Strategy v_refine_patch_strategy;
         V_Coarsen_Patch_Strategy v_coarsen_patch_strategy;
 

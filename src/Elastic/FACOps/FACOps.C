@@ -54,15 +54,12 @@ namespace SAMRAI {
 
                              ),
       d_cf_discretization("Ewing"),
-      p_prolongation_method("P_REFINE"),
       v_prolongation_method("V_REFINE"),
-      p_rrestriction_method("CONSERVATIVE_COARSEN"),
       d_coarse_solver_tolerance(1.e-8),
       d_coarse_solver_max_iterations(10),
       d_residual_tolerance_during_smoothing(-1.0),
       cell_moduli_id(invalid_id),
       edge_moduli_id(invalid_id),
-      dp_id(invalid_id),
 #ifdef HAVE_HYPRE
       d_hypre_solver(dim,
                      object_name + "::hypre_solver",
@@ -75,26 +72,15 @@ namespace SAMRAI {
                 ->getContext(object_name + "::PRIVATE_CONTEXT")),
       d_cell_scratch_id(invalid_id),
       d_side_scratch_id(invalid_id),
-      p_prolongation_refine_operator(),
-      p_prolongation_refine_schedules(),
       v_prolongation_refine_operator(),
       v_prolongation_refine_schedules(),
-      p_urestriction_coarsen_operator(),
-      p_urestriction_coarsen_schedules(),
       v_urestriction_coarsen_operator(),
       v_urestriction_coarsen_schedules(),
-      p_rrestriction_coarsen_operator(),
-      p_rrestriction_coarsen_schedules(),
       v_rrestriction_coarsen_operator(),
       v_rrestriction_coarsen_schedules(),
-      p_ghostfill_refine_operator(),
-      p_ghostfill_refine_schedules(),
       v_ghostfill_refine_operator(),
       v_ghostfill_refine_schedules(),
-      p_nocoarse_refine_schedules(),
       v_nocoarse_refine_schedules(),
-      p_refine_patch_strategy(dim,
-                              d_object_name + "::refine patch strategy"),
       v_refine_patch_strategy(dim,
                               d_object_name + "::refine patch strategy"),
       v_coarsen_patch_strategy(dim,
@@ -170,17 +156,9 @@ namespace SAMRAI {
           database->getStringWithDefault("cf_discretization",
                                          d_cf_discretization);
 
-        p_prolongation_method =
-          database->getStringWithDefault("p_prolongation_method",
-                                         p_prolongation_method);
-
         v_prolongation_method =
           database->getStringWithDefault("v_prolongation_method",
                                          v_prolongation_method);
-
-        p_rrestriction_method =
-          database->getStringWithDefault("p_rrestriction_method",
-                                         p_rrestriction_method);
 
         d_enable_logging =
           database->getBoolWithDefault("enable_logging",

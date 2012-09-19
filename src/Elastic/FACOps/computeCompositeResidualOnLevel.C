@@ -23,9 +23,7 @@ void SAMRAI::solv::Elastic::FACOps::computeCompositeResidualOnLevel
    * Set up the bc helper so that when we use a refine schedule
    * to fill ghosts, the correct data is operated on.
    */
-  const int p_id = solution.getComponentDescriptorIndex(0);
-  const int v_id = solution.getComponentDescriptorIndex(1);
-  p_refine_patch_strategy.setTargetDataId(p_id);
+  const int v_id = solution.getComponentDescriptorIndex(0);
   v_refine_patch_strategy.setTargetDataId(v_id);
   // v_refine_patch_strategy.setHomogeneousBc(error_equation_indicator);
 
@@ -52,13 +50,13 @@ void SAMRAI::solv::Elastic::FACOps::computeCompositeResidualOnLevel
 
   /* S1. Fill solution ghost data. */
 
-  set_boundaries(p_id,v_id,ln,error_equation_indicator);
+  set_boundaries(v_id,ln,error_equation_indicator);
   if (ln > d_ln_min) {
     /* Fill from current, next coarser level and physical boundary */
-    xeqScheduleGhostFill(p_id, v_id, ln);
+    xeqScheduleGhostFill(v_id, ln);
   } else {
     /* Fill from current and physical boundary */
-    xeqScheduleGhostFillNoCoarse(p_id, v_id, ln);
+    xeqScheduleGhostFillNoCoarse(v_id, ln);
   }
 
   /*
@@ -67,20 +65,14 @@ void SAMRAI::solv::Elastic::FACOps::computeCompositeResidualOnLevel
 
   for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
     tbox::Pointer<hier::Patch> patch = *pi;
-    tbox::Pointer<pdat::CellData<double> >
-      p_ptr = solution.getComponentPatchData(0, *patch);
     tbox::Pointer<pdat::SideData<double> >
-      v_ptr = solution.getComponentPatchData(1, *patch);
+      v_ptr = solution.getComponentPatchData(0, *patch);
     tbox::Pointer<pdat::CellData<double> >
       cell_moduli_ptr = patch->getPatchData(cell_moduli_id);
-    tbox::Pointer<pdat::CellData<double> >
-      p_rhs_ptr = rhs.getComponentPatchData(0, *patch);
     tbox::Pointer<pdat::SideData<double> >
-      v_rhs_ptr = rhs.getComponentPatchData(1, *patch);
-    tbox::Pointer<pdat::CellData<double> >
-      p_resid_ptr = residual.getComponentPatchData(0, *patch);
+      v_rhs_ptr = rhs.getComponentPatchData(0, *patch);
     tbox::Pointer<pdat::SideData<double> >
-      v_resid_ptr = residual.getComponentPatchData(1, *patch);
+      v_resid_ptr = residual.getComponentPatchData(0, *patch);
 
     hier::Box pbox=patch->getBox();
     pbox.growUpper(hier::IntVector::getOne(d_dim));
@@ -90,12 +82,12 @@ void SAMRAI::solv::Elastic::FACOps::computeCompositeResidualOnLevel
     switch(d_dim.getValue())
       {
       case 2:
-        residual_2D(*p_ptr,*v_ptr,*cell_moduli_ptr,*p_rhs_ptr,*v_rhs_ptr,
-                    *p_resid_ptr,*v_resid_ptr,*patch,pbox,*geom);
+        residual_2D(*v_ptr,*cell_moduli_ptr,*v_rhs_ptr,
+                    *v_resid_ptr,*patch,pbox,*geom);
         break;
       case 3:
-        residual_3D(*p_ptr,*v_ptr,*cell_moduli_ptr,*p_rhs_ptr,*v_rhs_ptr,
-                    *p_resid_ptr,*v_resid_ptr,*patch,pbox,*geom);
+        residual_3D(*v_ptr,*cell_moduli_ptr,*v_rhs_ptr,
+                    *v_resid_ptr,*patch,pbox,*geom);
         break;
       default:
         abort();

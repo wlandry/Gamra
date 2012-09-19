@@ -71,8 +71,7 @@ namespace SAMRAI {
       d_hypre_solver.setStoppingCriteria(d_coarse_solver_max_iterations,
                                          d_coarse_solver_tolerance);
       const int solver_ret =
-        d_hypre_solver.solveSystem(
-                                   data.getComponentDescriptorIndex(0),
+        d_hypre_solver.solveSystem(data.getComponentDescriptorIndex(0),
                                    residual.getComponentDescriptorIndex(0),
                                    true);
       /*

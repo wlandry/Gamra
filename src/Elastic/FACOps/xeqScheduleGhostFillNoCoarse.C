@@ -9,22 +9,9 @@
  ************************************************************************/
 #include "Elastic/FACOps.h"
 
-void SAMRAI::solv::Elastic::FACOps::xeqScheduleGhostFillNoCoarse(int p_id,
-                                                              int v_id,
-                                                              int dest_ln)
+void SAMRAI::solv::Elastic::FACOps::xeqScheduleGhostFillNoCoarse(int v_id,
+                                                                 int dest_ln)
 {
-  /* p */
-  if(p_id!=invalid_id)
-  {
-    if (!p_nocoarse_refine_schedules[dest_ln]) {
-      TBOX_ERROR("Expected cell schedule not found.");
-    }
-    xfer::RefineAlgorithm refiner(d_dim);
-    refiner.registerRefine(p_id,p_id,p_id,tbox::Pointer<xfer::RefineOperator>(0));
-    refiner.resetSchedule(p_nocoarse_refine_schedules[dest_ln]);
-    p_nocoarse_refine_schedules[dest_ln]->fillData(0.0,false);
-  }
-
   /* v */
   if(v_id!=invalid_id)
   {

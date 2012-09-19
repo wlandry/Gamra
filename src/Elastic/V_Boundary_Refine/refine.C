@@ -26,7 +26,7 @@ void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
 
    TBOX_ASSERT(t_overlap != NULL);
 
-   set_boundary(coarse,invalid_id,src_component,true);
+   set_boundary(coarse,src_component,true);
 
    for(int axis=0; axis<getDim().getValue(); ++axis)
      {
@@ -63,6 +63,7 @@ void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
 #endif
 
    hier::Box fine_box=fine.getBox();
+   hier::Box coarse_box=coarse.getBox();
 
    /* We have to infer where the boundary is from the boxes */
    int boundary_direction;

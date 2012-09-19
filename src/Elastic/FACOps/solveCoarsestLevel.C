@@ -82,7 +82,6 @@ int SAMRAI::solv::Elastic::FACOps::solveCoarsestLevel
   }
 
   xeqScheduleGhostFillNoCoarse(data.getComponentDescriptorIndex(0),
-                               data.getComponentDescriptorIndex(1),
                                coarsest_ln);
   t_solve_coarsest->stop();
 

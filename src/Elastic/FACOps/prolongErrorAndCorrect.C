@@ -76,10 +76,8 @@ void SAMRAI::solv::Elastic::FACOps::prolongErrorAndCorrect
   fine_level->allocatePatchData(d_cell_scratch_id);
   fine_level->allocatePatchData(d_side_scratch_id);
 
-  // int p_src(s.getComponentDescriptorIndex(0)),
-  //   v_src(s.getComponentDescriptorIndex(1)),
-  //   p_dst(d.getComponentDescriptorIndex(0)),
-  //   v_dst(d.getComponentDescriptorIndex(1));
+  // int v_src(s.getComponentDescriptorIndex(0)),
+  //   v_dst(d.getComponentDescriptorIndex(0));
   // xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_ln+1);
 
   /*
@@ -87,33 +85,34 @@ void SAMRAI::solv::Elastic::FACOps::prolongErrorAndCorrect
    * interior in the scratch space, then use that refined data
    * to correct the fine level error.
    */
-  p_refine_patch_strategy.setTargetDataId(d_cell_scratch_id);
   v_refine_patch_strategy.setTargetDataId(d_side_scratch_id);
   // v_refine_patch_strategy.setHomogeneousBc(true);
-  xeqScheduleProlongation(d_cell_scratch_id,
+  xeqScheduleProlongation(d_side_scratch_id,
                           s.getComponentDescriptorIndex(0),
-                          d_cell_scratch_id,
-                          d_side_scratch_id,
-                          s.getComponentDescriptorIndex(1),
                           d_side_scratch_id,
                           dest_ln);
 
-  set_boundaries(s.getComponentDescriptorIndex(0),
-                 s.getComponentDescriptorIndex(1),fine_level,true);
+  set_boundaries(s.getComponentDescriptorIndex(0),fine_level,true);
+
+  // if (fine_level > d_ln_min) {
+  //   /* Fill from current, next coarser level and physical boundary */
+  //   xeqScheduleGhostFill(s.getComponentDescriptorIndex(0),
+  //                        s.getComponentDescriptorIndex(0), fine_level);
+  // } else {
+  //   /* Fill from current and physical boundary */
+  //   xeqScheduleGhostFillNoCoarse(s.getComponentDescriptorIndex(0),
+  //                                s.getComponentDescriptorIndex(0), fine_level);
+  // }
+
+
   /*
    * Add the refined error in the scratch space to the error currently
    * residing in the destination level.
    */
   {
-    math::HierarchyCellDataOpsReal<double>
-      hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
-    const int p_dst = d.getComponentDescriptorIndex(0);
-    hierarchy_math_ops.add(p_dst, p_dst, d_cell_scratch_id);
-  }
-  {
     math::HierarchySideDataOpsReal<double>
       hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
-    const int v_dst = d.getComponentDescriptorIndex(1);
+    const int v_dst = d.getComponentDescriptorIndex(0);
     hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);
   }
   fine_level->deallocatePatchData(d_cell_scratch_id);

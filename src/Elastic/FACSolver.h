@@ -160,12 +160,8 @@ namespace SAMRAI {
          * @see initializeSolverState
          */
         bool
-        solveSystem(
-                    const int p,
-                    const int cell_moduli,
+        solveSystem(const int cell_moduli,
                     const int edge_moduli,
-                    const int dp,
-                    const int p_rhs,
                     const int v,
                     const int v_rhs,
                     tbox::Pointer<hier::PatchHierarchy> hierarchy,
@@ -193,8 +189,7 @@ namespace SAMRAI {
          * @see solveSystem( const int, const int, tbox::Pointer< hier::PatchHierarchy >, int, int);
          */
         bool
-        solveSystem(const int p, const int p_rhs,
-                    const int v, const int v_rhs);
+        solveSystem(const int v, const int v_rhs);
 
         //@{ @name Functions for setting solver mathematic algorithm controls
 
@@ -294,10 +289,6 @@ namespace SAMRAI {
          * @param prolongation_method String selecting the coarse-fine discretization method.
          */
         void
-        set_P_ProlongationMethod(
-                                 const std::string& prolongation_method);
-
-        void
         set_V_ProlongationMethod(
                                  const std::string& prolongation_method);
 
@@ -376,11 +367,8 @@ namespace SAMRAI {
          * @param fine_level The finest level in the solve
          */
         void
-        initializeSolverState(const int p,
-                              const int cell_moduli,
+        initializeSolverState(const int cell_moduli,
                               const int edge_moduli,
-                              const int dp,
-                              const int p_rhs,
                               const int v,
                               const int v_rhs,
                               tbox::Pointer<hier::PatchHierarchy> hierarchy,
@@ -433,11 +421,11 @@ namespace SAMRAI {
         double
         getResidualNorm() const;
 
-        void set_boundaries(const int &p_id, const int &v_id,
+        void set_boundaries(const int &v_id,
                             tbox::Pointer<hier::PatchLevel> &level,
                             const bool &homogeneous)
         {
-          d_fac_ops.set_boundaries(p_id,v_id,level,homogeneous);
+          d_fac_ops.set_boundaries(v_id,level,homogeneous);
         }
 
 
@@ -462,7 +450,7 @@ namespace SAMRAI {
          * specified by patch data indices u and f.
          */
         void
-        createVectorWrappers(int p, int p_rhs, int v, int v_rhs);
+        createVectorWrappers(int v, int v_rhs);
 
         /*
          * @brief Destroy vector wrappers referenced to by @c d_uv and @c d_fv.

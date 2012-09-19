@@ -36,18 +36,12 @@ namespace SAMRAI {
                  << "The hierarchy must be set before calling\n"
                  << "this function.\n");
     }
-    plotter.registerPlotQuantity("Pressure",
-                                 "SCALAR",
-                                 p_id);
     plotter.registerDerivedPlotQuantity("Displacement",
                                         "VECTOR",
                                         (appu::VisDerivedDataStrategy *)this);
     plotter.registerDerivedPlotQuantity("Equivalent body force",
                                         "VECTOR",
                                         (appu::VisDerivedDataStrategy *)this);
-    plotter.registerPlotQuantity("Exact solution",
-                                 "SCALAR",
-                                 p_exact_id);
     plotter.registerPlotQuantity("Cell lambda",
                                  "SCALAR",
                                  cell_moduli_id,0);
@@ -55,10 +49,6 @@ namespace SAMRAI {
     plotter.registerPlotQuantity("Cell mu",
                                  "SCALAR",
                                  cell_moduli_id,1);
-    plotter.registerPlotQuantity("Elastic source",
-                                 "SCALAR",
-                                 p_rhs_id);
-
     return 0;
   }
 #endif

@@ -2,12 +2,9 @@
 #include "Constants.h"
 
 void SAMRAI::solv::Elastic::FACOps::residual_2D
-(pdat::CellData<double> &p,
- pdat::SideData<double> &v,
+(pdat::SideData<double> &v,
  pdat::CellData<double> &cell_moduli,
- pdat::CellData<double> &p_rhs,
  pdat::SideData<double> &v_rhs,
- pdat::CellData<double> &p_resid,
  pdat::SideData<double> &v_resid,
  hier::Patch &patch,
  const hier::Box &pbox,
@@ -31,12 +28,6 @@ void SAMRAI::solv::Elastic::FACOps::residual_2D
         y(center,1,pdat::SideIndex::Lower);
       const pdat::NodeIndex
         edge(center,pdat::NodeIndex::LowerLeft);
-
-      /* p */
-      if(center[0]!=pbox.upper(0) && center[1]!=pbox.upper(1))
-        {
-          p_resid(center)=0;
-        }
 
       /* vx */
       if(center[1]!=pbox.upper(1))

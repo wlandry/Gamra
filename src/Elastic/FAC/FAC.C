@@ -85,30 +85,23 @@ namespace SAMRAI {
      * and get the descriptor indices for those variables.
      */
 
-    tbox::Pointer<pdat::CellVariable<double> >
-      p_ptr(new pdat::CellVariable<double>(d_dim, object_name + ":p", 1));
-    p_id = vdb->registerVariableAndContext(p_ptr, d_context,
-                                           hier::IntVector(d_dim, 1)
-                                           /* ghost cell width is 1 for
-                                              stencil widths */);
-
-	int depth=2;
+    int depth=2;
     tbox::Pointer<pdat::CellVariable<double> >
       cell_moduli_ptr(new pdat::CellVariable<double>(d_dim,
-                                                        object_name
-                                                        + ":cell_moduli",depth));
+                                                     object_name
+                                                     + ":cell_moduli",depth));
     cell_moduli_id = vdb->registerVariableAndContext(cell_moduli_ptr,
-                                                        d_context,
-                                                        hier::IntVector(d_dim, 1)
-                                                        /* ghost cell width is
-                                                           1 in case needed */);
+                                                     d_context,
+                                                     hier::IntVector(d_dim, 1)
+                                                     /* ghost cell width is
+                                                        1 in case needed */);
 
     if(dim==2)
       {
         tbox::Pointer<pdat::NodeVariable<double> >
           edge_moduli_ptr(new pdat::NodeVariable<double>(d_dim,
-                                                            object_name
-                                                            + ":edge_moduli",depth));
+                                                         object_name
+                                                         + ":edge_moduli",depth));
         edge_moduli_id =
           vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                           hier::IntVector(d_dim,1)
@@ -119,34 +112,14 @@ namespace SAMRAI {
       {
         tbox::Pointer<pdat::EdgeVariable<double> >
           edge_moduli_ptr(new pdat::EdgeVariable<double>(d_dim,
-                                                            object_name
-                                                            + ":edge_moduli",depth));
+                                                         object_name
+                                                         + ":edge_moduli",depth));
         edge_moduli_id =
           vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                           hier::IntVector(d_dim,1)
                                           /* ghost cell width is 1 in
                                              case needed */);
       }
-
-    tbox::Pointer<pdat::CellVariable<double> >
-      dp_ptr(new pdat::CellVariable<double>(d_dim, object_name + ":dp"));
-    dp_id = vdb->registerVariableAndContext(dp_ptr,d_context,
-                                            hier::IntVector(d_dim, 1)
-                                            /* ghost cell width is
-                                                    1 in case needed */);
-
-    tbox::Pointer<pdat::CellVariable<double> >
-      p_exact_ptr(new pdat::CellVariable<double>(d_dim, object_name + ":p exact"));
-    p_exact_id = vdb->registerVariableAndContext(p_exact_ptr,d_context,
-                                                 hier::IntVector(d_dim, 1)
-                                                 /* ghost cell width is
-                                                    1 in case needed */);
-
-    tbox::Pointer<pdat::CellVariable<double> >
-      p_rhs_ptr(new pdat::CellVariable<double>(d_dim,object_name
-                                               + ":p right hand side"));
-    p_rhs_id = vdb->registerVariableAndContext(p_rhs_ptr,d_context,
-                                               hier::IntVector(d_dim, 1));
 
     tbox::Pointer<pdat::SideVariable<double> >
       v_ptr(new pdat::SideVariable<double>(d_dim, object_name + ":v", 1));
@@ -197,16 +170,6 @@ namespace SAMRAI {
         v_rhs=database->getDoubleArray("v_rhs_data");
         check_array_sizes(v_rhs_ijk,v_rhs_xyz_min,v_rhs_xyz_max,
                           v_rhs,dim,"v_rhs",dim);
-      }
-
-    if(database->keyExists("p_initial_data"))
-      {
-        p_initial_ijk=database->getIntegerArray("p_initial_ijk");
-        p_initial_xyz_min=database->getDoubleArray("p_initial_coord_min");
-        p_initial_xyz_max=database->getDoubleArray("p_initial_coord_max");
-        p_initial=database->getDoubleArray("p_initial_data");
-        check_array_sizes(p_initial_ijk,p_initial_xyz_min,p_initial_xyz_max,
-                          p_initial,dim,"p_initial");
       }
   }
 }

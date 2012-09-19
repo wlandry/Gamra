@@ -29,11 +29,8 @@
 */
 
 void SAMRAI::solv::Elastic::FACSolver::initializeSolverState
-(const int p,
- const int cell_moduli,
+(const int cell_moduli,
  const int edge_moduli,
- const int dp,
- const int p_rhs,
  const int v,
  const int v_rhs,
  tbox::Pointer<hier::PatchHierarchy> hierarchy,
@@ -44,7 +41,7 @@ void SAMRAI::solv::Elastic::FACSolver::initializeSolverState
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-  if (p < 0 || p_rhs < 0) {
+  if (v < 0 || v_rhs < 0) {
     TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
   }
 #endif
@@ -85,7 +82,7 @@ void SAMRAI::solv::Elastic::FACSolver::initializeSolverState
 
   d_fac_ops.set_moduli_id(cell_moduli,edge_moduli);
 
-  createVectorWrappers(p, p_rhs, v, v_rhs);
+  createVectorWrappers(v, v_rhs);
 
   d_fac_precond.initializeSolverState(*d_uv, *d_fv);
 

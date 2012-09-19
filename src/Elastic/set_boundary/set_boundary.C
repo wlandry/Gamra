@@ -11,8 +11,8 @@ double okada(const double xyz[], const int &ix);
 double okada_tangent_deriv(const double xyz[],
                            const int &ix, const int &iy);
 
-void set_boundary(const SAMRAI::hier::Patch& patch, const int &,
-                    const int &v_id, const bool &rhs)
+void set_boundary(const SAMRAI::hier::Patch& patch,
+                  const int &v_id, const bool &rhs)
 {
   hier::Box pbox=patch.getBox();
 

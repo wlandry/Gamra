@@ -46,12 +46,12 @@
 /* Set the physical boundaries for the velocity. */
 
 void SAMRAI::solv::Elastic::FACOps::set_boundaries
-(const int &p_id, const int &v_id,
+(const int &v_id,
  tbox::Pointer<hier::PatchLevel> &level, const bool &rhs)
 {
   for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
     {
       tbox::Pointer<hier::Patch> patch = *pi;
-      set_boundary(*patch,p_id,v_id,rhs);
+      set_boundary(*patch,v_id,rhs);
     }
 }

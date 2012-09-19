@@ -53,16 +53,14 @@ void SAMRAI::solv::Elastic::FACOps::restrictResidual
 {
   t_restrict_residual->start();
 
-  int p_src(s.getComponentDescriptorIndex(0)),
-    p_dst(d.getComponentDescriptorIndex(0)),
-    v_src(s.getComponentDescriptorIndex(1)),
-    v_dst(d.getComponentDescriptorIndex(1));
+  int v_src(s.getComponentDescriptorIndex(0)),
+    v_dst(d.getComponentDescriptorIndex(0));
 
   /* Need to do a sync because the coarsening for v uses ghost zones */
   v_coarsen_patch_strategy.setSourceDataId(v_src);
-  xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_ln+1);
+  xeqScheduleGhostFillNoCoarse(v_src,dest_ln+1);
 
-  xeqScheduleRRestriction(p_dst,p_src,v_dst,v_src,dest_ln);
+  xeqScheduleRRestriction(v_dst,v_src,dest_ln);
 
   t_restrict_residual->stop();
 }

@@ -168,21 +168,6 @@ void Elastic::FACOps::setCoarseFineDiscretization(
  */
 
 SAMRAI_INLINE_KEYWORD
-void Elastic::FACOps::set_P_ProlongationMethod(
-   const std::string& prolongation_method) {
-#ifdef DEBUG_CHECK_ASSERTIONS
-   if (d_hierarchy) {
-      TBOX_ERROR(
-         d_object_name << ": Cannot change p prolongation method\n"
-         <<
-         "while operator state is initialized because that\n"
-         << "causes a corruption in the state.\n");
-   }
-#endif
-   p_prolongation_method = prolongation_method;
-}
-
-SAMRAI_INLINE_KEYWORD
 void Elastic::FACOps::set_V_ProlongationMethod(
    const std::string& prolongation_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS

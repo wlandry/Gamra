@@ -15,10 +15,8 @@ void SAMRAI::solv::Elastic::FACOps::smooth_Tackley_3D
  int num_sweeps,
  double residual_tolerance)
 {
-  const int p_id(solution.getComponentDescriptorIndex(0)),
-    p_rhs_id(residual.getComponentDescriptorIndex(0)),
-    v_id(solution.getComponentDescriptorIndex(1)),
-    v_rhs_id(residual.getComponentDescriptorIndex(1));
+  const int v_id(solution.getComponentDescriptorIndex(0)),
+    v_rhs_id(residual.getComponentDescriptorIndex(0));
 
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (solution.getPatchHierarchy() != d_hierarchy
@@ -34,10 +32,9 @@ void SAMRAI::solv::Elastic::FACOps::smooth_Tackley_3D
      calculating a new pressure update requires computing in the ghost
      region so that the update for the velocity inside the box will be
      correct. */
-  p_refine_patch_strategy.setTargetDataId(p_id);
   v_refine_patch_strategy.setTargetDataId(v_id);
-  set_boundaries(p_id,v_id,level,true);
-  xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
+  set_boundaries(v_id,level,true);
+  xeqScheduleGhostFillNoCoarse(v_rhs_id,ln);
 
   if (ln > d_ln_min) {
     /*
@@ -45,7 +42,7 @@ void SAMRAI::solv::Elastic::FACOps::smooth_Tackley_3D
      * to fill ghost boundaries that will not change through
      * the smoothing loop.
      */
-    xeqScheduleGhostFill(p_id, v_id, ln);
+    xeqScheduleGhostFill(v_id, ln);
   }
 
   double theta_momentum=1.0;
@@ -70,20 +67,14 @@ void SAMRAI::solv::Elastic::FACOps::smooth_Tackley_3D
       maxres=0;
 
       /* v sweeps */
-      xeqScheduleGhostFillNoCoarse(p_id,invalid_id,ln);
-
       for(int ix=0;ix<3;++ix)
         for(int rb=0;rb<2;++rb)
           {
-            xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
+            xeqScheduleGhostFillNoCoarse(v_id,ln);
             for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
               {
                 tbox::Pointer<hier::Patch> patch = *pi;
 
-                tbox::Pointer<pdat::CellData<double> > p_ptr =
-                  patch->getPatchData(p_id);
-                pdat::CellData<double> &p(*p_ptr);
-                
                 tbox::Pointer<pdat::SideData<double> > v_ptr =
                   patch->getPatchData(v_id);
                 pdat::SideData<double> &v(*v_ptr);
@@ -120,7 +111,7 @@ void SAMRAI::solv::Elastic::FACOps::smooth_Tackley_3D
                         }
                     }
               }
-            set_boundaries(invalid_id,v_id,level,true);
+            set_boundaries(v_id,level,true);
           }
 
       // if (residual_tolerance >= 0.0) {

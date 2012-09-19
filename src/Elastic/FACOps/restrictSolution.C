@@ -55,27 +55,24 @@ void SAMRAI::solv::Elastic::FACOps::restrictSolution
 {
   t_restrict_solution->start();
 
-  int p_src(s.getComponentDescriptorIndex(0)),
-    p_dst(d.getComponentDescriptorIndex(0)),
-    v_src(s.getComponentDescriptorIndex(1)),
-    v_dst(d.getComponentDescriptorIndex(1));
+  int v_src(s.getComponentDescriptorIndex(0)),
+    v_dst(d.getComponentDescriptorIndex(0));
 
   /* Need to do a sync because the coarsening for v uses ghost zones. */
   v_coarsen_patch_strategy.setSourceDataId(v_src);
-  xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_ln+1);
+  xeqScheduleGhostFillNoCoarse(v_src,dest_ln+1);
 
-  xeqScheduleURestriction(p_dst,p_src,v_dst,v_src,dest_ln);
+  xeqScheduleURestriction(v_dst,v_src,dest_ln);
 
   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(dest_ln);
-  set_boundaries(p_dst,v_dst,level,false);
+  set_boundaries(v_dst,level,false);
   // v_refine_patch_strategy.setHomogeneousBc(false);
-  p_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));
-  v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(1));
+  v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));
 
   if (dest_ln == d_ln_min) {
-    xeqScheduleGhostFillNoCoarse(p_dst,v_dst,dest_ln);
+    xeqScheduleGhostFillNoCoarse(v_dst,dest_ln);
   } else {
-    xeqScheduleGhostFill(p_dst,v_dst,dest_ln);
+    xeqScheduleGhostFill(v_dst,dest_ln);
   }
 
   t_restrict_solution->stop();

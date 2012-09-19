@@ -51,12 +51,8 @@ void SAMRAI::Elastic::FAC::initializeLevelData
   const int dim=d_dim.getValue();
 
   if (allocate_data) {
-    level->allocatePatchData(p_id);
     level->allocatePatchData(cell_moduli_id);
     level->allocatePatchData(edge_moduli_id);
-    level->allocatePatchData(dp_id);
-    level->allocatePatchData(p_rhs_id);
-    level->allocatePatchData(p_exact_id);
     level->allocatePatchData(v_id);
     level->allocatePatchData(v_rhs_id);
   }
@@ -123,13 +119,6 @@ void SAMRAI::Elastic::FAC::initializeLevelData
       }
 
     /* I do not think this is actually necessary. */
-    tbox::Pointer<pdat::CellData<double> > dp_data =
-      patch->getPatchData(dp_id);
-    dp_data->fill(0.0);
-
-    tbox::Pointer<pdat::CellData<double> > p_rhs_data =
-      patch->getPatchData(p_rhs_id);
-    p_rhs_data->fill(0.0);
 
     /* v_rhs */
     tbox::Pointer<pdat::SideData<double> > v_rhs_data =

@@ -65,7 +65,7 @@ public:
                     const hier::Box& ,
                     const hier::IntVector& )
   {
-    set_boundary(fine,invalid_id,v_id,true);
+    set_boundary(fine,v_id,true);
   }
 
    virtual void

@@ -10,12 +10,6 @@
 namespace SAMRAI {
 namespace solv {
 
-SAMRAI_INLINE_KEYWORD
-void Elastic::FACSolver::set_P_ProlongationMethod(
-   const std::string& p_prolongation_method)
-{
-   d_fac_ops.set_P_ProlongationMethod(p_prolongation_method);
-}
 
 SAMRAI_INLINE_KEYWORD
 void Elastic::FACSolver::set_V_ProlongationMethod(

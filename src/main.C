@@ -35,9 +35,7 @@ using namespace std;
 #include "Stokes/V_Boundary_Refine.h"
 #include "Stokes/V_Coarsen.h"
 #include "Stokes/Resid_Coarsen.h"
-#include "Elastic/P_Refine.h"
 #include "Elastic/V_Refine.h"
-#include "Elastic/P_Boundary_Refine.h"
 #include "Elastic/V_Boundary_Refine.h"
 #include "Elastic/V_Coarsen.h"
 #include "Elastic/Resid_Coarsen.h"
@@ -210,13 +208,7 @@ int main(
                                  input_db->getDatabase("Elastic"));
         grid_geometry->addSpatialRefineOperator
           (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
-           (new SAMRAI::geom::Elastic::P_Refine(dim)));
-        grid_geometry->addSpatialRefineOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
            (new SAMRAI::geom::Elastic::V_Refine(dim)));
-        grid_geometry->addSpatialRefineOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
-           (new SAMRAI::geom::Elastic::P_Boundary_Refine(dim)));
         grid_geometry->addSpatialRefineOperator
           (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
            (new SAMRAI::geom::Elastic::V_Boundary_Refine(dim)));
