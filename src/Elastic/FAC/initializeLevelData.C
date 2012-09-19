@@ -142,18 +142,12 @@ void SAMRAI::Elastic::FAC::initializeLevelData
     else
       {
         double L(0.2),W(0.25);
-        double cdip(0.707107),sdip(0.707107);
-        //double cdip(0.),sdip(1.);
-        double cstrike(0.),sstrike(1.);
-        double cr(0.),sr(1.);
-        double delta(0.003);
         double x(0.000001),y(0.0),z(0.0);
-        double beta(0.2);
 	double scale(-10.);
 
         const double pi=4*atan(1);
-        const double theta(0);
-        // const double theta(pi/4);
+        // const double theta(0);
+        const double theta(pi/4);
         const FTensor::Tensor1<double,3> center(x,y,z);
         const FTensor::Tensor2<double,3,3> rot(std::cos(theta),std::sin(theta),0,
                                                -std::sin(theta),cos(theta),0,
