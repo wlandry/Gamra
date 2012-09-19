@@ -158,11 +158,6 @@ namespace Elastic {
      */
     solv::Elastic::FACSolver d_elastic_fac_solver;
 
-    /*!
-     * @brief Boundary condition coefficient implementation.
-     */
-    solv::LocationIndexRobinBcCoefs d_bc_coefs;
-
     //@}
 
     //@{

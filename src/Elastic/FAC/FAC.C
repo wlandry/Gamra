@@ -69,12 +69,6 @@ namespace SAMRAI {
                           database->isDatabase("fac_solver")) ?
                          database->getDatabase("fac_solver"):
                          tbox::Pointer<tbox::Database>(NULL)),
-    d_bc_coefs(d_dim,
-               object_name + "::bc_coefs",
-               (!database.isNull() &&
-                database->isDatabase("bc_coefs")) ?
-               database->getDatabase("bc_coefs"):
-               tbox::Pointer<tbox::Database>(NULL)),
     d_context()
   {
     const int dim(d_dim.getValue());
