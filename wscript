@@ -16,6 +16,12 @@ def options(opt):
                    '(e.g. "SAMRAI_appu SAMRAI_algs SAMRAI_solv"')
 
 def configure(conf):
+    conf.setenv('debug')
+    configure_variant(conf);
+    conf.setenv('release')
+    configure_variant(conf);
+
+def configure_variant(conf):
     conf.load('compiler_cxx')
 
     # Find SAMRAI
@@ -44,6 +50,11 @@ def configure(conf):
 
 
 def build(bld):
+    if not bld.variant:
+        bld.fatal('call "waf build_debug" or "waf build_release", and try "waf --help"')
+    default_flags=['-Wall', '-Wextra', '-Wconversion', '-Drestrict=']
+    variant_flags= {'release' : ['-O3', '-DTESTING=0'],
+                    'debug' : ['-g']}
     bld.program(
         features     = ['cxx','cprogram'],
         source       = ['src/main.C',
@@ -203,10 +214,7 @@ def build(bld):
                         'muparserx_v2_1_3/parser/mpValueCache.cpp',
                         'muparserx_v2_1_3/parser/mpVariable.cpp'],
         target       = 'gamra',
-        cxxflags      = ['-O3', '-Wall', '-Wextra', '-Wconversion',
-                        '-DTESTING=0', '-Drestrict='],
-        # cxxflags      = ['-g', '-Wall', '-Wextra', '-Wconversion',
-        #                  '-Drestrict='],
+        cxxflags = variant_flags[bld.variant] + default_flags,
         lib          = ['petsc', 'hdf5',
                         'HYPRE',
                         'HYPRE_sstruct_ls', 'HYPRE_sstruct_mv',
@@ -230,3 +238,13 @@ def build(bld):
                     '/usr/include'],
         use=['samrai']
         )
+
+from waflib.Build import BuildContext, CleanContext, \
+    InstallContext, UninstallContext
+
+for x in 'debug release'.split():
+    for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
+        name = y.__name__.replace('Context','').lower()
+        class tmp(y):
+            cmd = name + '_' + x
+            variant = x
