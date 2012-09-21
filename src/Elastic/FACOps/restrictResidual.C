@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -46,9 +45,9 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::Elastic::FACOps::restrictResidual
-(const SAMRAIVectorReal<double>& s,
- SAMRAIVectorReal<double>& d,
+void Elastic::FACOps::restrictResidual
+(const SAMRAI::solv::SAMRAIVectorReal<double>& s,
+ SAMRAI::solv::SAMRAIVectorReal<double>& d,
  int dest_ln)
 {
   t_restrict_residual->start();

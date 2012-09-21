@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -49,9 +48,9 @@
 ***********************************************************************
 */
 
-void SAMRAI::solv::Elastic::FACOps::prolongErrorAndCorrect
-(const SAMRAIVectorReal<double>& s,
- SAMRAIVectorReal<double>& d,
+void Elastic::FACOps::prolongErrorAndCorrect
+(const SAMRAI::solv::SAMRAIVectorReal<double>& s,
+ SAMRAI::solv::SAMRAIVectorReal<double>& d,
  int dest_ln)
 {
   t_prolong->start();
@@ -64,9 +63,9 @@ void SAMRAI::solv::Elastic::FACOps::prolongErrorAndCorrect
   }
 #endif
 
-  tbox::Pointer<hier::PatchLevel> coarse_level =
+  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> coarse_level =
     d_hierarchy->getPatchLevel(dest_ln - 1);
-  tbox::Pointer<hier::PatchLevel> fine_level =
+  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> fine_level =
     d_hierarchy->getPatchLevel(dest_ln);
 
   /*
@@ -110,7 +109,7 @@ void SAMRAI::solv::Elastic::FACOps::prolongErrorAndCorrect
    * residing in the destination level.
    */
   {
-    math::HierarchySideDataOpsReal<double>
+    SAMRAI::math::HierarchySideDataOpsReal<double>
       hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
     const int v_dst = d.getComponentDescriptorIndex(0);
     hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);

@@ -9,8 +9,8 @@
  ************************************************************************/
 #include "Elastic/FACOps.h"
 
-void SAMRAI::solv::Elastic::FACOps::xeqScheduleRRestriction(int v_dst, int v_src,
-                                                         int dest_ln)
+void Elastic::FACOps::xeqScheduleRRestriction(int v_dst, int v_src,
+                                              int dest_ln)
 {
   /* v */
   {
@@ -18,7 +18,7 @@ void SAMRAI::solv::Elastic::FACOps::xeqScheduleRRestriction(int v_dst, int v_src
       TBOX_ERROR("Expected schedule not found.");
     }
 
-    xfer::CoarsenAlgorithm coarsener(d_dim);
+    SAMRAI::xfer::CoarsenAlgorithm coarsener(d_dim);
     coarsener.registerCoarsen(v_dst,v_src,v_rrestriction_coarsen_operator);
     coarsener.resetSchedule(v_rrestriction_coarsen_schedules[dest_ln]);
     v_rrestriction_coarsen_schedules[dest_ln]->coarsenData();

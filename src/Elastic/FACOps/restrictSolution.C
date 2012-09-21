@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -48,9 +47,9 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::Elastic::FACOps::restrictSolution
-(const SAMRAIVectorReal<double>& s,
- SAMRAIVectorReal<double>& d,
+void Elastic::FACOps::restrictSolution
+(const SAMRAI::solv::SAMRAIVectorReal<double>& s,
+ SAMRAI::solv::SAMRAIVectorReal<double>& d,
  int dest_ln)
 {
   t_restrict_solution->start();
@@ -64,7 +63,8 @@ void SAMRAI::solv::Elastic::FACOps::restrictSolution
 
   xeqScheduleURestriction(v_dst,v_src,dest_ln);
 
-  tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(dest_ln);
+  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
+    level = d_hierarchy->getPatchLevel(dest_ln);
   set_boundaries(v_dst,level,false);
   // v_refine_patch_strategy.setHomogeneousBc(false);
   v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));

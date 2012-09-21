@@ -17,10 +17,8 @@
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/CellIndex.h"
 #include "Constants.h"
-#include "set_boundary.h"
+#include "Boundary_Conditions.h"
 
-namespace SAMRAI {
-namespace solv {
 namespace Elastic {
 
 /*!
@@ -31,7 +29,7 @@ namespace Elastic {
  * communication schedules if desired.
  */
 class V_Refine_Patch_Strategy:
-   public xfer::RefinePatchStrategy
+   public SAMRAI::xfer::RefinePatchStrategy
 {
 
 public:
@@ -42,52 +40,53 @@ public:
     * @param coef_strategy Coefficients strategy being helped.
     */
    V_Refine_Patch_Strategy(
-      const tbox::Dimension& dim,
-      std::string object_name = std::string()):
-     xfer::RefinePatchStrategy(dim), d_dim(dim),d_object_name(object_name) {}
+      const SAMRAI::tbox::Dimension& dim,
+      std::string object_name, Boundary_Conditions &bc):
+     SAMRAI::xfer::RefinePatchStrategy(dim), d_dim(dim), d_object_name(object_name),
+     d_boundary_conditions(bc) {}
 
    /*!
     * @brief Destructor.
     */
    virtual ~V_Refine_Patch_Strategy(void) {}
 
-   //@{ @name xfer::RefinePatchStrategy virtuals
+   //@{ @name SAMRAI::xfer::RefinePatchStrategy virtuals
 
    virtual void
    setPhysicalBoundaryConditions(
-      hier::Patch& ,
+      SAMRAI::hier::Patch& ,
       const double ,
-      const hier::IntVector& ) {}
-   hier::IntVector
+      const SAMRAI::hier::IntVector& ) {}
+   SAMRAI::hier::IntVector
    getRefineOpStencilWidth() const
-  { return hier::IntVector::getOne(d_dim); }
+  { return SAMRAI::hier::IntVector::getOne(d_dim); }
    // virtual void
    // preprocessRefineBoxes(
-   //    hier::Patch& fine,
-   //    const hier::Patch& coarse,
-   //    const hier::BoxList& fine_boxes,
-   //    const hier::IntVector& ratio) {}
+   //    SAMRAI::hier::Patch& fine,
+   //    const SAMRAI::hier::Patch& coarse,
+   //    const SAMRAI::hier::BoxList& fine_boxes,
+   //    const SAMRAI::hier::IntVector& ratio) {}
    virtual void
-   preprocessRefine(hier::Patch& ,
-                    const hier::Patch& coarse,
-                    const hier::Box& ,
-                    const hier::IntVector& )
+   preprocessRefine(SAMRAI::hier::Patch& ,
+                    const SAMRAI::hier::Patch& coarse,
+                    const SAMRAI::hier::Box& ,
+                    const SAMRAI::hier::IntVector& )
   {
-    set_boundary(coarse,v_id,true);
+    d_boundary_conditions.set_boundary(coarse,v_id,true);
   }
 
    virtual void
    postprocessRefineBoxes(
-      hier::Patch& ,
-      const hier::Patch& ,
-      const hier::BoxList& ,
-      const hier::IntVector& ) {}
+      SAMRAI::hier::Patch& ,
+      const SAMRAI::hier::Patch& ,
+      const SAMRAI::hier::BoxList& ,
+      const SAMRAI::hier::IntVector& ) {}
    virtual void
    postprocessRefine(
-      hier::Patch& ,
-      const hier::Patch& ,
-      const hier::Box& ,
-      const hier::IntVector& ) {}
+      SAMRAI::hier::Patch& ,
+      const SAMRAI::hier::Patch& ,
+      const SAMRAI::hier::Box& ,
+      const SAMRAI::hier::IntVector& ) {}
 
    //@}
 
@@ -102,7 +101,7 @@ public:
     * value of the first ghost cells.
     *
     * This function has an interface similar to the virtual function
-    * xfer::RefinePatchStrategy::setPhysicalBoundaryConditions(),
+    * SAMRAI::xfer::RefinePatchStrategy::setPhysicalBoundaryConditions(),
     * and it may be used to help implement that function,
     * but it does not serve the same purpose.  The primary
     * differences are:
@@ -170,19 +169,19 @@ public:
     * expanded to later include coarse-fine boundary boxes
     * for more generality.
     *
-    * @param patch hier::Patch on which to set boundary condition
+    * @param patch SAMRAI::hier::Patch on which to set boundary condition
     * @param fill_time Solution time corresponding to filling
     * @param ghost_width_to_fill Max ghost width requiring fill
-    * @param target_data_id hier::Patch data index of data to be set.
+    * @param target_data_id SAMRAI::hier::Patch data index of data to be set.
     *        This data must be a cell-centered double.
     * @param homogeneous_bc Set a homogeneous boundary condition.
     *    This means g=0 for the boundary.
     */
    // void
    // setBoundaryValuesInCells(
-   //    hier::Patch& patch,
+   //    SAMRAI::hier::Patch& patch,
    //    const double fill_time,
-   //    const hier::IntVector& ghost_width_to_fill,
+   //    const SAMRAI::hier::IntVector& ghost_width_to_fill,
    //    int target_data_id,
    //    bool homogeneous_bc = false) const;
 
@@ -190,9 +189,9 @@ public:
     * @brief Set ghost cells for an entire level.
     *
     * Loop through all patches on the given level and call
-    * setBoundaryValuesInCells(hier::Patch &patch,
+    * setBoundaryValuesInCells(SAMRAI::hier::Patch &patch,
     *                          const double fill_time ,
-    *                          const hier::IntVector &ghost_width_to_fill ,
+    *                          const SAMRAI::hier::IntVector &ghost_width_to_fill ,
     *                          int target_data_id ,
     *                          bool homogeneous_bc=false )
     * for each.
@@ -200,16 +199,16 @@ public:
     * @param level PatchLevel on which to set boundary condition
     * @param fill_time Solution time corresponding to filling
     * @param ghost_width_to_fill Max ghost width requiring fill
-    * @param target_data_id hier::Patch data index of data to be set.
+    * @param target_data_id SAMRAI::hier::Patch data index of data to be set.
     *        This data must be a cell-centered double.
     * @param homogeneous_bc Set a homogeneous boundary condition.
     *    This means g=0 for the boundary.
     */
    // void
    // setBoundaryValuesInCells(
-   //    hier::PatchLevel& level,
+   //    SAMRAI::hier::PatchLevel& level,
    //    const double fill_time,
-   //    const hier::IntVector& ghost_width_to_fill,
+   //    const SAMRAI::hier::IntVector& ghost_width_to_fill,
    //    int target_data_id,
    //    bool homogeneous_bc = false) const;
 
@@ -227,7 +226,7 @@ public:
     *    to compute the value to be set?
     *
     * This function has an interface similar to the virtual function
-    * xfer::RefinePatchStrategy::setPhysicalBoundaryConditions(),
+    * SAMRAI::xfer::RefinePatchStrategy::setPhysicalBoundaryConditions(),
     * and it may be used to help implement that function,
     * but it does not serve the same purpose.  The primary
     * differences are:
@@ -247,15 +246,15 @@ public:
     * problem.  This function respects such requests specified
     * through the argument @c homogeneous_bc.
     *
-    * @param patch hier::Patch on which to set boundary condition
+    * @param patch SAMRAI::hier::Patch on which to set boundary condition
     * @param fill_time Solution time corresponding to filling
-    * @param target_data_id hier::Patch data index of data to be set.
+    * @param target_data_id SAMRAI::hier::Patch data index of data to be set.
     * @param homogeneous_bc Set a homogeneous boundary condition.
     *    This means g=0 for the boundary.
     */
    // void
    // setBoundaryValuesAtNodes(
-   //    hier::Patch& patch,
+   //    SAMRAI::hier::Patch& patch,
    //    const double fill_time,
    //    int target_data_id,
    //    bool homogeneous_bc = false) const;
@@ -326,14 +325,14 @@ private:
     * The boundary box trimmed must be of type 1 or 2.
     *
     * @param boundary_box Boundary box to be trimmed.
-    * @param limit_box hier::Box to not stick past
+    * @param limit_box SAMRAI::hier::Box to not stick past
     *
     * @return New trimmed boundary box.
     */
-   // hier::BoundaryBox
+   // SAMRAI::hier::BoundaryBox
    // trimBoundaryBox(
-   //    const hier::BoundaryBox& boundary_box,
-   //    const hier::Box& limit_box) const;
+   //    const SAMRAI::hier::BoundaryBox& boundary_box,
+   //    const SAMRAI::hier::Box& limit_box) const;
 
    /*!
     * @brief Return box describing the index space of boundary nodes
@@ -344,15 +343,15 @@ private:
     * itself.
     *
     * The input boundary_box must be of type 1
-    * (see hier::BoundaryBox::getBoundaryType()).
+    * (see SAMRAI::hier::BoundaryBox::getBoundaryType()).
     *
     * @param boundary_box input boundary box
     * @return a box to define the node indices corresponding to
     *   boundary_box
     */
-   // hier::Box
+   // SAMRAI::hier::Box
    // makeNodeBoundaryBox(
-   //    const hier::BoundaryBox& boundary_box) const;
+   //    const SAMRAI::hier::BoundaryBox& boundary_box) const;
 
    /*!
     * @brief Return box describing the index space of faces
@@ -362,7 +361,7 @@ private:
     * surface corresponding to the input boundary box.
     *
     * The input boundary_box must be of type 1
-    * (see hier::BoundaryBox::getBoundaryType()).
+    * (see SAMRAI::hier::BoundaryBox::getBoundaryType()).
     *
     * This is a utility function for working with the
     * indices coresponding to a boundary box but coincide
@@ -372,11 +371,11 @@ private:
     * @return a box to define the face indices corresponding to
     *    boundary_box
     */
-   // hier::Box
+   // SAMRAI::hier::Box
    // makeFaceBoundaryBox(
-   //    const hier::BoundaryBox& boundary_box) const;
+   //    const SAMRAI::hier::BoundaryBox& boundary_box) const;
 
-   const tbox::Dimension d_dim;
+   const SAMRAI::tbox::Dimension d_dim;
 
    std::string d_object_name;
 
@@ -387,9 +386,11 @@ private:
    // const RobinBcCoefStrategy* d_coef_strategy;
 
    /*!
-    * @brief hier::Index of target patch data when filling ghosts.
+    * @brief SAMRAI::hier::Index of target patch data when filling ghosts.
     */
    int v_id;
+
+  Boundary_Conditions &d_boundary_conditions;
 
    /*!
     * @brief Whether to assumg g=0 when filling ghosts.
@@ -403,7 +404,5 @@ private:
    // tbox::Pointer<tbox::Timer> t_use_set_bc_coefs;
 };
 
-}
-}
 }
 #endif  // included_solv_V_Refine_Patch_Strategy

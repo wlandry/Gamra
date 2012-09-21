@@ -15,23 +15,15 @@
 
 #include IOMANIP_HEADER_FILE
 
-namespace SAMRAI {
-  namespace solv {
-
-
-    /*
+/*
 *************************************************************************
 * Enable logging and propagate logging flag to major components.        *
 *************************************************************************
 */
 
-    void Elastic::FACSolver::enableLogging(
-                                        bool logging)
-    {
-      d_enable_logging = logging;
-      d_fac_precond.enableLogging(d_enable_logging);
-      d_fac_ops.enableLogging(d_enable_logging);
-    }
-
-  }
+void Elastic::FACSolver::enableLogging(bool logging)
+{
+  d_enable_logging = logging;
+  d_fac_precond.enableLogging(d_enable_logging);
+  d_fac_ops.enableLogging(d_enable_logging);
 }

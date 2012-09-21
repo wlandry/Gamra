@@ -20,23 +20,24 @@
 ************************************************************************
 */
 
-void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
-(const SAMRAIVectorReal<double>& solution,
- const SAMRAIVectorReal<double>& rhs)
+void Elastic::FACOps::initializeOperatorState
+(const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& rhs)
 {
   deallocateOperatorState();
   int ln;
-  hier::VariableDatabase* vdb = hier::VariableDatabase::getDatabase();
+  SAMRAI::hier::VariableDatabase*
+    vdb = SAMRAI::hier::VariableDatabase::getDatabase();
 
   d_hierarchy = solution.getPatchHierarchy();
   d_ln_min = solution.getCoarsestLevelNumber();
   d_ln_max = solution.getFinestLevelNumber();
-  d_hopscell = new math::HierarchyCellDataOpsReal<double>(d_hierarchy,
-                                                          d_ln_min,
-                                                          d_ln_max);
-  d_hopsside = new math::HierarchySideDataOpsReal<double>(d_hierarchy,
-                                                          d_ln_min,
-                                                          d_ln_max);
+  d_hopscell = new SAMRAI::math::HierarchyCellDataOpsReal<double>(d_hierarchy,
+                                                                  d_ln_min,
+                                                                  d_ln_max);
+  d_hopsside = new SAMRAI::math::HierarchySideDataOpsReal<double>(d_hierarchy,
+                                                                  d_ln_min,
+                                                                  d_ln_max);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
 
@@ -57,7 +58,7 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
    *   are allocated
    *   has sufficient ghost width
    */
-  tbox::Pointer<hier::Variable> var;
+  SAMRAI::tbox::Pointer<SAMRAI::hier::Variable> var;
   {
     vdb->mapIndexToVariable(rhs.getComponentDescriptorIndex(0),
                             var);
@@ -65,7 +66,7 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name << ": RHS component does not\n"
                  << "correspond to a variable.\n");
     }
-    tbox::Pointer<pdat::SideVariable<double> > side_var = var;
+    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> > side_var = var;
     if (!side_var) {
       TBOX_ERROR(d_object_name
                  << ": RHS variable is not side-centered double\n");
@@ -78,25 +79,25 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name << ": Solution component does not\n"
                  << "correspond to a variable.\n");
     }
-    tbox::Pointer<pdat::SideVariable<double> > side_var = var;
+    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> > side_var = var;
     if (!side_var) {
       TBOX_ERROR(d_object_name
                  << ": Solution variable is not side-centered double\n");
     }
   }
   for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-    tbox::Pointer<hier::PatchLevel> level_ptr =
+    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> level_ptr =
       d_hierarchy->getPatchLevel(ln);
-    hier::PatchLevel& level = *level_ptr;
-    for (hier::PatchLevel::Iterator pi(level); pi; pi++) {
-      hier::Patch& patch = **pi;
-      tbox::Pointer<hier::PatchData> fd =
+    SAMRAI::hier::PatchLevel& level = *level_ptr;
+    for (SAMRAI::hier::PatchLevel::Iterator pi(level); pi; pi++) {
+      SAMRAI::hier::Patch& patch = **pi;
+      SAMRAI::tbox::Pointer<SAMRAI::hier::PatchData> fd =
         patch.getPatchData(rhs.getComponentDescriptorIndex(0));
       if (fd) {
         /*
          * Some data checks can only be done if the data already exists.
          */
-        tbox::Pointer<pdat::SideData<double> > cd = fd;
+        SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > cd = fd;
         if (!cd) {
           TBOX_ERROR(d_object_name
                      << ": RHS data is not side-centered double\n");
@@ -107,13 +108,13 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
                        << "Solver is for depth 0 only.\n");
         }
       }
-      tbox::Pointer<hier::PatchData> ud =
+      SAMRAI::tbox::Pointer<SAMRAI::hier::PatchData> ud =
         patch.getPatchData(solution.getComponentDescriptorIndex(0));
       if (ud) {
         /*
          * Some data checks can only be done if the data already exists.
          */
-        tbox::Pointer<pdat::SideData<double> > cd = ud;
+        SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > cd = ud;
         if (!cd) {
           TBOX_ERROR(d_object_name
                      << ": Solution data is not side-centered double\n");
@@ -123,7 +124,7 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
                        << ": Solution data has multiple depths.\n"
                        << "Solver is for depth 0 only.\n");
         }
-        if (cd->getGhostCellWidth() < hier::IntVector::getOne(d_dim)) {
+        if (cd->getGhostCellWidth() < SAMRAI::hier::IntVector::getOne(d_dim)) {
           TBOX_ERROR(d_object_name
                      << ": Solution data has insufficient ghost width\n");
         }
@@ -149,34 +150,21 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
    */
   d_cf_boundary.resizeArray(d_hierarchy->getNumberOfLevels());
 
-  hier::IntVector max_gcw(d_dim, 1);
+  SAMRAI::hier::IntVector max_gcw(d_dim, 1);
   for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-    d_cf_boundary[ln] = new hier::CoarseFineBoundary(*d_hierarchy,
+    d_cf_boundary[ln] = new SAMRAI::hier::CoarseFineBoundary(*d_hierarchy,
                                                      ln,
                                                      max_gcw);
   }
 
   v_coarsen_patch_strategy.coarse_fine=d_cf_boundary;
-// #ifdef HAVE_HYPRE
-//   if (d_coarse_solver_choice == "hypre") {
-//     d_hypre_solver.initializeSolverState(d_hierarchy, d_ln_min);
-//     /*
-//      * Share the boundary condition object with the hypre solver
-//      * to make sure that boundary condition settings are consistent
-//      * between the two objects.
-//      */
-//     d_hypre_solver.setPhysicalBcCoefObject(d_physical_bc_coef);
-//     d_hypre_solver.setMatrixCoefficients(d_elastic_spec);
-//   }
-// #endif
-
   /*
    * Get the transfer operators.
    * Cell (solution, error, etc) coarsening is conservative.
    */
-  tbox::Pointer<geom::CartesianGridGeometry> geometry =
+  SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianGridGeometry> geometry =
     d_hierarchy->getGridGeometry();
-  tbox::Pointer<hier::Variable> variable;
+  SAMRAI::tbox::Pointer<SAMRAI::hier::Variable> variable;
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_prolongation_refine_operator =
@@ -224,10 +212,10 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
   v_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   v_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
 
-  xfer::RefineAlgorithm v_prolongation_refine_algorithm(d_dim),
+  SAMRAI::xfer::RefineAlgorithm v_prolongation_refine_algorithm(d_dim),
     v_ghostfill_refine_algorithm(d_dim),
     v_nocoarse_refine_algorithm(d_dim);
-  xfer::CoarsenAlgorithm v_urestriction_coarsen_algorithm(d_dim),
+  SAMRAI::xfer::CoarsenAlgorithm v_urestriction_coarsen_algorithm(d_dim),
     v_rrestriction_coarsen_algorithm(d_dim);
 
   /* This is a little confusing.  The only real purpose here is to
@@ -259,18 +247,18 @@ void SAMRAI::solv::Elastic::FACOps::initializeOperatorState
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
-                   tbox::Pointer<xfer::RefineOperator>(0));
+                   SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>(0));
 
   /* Refinement and ghost fill operators */
   for (int dest_ln = d_ln_min + 1; dest_ln <= d_ln_max; ++dest_ln) {
 
-    tbox::Pointer<xfer::PatchLevelFullFillPattern>
-      fill_pattern(new xfer::PatchLevelFullFillPattern());
+    SAMRAI::tbox::Pointer<SAMRAI::xfer::PatchLevelFullFillPattern>
+      fill_pattern(new SAMRAI::xfer::PatchLevelFullFillPattern());
     v_prolongation_refine_schedules[dest_ln] =
       v_prolongation_refine_algorithm.
       createSchedule(fill_pattern,
                      d_hierarchy->getPatchLevel(dest_ln),
-                     tbox::Pointer<hier::PatchLevel>(),
+                     SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>(),
                      dest_ln - 1,
                      d_hierarchy);
     if (!v_prolongation_refine_schedules[dest_ln]) {

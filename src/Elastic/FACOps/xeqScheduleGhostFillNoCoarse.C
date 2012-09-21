@@ -9,18 +9,14 @@
  ************************************************************************/
 #include "Elastic/FACOps.h"
 
-void SAMRAI::solv::Elastic::FACOps::xeqScheduleGhostFillNoCoarse(int v_id,
-                                                                 int dest_ln)
+void Elastic::FACOps::xeqScheduleGhostFillNoCoarse(int v_id, int dest_ln)
 {
-  /* v */
-  if(v_id!=invalid_id)
-  {
-    if (!v_nocoarse_refine_schedules[dest_ln]) {
-      TBOX_ERROR("Expected side schedule not found.");
-    }
-    xfer::RefineAlgorithm refiner(d_dim);
-    refiner.registerRefine(v_id,v_id,v_id,tbox::Pointer<xfer::RefineOperator>(0));
-    refiner.resetSchedule(v_nocoarse_refine_schedules[dest_ln]);
-    v_nocoarse_refine_schedules[dest_ln]->fillData(0.0,false);
+  if (!v_nocoarse_refine_schedules[dest_ln]) {
+    TBOX_ERROR("Expected side schedule not found.");
   }
+  SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
+  refiner.registerRefine(v_id,v_id,v_id,
+                         SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>(0));
+  refiner.resetSchedule(v_nocoarse_refine_schedules[dest_ln]);
+  v_nocoarse_refine_schedules[dest_ln]->fillData(0.0,false);
 }

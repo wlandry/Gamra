@@ -16,11 +16,7 @@
 
 #include IOMANIP_HEADER_FILE
 
-namespace SAMRAI {
-  namespace solv {
-
-
-    /*
+/*
 ********************************************************************
 * Set state from database                                          *
 *                                                                  *
@@ -34,59 +30,49 @@ namespace SAMRAI {
 ********************************************************************
 */
 
-    void Elastic::FACSolver::getFromInput(
-                                       tbox::Pointer<tbox::Database> database)
-    {
-      if (database) {
-        if (database->isBool("enable_logging")) {
-          bool logging = database->getBool("enable_logging");
-          enableLogging(logging);
-        }
-        if (database->isInteger("max_cycles")) {
-          int max_cycles = database->getInteger("max_cycles");
-          setMaxCycles(max_cycles);
-        }
-        if (database->isDouble("residual_tol")) {
-          double residual_tol = database->getDouble("residual_tol");
-          setResidualTolerance(residual_tol);
-        }
-        if (database->isInteger("num_pre_sweeps")) {
-          int num_pre_sweeps = database->getInteger("num_pre_sweeps");
-          setPresmoothingSweeps(num_pre_sweeps);
-        }
-        if (database->isInteger("num_post_sweeps")) {
-          int num_post_sweeps = database->getInteger("num_post_sweeps");
-          setPostsmoothingSweeps(num_post_sweeps);
-        }
-        if (database->isString("coarse_fine_discretization")) {
-          std::string s = database->getString("coarse_fine_discretization");
-          setCoarseFineDiscretization(s);
-        }
-        if (database->isString("v_prolongation_method")) {
-          std::string s = database->getString("v_prolongation_method");
-          set_V_ProlongationMethod(s);
-        }
-        if (database->isString("coarse_solver_choice")) {
-          std::string s = database->getString("coarse_solver_choice");
-          setCoarsestLevelSolverChoice(s);
-        }
-        if (database->isDouble("coarse_solver_tolerance")) {
-          double tol = database->getDouble("coarse_solver_tolerance");
-          setCoarsestLevelSolverTolerance(tol);
-        }
-        if (database->isInteger("coarse_solver_max_iterations")) {
-          int itr = database->getInteger("coarse_solver_max_iterations");
-          setCoarsestLevelSolverMaxIterations(itr);
-        }
-#ifdef HAVE_HYPRE
-        if (database->isBool("use_smg")) {
-          bool smg = database->getBool("use_smg");
-          setUseSMG(smg);
-        }
-#endif
-      }
+void Elastic::FACSolver::getFromInput
+(SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database)
+{
+  if (database) {
+    if (database->isBool("enable_logging")) {
+      bool logging = database->getBool("enable_logging");
+      enableLogging(logging);
     }
-
-
+    if (database->isInteger("max_cycles")) {
+      int max_cycles = database->getInteger("max_cycles");
+      setMaxCycles(max_cycles);
+    }
+    if (database->isDouble("residual_tol")) {
+      double residual_tol = database->getDouble("residual_tol");
+      setResidualTolerance(residual_tol);
+    }
+    if (database->isInteger("num_pre_sweeps")) {
+      int num_pre_sweeps = database->getInteger("num_pre_sweeps");
+      setPresmoothingSweeps(num_pre_sweeps);
+    }
+    if (database->isInteger("num_post_sweeps")) {
+      int num_post_sweeps = database->getInteger("num_post_sweeps");
+      setPostsmoothingSweeps(num_post_sweeps);
+    }
+    if (database->isString("coarse_fine_discretization")) {
+      std::string s = database->getString("coarse_fine_discretization");
+      setCoarseFineDiscretization(s);
+    }
+    if (database->isString("v_prolongation_method")) {
+      std::string s = database->getString("v_prolongation_method");
+      set_V_ProlongationMethod(s);
+    }
+    if (database->isString("coarse_solver_choice")) {
+      std::string s = database->getString("coarse_solver_choice");
+      setCoarsestLevelSolverChoice(s);
+    }
+    if (database->isDouble("coarse_solver_tolerance")) {
+      double tol = database->getDouble("coarse_solver_tolerance");
+      setCoarsestLevelSolverTolerance(tol);
+    }
+    if (database->isInteger("coarse_solver_max_iterations")) {
+      int itr = database->getInteger("coarse_solver_max_iterations");
+      setCoarsestLevelSolverMaxIterations(itr);
+    }
   }
 }

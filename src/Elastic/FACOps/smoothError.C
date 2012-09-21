@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -45,9 +44,9 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::Elastic::FACOps::smoothError
-(SAMRAIVectorReal<double>& data,
- const SAMRAIVectorReal<double>& residual,
+void Elastic::FACOps::smoothError
+(SAMRAI::solv::SAMRAIVectorReal<double>& data,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int ln,
  int num_sweeps)
 {

@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -40,108 +39,104 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 * Compute the vector weight and put it at a specified patch data   *
 * index.                                                           *
 ********************************************************************
 */
 
-    void Elastic::FACOps::computeVectorWeights(
-                                            tbox::Pointer<hier::PatchHierarchy> hierarchy,
-                                            int weight_id,
-                                            int coarsest_ln,
-                                            int finest_ln) const
-    {
-      TBOX_ASSERT(!hierarchy.isNull());
-      TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
+void Elastic::FACOps::computeVectorWeights
+(SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> hierarchy,
+ int weight_id,
+ int coarsest_ln,
+ int finest_ln) const
+{
+  TBOX_ASSERT(!hierarchy.isNull());
+  TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
-      if (coarsest_ln == -1) coarsest_ln = 0;
-      if (finest_ln == -1) finest_ln = hierarchy->getFinestLevelNumber();
-      if (finest_ln < coarsest_ln) {
-        TBOX_ERROR(d_object_name
-                   << ": Illegal level number range.  finest_ln < coarsest_ln.");
+  if (coarsest_ln == -1) coarsest_ln = 0;
+  if (finest_ln == -1) finest_ln = hierarchy->getFinestLevelNumber();
+  if (finest_ln < coarsest_ln) {
+    TBOX_ERROR(d_object_name
+               << ": Illegal level number range.  finest_ln < coarsest_ln.");
+  }
+
+  int ln;
+  for (ln = finest_ln; ln >= coarsest_ln; --ln) {
+
+    /*
+     * On every level, first assign cell volume to vector weight.
+     */
+
+    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> level =
+      hierarchy->getPatchLevel(ln);
+    for (SAMRAI::hier::PatchLevel::Iterator p(level); p; p++) {
+      SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *p;
+      SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
+        patch_geometry= patch->getPatchGeometry();
+      const double* dx = patch_geometry->getDx();
+      double cell_vol = dx[0];
+      if (d_dim > SAMRAI::tbox::Dimension(1)) {
+        cell_vol *= dx[1];
       }
 
-      int ln;
-      for (ln = finest_ln; ln >= coarsest_ln; --ln) {
+      if (d_dim > SAMRAI::tbox::Dimension(2)) {
+        cell_vol *= dx[2];
+      }
 
-        /*
-         * On every level, first assign cell volume to vector weight.
-         */
-
-        tbox::Pointer<hier::PatchLevel> level =
-          hierarchy->getPatchLevel(ln);
-        for (hier::PatchLevel::Iterator p(level); p; p++) {
-          tbox::Pointer<hier::Patch> patch = *p;
-          tbox::Pointer<geom::CartesianPatchGeometry> patch_geometry =
-            patch->getPatchGeometry();
-          const double* dx = patch_geometry->getDx();
-          double cell_vol = dx[0];
-          if (d_dim > tbox::Dimension(1)) {
-            cell_vol *= dx[1];
-          }
-
-          if (d_dim > tbox::Dimension(2)) {
-            cell_vol *= dx[2];
-          }
-
-          tbox::Pointer<pdat::CellData<double> > w =
-            patch->getPatchData(weight_id);
-          if (!w) {
-            TBOX_ERROR(d_object_name
-                       << ": weight id must refer to a pdat::CellVariable");
-          }
-          w->fillAll(cell_vol);
-        }
-
-        /*
-         * On all but the finest level, assign 0 to vector
-         * weight to cells covered by finer cells.
-         */
-
-        if (ln < finest_ln) {
-
-          /*
-           * First get the boxes that describe index space of the next finer
-           * level and coarsen them to describe corresponding index space
-           * at this level.
-           */
-
-          tbox::Pointer<hier::PatchLevel> next_finer_level =
-            hierarchy->getPatchLevel(ln + 1);
-          hier::BoxArray coarsened_boxes = next_finer_level->getBoxes();
-          hier::IntVector coarsen_ratio(next_finer_level->getRatioToLevelZero());
-          coarsen_ratio /= level->getRatioToLevelZero();
-          coarsened_boxes.coarsen(coarsen_ratio);
-
-          /*
-           * Then set vector weight to 0 wherever there is
-           * a nonempty intersection with the next finer level.
-           * Note that all assignments are local.
-           */
-
-          for (hier::PatchLevel::Iterator p(level); p; p++) {
-
-            tbox::Pointer<hier::Patch> patch = *p;
-            for (int i = 0; i < coarsened_boxes.getNumberOfBoxes(); i++) {
-
-              hier::Box coarse_box = coarsened_boxes[i];
-              hier::Box intersection = coarse_box * (patch->getBox());
-              if (!intersection.empty()) {
-                tbox::Pointer<pdat::CellData<double> > w =
-                  patch->getPatchData(weight_id);
-                w->fillAll(0.0, intersection);
-
-              }  // assignment only in non-empty intersection
-            }  // loop over coarsened boxes from finer level
-          }  // loop over patches in level
-        }  // all levels except finest
-      }  // loop over levels
+      SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> > w =
+        patch->getPatchData(weight_id);
+      if (!w) {
+        TBOX_ERROR(d_object_name
+                   << ": weight id must refer to a SAMRAI::pdat::CellVariable");
+      }
+      w->fillAll(cell_vol);
     }
 
-  }
+    /*
+     * On all but the finest level, assign 0 to vector
+     * weight to cells covered by finer cells.
+     */
+
+    if (ln < finest_ln) {
+
+      /*
+       * First get the boxes that describe index space of the next finer
+       * level and coarsen them to describe corresponding index space
+       * at this level.
+       */
+
+      SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> next_finer_level =
+        hierarchy->getPatchLevel(ln + 1);
+      SAMRAI::hier::BoxArray coarsened_boxes = next_finer_level->getBoxes();
+      SAMRAI::hier::IntVector
+        coarsen_ratio(next_finer_level->getRatioToLevelZero());
+      coarsen_ratio /= level->getRatioToLevelZero();
+      coarsened_boxes.coarsen(coarsen_ratio);
+
+      /*
+       * Then set vector weight to 0 wherever there is
+       * a nonempty intersection with the next finer level.
+       * Note that all assignments are local.
+       */
+
+      for (SAMRAI::hier::PatchLevel::Iterator p(level); p; p++) {
+
+        SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *p;
+        for (int i = 0; i < coarsened_boxes.getNumberOfBoxes(); i++) {
+
+          SAMRAI::hier::Box coarse_box = coarsened_boxes[i];
+          SAMRAI::hier::Box intersection = coarse_box * (patch->getBox());
+          if (!intersection.empty()) {
+            SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> > w =
+              patch->getPatchData(weight_id);
+            w->fillAll(0.0, intersection);
+
+          }  // assignment only in non-empty intersection
+        }  // loop over coarsened boxes from finer level
+      }  // loop over patches in level
+    }  // all levels except finest
+  }  // loop over levels
 }
+

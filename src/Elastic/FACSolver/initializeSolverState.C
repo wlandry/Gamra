@@ -28,12 +28,12 @@
 *************************************************************************
 */
 
-void SAMRAI::solv::Elastic::FACSolver::initializeSolverState
+void Elastic::FACSolver::initializeSolverState
 (const int cell_moduli,
  const int edge_moduli,
  const int v,
  const int v_rhs,
- tbox::Pointer<hier::PatchHierarchy> hierarchy,
+ SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> hierarchy,
  const int coarse_level,
  const int fine_level)
 {

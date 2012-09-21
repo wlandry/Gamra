@@ -28,7 +28,7 @@
 *************************************************************************
 */
 
-bool SAMRAI::solv::Elastic::FACSolver::solveSystem(const int v, const int v_rhs)
+bool Elastic::FACSolver::solveSystem(const int v, const int v_rhs)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (!d_solver_is_initialized) {
@@ -68,12 +68,12 @@ bool SAMRAI::solv::Elastic::FACSolver::solveSystem(const int v, const int v_rhs)
 *************************************************************************
 */
 
-bool SAMRAI::solv::Elastic::FACSolver::solveSystem
+bool Elastic::FACSolver::solveSystem
 (const int cell_moduli,
  const int edge_moduli,
  const int v,
  const int v_rhs,
- tbox::Pointer<hier::PatchHierarchy>
+ SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy>
  hierarchy,
  int coarse_ln,
  int fine_ln)
@@ -82,7 +82,7 @@ bool SAMRAI::solv::Elastic::FACSolver::solveSystem
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
   if (d_enable_logging) {
-    tbox::plog << "Elastic::FACSolver::solveSystem (" << d_object_name
+    SAMRAI::tbox::plog << "Elastic::FACSolver::solveSystem (" << d_object_name
                << ")\n";
   }
 #ifdef DEBUG_CHECK_ASSERTIONS

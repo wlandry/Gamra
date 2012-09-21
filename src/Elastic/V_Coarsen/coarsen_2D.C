@@ -22,35 +22,34 @@
 
 #include "FTensor.hpp"
 
-using namespace SAMRAI;
-
-inline void coarsen_point_2D(const pdat::SideIndex &coarse,
-                             const hier::Index &ip, const hier::Index &jp,
-                             tbox::Pointer<pdat::SideData<double> > &v,
-                             tbox::Pointer<pdat::SideData<double> > &v_fine )
+inline void
+coarsen_point_2D(const SAMRAI::pdat::SideIndex &coarse,
+                 const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
+                 SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > &v,
+                 SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > &v_fine )
 {
-  pdat::SideIndex center(coarse*2);
+  SAMRAI::pdat::SideIndex center(coarse*2);
   (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/4
     + ((*v_fine)(center-ip) + (*v_fine)(center-ip+jp)
        + (*v_fine)(center+ip) + (*v_fine)(center+jp+ip))/8;
 }
 
 
-void SAMRAI::geom::Elastic::V_Coarsen::coarsen_2D
-(hier::Patch& coarse,
- const hier::Patch& fine,
+void Elastic::V_Coarsen::coarsen_2D
+(SAMRAI::hier::Patch& coarse,
+ const SAMRAI::hier::Patch& fine,
  const int dst_component,
  const int src_component,
- const hier::Box& coarse_box,
- const hier::IntVector& ratio) const
+ const SAMRAI::hier::Box& coarse_box,
+ const SAMRAI::hier::IntVector& ratio) const
 {
-  const tbox::Dimension& Dim(getDim());
+  const SAMRAI::tbox::Dimension& Dim(getDim());
 
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(Dim, coarse, fine, coarse_box, ratio);
 
-  tbox::Pointer<pdat::SideData<double> >
+  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
     v_fine = fine.getPatchData(src_component);
-  tbox::Pointer<pdat::SideData<double> >
+  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
     v = coarse.getPatchData(dst_component);
 
   TBOX_ASSERT(!v.isNull());
@@ -58,12 +57,12 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_2D
   TBOX_ASSERT(v_fine->getDepth() == v->getDepth());
   TBOX_ASSERT(v->getDepth() == 1);
 
-  const hier::IntVector& directions(v->getDirectionVector());
+  const SAMRAI::hier::IntVector& directions(v->getDirectionVector());
 
   TBOX_ASSERT(directions ==
-              hier::IntVector::min(directions, v_fine->getDirectionVector()));
+              SAMRAI::hier::IntVector::min(directions, v_fine->getDirectionVector()));
 
-  const tbox::Pointer<CartesianPatchGeometry> cgeom =
+  const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> cgeom =
     coarse.getPatchGeometry();
   const double *dx=cgeom->getDx();
 
@@ -104,15 +103,15 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_2D
      The coarse/fine boundaries get fixed up later in
      V_Coarsen_Patch_Strategy::postprocessCoarsen.
   */
-  hier::Index ip(1,0), jp(0,1);
+  SAMRAI::hier::Index ip(1,0), jp(0,1);
   for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
     for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
       {
         if(directions(0) && j!=coarse_box.upper(1)+1)
           {
-            pdat::SideIndex coarse(hier::Index(i,j),0,
-                                   pdat::SideIndex::Lower);
-            pdat::SideIndex fine(coarse*2);
+            SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j),0,
+                                           SAMRAI::pdat::SideIndex::Lower);
+            SAMRAI::pdat::SideIndex fine(coarse*2);
             if((i==coarse_box.lower(0)
                 && cgeom->getTouchesRegularBoundary(0,0))
                || (i==coarse_box.upper(0)+1
@@ -135,9 +134,9 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_2D
           }
         if(directions(1) && i!=coarse_box.upper(0)+1)
           {
-            pdat::SideIndex coarse(hier::Index(i,j),1,
-                                   pdat::SideIndex::Lower);
-            pdat::SideIndex fine(coarse*2);
+            SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j),1,
+                                           SAMRAI::pdat::SideIndex::Lower);
+            SAMRAI::pdat::SideIndex fine(coarse*2);
             if((j==coarse_box.lower(1)
                 && cgeom->getTouchesRegularBoundary(1,0))
                || (j==coarse_box.upper(1)+1

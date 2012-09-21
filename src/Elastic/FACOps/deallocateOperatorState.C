@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -40,10 +39,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 * FACOperatorStrategy virtual deallocateOperatorState        *
 * function.  Deallocate internal hierarchy-dependent data.         *
@@ -51,24 +47,18 @@ namespace SAMRAI {
 ********************************************************************
 */
 
-    void Elastic::FACOps::deallocateOperatorState()
-    {
-      if (d_hierarchy) {
-        d_cf_boundary.resizeArray(0);
-#ifdef HAVE_HYPRE
-        d_hypre_solver.deallocateSolverState();
-#endif
-        d_hierarchy.setNull();
-        d_ln_min = -1;
-        d_ln_max = -1;
+void Elastic::FACOps::deallocateOperatorState()
+{
+  if (d_hierarchy) {
+    d_cf_boundary.resizeArray(0);
+    d_hierarchy.setNull();
+    d_ln_min = -1;
+    d_ln_max = -1;
 
-        v_prolongation_refine_schedules.setNull();
-        v_urestriction_coarsen_schedules.setNull();
-        v_rrestriction_coarsen_schedules.setNull();
-        v_ghostfill_refine_schedules.setNull();
-        v_nocoarse_refine_schedules.setNull();
-      }
-    }
-
+    v_prolongation_refine_schedules.setNull();
+    v_urestriction_coarsen_schedules.setNull();
+    v_rrestriction_coarsen_schedules.setNull();
+    v_ghostfill_refine_schedules.setNull();
+    v_nocoarse_refine_schedules.setNull();
   }
 }

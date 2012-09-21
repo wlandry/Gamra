@@ -15,18 +15,12 @@
 
 #include IOMANIP_HEADER_FILE
 
-namespace SAMRAI {
-  namespace solv {
+void Elastic::FACSolver::initializeStatics() {
 
-    void Elastic::FACSolver::initializeStatics() {
-
-      for (int d = 0; d < SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
-        s_weight_id[d] = -1;
-        s_instance_counter[d] = -1;
-      }
-
-      s_initialized = 1;
-    }
-
+  for (int d = 0; d < SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
+    s_weight_id[d] = -1;
+    s_instance_counter[d] = -1;
   }
+
+  s_initialized = 1;
 }

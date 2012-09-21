@@ -1,33 +1,33 @@
 #include "Elastic/FACOps.h"
 #include "Constants.h"
 
-void SAMRAI::solv::Elastic::FACOps::residual_2D
-(pdat::SideData<double> &v,
- pdat::CellData<double> &cell_moduli,
- pdat::SideData<double> &v_rhs,
- pdat::SideData<double> &v_resid,
- hier::Patch &patch,
- const hier::Box &pbox,
- const geom::CartesianPatchGeometry &geom)
+void Elastic::FACOps::residual_2D
+(SAMRAI::pdat::SideData<double> &v,
+ SAMRAI::pdat::CellData<double> &cell_moduli,
+ SAMRAI::pdat::SideData<double> &v_rhs,
+ SAMRAI::pdat::SideData<double> &v_resid,
+ SAMRAI::hier::Patch &patch,
+ const SAMRAI::hier::Box &pbox,
+ const SAMRAI::geom::CartesianPatchGeometry &geom)
 {
-  const hier::Index ip(1,0), jp(0,1);
+  const SAMRAI::hier::Index ip(1,0), jp(0,1);
 
-  tbox::Pointer<pdat::NodeData<double> >
+  SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeData<double> >
     edge_moduli_ptr = patch.getPatchData(edge_moduli_id);
-  pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
+  SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
   double dx = geom.getDx()[0];
   double dy = geom.getDx()[1];
 
-  for(pdat::CellIterator ci(pbox); ci; ci++)
+  for(SAMRAI::pdat::CellIterator ci(pbox); ci; ci++)
     {
-      pdat::CellIndex center(*ci);
+      SAMRAI::pdat::CellIndex center(*ci);
 
-      const pdat::SideIndex
-        x(center,0,pdat::SideIndex::Lower),
-        y(center,1,pdat::SideIndex::Lower);
-      const pdat::NodeIndex
-        edge(center,pdat::NodeIndex::LowerLeft);
+      const SAMRAI::pdat::SideIndex
+        x(center,0,SAMRAI::pdat::SideIndex::Lower),
+        y(center,1,SAMRAI::pdat::SideIndex::Lower);
+      const SAMRAI::pdat::NodeIndex
+        edge(center,SAMRAI::pdat::NodeIndex::LowerLeft);
 
       /* vx */
       if(center[1]!=pbox.upper(1))

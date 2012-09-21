@@ -7,30 +7,12 @@
  * Description:   Operator class for solving scalar Elastic using FAC 
  *
  ************************************************************************/
-namespace SAMRAI {
-namespace solv {
 
 SAMRAI_INLINE_KEYWORD
 void Elastic::FACOps::setPreconditioner(
-   const FACPreconditioner* preconditioner) {
+   const SAMRAI::solv::FACPreconditioner* preconditioner) {
    d_preconditioner = preconditioner;
 }
-
-#ifdef HAVE_HYPRE
-SAMRAI_INLINE_KEYWORD
-void Elastic::FACOps::setUseSMG(
-   bool use_smg)
-{
-   if (d_hierarchy) {
-      TBOX_ERROR(
-         d_object_name << ": setUseSMG(bool) may NOT be called\n"
-         <<
-         "while the solver state is initialized, as that\n"
-         << "would lead to a corrupted solver state.\n");
-   }
-   d_hypre_solver.setUseSMG(use_smg);
-}
-#endif
 
 /*
  ********************************************************************
@@ -44,9 +26,6 @@ void Elastic::FACOps::setUseSMG(
 // {
 //    d_physical_bc_coef = physical_bc_coef;
 //    // d_bc_helper.setCoefImplementation(physical_bc_coef);
-// #ifdef HAVE_HYPRE
-//    d_hypre_solver.setPhysicalBcCoefObject(d_physical_bc_coef);
-// #endif
 // }
 
 /*
@@ -90,16 +69,7 @@ void Elastic::FACOps::setSmoothingChoice(
 SAMRAI_INLINE_KEYWORD
 void Elastic::FACOps::setCoarsestLevelSolverChoice(
    const std::string& choice) {
-#ifdef DEBUG_CHECK_ASSERTIONS
-#ifndef HAVE_HYPRE
-   if (choice == "hypre") {
-      TBOX_ERROR(d_object_name << ": HYPRe library is not available.\n");
-   }
-#endif
-#endif
-   if (choice == "Tackley"
-       || choice == "Gerya"
-       || choice == "hypre") {
+   if (choice == "Tackley") {
       d_coarse_solver_choice = choice;
    } else {
       TBOX_ERROR(
@@ -182,5 +152,3 @@ void Elastic::FACOps::set_V_ProlongationMethod(
    v_prolongation_method = prolongation_method;
 }
 
-}
-}

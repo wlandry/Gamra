@@ -28,26 +28,26 @@ Elastic {
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
-    adaption_threshold = 1.0e-1
-    min_full_refinement_level = 1
+    adaption_threshold = 1.0e-3
+    min_full_refinement_level = 10
 
     lambda_ijk= 2, 2
-    lambda_coord_min= -0.001, -0.001
-    lambda_coord_max= 1.001, 1.001
+    lambda_coord_min= -10.001, -10.001
+    lambda_coord_max= 10.001, 10.001
     lambda_data= 
     1, 1,
     1, 1
 
     mu_ijk= 3, 3
-    mu_coord_min= -0.001, -0.001
-    mu_coord_max= 1.001, 1.001
+    mu_coord_min= -10.001, -10.001
+    mu_coord_max= 10.001, 10.001
     mu_data= 1, 1, 1,
     1, 1, 1,
     1, 1, 1
 
     v_rhs_ijk= 11, 11
-    v_rhs_coord_min= -0.001, -0.001
-    v_rhs_coord_max= 1.001, 1.001
+    v_rhs_coord_min= -10.001, -10.001
+    v_rhs_coord_max= 10.001, 10.001
     // v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -90,15 +90,10 @@ Elastic {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 3, -3, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 3, -3, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-    // p_initial_ijk= 2, 2
-    // p_initial_coord_min= 0, 0
-    // p_initial_coord_max= 1, 1
-    // p_initial_data= 1,1,0,0
 
     fac_solver {
         // This is the input for the cell-centered Stokes FAC solver
@@ -106,39 +101,23 @@ Elastic {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
         residual_tol = 1e-3     // Residual tolerance to solve for
-        num_pre_sweeps = 8      // Number of presmoothing sweeps to use
-        num_post_sweeps = 8     // Number of postsmoothing sweeps to use
+        num_pre_sweeps = 2      // Number of presmoothing sweeps to use
+        num_post_sweeps = 2     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
-        // smoothing_choice = "Gerya"
-        // coarse_solver_choice = "Gerya"
         coarse_solver_max_iterations = 32
         coarse_solver_tolerance = 1e-5
-        // p_prolongation_method = "P_MDPI_REFINE"
-        p_prolongation_method = "P_REFINE"
         v_prolongation_method = "V_REFINE"
-        p_rrestriction_method = "RESID_COARSEN"
     }
-    bc_coefs {
-        // These are the boundary condition specifications.  The number
-        // after "boundary_" is the location index of the boundary.
-        // The inputs are arrays of strings where the first string
-        // indicates the type of values you want to set.  "slope" means
-        // boundary slope, "value" means boundary value, and "coefficients"
-        // mean the raw Robin boundary condition coefficients.
-        // The remaining strings are converted into numbers as
-        // appropriate for what boundary condition you specified with
-        // the first string.  Other boundary conditions are possible.
-        // see the solv_RobinBcCoefStrategy class.
-        // Examples:
-        // boundary_0 = "slope", "0"
-        // boundary_1 = "coefficients", "0", "0"
-        // boundary_2 = "value", "0"
-        // boundary_3 = "value", "0"
-        boundary_0 = "value", "0"
-        boundary_1 = "value", "0"
-        boundary_2 = "value", "0"
-        boundary_3 = "value", "0"
+    boundary_conditions {
+        dirichlet_vx_x_upper="4*y*y"
+        dirichlet_vx_x_lower="0"
+        dirichlet_vy_y_upper="0"
+        dirichlet_vy_y_lower="0"
+        neumann_vx_y_upper="0"
+        neumann_vx_y_lower="0"
+        neumann_vy_x_upper="0"
+        neumann_vy_x_lower="0"
     }
 }
 
@@ -155,10 +134,16 @@ CartesianGridGeometry {
     //                        domain is periodic.  Zero indicates not
     //                        periodic, non-zero value indicates periodicity.
     //                        [0]
+    // domain_boxes = [(0,0), (127,127)]
+    // domain_boxes = [(0,0), (63,63)]
+    // domain_boxes = [(0,0), (31,31)]
     // domain_boxes = [(0,0), (15,15)]
+    // domain_boxes = [(0,0), (7,7)]
     domain_boxes = [(0,0), (3,3)]
-    x_lo         = 0, 0
-    x_up         = 1, 1
+    x_lo         = -.5, -.5
+    x_up         = .5, .5
+    // x_lo         = -4, -4
+    // x_up         = 4, 4
 }
 
 StandardTagAndInitialize {
@@ -191,8 +176,8 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 5
-    proper_nesting_buffer = 2, 2, 2, 2, 2, 2
+    max_levels = 7
+    proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
         level_2            = 2, 2
@@ -200,6 +185,7 @@ PatchHierarchy {
         level_4            = 2, 2
         level_5            = 2, 2
         level_6            = 2, 2
+        level_7            = 2, 2
     }
     largest_patch_size {
         // level_0 = 32, 32
@@ -212,7 +198,7 @@ PatchHierarchy {
 GriddingAlgorithm {
     enforce_proper_nesting = TRUE
     extend_to_domain_boundary = FALSE
-    proper_nesting_buffer = 2, 2, 2, 2, 2, 2
+    proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     // load_balance = FALSE
     efficiency_tolerance = 0.80
     combine_efficiency = 0.75

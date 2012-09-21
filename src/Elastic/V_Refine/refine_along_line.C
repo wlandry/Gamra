@@ -11,15 +11,15 @@
 
 /* Maybe in 3D we should include cross derivatives? */
 
-double SAMRAI::geom::Elastic::V_Refine::refine_along_line
-(pdat::SideData<double> &v,
+double Elastic::V_Refine::refine_along_line
+(SAMRAI::pdat::SideData<double> &v,
  const int &axis,
  const int &dim,
- const hier::Index pp[],
- const pdat::SideIndex &fine,
- const pdat::SideIndex &coarse,
- const hier::Box &coarse_box,
- const CartesianPatchGeometry &coarse_geom,
+ const SAMRAI::hier::Index pp[],
+ const SAMRAI::pdat::SideIndex &fine,
+ const SAMRAI::pdat::SideIndex &coarse,
+ const SAMRAI::hier::Box &coarse_box,
+ const SAMRAI::geom::CartesianPatchGeometry &coarse_geom,
  const FTensor::Tensor1<double,3> &xyz,
  const double *dx) const
 {

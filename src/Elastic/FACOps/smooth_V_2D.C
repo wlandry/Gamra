@@ -7,27 +7,27 @@
 * Gauss-Seidel iteration.  *
 ********************************************************************
 */
-void SAMRAI::solv::Elastic::FACOps::smooth_V_2D
+void Elastic::FACOps::smooth_V_2D
 (const int &axis,
- const hier::Box &pbox,
- tbox::Pointer<geom::CartesianPatchGeometry> &geom,
- const pdat::CellIndex &center,
- const hier::Index &ip,
- const hier::Index &jp,
- pdat::SideData<double> &v,
- pdat::SideData<double> &v_rhs,
+ const SAMRAI::hier::Box &pbox,
+ SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> &geom,
+ const SAMRAI::pdat::CellIndex &center,
+ const SAMRAI::hier::Index &ip,
+ const SAMRAI::hier::Index &jp,
+ SAMRAI::pdat::SideData<double> &v,
+ SAMRAI::pdat::SideData<double> &v_rhs,
  double &maxres,
  const double &dx,
  const double &dy,
- pdat::CellData<double> &cell_moduli,
- pdat::NodeData<double> &edge_moduli,
+ SAMRAI::pdat::CellData<double> &cell_moduli,
+ SAMRAI::pdat::NodeData<double> &edge_moduli,
  const double &theta_momentum)
 {
   const int off_axis=(axis==0) ? 1 : 0;
 
-  const pdat::SideIndex x(center,axis,pdat::SideIndex::Lower),
-    y(center,off_axis,pdat::SideIndex::Lower);
-  const pdat::NodeIndex edge(center,pdat::NodeIndex::LowerLeft);
+  const SAMRAI::pdat::SideIndex x(center,axis,SAMRAI::pdat::SideIndex::Lower),
+    y(center,off_axis,SAMRAI::pdat::SideIndex::Lower);
+  const SAMRAI::pdat::NodeIndex edge(center,SAMRAI::pdat::NodeIndex::LowerLeft);
 
   /* If at a Dirichlet 'x' boundary, leave vx as is */
   if(!((center[axis]==pbox.lower(axis) && v(x-ip)==boundary_value)
@@ -38,7 +38,7 @@ void SAMRAI::solv::Elastic::FACOps::smooth_V_2D
       // bool set_lower_boundary(false), set_upper_boundary(false);
       // double dv_lower(0), dv_upper(0);
 
-      // hier::Index offset(0,0);
+      // SAMRAI::hier::Index offset(0,0);
       // offset[axis]=2;
 
       // /* Need to fix this for Neumann conditions at a physical boundary */

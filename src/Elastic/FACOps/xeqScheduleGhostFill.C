@@ -9,8 +9,7 @@
  ************************************************************************/
 #include "Elastic/FACOps.h"
 
-void SAMRAI::solv::Elastic::FACOps::xeqScheduleGhostFill(int v_id,
-                                                         int dest_ln)
+void Elastic::FACOps::xeqScheduleGhostFill(int v_id, int dest_ln)
 {
   /* v */
   {
@@ -18,7 +17,7 @@ void SAMRAI::solv::Elastic::FACOps::xeqScheduleGhostFill(int v_id,
       TBOX_ERROR("Expected schedule not found.");
     }
     set_boundaries(v_id,dest_ln-1);
-    xfer::RefineAlgorithm refiner(d_dim);
+    SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
     refiner.registerRefine(v_id,v_id,v_id,v_ghostfill_refine_operator);
     refiner.resetSchedule(v_ghostfill_refine_schedules[dest_ln]);
     v_ghostfill_refine_schedules[dest_ln]->fillData(0.0,false);

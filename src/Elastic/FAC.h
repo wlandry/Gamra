@@ -24,15 +24,15 @@
 #include "SAMRAI/hier/VariableContext.h"
 #include "SAMRAI/appu/VisDerivedDataStrategy.h"
 #include "SAMRAI/appu/VisItDataWriter.h"
+#include "Elastic/Boundary_Conditions.h"
 
-namespace SAMRAI {
 namespace Elastic {
   /*!
    * @brief Class to solve a sample Elastic equation on a SAMR grid.
    */
   class FAC:
-    public mesh::StandardTagAndInitStrategy,
-    public appu::VisDerivedDataStrategy
+    public SAMRAI::mesh::StandardTagAndInitStrategy,
+    public SAMRAI::appu::VisDerivedDataStrategy
   {
 
   public:
@@ -46,9 +46,9 @@ namespace Elastic {
      * @param database Input database (may be NULL)
      */
     FAC(const std::string& object_name,
-        const tbox::Dimension& dim,
-        tbox::Pointer<tbox::Database> database =
-        tbox::Pointer<tbox::Database>(NULL));
+        const SAMRAI::tbox::Dimension& dim,
+        SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database =
+        SAMRAI::tbox::Pointer<SAMRAI::tbox::Database>(NULL));
 
     virtual ~FAC() {}
 
@@ -65,42 +65,43 @@ namespace Elastic {
      * @see mesh::StandardTagAndInitStrategy::initializeLevelData()
      */
     virtual void
-    initializeLevelData(const tbox::Pointer<hier::BasePatchHierarchy> hierarchy,
+    initializeLevelData(const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> hierarchy,
                         const int level_number,
                         const double init_data_time,
                         const bool can_be_refined,
                         const bool initial_time,
-                        const tbox::Pointer<hier::BasePatchLevel> old_level,
+                        const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchLevel> old_level,
                         const bool allocate_data);
 
     /*!
      * @brief Reset any internal hierarchy-dependent information.
      */
     virtual void
-    resetHierarchyConfiguration(tbox::Pointer<hier::BasePatchHierarchy> new_hierarchy,
+    resetHierarchyConfiguration(SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> new_hierarchy,
                                 int coarsest_level,
                                 int finest_level);
 
     //@}
 
     virtual void
-    applyGradientDetector(const tbox::Pointer<hier::BasePatchHierarchy> hierarchy,
+    applyGradientDetector(const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> hierarchy,
                           const int level_number,
                           const double error_data_time,
                           const int tag_index,
                           const bool initial_time,
                           const bool uses_richardson_extrapolation);
 
-    void computeAdaptionEstimate(pdat::CellData<double>& estimate_data,
-                                 const pdat::CellData<double>& soln_cell_data)
+    void
+    computeAdaptionEstimate(SAMRAI::pdat::CellData<double>& estimate_data,
+                            const SAMRAI::pdat::CellData<double>& soln_cell_data)
       const;
 
     //@{ @name appu::VisDerivedDataStrategy virtuals
 
     virtual bool
     packDerivedDataIntoDoubleBuffer(double* buffer,
-                                    const hier::Patch& patch,
-                                    const hier::Box& region,
+                                    const SAMRAI::hier::Patch& patch,
+                                    const SAMRAI::hier::Box& region,
                                     const std::string& variable_name,
                                     int depth_id) const;
 
@@ -137,26 +138,27 @@ namespace Elastic {
      * @param viz_writer VisIt writer
      */
     int
-    setupPlotter(appu::VisItDataWriter& plotter) const;
+    setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const;
 #endif
 
   private:
     void fix_moduli();
     std::string d_object_name;
 
-    const tbox::Dimension d_dim;
+    const SAMRAI::tbox::Dimension d_dim;
 
-    tbox::Pointer<hier::PatchHierarchy> d_hierarchy;
+    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> d_hierarchy;
 
     //@{
     /*!
      * @name Major algorithm objects.
      */
 
+    Boundary_Conditions d_boundary_conditions;
     /*!
      * @brief FAC Elastic solver.
      */
-    solv::Elastic::FACSolver d_elastic_fac_solver;
+    Elastic::FACSolver d_elastic_fac_solver;
 
     //@}
 
@@ -169,7 +171,7 @@ namespace Elastic {
     /*!
      * @brief Context owned by this object.
      */
-    tbox::Pointer<hier::VariableContext> d_context;
+    SAMRAI::tbox::Pointer<SAMRAI::hier::VariableContext> d_context;
   
     /*!
      * @brief Descriptor indices of internal data.
@@ -182,20 +184,19 @@ namespace Elastic {
   public:
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id;
 
-    tbox::Array<double> lambda, lambda_xyz_max, lambda_xyz_min;
-    tbox::Array<int> lambda_ijk;
+    SAMRAI::tbox::Array<double> lambda, lambda_xyz_max, lambda_xyz_min;
+    SAMRAI::tbox::Array<int> lambda_ijk;
 
-    tbox::Array<double> mu, mu_xyz_max, mu_xyz_min;
-    tbox::Array<int> mu_ijk;
+    SAMRAI::tbox::Array<double> mu, mu_xyz_max, mu_xyz_min;
+    SAMRAI::tbox::Array<int> mu_ijk;
 
-    tbox::Array<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
-    tbox::Array<int> v_rhs_ijk;
+    SAMRAI::tbox::Array<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
+    SAMRAI::tbox::Array<int> v_rhs_ijk;
 
     //@}
 
   };
 
-}
 }
 
 #endif  // included_FACElastic

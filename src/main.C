@@ -208,16 +208,16 @@ int main(
                                  input_db->getDatabase("Elastic"));
         grid_geometry->addSpatialRefineOperator
           (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
-           (new SAMRAI::geom::Elastic::V_Refine(dim)));
+           (new Elastic::V_Refine(dim)));
         grid_geometry->addSpatialRefineOperator
           (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
-           (new SAMRAI::geom::Elastic::V_Boundary_Refine(dim)));
+           (new Elastic::V_Boundary_Refine(dim)));
         grid_geometry->addSpatialCoarsenOperator
           (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
-           (new SAMRAI::geom::Elastic::V_Coarsen(dim)));
+           (new Elastic::V_Coarsen(dim)));
         grid_geometry->addSpatialCoarsenOperator
           (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
-           (new SAMRAI::geom::Elastic::Resid_Coarsen(dim,fac_elastic.cell_moduli_id)));
+           (new Elastic::Resid_Coarsen(dim,fac_elastic.cell_moduli_id)));
 
         solve_system(fac_elastic,main_db,input_db,patch_hierarchy,
                      base_name,dim);

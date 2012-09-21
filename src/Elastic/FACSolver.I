@@ -7,9 +7,6 @@
  * Description:   High-level solver (wrapper) for scalar elastic equation. 
  *
  ************************************************************************/
-namespace SAMRAI {
-namespace solv {
-
 
 SAMRAI_INLINE_KEYWORD
 void Elastic::FACSolver::set_V_ProlongationMethod(
@@ -45,22 +42,6 @@ void Elastic::FACSolver::setCoarseFineDiscretization(
 {
    d_fac_ops.setCoarseFineDiscretization(coarsefine_method);
 }
-
-#ifdef HAVE_HYPRE
-SAMRAI_INLINE_KEYWORD
-void Elastic::FACSolver::setUseSMG(
-   bool use_smg)
-{
-   if (d_solver_is_initialized) {
-      TBOX_ERROR(
-         d_object_name << ": setUseSMG(bool) may NOT be called\n"
-         <<
-         "while the solver state is initialized, as that\n"
-         << "would lead to a corrupted solver state.\n");
-   }
-   d_fac_ops.setUseSMG(use_smg);
-}
-#endif
 
 SAMRAI_INLINE_KEYWORD
 void Elastic::FACSolver::setPresmoothingSweeps(
@@ -107,5 +88,3 @@ const
    d_fac_precond.getConvergenceFactors(avg_factor, final_factor);
 }
 
-}
-}

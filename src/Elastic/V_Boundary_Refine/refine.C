@@ -10,50 +10,52 @@
  ************************************************************************/
 
 #include "Elastic/V_Boundary_Refine.h"
-#include "Elastic/set_boundary.h"
 #include "Constants.h"
 
-void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
-(hier::Patch& fine,
- const hier::Patch& coarse,
+void Elastic::V_Boundary_Refine::refine
+(SAMRAI::hier::Patch& fine,
+ const SAMRAI::hier::Patch& coarse,
  const int dst_component,
  const int src_component,
- const hier::BoxOverlap& fine_overlap,
- const hier::IntVector& ratio) const
+ const SAMRAI::hier::BoxOverlap& fine_overlap,
+ const SAMRAI::hier::IntVector& ratio) const
 {
-   const pdat::SideOverlap* t_overlap =
-      dynamic_cast<const pdat::SideOverlap *>(&fine_overlap);
+   const SAMRAI::pdat::SideOverlap* t_overlap =
+      dynamic_cast<const SAMRAI::pdat::SideOverlap *>(&fine_overlap);
 
    TBOX_ASSERT(t_overlap != NULL);
 
-   set_boundary(coarse,src_component,true);
+   /* Commenting this out since it should be set by the refine patch
+      strategy */
+   // boundary_conditions.set_boundary(coarse,src_component,true);
 
    for(int axis=0; axis<getDim().getValue(); ++axis)
      {
-       const hier::BoxList& boxes = t_overlap->getDestinationBoxList(axis);
-       for (hier::BoxList::Iterator b(boxes); b; b++)
+       const SAMRAI::hier::BoxList&
+         boxes = t_overlap->getDestinationBoxList(axis);
+       for (SAMRAI::hier::BoxList::Iterator b(boxes); b; b++)
          {
            refine(fine,coarse,dst_component,src_component,b(),ratio,axis);
          }
      }
 }
 
-void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
-(hier::Patch& fine,
- const hier::Patch& coarse,
+void Elastic::V_Boundary_Refine::refine
+(SAMRAI::hier::Patch& fine,
+ const SAMRAI::hier::Patch& coarse,
  const int dst_component,
  const int src_component,
- const hier::Box& overlap_box,
- const hier::IntVector& ratio,
+ const SAMRAI::hier::Box& overlap_box,
+ const SAMRAI::hier::IntVector& ratio,
  const int &axis) const
 {
-   const tbox::Dimension& dimension(getDim());
+   const SAMRAI::tbox::Dimension& dimension(getDim());
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);
    const int dim(dimension.getValue());
 
-   tbox::Pointer<pdat::SideData<double> >
+   SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
    v = coarse.getPatchData(src_component);
-   tbox::Pointer<pdat::SideData<double> >
+   SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
    v_fine = fine.getPatchData(dst_component);
 #ifdef DEBUG_CHECK_ASSERTIONS
    TBOX_ASSERT(!v.isNull());
@@ -62,8 +64,8 @@ void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
    TBOX_ASSERT(v->getDepth() == 1);
 #endif
 
-   hier::Box fine_box=fine.getBox();
-   hier::Box coarse_box=coarse.getBox();
+   SAMRAI::hier::Box fine_box=fine.getBox();
+   SAMRAI::hier::Box coarse_box=coarse.getBox();
 
    /* We have to infer where the boundary is from the boxes */
    int boundary_direction;
@@ -84,7 +86,7 @@ void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
          }
      }
 
-   hier::Index p_min(overlap_box.lower()), p_max(overlap_box.upper());
+   SAMRAI::hier::Index p_min(overlap_box.lower()), p_max(overlap_box.upper());
 
    if(boundary_direction==axis)
      {
@@ -98,7 +100,8 @@ void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
          }
      }
 
-   hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+   SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dimension)),
+     jp(ip), kp(ip);
    ip[0]=1;
    jp[1]=1;
    if(dim>2)
@@ -109,7 +112,8 @@ void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
        for(int j=p_min[1]; j<=p_max[1]; ++j)
          for(int i=p_min[0]; i<=p_max[0]; ++i)
            {
-             pdat::SideIndex fine(hier::Index(i,j),axis,pdat::SideIndex::Lower);
+             SAMRAI::pdat::SideIndex fine(SAMRAI::hier::Index(i,j),axis,
+                                          SAMRAI::pdat::SideIndex::Lower);
              switch(axis)
                {
                case 0:
@@ -128,13 +132,14 @@ void SAMRAI::geom::Elastic::V_Boundary_Refine::refine
      }
    else
      {
-       hier::Index pp[]={ip,jp,kp};
-       hier::Index ijk(dimension);
+       SAMRAI::hier::Index pp[]={ip,jp,kp};
+       SAMRAI::hier::Index ijk(dimension);
        for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]=(ijk[2]/2)*2+2)
          for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]=(ijk[1]/2)*2+2)
            for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]=(ijk[0]/2)*2+2)
              {
-               pdat::SideIndex fine(ijk,axis,pdat::SideIndex::Lower);
+               SAMRAI::pdat::SideIndex
+                 fine(ijk,axis,SAMRAI::pdat::SideIndex::Lower);
                Update_V_3D(axis,boundary_direction,boundary_positive,fine,
                            pp,ijk,p_min,p_max,*v,*v_fine);
              }

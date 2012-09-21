@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -46,10 +45,10 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::Elastic::FACOps::postprocessOneCycle
+void Elastic::FACOps::postprocessOneCycle
 (int fac_cycle_num,
- const SAMRAIVectorReal<double>& current_soln,
- const SAMRAIVectorReal<double>& residual)
+ const SAMRAI::solv::SAMRAIVectorReal<double>& current_soln,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& residual)
 {
   NULL_USE(current_soln);
   NULL_USE(residual);
@@ -62,7 +61,7 @@ void SAMRAI::solv::Elastic::FACOps::postprocessOneCycle
        */
       double avg_factor, final_factor;
       d_preconditioner->getConvergenceFactors(avg_factor, final_factor);
-      tbox::plog
+      SAMRAI::tbox::plog
         << "iter=" << std::setw(4) << fac_cycle_num
         << " resid=" << d_preconditioner->getResidualNorm()
         << " net conv=" << d_preconditioner->getNetConvergenceFactor()

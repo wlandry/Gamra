@@ -1,9 +1,9 @@
 #include "Elastic/FACOps.h"
 
-void SAMRAI::solv::Elastic::FACOps::computeCompositeResidualOnLevel
-(SAMRAIVectorReal<double>& residual,
- const SAMRAIVectorReal<double>& solution,
- const SAMRAIVectorReal<double>& rhs,
+void Elastic::FACOps::computeCompositeResidualOnLevel
+(SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& rhs,
  int ln,
  bool error_equation_indicator) {
 
@@ -17,7 +17,8 @@ void SAMRAI::solv::Elastic::FACOps::computeCompositeResidualOnLevel
                "internal hierarchy.");
   }
 #endif
-  tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
+  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
+    level = d_hierarchy->getPatchLevel(ln);
 
   /*
    * Set up the bc helper so that when we use a refine schedule
@@ -63,20 +64,20 @@ void SAMRAI::solv::Elastic::FACOps::computeCompositeResidualOnLevel
    * S4. Compute residual on patches in level.
    */
 
-  for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
-    tbox::Pointer<hier::Patch> patch = *pi;
-    tbox::Pointer<pdat::SideData<double> >
+  for (SAMRAI::hier::PatchLevel::Iterator pi(*level); pi; pi++) {
+    SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *pi;
+    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
       v_ptr = solution.getComponentPatchData(0, *patch);
-    tbox::Pointer<pdat::CellData<double> >
+    SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> >
       cell_moduli_ptr = patch->getPatchData(cell_moduli_id);
-    tbox::Pointer<pdat::SideData<double> >
+    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
       v_rhs_ptr = rhs.getComponentPatchData(0, *patch);
-    tbox::Pointer<pdat::SideData<double> >
+    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
       v_resid_ptr = residual.getComponentPatchData(0, *patch);
 
-    hier::Box pbox=patch->getBox();
-    pbox.growUpper(hier::IntVector::getOne(d_dim));
-    tbox::Pointer<geom::CartesianPatchGeometry>
+    SAMRAI::hier::Box pbox=patch->getBox();
+    pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
+    SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
       geom = patch->getPatchGeometry();
 
     switch(d_dim.getValue())

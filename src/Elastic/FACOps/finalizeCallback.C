@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -40,17 +39,11 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    void
-    Elastic::FACOps::finalizeCallback()
-    {
-      for (int d = 0; d < tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
-        s_cell_scratch_var[d].setNull();
-        s_side_scratch_var[d].setNull();
-      }
-    }
-
+void
+Elastic::FACOps::finalizeCallback()
+{
+  for (int d = 0; d < SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
+    s_cell_scratch_var[d].setNull();
+    s_side_scratch_var[d].setNull();
   }
 }

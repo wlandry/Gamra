@@ -33,20 +33,21 @@ bool intersect_fault(const int &dim,
 * Fill the rhs and exact solution.                                      *
 *************************************************************************
 */
-void SAMRAI::Elastic::FAC::initializeLevelData
-(const tbox::Pointer<hier::BasePatchHierarchy> patch_hierarchy,
+void Elastic::FAC::initializeLevelData
+(const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> patch_hierarchy,
  const int level_number,
  const double ,
  const bool ,
  const bool ,
- const tbox::Pointer<hier::BasePatchLevel> ,
+ const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchLevel> ,
  const bool allocate_data)
 {
-  tbox::Pointer<hier::PatchHierarchy> hierarchy = patch_hierarchy;
-  tbox::Pointer<geom::CartesianGridGeometry> grid_geom =
+  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy>
+    hierarchy = patch_hierarchy;
+  SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianGridGeometry> grid_geom =
     hierarchy->getGridGeometry();
 
-  tbox::Pointer<hier::PatchLevel> level =
+  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> level =
     hierarchy->getPatchLevel(level_number);
   const int dim=d_dim.getValue();
 
@@ -60,27 +61,27 @@ void SAMRAI::Elastic::FAC::initializeLevelData
   /*
    * Initialize data in all patches in the level.
    */
-  hier::PatchLevel::Iterator p_i(*level);
+  SAMRAI::hier::PatchLevel::Iterator p_i(*level);
   for (p_i.initialize(*level); p_i; p_i++) {
 
-    tbox::Pointer<hier::Patch> patch = *p_i;
+    SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *p_i;
     if (patch.isNull()) {
       TBOX_ERROR(d_object_name
                  << ": Cannot find patch.  Null patch pointer.");
     }
-    tbox::Pointer<geom::CartesianPatchGeometry>
+    SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
       geom = patch->getPatchGeometry();
     const double *dx=geom->getDx();
 
     /* Initialize cell moduli */
-    tbox::Pointer<pdat::CellData<double> > cell_moduli =
+    SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> > cell_moduli =
       patch->getPatchData(cell_moduli_id);
 
-    hier::Box cell_moduli_box = cell_moduli->getBox();
+    SAMRAI::hier::Box cell_moduli_box = cell_moduli->getBox();
 
-    for(pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
+    for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
       {
-        pdat::CellIndex c=ci();
+        SAMRAI::pdat::CellIndex c=ci();
         double xyz[dim];
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
@@ -98,9 +99,9 @@ void SAMRAI::Elastic::FAC::initializeLevelData
         (*cell_moduli)(c,0)=lambda[ijk];
       }
 
-    for(pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
+    for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
       {
-        pdat::CellIndex c=ci();
+        SAMRAI::pdat::CellIndex c=ci();
         double xyz[dim];
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
@@ -121,7 +122,7 @@ void SAMRAI::Elastic::FAC::initializeLevelData
     /* I do not think this is actually necessary. */
 
     /* v_rhs */
-    tbox::Pointer<pdat::SideData<double> > v_rhs_data =
+    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > v_rhs_data =
       patch->getPatchData(v_rhs_id);
 
     if(v_rhs.empty())
@@ -157,15 +158,15 @@ void SAMRAI::Elastic::FAC::initializeLevelData
 
         double fault[]={L,W};
 
-        hier::Box pbox = v_rhs_data->getBox();
+        SAMRAI::hier::Box pbox = v_rhs_data->getBox();
         for(int ix=0;ix<dim;++ix)
           {
             double offset[]={0.5,0.5,0.5};
             offset[ix]=0;
 
-            for(pdat::SideIterator si(pbox,ix); si; si++)
+            for(SAMRAI::pdat::SideIterator si(pbox,ix); si; si++)
               {
-                pdat::SideIndex s=si();
+                SAMRAI::pdat::SideIndex s=si();
                 (*v_rhs_data)(s)=0;
 
                 FTensor::Tensor1<double,3> xyz(0,0,0);

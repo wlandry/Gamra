@@ -25,134 +25,133 @@
 #include "FTensor.hpp"
 #include <string>
 
-namespace SAMRAI {
-namespace geom {
 namespace Elastic {
 
-/**
- * Class V_Refine implements linear
- * interpolation for side-centered double patch data defined over a Cartesian
- * mesh.  It is derived from the xfer::RefineOperator base class.
- * CartesianSideDoubleConservativeLinearRefine does not handle the 
- * boundary for the velocity correctly, so use this instead for
- * velocity.
- *
- * The findRefineOperator() operator function returns true if the input
- * variable is side-centered double, and the std::string is "V_REFINE".
- *
- * @see xfer::RefineOperator
- */
-
-class V_Refine:
-  public xfer::RefineOperator
-{
-public:
   /**
-   * Uninteresting default constructor.
+   * Class V_Refine implements linear
+   * interpolation for side-centered double patch data defined over a Cartesian
+   * mesh.  It is derived from the xfer::RefineOperator base class.
+   * CartesianSideDoubleConservativeLinearRefine does not handle the 
+   * boundary for the velocity correctly, so use this instead for
+   * velocity.
+   *
+   * The findRefineOperator() operator function returns true if the input
+   * variable is side-centered double, and the std::string is "V_REFINE".
+   *
+   * @see xfer::RefineOperator
    */
-  explicit V_Refine(const tbox::Dimension& dim):
-    xfer::RefineOperator(dim, "V_REFINE")
+
+  class V_Refine:
+    public SAMRAI::xfer::RefineOperator
   {
-    d_name_id = "V_REFINE";
-  }
-
-
-  /**
-   * Uninteresting virtual destructor.
-   */
-  virtual ~V_Refine(){}
-
-  /**
-   * Return true if the variable and name std::string match side-centered
-   * double linear interpolation; otherwise, return false.
-   */
-  bool findRefineOperator(const tbox::Pointer<hier::Variable>& var,
-                          const std::string& op_name) const
-  {
-    TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
-
-    const tbox::Pointer<pdat::SideVariable<double> > cast_var(var);
-    if (!cast_var.isNull() && (op_name == d_name_id)) {
-      return true;
-    } else {
-      return false;
+  public:
+    /**
+     * Uninteresting default constructor.
+     */
+    explicit V_Refine(const SAMRAI::tbox::Dimension& dim):
+      SAMRAI::xfer::RefineOperator(dim, "V_REFINE")
+    {
+      d_name_id = "V_REFINE";
     }
-  }
-  /**
-   * Return name std::string identifier of this refinement operator.
-   */
-  const std::string& getOperatorName() const
-  {
-    return d_name_id;
-  }
 
-  /**
-   * The priority of side-centered double linear interpolation is 0.
-   * It will be performed before any user-defined interpolation operations.
-   */
-  int getOperatorPriority() const
-  {
-    return 0;
-  }
 
-  /**
-   * The stencil width of the linear interpolation operator is the vector
-   * of ones.  That is, its stencil extends one side outside the fine box.
-   */
-  hier::IntVector getStencilWidth() const
-  {
-    return hier::IntVector::getOne(getDim());
-  }
+    /**
+     * Uninteresting virtual destructor.
+     */
+    virtual ~V_Refine(){}
 
-  /**
-   * Refine the source component on the coarse patch to the destination
-   * component on the fine patch using the side-centered double linear
-   * interpolation operator.  Interpolation is performed on the intersection
-   * of the destination patch and the boxes contained in fine_overlap
-   * It is assumed that the coarse patch contains sufficient data for the
-   * stencil width of the refinement operator.
-   */
-  void refine(hier::Patch& fine,
-              const hier::Patch& coarse,
-              const int dst_component,
-              const int src_component,
-              const hier::BoxOverlap& fine_overlap,
-              const hier::IntVector& ratio) const;
+    /**
+     * Return true if the variable and name std::string match side-centered
+     * double linear interpolation; otherwise, return false.
+     */
+    bool
+    findRefineOperator(const SAMRAI::tbox::Pointer<SAMRAI::hier::Variable>& var,
+                       const std::string& op_name) const
+    {
+      TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
 
-  /**
-   * Refine the source component on the coarse patch to the destination
-   * component on the fine patch using the side-centered double linear
-   * interpolation operator.  Interpolation is performed on the intersection
-   * of the destination patch and the fine box.   It is assumed that the
-   * coarse patch contains sufficient data for the stencil width of the
-   * refinement operator.  This differs from the above refine() method
-   * only in that it operates on a single fine box instead of a BoxOverlap.
-   */
-  void refine(hier::Patch& fine,
-              const hier::Patch& coarse,
-              const int dst_component,
-              const int src_component,
-              const hier::Box& fine_box,
-              const hier::IntVector& ratio,
-              const int &axis) const;
+      const SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> >
+        cast_var(var);
+      if (!cast_var.isNull() && (op_name == d_name_id)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    /**
+     * Return name std::string identifier of this refinement operator.
+     */
+    const std::string& getOperatorName() const
+    {
+      return d_name_id;
+    }
 
-  double refine_along_line(pdat::SideData<double> &v,
-                           const int &axis,
-                           const int &dim,
-                           const hier::Index pp[],
-                           const pdat::SideIndex &fine,
-                           const pdat::SideIndex &coarse,
-                           const hier::Box &coarse_box,
-                           const CartesianPatchGeometry &coarse_geom,
-                           const FTensor::Tensor1<double,3> &xyz,
-                           const double *dx) const;
+    /**
+     * The priority of side-centered double linear interpolation is 0.
+     * It will be performed before any user-defined interpolation operations.
+     */
+    int getOperatorPriority() const
+    {
+      return 0;
+    }
 
-private:
-  std::string d_name_id;
+    /**
+     * The stencil width of the linear interpolation operator is the vector
+     * of ones.  That is, its stencil extends one side outside the fine box.
+     */
+    SAMRAI::hier::IntVector getStencilWidth() const
+    {
+      return SAMRAI::hier::IntVector::getOne(getDim());
+    }
 
-};
+    /**
+     * Refine the source component on the coarse patch to the destination
+     * component on the fine patch using the side-centered double linear
+     * interpolation operator.  Interpolation is performed on the intersection
+     * of the destination patch and the boxes contained in fine_overlap
+     * It is assumed that the coarse patch contains sufficient data for the
+     * stencil width of the refinement operator.
+     */
+    void refine(SAMRAI::hier::Patch& fine,
+                const SAMRAI::hier::Patch& coarse,
+                const int dst_component,
+                const int src_component,
+                const SAMRAI::hier::BoxOverlap& fine_overlap,
+                const SAMRAI::hier::IntVector& ratio) const;
 
-}
-}
+    /**
+     * Refine the source component on the coarse patch to the destination
+     * component on the fine patch using the side-centered double linear
+     * interpolation operator.  Interpolation is performed on the intersection
+     * of the destination patch and the fine box.   It is assumed that the
+     * coarse patch contains sufficient data for the stencil width of the
+     * refinement operator.  This differs from the above refine() method
+     * only in that it operates on a single fine box instead of a BoxOverlap.
+     */
+    void refine(SAMRAI::hier::Patch& fine,
+                const SAMRAI::hier::Patch& coarse,
+                const int dst_component,
+                const int src_component,
+                const SAMRAI::hier::Box& fine_box,
+                const SAMRAI::hier::IntVector& ratio,
+                const int &axis) const;
+
+    double refine_along_line
+    (SAMRAI::pdat::SideData<double> &v,
+     const int &axis,
+     const int &dim,
+     const SAMRAI::hier::Index pp[],
+     const SAMRAI::pdat::SideIndex &fine,
+     const SAMRAI::pdat::SideIndex &coarse,
+     const SAMRAI::hier::Box &coarse_box,
+     const SAMRAI::geom::CartesianPatchGeometry &coarse_geom,
+     const FTensor::Tensor1<double,3> &xyz,
+     const double *dx) const;
+
+  private:
+    std::string d_name_id;
+
+  };
+
 }
 #endif

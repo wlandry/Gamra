@@ -23,15 +23,15 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "Constants.h"
 
-using namespace SAMRAI;
-
-inline void coarsen_point_3D(const pdat::SideIndex &coarse,
-                             const hier::Index &ip, const hier::Index &jp,
-                             const hier::Index &kp,
-                             tbox::Pointer<pdat::SideData<double> > &v,
-                             tbox::Pointer<pdat::SideData<double> > &v_fine )
+inline void
+coarsen_point_3D(const SAMRAI::pdat::SideIndex &coarse,
+                 const SAMRAI::hier::Index &ip,
+                 const SAMRAI::hier::Index &jp,
+                 const SAMRAI::hier::Index &kp,
+                 SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > &v,
+                 SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > &v_fine)
 {
-  pdat::SideIndex center(coarse*2);
+  SAMRAI::pdat::SideIndex center(coarse*2);
   (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp)
                 + (*v_fine)(center+kp) + (*v_fine)(center+jp+kp))/8
     + ((*v_fine)(center-ip) + (*v_fine)(center-ip+jp)
@@ -41,21 +41,20 @@ inline void coarsen_point_3D(const pdat::SideIndex &coarse,
 }
 
 
-void SAMRAI::geom::Elastic::V_Coarsen::coarsen_3D
-(hier::Patch& coarse,
- const hier::Patch& fine,
- const int dst_component,
- const int src_component,
- const hier::Box& coarse_box,
- const hier::IntVector& ratio) const
+void Elastic::V_Coarsen::coarsen_3D(SAMRAI::hier::Patch& coarse,
+                                    const SAMRAI::hier::Patch& fine,
+                                    const int dst_component,
+                                    const int src_component,
+                                    const SAMRAI::hier::Box& coarse_box,
+                                    const SAMRAI::hier::IntVector& ratio) const
 {
-  const tbox::Dimension& dim(getDim());
+  const SAMRAI::tbox::Dimension& dim(getDim());
 
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, coarse, fine, coarse_box, ratio);
 
-  tbox::Pointer<pdat::SideData<double> >
+  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
     v_fine = fine.getPatchData(src_component);
-  tbox::Pointer<pdat::SideData<double> >
+  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
     v = coarse.getPatchData(dst_component);
 
   TBOX_ASSERT(!v.isNull());
@@ -63,12 +62,12 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_3D
   TBOX_ASSERT(v_fine->getDepth() == v->getDepth());
   TBOX_ASSERT(v->getDepth() == 1);
 
-  const hier::IntVector& directions(v->getDirectionVector());
+  const SAMRAI::hier::IntVector& directions(v->getDirectionVector());
 
   TBOX_ASSERT(directions ==
-              hier::IntVector::min(directions, v_fine->getDirectionVector()));
+              SAMRAI::hier::IntVector::min(directions, v_fine->getDirectionVector()));
 
-  const tbox::Pointer<CartesianPatchGeometry> cgeom =
+  const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> cgeom =
     coarse.getPatchGeometry();
 
   /* Numbering of v nodes is
@@ -106,12 +105,12 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_3D
      (i*2-1,j*2+1), (i*2+1,j*2), (i*2+1,j*2+1).
 
 
-          --------------------
-         /                   /|
-        /                   / |
-       /                   /  |
-      /                   /   |
-      -------------------     |
+     --------------------
+     /                   /|
+     /                   / |
+     /                   /  |
+     /                   /   |
+     -------------------     |
      |                   |    |
      |    f        f     |    |
      |                   |    |
@@ -119,7 +118,7 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_3D
      |                   |  /
      |    f        f     | /
      |                   |/
-      -------------------
+     -------------------
 
      In 3D, a coarse point depend on 12 points
      (i*2,j*2,k*2), (i*2,j*2+1,k*2), (i*2,j*2,k*2+1), (i*2,j*2+1,k*2+1),
@@ -129,17 +128,17 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_3D
      The coarse/fine boundaries get fixed up later in
      V_Coarsen_Patch_Strategy::postprocessCoarsen.
   */
-  hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
+  SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   for(int k=coarse_box.lower(2); k<=coarse_box.upper(2)+1; ++k)
     for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
       for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
         {
           if(directions(0) && j!=coarse_box.upper(1)+1
-              && k!=coarse_box.upper(2)+1)
+             && k!=coarse_box.upper(2)+1)
             {
-              pdat::SideIndex coarse(hier::Index(i,j,k),0,
-                                     pdat::SideIndex::Lower);
-              pdat::SideIndex center(coarse*2);
+              SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j,k),0,
+                                             SAMRAI::pdat::SideIndex::Lower);
+              SAMRAI::pdat::SideIndex center(coarse*2);
               if((i==coarse_box.lower(0)
                   && cgeom->getTouchesRegularBoundary(0,0))
                  || (i==coarse_box.upper(0)+1
@@ -157,9 +156,9 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_3D
           if(directions(1) && i!=coarse_box.upper(0)+1
              && k!=coarse_box.upper(2)+1)
             {
-              pdat::SideIndex coarse(hier::Index(i,j,k),1,
-                                     pdat::SideIndex::Lower);
-              pdat::SideIndex center(coarse*2);
+              SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j,k),1,
+                                             SAMRAI::pdat::SideIndex::Lower);
+              SAMRAI::pdat::SideIndex center(coarse*2);
               if((j==coarse_box.lower(1)
                   && cgeom->getTouchesRegularBoundary(1,0))
                  || (j==coarse_box.upper(1)+1
@@ -175,11 +174,11 @@ void SAMRAI::geom::Elastic::V_Coarsen::coarsen_3D
                 }
             }
           if(directions(2) && i!=coarse_box.upper(0)+1
-              && j!=coarse_box.upper(1)+1)
+             && j!=coarse_box.upper(1)+1)
             {
-              pdat::SideIndex coarse(hier::Index(i,j,k),2,
-                                     pdat::SideIndex::Lower);
-              pdat::SideIndex center(coarse*2);
+              SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j,k),2,
+                                             SAMRAI::pdat::SideIndex::Lower);
+              SAMRAI::pdat::SideIndex center(coarse*2);
               if((k==coarse_box.lower(2)
                   && cgeom->getTouchesRegularBoundary(2,0))
                  || (k==coarse_box.upper(2)+1

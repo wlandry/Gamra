@@ -27,7 +27,7 @@
 * deallocate the solver state in this example.                          *
 *************************************************************************
 */
-int SAMRAI::Elastic::FAC::solve()
+int Elastic::FAC::solve()
 {
 
   if (d_hierarchy.isNull()) {
@@ -40,15 +40,16 @@ int SAMRAI::Elastic::FAC::solve()
    * Fill in the initial guess.
    */
   for (ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln) {
-    tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
-    hier::PatchLevel::Iterator ip(*level);
+    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
+      level = d_hierarchy->getPatchLevel(ln);
+    SAMRAI::hier::PatchLevel::Iterator ip(*level);
     for ( ; ip; ip++) {
-      tbox::Pointer<hier::Patch> patch = *ip;
+      SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *ip;
 
-      tbox::Pointer<geom::CartesianPatchGeometry>
+      SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
         geom = patch->getPatchGeometry();
 
-      tbox::Pointer<pdat::SideData<double> >
+      SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
         v = patch->getPatchData(v_id);
       v->fill(0.0);
     }
@@ -61,22 +62,22 @@ int SAMRAI::Elastic::FAC::solve()
     (cell_moduli_id,edge_moduli_id,v_id,v_rhs_id,
      d_hierarchy,0,d_hierarchy->getFinestLevelNumber());
 
-  tbox::plog << "solving..." << std::endl;
+  SAMRAI::tbox::plog << "solving..." << std::endl;
   int solver_ret;
   solver_ret = d_elastic_fac_solver.solveSystem(v_id,v_rhs_id);
   /*
    * Present data on the solve.
    */
-  // double avg_factor, final_factor;
-  // d_elastic_fac_solver.getConvergenceFactors(avg_factor, final_factor);
-  // tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
-  //            << "	iterations: "
-  //            << d_elastic_fac_solver.getNumberOfIterations() << "\n"
-  //            << "	residual: "<< d_elastic_fac_solver.getResidualNorm()
-  //            << "\n"
-  //            << "	average convergence: "<< avg_factor << "\n"
-  //            << "	final convergence: "<< final_factor << "\n"
-  //            << std::flush;
+  double avg_factor, final_factor;
+  d_elastic_fac_solver.getConvergenceFactors(avg_factor, final_factor);
+  SAMRAI::tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
+             << "	iterations: "
+             << d_elastic_fac_solver.getNumberOfIterations() << "\n"
+             << "	residual: "<< d_elastic_fac_solver.getResidualNorm()
+             << "\n"
+             << "	average convergence: "<< avg_factor << "\n"
+             << "	final convergence: "<< final_factor << "\n"
+             << std::flush;
 
   d_elastic_fac_solver.deallocateSolverState();
 

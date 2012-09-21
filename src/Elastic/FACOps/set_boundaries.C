@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -41,17 +40,16 @@
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
 #include "Constants.h"
-#include "Elastic/set_boundary.h"
 
 /* Set the physical boundaries for the velocity. */
 
-void SAMRAI::solv::Elastic::FACOps::set_boundaries
+void Elastic::FACOps::set_boundaries
 (const int &v_id,
- tbox::Pointer<hier::PatchLevel> &level, const bool &rhs)
+ SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
 {
-  for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+  for (SAMRAI::hier::PatchLevel::Iterator pi(*level); pi; pi++)
     {
-      tbox::Pointer<hier::Patch> patch = *pi;
-      set_boundary(*patch,v_id,rhs);
+      SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *pi;
+      d_boundary_conditions.set_boundary(*patch,v_id,rhs);
     }
 }

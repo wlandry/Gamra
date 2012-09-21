@@ -22,48 +22,49 @@
 
 #include "FTensor.hpp"
 
-void SAMRAI::geom::Elastic::V_Refine::refine(
-   hier::Patch& fine,
-   const hier::Patch& coarse,
-   const int dst_component,
-   const int src_component,
-   const hier::BoxOverlap& fine_overlap,
-   const hier::IntVector& ratio) const
+void Elastic::V_Refine::refine(SAMRAI::hier::Patch& fine,
+                               const SAMRAI::hier::Patch& coarse,
+                               const int dst_component,
+                               const int src_component,
+                               const SAMRAI::hier::BoxOverlap& fine_overlap,
+                               const SAMRAI::hier::IntVector& ratio) const
 {
-   const pdat::SideOverlap* t_overlap =
-      dynamic_cast<const pdat::SideOverlap *>(&fine_overlap);
+   const SAMRAI::pdat::SideOverlap* t_overlap =
+      dynamic_cast<const SAMRAI::pdat::SideOverlap *>(&fine_overlap);
 
    TBOX_ASSERT(t_overlap != NULL);
 
    for(int axis=0; axis<getDim().getValue(); ++axis)
      {
-       const hier::BoxList& boxes = t_overlap->getDestinationBoxList(axis);
-       for (hier::BoxList::Iterator b(boxes); b; b++)
+       const SAMRAI::hier::BoxList&
+         boxes = t_overlap->getDestinationBoxList(axis);
+       for (SAMRAI::hier::BoxList::Iterator b(boxes); b; b++)
          {
            refine(fine,coarse,dst_component,src_component,b(),ratio,axis);
          }
      }
 }
 
-void SAMRAI::geom::Elastic::V_Refine::refine
-(hier::Patch& fine_patch,
- const hier::Patch& coarse_patch,
+void Elastic::V_Refine::refine
+(SAMRAI::hier::Patch& fine_patch,
+ const SAMRAI::hier::Patch& coarse_patch,
  const int dst_component,
  const int src_component,
- const hier::Box& fine_box,
- const hier::IntVector& ratio,
+ const SAMRAI::hier::Box& fine_box,
+ const SAMRAI::hier::IntVector& ratio,
  const int &axis) const
 {
-   const tbox::Dimension& dimension(getDim());
+   const SAMRAI::tbox::Dimension& dimension(getDim());
    const int dim(dimension.getValue());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine_patch, coarse_patch, fine_box, ratio);
+   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine_patch, coarse_patch,
+                                   fine_box, ratio);
 
-   tbox::Pointer<pdat::SideData<double> >
+   SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
    v_ptr = coarse_patch.getPatchData(src_component);
-   pdat::SideData<double> &v(*v_ptr);
-   tbox::Pointer<pdat::SideData<double> >
+   SAMRAI::pdat::SideData<double> &v(*v_ptr);
+   SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
    v_fine_ptr = fine_patch.getPatchData(dst_component);
-   pdat::SideData<double> &v_fine(*v_fine_ptr);
+   SAMRAI::pdat::SideData<double> &v_fine(*v_fine_ptr);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
    TBOX_ASSERT(!v_ptr.isNull());
@@ -72,29 +73,30 @@ void SAMRAI::geom::Elastic::V_Refine::refine
    TBOX_ASSERT(v.getDepth() == 1);
 #endif
 
-   hier::Box coarse_box=coarse_patch.getBox();
-   tbox::Pointer<geom::CartesianPatchGeometry>
+   SAMRAI::hier::Box coarse_box=coarse_patch.getBox();
+   SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
      coarse_geom = coarse_patch.getPatchGeometry();
 
-   tbox::Pointer<geom::CartesianPatchGeometry>
+   SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
      fine_geom = fine_patch.getPatchGeometry();
    const double *dx=fine_geom->getDx();
 
-   const hier::Box &fine_patch_box(fine_patch.getBox());
+   const SAMRAI::hier::Box &fine_patch_box(fine_patch.getBox());
 
-   hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+   SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dimension)),
+     jp(ip), kp(ip);
    ip[0]=1;
    jp[1]=1;
    if(dim>2)
      kp[2]=1;
-   hier::Index pp[]={ip,jp,kp};
+   SAMRAI::hier::Index pp[]={ip,jp,kp};
 
-   for(pdat::CellIterator ci(fine_box); ci; ci++)
+   for(SAMRAI::pdat::CellIterator ci(fine_box); ci; ci++)
      {
-       pdat::SideIndex fine(*ci,axis,pdat::SideIndex::Lower);
+       SAMRAI::pdat::SideIndex fine(*ci,axis,SAMRAI::pdat::SideIndex::Lower);
 
-       pdat::SideIndex coarse(fine);
-       coarse.coarsen(hier::Index::getOneIndex(dimension)*2);
+       SAMRAI::pdat::SideIndex coarse(fine);
+       coarse.coarsen(SAMRAI::hier::Index::getOneIndex(dimension)*2);
 
        FTensor::Tensor1<double,3> offset(0,0,0);
        offset(axis)=dx[axis]/2;

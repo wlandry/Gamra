@@ -24,7 +24,6 @@
 #include "SAMRAI/hier/PatchData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/solv/FACPreconditioner.h"
-#include "Elastic/HypreSolver.h"
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/tbox/StartupShutdownManager.h"
@@ -47,9 +46,9 @@
 ********************************************************************
 */
 
-int SAMRAI::solv::Elastic::FACOps::solveCoarsestLevel
-(SAMRAIVectorReal<double>& data,
- const SAMRAIVectorReal<double>& residual,
+int Elastic::FACOps::solveCoarsestLevel
+(SAMRAI::solv::SAMRAIVectorReal<double>& data,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int coarsest_ln)
 {
   t_solve_coarsest->start();
@@ -64,15 +63,6 @@ int SAMRAI::solv::Elastic::FACOps::solveCoarsestLevel
                 coarsest_ln,
                 d_coarse_solver_max_iterations);
     d_residual_tolerance_during_smoothing = -1.0;
-  } else if (d_coarse_solver_choice == "hypre") {
-#ifndef HAVE_HYPRE
-    TBOX_ERROR(d_object_name << ": Coarse level solver choice '"
-               << d_coarse_solver_choice
-               << "' unavailable in "
-               << "Elastic::FACOps::solveCoarsestLevel.");
-#else
-    return_value = solveCoarsestLevel_HYPRE(data, residual, coarsest_ln);
-#endif
   } else {
     TBOX_ERROR(
                d_object_name << ": Bad coarse level solver choice '"
