@@ -35,79 +35,91 @@ void Elastic::Boundary_Conditions::set_boundary
     {
       double offset[]={0.5,0.5,0.5};
       offset[ix]=0;
-      for(SAMRAI::pdat::SideIterator si(gbox,ix); si; si++)
+      try
         {
-          SAMRAI::pdat::SideIndex x(*si);
+          for(SAMRAI::pdat::SideIterator si(gbox,ix); si; si++)
+            {
+              SAMRAI::pdat::SideIndex x(*si);
 
-          for(int d=0;d<dim;++d)
-            coord[d]=geom->getXLower()[d]
-              + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+              for(int d=0;d<dim;++d)
+                coord[d]=geom->getXLower()[d]
+                  + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
 
-          /* Set a sentinel value for normal components */
-          if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
-            {
-              if(is_dirichlet[ix][0][ix])
-                v(x)=boundary_value;
-              else
-                v(x)=v(x+pp[ix]*2);
-            }
-          else if(x[ix]>pbox.upper(ix)+1
-                  && geom->getTouchesRegularBoundary(ix,1))
-            {
-              if(is_dirichlet[ix][1][ix])
-                v(x)=boundary_value;
-              else
-                v(x)=v(x-pp[ix]*2);
-            }
-          /* Set values for normal components */
-          else if(x[ix]==pbox.lower(ix)
-                  && geom->getTouchesRegularBoundary(ix,0)
-                  && !rhs && is_dirichlet[ix][0][ix])
-            {
-              v(x)=dirichlet[ix][0][ix].Eval();
-            }
-          else if(x[ix]==pbox.upper(ix)+1
-                  && geom->getTouchesRegularBoundary(ix,1)
-                  && !rhs && is_dirichlet[ix][1][ix])
-            {
-              v(x)=dirichlet[ix][1][ix].Eval();
-            }
-          /* Set derivatives for tangential component.  The edges
-             and corners are incorrect for now.  */
-          else
-            {
-              for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+              /* Set a sentinel value for normal components */
+              if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
                 {
-                  if(x[iy]<pbox.lower(iy)
-                     && geom->getTouchesRegularBoundary(iy,0))
+                  if(is_dirichlet[ix][0][ix])
+                    v(x)=boundary_value;
+                  else
+                    v(x)=v(x+pp[ix]*2);
+                }
+              else if(x[ix]>pbox.upper(ix)+1
+                      && geom->getTouchesRegularBoundary(ix,1))
+                {
+                  if(is_dirichlet[ix][1][ix])
+                    v(x)=boundary_value;
+                  else
+                    v(x)=v(x-pp[ix]*2);
+                }
+              /* Set values for normal components */
+              else if(x[ix]==pbox.lower(ix)
+                      && geom->getTouchesRegularBoundary(ix,0)
+                      && !rhs && is_dirichlet[ix][0][ix])
+                {
+                  v(x)=dirichlet[ix][0][ix].Eval();
+                }
+              else if(x[ix]==pbox.upper(ix)+1
+                      && geom->getTouchesRegularBoundary(ix,1)
+                      && !rhs && is_dirichlet[ix][1][ix])
+                {
+                  v(x)=dirichlet[ix][1][ix].Eval();
+                }
+              /* Set derivatives for tangential component.  The edges
+                 and corners are incorrect for now.  */
+              else
+                {
+                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                     {
-                      if(rhs)
+                      if(x[iy]<pbox.lower(iy)
+                         && geom->getTouchesRegularBoundary(iy,0))
                         {
-                          v(x)=v(x+pp[iy]);
+                          if(rhs)
+                            {
+                              v(x)=v(x+pp[iy]);
+                            }
+                          else
+                            {
+                              coord[iy]=geom->getXLower()[iy];
+                              v(x)=v(x+pp[iy])
+                                - neumann[ix][0][iy].Eval()*dx[iy];
+                            }
                         }
-                      else
+                      else if(x[iy]>pbox.upper(iy)
+                              && geom->getTouchesRegularBoundary(iy,1))
                         {
-                          coord[iy]=geom->getXLower()[iy];
-                          v(x)=v(x+pp[iy])
-                            - neumann[ix][0][iy].Eval()*dx[iy];
-                        }
-                    }
-                  else if(x[iy]>pbox.upper(iy)
-                          && geom->getTouchesRegularBoundary(iy,1))
-                    {
-                      if(rhs)
-                        {
-                          v(x)=v(x-pp[iy]);
-                        }
-                      else
-                        {
-                          coord[iy]=geom->getXUpper()[iy];
-                          v(x)=v(x-pp[iy])
-                            - neumann[ix][1][iy].Eval()*dx[iy];
+                          if(rhs)
+                            {
+                              v(x)=v(x-pp[iy]);
+                            }
+                          else
+                            {
+                              coord[iy]=geom->getXUpper()[iy];
+                              v(x)=v(x-pp[iy])
+                                - neumann[ix][1][iy].Eval()*dx[iy];
+                            }
                         }
                     }
                 }
             }
+        }
+      catch(mu::Parser::exception_type &e)
+        {
+          TBOX_ERROR("Error in input formula\n"
+                     << "Message:  " << e.GetMsg() << "\n"
+                     << "Formula:  " << e.GetExpr() << "\n"
+                     << "Token:    " << e.GetToken() << "\n"
+                     << "Position: " << e.GetPos() << "\n"
+                     << "Errc:     " << e.GetCode() << "\n");
         }
       /* Fix up the edges.  This has to be done in a different
          loop, because the values on the faces will be used to
