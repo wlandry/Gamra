@@ -22,49 +22,28 @@ Elastic::Boundary_Conditions::Boundary_Conditions
   for(int i=0;i<keys.size();++i)
     SAMRAI::tbox::plog << keys[i] << "\n";
 
-  // for(int vxyz=0;vxyz<dim;++vxyz)
-  //   for(int direction=0;direction<dim;++direction)
-  //     for(int upper_lower=0;upper_lower<2;++upper_lower)
-  //       {
-  //         dirichlet[direction][upper_lower].
-  //           push_back(mup::ParserX(mup::pckALL_NON_COMPLEX));
-  //         neumann[direction][upper_lower].
-  //           push_back(mup::ParserX(mup::pckALL_NON_COMPLEX));
-  //       }
   for(int vxyz=0;vxyz<dim;++vxyz)
     for(int direction=0;direction<dim;++direction)
       for(int upper_lower=0;upper_lower<2;++upper_lower)
         {
-          // dirichlet[direction][upper_lower].
-          //   push_back(mup::ParserX(mup::pckALL_NON_COMPLEX));
-          // neumann[direction][upper_lower].
-          //   push_back(mup::ParserX(mup::pckALL_NON_COMPLEX));
           std::string bc_name(v+xyz[vxyz]+"_"+xyz[direction]+"_"
                               +upper_string[upper_lower]);
           if(database->keyExists("dirichlet_"+bc_name))
             {
               is_dirichlet[direction][upper_lower][vxyz]=true;
-              // dirichlet[direction][upper_lower][vxyz].DefineVar("x", mup::Variable(&xyz.At(0)));
-              // dirichlet[direction][upper_lower][vxyz].DefineVar("y", mup::Variable(&y)); 
-              // dirichlet[direction][upper_lower][vxyz].DefineVar("z", mup::Variable(&z)); 
-              // dirichlet[direction][upper_lower][vxyz].EnableAutoCreateVar(true);
-              // dirichlet[direction][upper_lower][vxyz].SetExpr(database->getString("dirichlet_"+bc_name));
               dirichlet[direction][upper_lower][vxyz].DefineVar("x",&coord[0]);
               dirichlet[direction][upper_lower][vxyz].DefineVar("y",&coord[1]);
               dirichlet[direction][upper_lower][vxyz].DefineVar("z",&coord[2]);
+              dirichlet[direction][upper_lower][vxyz].SetVarFactory(variable_factory, NULL);
               dirichlet[direction][upper_lower][vxyz].SetExpr(database->getString("dirichlet_"+bc_name));
             }
           else if(database->keyExists("neumann_"+bc_name))
             {
               is_dirichlet[direction][upper_lower][vxyz]=false;
-              // neumann[direction][upper_lower][vxyz].DefineVar("x",mup::Variable(&x));
-              // neumann[direction][upper_lower][vxyz].DefineVar("y",mup::Variable(&y));
-              // neumann[direction][upper_lower][vxyz].DefineVar("z",mup::Variable(&z));
-              // neumann[direction][upper_lower][vxyz].EnableAutoCreateVar(true);
-              // neumann[direction][upper_lower][vxyz].SetExpr(database->getString("neumann_"+bc_name));
               neumann[direction][upper_lower][vxyz].DefineVar("x",&coord[0]);
               neumann[direction][upper_lower][vxyz].DefineVar("y",&coord[1]);
               neumann[direction][upper_lower][vxyz].DefineVar("z",&coord[2]);
+              neumann[direction][upper_lower][vxyz].SetVarFactory(variable_factory, NULL);
               neumann[direction][upper_lower][vxyz].SetExpr(database->getString("neumann_"+bc_name));
             }
           else
