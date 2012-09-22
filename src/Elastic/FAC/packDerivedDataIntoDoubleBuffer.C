@@ -63,8 +63,7 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
           x(center,0,SAMRAI::pdat::SideIndex::Lower),
           y(center,1,SAMRAI::pdat::SideIndex::Lower);
 	
-        double vx=v(x);
-        // double vx=(v(x+ip) + v(x))/2.;
+        double vx=(v(x+ip) + v(x))/2.;
         double vy=(v(y+jp) + v(y))/2.;
 
         if (0==depth_id)
