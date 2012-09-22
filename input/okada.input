@@ -48,28 +48,6 @@ Elastic {
     v_rhs_ijk= 11, 11
     v_rhs_coord_min= -10.001, -10.001
     v_rhs_coord_max= 10.001, 10.001
-    // v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1.03, 1.03, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1.03, 1.03, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 
     v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -95,11 +73,9 @@ Elastic {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-    faults= -10, 0.0707106781188, -0.0707106781188, 0.0, 0.2, 0.25, -45, 0, 0
+    faults= -10, 0.000001, -.1, 0.0, 0.2, 0.25, 0, 0, 0
 
     fac_solver {
-        // This is the input for the cell-centered Stokes FAC solver
-        // class in the SAMRAI library.
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
         residual_tol = 1e-3     // Residual tolerance to solve for
@@ -112,22 +88,14 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="0"
-        dirichlet_vx_x_lower="0"
-        dirichlet_vy_y_upper="0"
-        dirichlet_vy_y_lower="0"
-        neumann_vx_y_upper="0"
-        neumann_vx_y_lower="0"
-        neumann_vy_x_upper="0"
-        neumann_vy_x_lower="0"
-        // dirichlet_vx_x_upper="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
-        // dirichlet_vx_x_lower="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
-        // dirichlet_vy_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
-        // dirichlet_vy_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
-        // neumann_vx_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y"
-        // neumann_vx_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y"
-        // neumann_vy_x_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duyp_x+duym_x"
-        // neumann_vy_x_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duyp_x+duym_x"
+        dirichlet_vx_x_upper="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
+        dirichlet_vx_x_lower="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
+        dirichlet_vy_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
+        dirichlet_vy_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
+        neumann_vx_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), -duxp_y+duxm_y"
+        neumann_vx_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), -duxp_y+duxm_y"
+        neumann_vy_x_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duyp_x+duym_x"
+        neumann_vy_x_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duyp_x+duym_x"
     }
 }
 
