@@ -172,4 +172,9 @@ Elastic::FAC::FAC(const std::string& object_name,
       check_array_sizes(v_rhs_ijk,v_rhs_xyz_min,v_rhs_xyz_max,
                         v_rhs,dim,"v_rhs",dim);
     }
+
+  if(database->keyExists("faults"))
+    {
+      faults=database->getDoubleArray("faults");
+    }
 }

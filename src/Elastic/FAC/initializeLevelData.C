@@ -19,8 +19,8 @@ bool intersect_fault(const int &dim,
   bool result(true);
   for(int d=1;d<dim;++d)
     {
-      double y((c1(d)*c0(0) -  c1(0)*c0(d))/(c1(0) - c0(0)));
-      result=result && (y<=fault[d-1]/2 && y>-fault[d-1]/2);
+      double y((c1(d)*c0(0) -  c1(0)*c0(d))/(c0(0) - c1(0)));
+      result=result && (y<=fault[d-1] && y>0);
     }
   return result;
 }
@@ -125,23 +125,27 @@ void Elastic::FAC::initializeLevelData
     SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > v_rhs_data =
       patch->getPatchData(v_rhs_id);
 
-    if(v_rhs.empty())
+    v_rhs_data->fill(0,0);
+    // if(v_rhs.empty())
+    //   {
+    //     v_rhs_data->fill(0,0);
+    //   }
+    for(int fault_index=0;fault_index<faults.size();fault_index+=9)
       {
-        v_rhs_data->fill(0,0);
-      }
-    else
-      {
-        double L(0.2),W(0.25);
-        double x(0.000001),y(0.0),z(0.0);
-	double scale(-10.);
-
         const double pi=4*atan(1);
-        // const double theta(0);
-        const double theta(pi/4);
+        double scale(faults[fault_index+0]), x(faults[fault_index+1]),
+          y(faults[fault_index+2]), z(faults[fault_index+3]),
+          L(faults[fault_index+4]), W(faults[fault_index+5]),
+          strike(faults[fault_index+6]*pi/180),
+          dip(faults[fault_index+7]*pi/180),
+          rake(faults[fault_index+8]*pi/180);
+
         const FTensor::Tensor1<double,3> center(x,y,z);
-        const FTensor::Tensor2<double,3,3> rot(std::cos(theta),std::sin(theta),0,
-                                               -std::sin(theta),cos(theta),0,
-                                               0,0,1);
+        /* I use an opposite convention for the sign of the strike */
+        const FTensor::Tensor2<double,3,3>
+          rot(std::cos(strike),-std::sin(strike),0,
+              std::sin(strike),std::cos(strike),0,0,0,1);
+
         FTensor::Tensor1<double,3> Dx[dim];
         for(int d0=0;d0<dim;++d0)
           {
@@ -167,7 +171,6 @@ void Elastic::FAC::initializeLevelData
             for(SAMRAI::pdat::SideIterator si(pbox,ix); si; si++)
               {
                 SAMRAI::pdat::SideIndex s=si();
-                (*v_rhs_data)(s)=0;
 
                 FTensor::Tensor1<double,3> xyz(0,0,0);
                 for(int d=0;d<dim;++d)

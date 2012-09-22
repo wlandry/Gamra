@@ -193,6 +193,8 @@ namespace Elastic {
     SAMRAI::tbox::Array<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
     SAMRAI::tbox::Array<int> v_rhs_ijk;
 
+    SAMRAI::tbox::Array<double> faults;
+
     //@}
 
   };
