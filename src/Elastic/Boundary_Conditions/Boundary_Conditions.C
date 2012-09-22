@@ -30,21 +30,21 @@ Elastic::Boundary_Conditions::Boundary_Conditions
                               +upper_string[upper_lower]);
           if(database->keyExists("dirichlet_"+bc_name))
             {
-              is_dirichlet[direction][upper_lower][vxyz]=true;
-              dirichlet[direction][upper_lower][vxyz].DefineVar("x",&coord[0]);
-              dirichlet[direction][upper_lower][vxyz].DefineVar("y",&coord[1]);
-              dirichlet[direction][upper_lower][vxyz].DefineVar("z",&coord[2]);
-              dirichlet[direction][upper_lower][vxyz].SetVarFactory(variable_factory, NULL);
-              dirichlet[direction][upper_lower][vxyz].SetExpr(database->getString("dirichlet_"+bc_name));
+              is_dirichlet[vxyz][direction][upper_lower]=true;
+              dirichlet[vxyz][direction][upper_lower].DefineVar("x",&coord[0]);
+              dirichlet[vxyz][direction][upper_lower].DefineVar("y",&coord[1]);
+              dirichlet[vxyz][direction][upper_lower].DefineVar("z",&coord[2]);
+              dirichlet[vxyz][direction][upper_lower].SetVarFactory(variable_factory, NULL);
+              dirichlet[vxyz][direction][upper_lower].SetExpr(database->getString("dirichlet_"+bc_name));
             }
           else if(database->keyExists("neumann_"+bc_name))
             {
-              is_dirichlet[direction][upper_lower][vxyz]=false;
-              neumann[direction][upper_lower][vxyz].DefineVar("x",&coord[0]);
-              neumann[direction][upper_lower][vxyz].DefineVar("y",&coord[1]);
-              neumann[direction][upper_lower][vxyz].DefineVar("z",&coord[2]);
-              neumann[direction][upper_lower][vxyz].SetVarFactory(variable_factory, NULL);
-              neumann[direction][upper_lower][vxyz].SetExpr(database->getString("neumann_"+bc_name));
+              is_dirichlet[vxyz][direction][upper_lower]=false;
+              neumann[vxyz][direction][upper_lower].DefineVar("x",&coord[0]);
+              neumann[vxyz][direction][upper_lower].DefineVar("y",&coord[1]);
+              neumann[vxyz][direction][upper_lower].DefineVar("z",&coord[2]);
+              neumann[vxyz][direction][upper_lower].SetVarFactory(variable_factory, NULL);
+              neumann[vxyz][direction][upper_lower].SetExpr(database->getString("neumann_"+bc_name));
             }
           else
             {

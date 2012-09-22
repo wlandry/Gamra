@@ -48,7 +48,7 @@ void Elastic::Boundary_Conditions::set_boundary
               /* Set a sentinel value for normal components */
               if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
                 {
-                  if(is_dirichlet[ix][0][ix])
+                  if(is_dirichlet[ix][ix][0])
                     v(x)=boundary_value;
                   else
                     v(x)=v(x+pp[ix]*2);
@@ -56,7 +56,7 @@ void Elastic::Boundary_Conditions::set_boundary
               else if(x[ix]>pbox.upper(ix)+1
                       && geom->getTouchesRegularBoundary(ix,1))
                 {
-                  if(is_dirichlet[ix][1][ix])
+                  if(is_dirichlet[ix][ix][1])
                     v(x)=boundary_value;
                   else
                     v(x)=v(x-pp[ix]*2);
@@ -64,15 +64,15 @@ void Elastic::Boundary_Conditions::set_boundary
               /* Set values for normal components */
               else if(x[ix]==pbox.lower(ix)
                       && geom->getTouchesRegularBoundary(ix,0)
-                      && !rhs && is_dirichlet[ix][0][ix])
+                      && !rhs && is_dirichlet[ix][ix][0])
                 {
-                  v(x)=dirichlet[ix][0][ix].Eval();
+                  v(x)=dirichlet[ix][ix][0].Eval();
                 }
               else if(x[ix]==pbox.upper(ix)+1
                       && geom->getTouchesRegularBoundary(ix,1)
-                      && !rhs && is_dirichlet[ix][1][ix])
+                      && !rhs && is_dirichlet[ix][ix][1])
                 {
-                  v(x)=dirichlet[ix][1][ix].Eval();
+                  v(x)=dirichlet[ix][ix][1].Eval();
                 }
               /* Set derivatives for tangential component.  The edges
                  and corners are incorrect for now.  */
@@ -91,7 +91,7 @@ void Elastic::Boundary_Conditions::set_boundary
                             {
                               coord[iy]=geom->getXLower()[iy];
                               v(x)=v(x+pp[iy])
-                                - neumann[ix][0][iy].Eval()*dx[iy];
+                                - neumann[ix][iy][0].Eval()*dx[iy];
                             }
                         }
                       else if(x[iy]>pbox.upper(iy)
@@ -105,7 +105,7 @@ void Elastic::Boundary_Conditions::set_boundary
                             {
                               coord[iy]=geom->getXUpper()[iy];
                               v(x)=v(x-pp[iy])
-                                - neumann[ix][1][iy].Eval()*dx[iy];
+                                + neumann[ix][iy][1].Eval()*dx[iy];
                             }
                         }
                     }

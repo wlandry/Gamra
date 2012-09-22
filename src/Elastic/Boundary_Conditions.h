@@ -25,8 +25,8 @@ namespace Elastic {
       variables.push_back(0);
       return &variables.back();
     }
-    mu::Parser dirichlet[3][2][3], neumann[3][2][3];
-    bool is_dirichlet[3][2][3];
+    mu::Parser dirichlet[3][3][2], neumann[3][3][2];
+    bool is_dirichlet[3][3][2];
     double coord[3];
     std::string d_object_name;
   };
