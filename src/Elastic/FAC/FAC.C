@@ -46,7 +46,7 @@ namespace Elastic {
     if(data.size()!=data_size*num_components)
       TBOX_ERROR("Bad number of elements in "
                  << name << "_data.  Expected "
-                 << data_size << " but got " << data.size());
+                 << data_size*num_components << " but got " << data.size());
   }
 }
 /*
