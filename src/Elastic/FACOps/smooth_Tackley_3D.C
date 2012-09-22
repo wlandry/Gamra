@@ -112,6 +112,14 @@ void Elastic::FACOps::smooth_Tackley_3D
                     }
               }
             set_boundaries(v_id,level,true);
+  if (ln > d_ln_min) {
+    /*
+     * Perform a one-time transfer of data from coarser level,
+     * to fill ghost boundaries that will not change through
+     * the smoothing loop.
+     */
+    xeqScheduleGhostFill(v_id, ln);
+  }
           }
 
       // if (residual_tolerance >= 0.0) {
