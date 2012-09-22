@@ -18,9 +18,6 @@ Elastic::Boundary_Conditions::Boundary_Conditions
   std::string upper_string[]={"lower","upper"};
 
   SAMRAI::tbox::Array<std::string> keys(database->getAllKeys());
-  SAMRAI::tbox::plog << "keys\n";
-  for(int i=0;i<keys.size();++i)
-    SAMRAI::tbox::plog << keys[i] << "\n";
 
   for(int vxyz=0;vxyz<dim;++vxyz)
     for(int direction=0;direction<dim;++direction)
