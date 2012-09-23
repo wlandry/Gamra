@@ -20,7 +20,7 @@ bool intersect_fault(const int &dim,
   for(int d=1;d<dim;++d)
     {
       double y((c1(d)*c0(0) -  c1(0)*c0(d))/(c0(0) - c1(0)));
-      result=result && (y<=fault[d-1] && y>0);
+      result=result && ((y<=fault[d-1] && y>0) || (y>=fault[d-1] && y<0));
     }
   return result;
 }
@@ -119,8 +119,6 @@ void Elastic::FAC::initializeLevelData
         (*cell_moduli)(c,1)=mu[ijk];
       }
 
-    /* I do not think this is actually necessary. */
-
     /* v_rhs */
     SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > v_rhs_data =
       patch->getPatchData(v_rhs_id);
@@ -130,21 +128,37 @@ void Elastic::FAC::initializeLevelData
     //   {
     //     v_rhs_data->fill(0,0);
     //   }
+
+    /* Iterate over the faults */
     for(int fault_index=0;fault_index<faults.size();fault_index+=9)
       {
         const double pi=4*atan(1);
+        /* The conventions for faults are different from the regular
+         * xyz coordinates, so we have to convert.  Depth is a
+         * coordinate, giving a left-handed coordinate system.  So we
+         * invert the depth and width to convert to a right-handed
+         * coordinate system.  Strike is opposite in direction, and
+         * dip is measured from a plane lying flat. */
         double scale(faults[fault_index+0]), x(faults[fault_index+1]),
-          y(faults[fault_index+2]), z(faults[fault_index+3]),
-          L(faults[fault_index+4]), W(faults[fault_index+5]),
+          y(faults[fault_index+2]), z(-faults[fault_index+3]),
+          L(faults[fault_index+4]), W(-faults[fault_index+5]),
           strike(faults[fault_index+6]*pi/180),
           dip(faults[fault_index+7]*pi/180),
           rake(faults[fault_index+8]*pi/180);
 
         const FTensor::Tensor1<double,3> center(x,y,z);
-        /* I use an opposite convention for the sign of the strike */
         const FTensor::Tensor2<double,3,3>
-          rot(std::cos(strike),-std::sin(strike),0,
-              std::sin(strike),std::cos(strike),0,0,0,1);
+          rot_strike(std::cos(strike),-std::sin(strike),0,
+                     std::sin(strike),std::cos(strike),0,0,0,1),
+          rot_dip(std::sin(dip),0,-std::cos(dip),
+                  0,1,0,
+                  std::cos(dip),0,std::sin(dip));
+
+        FTensor::Tensor2<double,3,3> rot;
+        FTensor::Index<'a',3> a;
+        FTensor::Index<'b',3> b;
+        FTensor::Index<'c',3> c;
+        rot(a,b)=rot_dip(a,c)*rot_strike(c,b);
 
         FTensor::Tensor1<double,3> Dx[dim];
         for(int d0=0;d0<dim;++d0)
@@ -155,10 +169,12 @@ void Elastic::FAC::initializeLevelData
             Dx[d0](d0)=dx[d0];
           }
         FTensor::Tensor1<double,3> slip(0,scale,0);
-        FTensor::Index<'a',3> a;
-        FTensor::Index<'b',3> b;
+        const FTensor::Tensor2<double,3,3>
+          rot_rake(1,0,0,
+                   0,std::cos(rake),-std::sin(rake),
+                   0,std::sin(rake),std::cos(rake));
         FTensor::Tensor1<double,3> jump;
-        jump(a)=slip(b)*rot(b,a);
+        jump(c)=rot(b,c)*rot_rake(b,a)*slip(a);
 
         double fault[]={L,W};
 
