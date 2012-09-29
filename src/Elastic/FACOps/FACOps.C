@@ -53,7 +53,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   // d_physical_bc_coef(NULL),
   d_context(SAMRAI::hier::VariableDatabase::getDatabase()
             ->getContext(object_name + "::PRIVATE_CONTEXT")),
-  d_cell_scratch_id(invalid_id),
   d_side_scratch_id(invalid_id),
   v_prolongation_refine_operator(),
   v_prolongation_refine_schedules(),
@@ -112,10 +111,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
 
   SAMRAI::hier::VariableDatabase*
     vdb = SAMRAI::hier::VariableDatabase::getDatabase();
-  d_cell_scratch_id = vdb->
-    registerVariableAndContext(s_cell_scratch_var[dim.getValue() - 1],
-                               d_context,
-                               SAMRAI::hier::IntVector::getOne(dim));
   d_side_scratch_id = vdb->
     registerVariableAndContext(s_side_scratch_var[dim.getValue() - 1],
                                d_context,

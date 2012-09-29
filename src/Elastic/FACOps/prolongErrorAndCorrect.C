@@ -72,7 +72,6 @@ void Elastic::FACOps::prolongErrorAndCorrect
    * Data is prolonged into the scratch space corresponding
    * to index d_cell_scratch_id and allocated here.
    */
-  fine_level->allocatePatchData(d_cell_scratch_id);
   fine_level->allocatePatchData(d_side_scratch_id);
 
   // int v_src(s.getComponentDescriptorIndex(0)),
@@ -114,7 +113,6 @@ void Elastic::FACOps::prolongErrorAndCorrect
     const int v_dst = d.getComponentDescriptorIndex(0);
     hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);
   }
-  fine_level->deallocatePatchData(d_cell_scratch_id);
   fine_level->deallocatePatchData(d_side_scratch_id);
 
   t_prolong->stop();
