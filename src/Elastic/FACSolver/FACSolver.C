@@ -125,19 +125,13 @@ Elastic::FACSolver::FACSolver
     }
   }
 
-  // /*
-  //  * The default RobinBcCoefStrategy used,
-  //  * SimpleCellRobinBcCoefs only works with constant refine
-  //  * for prolongation.  So we use constant refinement
-  //  * for prolongation by default.
-  //  */
-  // setProlongationMethod("CONSTANT_REFINE");
+  d_fac_precond.setAlgorithmChoice("fas");
 
   /*
    * The FAC operator optionally uses the preconditioner
    * to get data for logging.
    */
-  d_fac_ops.setPreconditioner((const SAMRAI::solv::FACPreconditioner *)(&d_fac_precond));
+  d_fac_ops.setPreconditioner(&d_fac_precond);
 
   if (database) {
     getFromInput(database);
