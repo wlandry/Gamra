@@ -153,8 +153,9 @@ namespace Elastic {
     /*!
      * @name Major algorithm objects.
      */
-
+  public:
     Boundary_Conditions d_boundary_conditions;
+  private:
     /*!
      * @brief FAC Elastic solver.
      */
