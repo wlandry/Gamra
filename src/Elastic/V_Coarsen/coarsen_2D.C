@@ -62,9 +62,8 @@ void Elastic::V_Coarsen::coarsen_2D
   TBOX_ASSERT(directions ==
               SAMRAI::hier::IntVector::min(directions, v_fine->getDirectionVector()));
 
-  const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> cgeom =
-    coarse.getPatchGeometry();
-  const double *dx=cgeom->getDx();
+  const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
+    cgeom = coarse.getPatchGeometry();
 
   /* Numbering of v nodes is
 
@@ -113,22 +112,16 @@ void Elastic::V_Coarsen::coarsen_2D
                                            SAMRAI::pdat::SideIndex::Lower);
             SAMRAI::pdat::SideIndex fine(coarse*2);
             if((i==coarse_box.lower(0)
-                && cgeom->getTouchesRegularBoundary(0,0))
+                && cgeom->getTouchesRegularBoundary(0,0)
+                && d_boundary_conditions.is_dirichlet[0][0][0])
                || (i==coarse_box.upper(0)+1
-                   && cgeom->getTouchesRegularBoundary(0,1)))
+                   && cgeom->getTouchesRegularBoundary(0,1)
+                   && d_boundary_conditions.is_dirichlet[0][0][1]))
               {
                 (*v)(coarse)=((*v_fine)(fine) + (*v_fine)(fine+jp))/2;
               }
             else
               {
-                const int axis=0;
-                FTensor::Tensor1<double,3> offset(0,0,0);
-                offset(axis)=dx[axis]/2;
-                FTensor::Tensor1<double,3> xyz(0,0,0);
-                for(int d=0;d<Dim.getValue();++d)
-                  xyz(d)=cgeom->getXLower()[d]
-                    + dx[d]*(coarse[d]-coarse_box.lower()[d] + 0.5) - offset(d);
-
                 coarsen_point_2D(coarse,ip,jp,v,v_fine);
               }
           }
@@ -138,9 +131,11 @@ void Elastic::V_Coarsen::coarsen_2D
                                            SAMRAI::pdat::SideIndex::Lower);
             SAMRAI::pdat::SideIndex fine(coarse*2);
             if((j==coarse_box.lower(1)
-                && cgeom->getTouchesRegularBoundary(1,0))
+                && cgeom->getTouchesRegularBoundary(1,0)
+                && d_boundary_conditions.is_dirichlet[1][1][0])
                || (j==coarse_box.upper(1)+1
-                   && cgeom->getTouchesRegularBoundary(1,1)))
+                   && cgeom->getTouchesRegularBoundary(1,1)
+                   && d_boundary_conditions.is_dirichlet[1][1][1]))
               {
                 (*v)(coarse)=((*v_fine)(fine) + (*v_fine)(fine+ip))/2;
               }
