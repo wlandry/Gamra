@@ -64,7 +64,7 @@ Elastic::FAC::FAC(const std::string& object_name,
   d_boundary_conditions(dimension,d_object_name + "::boundary conditions",
                         database->getDatabase("boundary_conditions")),
   d_elastic_fac_solver((d_dim),
-                       object_name + "::elastic",
+                       object_name + "::fac_solver",
                        (!database.isNull() &&
                         database->isDatabase("fac_solver")) ?
                        database->getDatabase("fac_solver"):
