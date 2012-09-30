@@ -887,7 +887,7 @@ namespace Elastic {
      * Scratch data is allocated and removed as needed
      * to reduce memory usage.
      */
-    int d_cell_scratch_id, d_side_scratch_id;
+    int d_side_scratch_id;
 
     //@}
 
