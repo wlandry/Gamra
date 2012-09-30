@@ -20,6 +20,7 @@
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/pdat/SideVariable.h"
+#include "Elastic/Boundary_Conditions.h"
 
 #include <string>
 
@@ -47,11 +48,11 @@ namespace Elastic {
     /**
      * Uninteresting default constructor.
      */
-    explicit V_Coarsen(const SAMRAI::tbox::Dimension& dim):
-      SAMRAI::xfer::CoarsenOperator(dim, "V_COARSEN")
-    {
-      d_name_id = "V_COARSEN";
-    }
+    explicit V_Coarsen(const SAMRAI::tbox::Dimension& dim,
+                       const Boundary_Conditions &bc):
+      SAMRAI::xfer::CoarsenOperator(dim, "V_COARSEN"), 
+      d_boundary_conditions(bc), d_name_id("V_COARSEN")
+    {}
 
     /**
      * Uninteresting virtual destructor.
@@ -136,6 +137,8 @@ namespace Elastic {
                const int src_component,
                const SAMRAI::hier::Box& coarse_box,
                const SAMRAI::hier::IntVector& ratio) const;
+
+    const Boundary_Conditions &d_boundary_conditions;
 
   private:
     std::string d_name_id;

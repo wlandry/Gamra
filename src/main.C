@@ -38,7 +38,6 @@ using namespace std;
 #include "Elastic/V_Refine.h"
 #include "Elastic/V_Boundary_Refine.h"
 #include "Elastic/V_Coarsen.h"
-#include "Elastic/Resid_Coarsen.h"
 
 #include "Stokes/FAC.h"
 #include "Elastic/FAC.h"
@@ -214,19 +213,11 @@ int main(
            (new Elastic::V_Boundary_Refine(dim)));
         grid_geometry->addSpatialCoarsenOperator
           (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
-           (new Elastic::V_Coarsen(dim)));
-        grid_geometry->addSpatialCoarsenOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
-           (new Elastic::Resid_Coarsen(dim,fac_elastic.cell_moduli_id)));
+           (new Elastic::V_Coarsen(dim,fac_elastic.d_boundary_conditions)));
 
         solve_system(fac_elastic,main_db,input_db,patch_hierarchy,
                      base_name,dim);
       }
-
-    /*
-     * Deallocate objects when done.
-     */
-
   }
   /*
    * This print is for the SAMRAI testing framework.  Passing here
