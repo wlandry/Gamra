@@ -32,9 +32,6 @@ void Elastic::FACOps::initializeOperatorState
   d_hierarchy = solution.getPatchHierarchy();
   d_ln_min = solution.getCoarsestLevelNumber();
   d_ln_max = solution.getFinestLevelNumber();
-  d_hopscell = new SAMRAI::math::HierarchyCellDataOpsReal<double>(d_hierarchy,
-                                                                  d_ln_min,
-                                                                  d_ln_max);
   d_hopsside = new SAMRAI::math::HierarchySideDataOpsReal<double>(d_hierarchy,
                                                                   d_ln_min,
                                                                   d_ln_max);
@@ -160,7 +157,6 @@ void Elastic::FACOps::initializeOperatorState
   v_coarsen_patch_strategy.coarse_fine=d_cf_boundary;
   /*
    * Get the transfer operators.
-   * Cell (solution, error, etc) coarsening is conservative.
    */
   SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianGridGeometry> geometry =
     d_hierarchy->getGridGeometry();

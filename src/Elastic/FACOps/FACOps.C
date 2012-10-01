@@ -70,7 +70,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   d_enable_logging(false),
   d_preconditioner(NULL),
   d_boundary_conditions(bc),
-  d_hopscell(),
   d_hopsside()
 {
 

@@ -964,12 +964,6 @@ namespace Elastic {
     Boundary_Conditions &d_boundary_conditions;
         
     /*!
-     * @brief Hierarchy cell operator used in debugging.
-     */
-    SAMRAI::tbox::Pointer<SAMRAI::math::HierarchyCellDataOpsReal<double> >
-    d_hopscell;
-
-    /*!
      * @brief Hierarchy side operator used in debugging.
      */
     SAMRAI::tbox::Pointer<SAMRAI::math::HierarchySideDataOpsReal<double> >
