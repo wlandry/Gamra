@@ -49,11 +49,11 @@ void Elastic::V_Boundary_Refine::Update_V_2D
       center.coarsen(SAMRAI::hier::Index(2,2));
 
       const double v_center=
-        (-v(center-ip_s) + 3*v(center) + 6*v(center+ip_s))/8;
+        (-v(center-ip_s) + 6*v(center) + 3*v(center+ip_s))/8;
       const double v_plus=
-        (-v(center-ip_s+jp) + 3*v(center+jp) + 6*v(center+ip_s+jp))/8;
+        (-v(center-ip_s+jp) + 6*v(center+jp) + 3*v(center+ip_s+jp))/8;
       const double v_minus=
-        (-v(center-ip_s-jp) + 3*v(center-jp) + 6*v(center+ip_s-jp))/8;
+        (-v(center-ip_s-jp) + 6*v(center-jp) + 3*v(center+ip_s-jp))/8;
                             
 
       // const double v_center=(-v(center-ip_s) + 4*v(center)
@@ -79,6 +79,20 @@ void Elastic::V_Boundary_Refine::Update_V_2D
         {
           v_fine(fine)=v_p;
         }
+
+      SAMRAI::tbox::plog << "Update V "
+                         << fine << " "
+                         << center << " "
+                         << ip_s << " "
+                         << jp << " "
+                         << v_fine(fine) << " "
+                         << v(center-ip_s) << " "
+                         << v(center) << " "
+                         << v(center+ip_s) << " "
+                         << v_center << " "
+                         << v_plus << " "
+                         << v_minus << " "
+                         << "\n";
 
       // v_fine(fine)=boundary_value;
       // if(j%2==0)
@@ -131,29 +145,59 @@ void Elastic::V_Boundary_Refine::Update_V_2D
                * later for the actual point. */
 
               const double dv_plus=v(center+ip-jp_s)-v(center+ip);
-              const double dv_plus_plus=v(center+ip+ip-jp_s)-v(center+ip+ip);
-              const double dv_minus_minus=v(center-ip-jp_s)-v(center-ip);
-              v_fine(fine+ip)=v_fine(fine+ip-jp_s)
-                - (-dv_minus_minus + 4*dv_minus + 4*dv_plus - dv_plus_plus)/12;
-
-              // v_fine(fine+ip)=v_fine(fine+ip-jp_s)
-              //   - (dv_minus + dv_plus)/4;
+              if(v(center+ip+ip)==boundary_value || v(center-ip)==boundary_value)
+                {
+                  v_fine(fine+ip)=v_fine(fine+ip-jp_s)
+                    - (dv_minus + dv_plus)/4;
+                }
+              else
+                {
+                  const double dv_plus_plus=v(center+ip+ip-jp_s)-v(center+ip+ip);
+                  const double dv_minus_minus=v(center-ip-jp_s)-v(center-ip);
+                  v_fine(fine+ip)=v_fine(fine+ip-jp_s)
+                    - (-dv_minus_minus + 4*dv_minus + 4*dv_plus - dv_plus_plus)/12;
+                }
 
               /* Since we update two points on 'i' at once, we
                  increment 'i' again.  This is ok, since the box in
                  the 'j' direction is defined to be only one cell
                  wide */
               ++i;
+
+       SAMRAI::tbox::plog << "Update V "
+                          << axis << " "
+                          << boundary_direction << " "
+                          << fine << " "
+                          << v_fine(fine) << " "
+                          << v_fine(fine-jp_s) << " "
+                          << v_fine(fine+ip) << " "
+                          << v_fine(fine+ip-jp_s) << " "
+                          << v(center+ip+ip) << " "
+                          << v(center+ip) << " "
+                          << v(center) << " "
+                          << v(center-ip) << " "
+                          << dv_plus << " "
+                          // << dv_plus_plus << " "
+                          << dv_minus << " "
+                          // << dv_minus_minus << " "
+                          << "\n";
             }
         }
       else
         {
           const double dv_plus=v(center+ip-jp_s)-v(center+ip);
-          const double dv_plus_plus=v(center+ip+ip-jp_s)-v(center+ip+ip);
-          const double dv_minus_minus=v(center-ip-jp_s)-v(center-ip);
-          v_fine(fine)=v_fine(fine-jp_s)
-            - (-dv_minus_minus + 4*dv_minus + 4*dv_plus - dv_plus_plus)/12;
-
+          if(v(center+ip+ip)==boundary_value || v(center-ip)==boundary_value)
+            {
+              v_fine(fine)=v_fine(fine-jp_s)
+                - (dv_minus + dv_plus)/4;
+            }
+          else
+            {
+              const double dv_plus_plus=v(center+ip+ip-jp_s)-v(center+ip+ip);
+              const double dv_minus_minus=v(center-ip-jp_s)-v(center-ip);
+              v_fine(fine)=v_fine(fine-jp_s)
+                - (-dv_minus_minus + 4*dv_minus + 4*dv_plus - dv_plus_plus)/12;
+            }
 
           // v_fine(fine)=v_fine(fine-jp_s)
           //   - (dv_minus + dv_plus)/4;

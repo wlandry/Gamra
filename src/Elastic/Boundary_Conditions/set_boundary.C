@@ -20,6 +20,11 @@ void Elastic::Boundary_Conditions::set_boundary
   for(int i=0;i<dim;++i)
     pp[i][i]=1;
 
+  if(!rhs)
+    {
+      SAMRAI::tbox::plog << "Setting physical boundary\n";
+    }
+
   /* This should really get read from the input file. */
   const double *dx=geom->getDx();
 
@@ -50,7 +55,11 @@ void Elastic::Boundary_Conditions::set_boundary
                   if(is_dirichlet[ix][ix][0])
                     v(x)=boundary_value;
                   else
-                    v(x)=v(x+pp[ix]*2) - neumann[ix][ix][0].Eval()*2*dx[ix];
+                    {
+                      v(x)=v(x+pp[ix]*2);
+                      if(!rhs)
+                        v(x)-=neumann[ix][ix][0].Eval()*2*dx[ix];
+                    }
                 }
               else if(x[ix]>pbox.upper(ix)+1
                       && geom->getTouchesRegularBoundary(ix,1))
@@ -58,7 +67,11 @@ void Elastic::Boundary_Conditions::set_boundary
                   if(is_dirichlet[ix][ix][1])
                     v(x)=boundary_value;
                   else
-                    v(x)=v(x-pp[ix]*2) + neumann[ix][ix][1].Eval()*2*dx[ix];
+                    {
+                      v(x)=v(x-pp[ix]*2);
+                      if(!rhs)
+                        v(x)+=neumann[ix][ix][1].Eval()*2*dx[ix];
+                    }
                 }
               /* If at the boundary line, set values for normal
                * components. */
@@ -66,13 +79,19 @@ void Elastic::Boundary_Conditions::set_boundary
                       && geom->getTouchesRegularBoundary(ix,0)
                       && !rhs && is_dirichlet[ix][ix][0])
                 {
-                  v(x)=dirichlet[ix][ix][0].Eval();
+                  if(!rhs)
+                    v(x)=dirichlet[ix][ix][0].Eval();
+                  else
+                    v(x)=0;
                 }
               else if(x[ix]==pbox.upper(ix)+1
                       && geom->getTouchesRegularBoundary(ix,1)
                       && !rhs && is_dirichlet[ix][ix][1])
                 {
-                  v(x)=dirichlet[ix][ix][1].Eval();
+                  if(!rhs)
+                    v(x)=dirichlet[ix][ix][1].Eval();
+                  else
+                    v(x)=0;
                 }
               /* Set tangential components. */
               else
@@ -86,18 +105,15 @@ void Elastic::Boundary_Conditions::set_boundary
                           std::swap(coord[iy],coord_save);
                           if(is_dirichlet[ix][iy][0])
                             {
+                              v(x)=-v(x+pp[iy]);
                               if(!rhs)
-                                v(x)=2*dirichlet[ix][iy][0].Eval()
-                                  - v(x+pp[iy]);
-                              else
-                                abort();
-                              /* We need to coarsen the dirichlet
-                               * value and store it somewhere. */
+                                v(x)+=2*dirichlet[ix][iy][0].Eval();
                             }
                           else
                             {
-                              v(x)=v(x+pp[iy])
-                                - neumann[ix][iy][0].Eval()*dx[iy];
+                              v(x)=v(x+pp[iy]);
+                              if(!rhs)
+                                v(x)-=neumann[ix][iy][0].Eval()*dx[iy];
                             }
                           std::swap(coord[iy],coord_save);
                         }
@@ -108,23 +124,25 @@ void Elastic::Boundary_Conditions::set_boundary
                           std::swap(coord[iy],coord_save);
                           if(is_dirichlet[ix][iy][1])
                             {
+                              v(x)=-v(x-pp[iy]);
                               if(!rhs)
-                                v(x)=2*dirichlet[ix][iy][1].Eval()
-                                  - v(x-pp[iy]);
-                              else
-                                abort();
-                              /* We need to coarsen the dirichlet
-                               * value and store it somewhere. */
+                                v(x)+=2*dirichlet[ix][iy][1].Eval();
                             }
                           else
                             {
-                              v(x)=v(x-pp[iy])
-                                + neumann[ix][iy][1].Eval()*dx[iy];
+                              v(x)=v(x-pp[iy]);
+                              if(!rhs)
+                                v(x)+=neumann[ix][iy][1].Eval()*dx[iy];
                             }
                           std::swap(coord[iy],coord_save);
                         }
                     }
                 }
+              // SAMRAI::tbox::plog << "set boundary "
+              //                    << ix << " "
+              //                    << x << " "
+              //                    << v(x) << " "
+              //                    << "\n";
             }
           /* Fix up the edges.  This has to be done in a different
              loop, because the values on the faces will be used to
@@ -154,18 +172,26 @@ void Elastic::Boundary_Conditions::set_boundary
                       if(x[iy]<pbox.lower(iy) 
                          && geom->getTouchesRegularBoundary(iy,0))
                         {
-                          double coord_save(geom->getXLower()[iy]);
-                          std::swap(coord[iy],coord_save);
-                          v(x)=v(x+pp[iy]) - neumann[ix][iy][0].Eval()*dx[iy];
-                          std::swap(coord[iy],coord_save);
+                          v(x)=v(x+pp[iy]);
+                          if(!rhs)
+                            {
+                              double coord_save(geom->getXLower()[iy]);
+                              std::swap(coord[iy],coord_save);
+                              v(x)-=neumann[ix][iy][0].Eval()*dx[iy];
+                              std::swap(coord[iy],coord_save);
+                            }
                         }
                       else if(x[iy]>pbox.upper(iy) 
                               && geom->getTouchesRegularBoundary(iy,1))
                         {
-                          double coord_save(geom->getXUpper()[iy]);
-                          std::swap(coord[iy],coord_save);
-                          v(x)=v(x-pp[iy]) + neumann[ix][iy][1].Eval()*dx[iy];
-                          std::swap(coord[iy],coord_save);
+                          v(x)=v(x-pp[iy]);
+                          if(!rhs)
+                            {
+                              double coord_save(geom->getXUpper()[iy]);
+                              std::swap(coord[iy],coord_save);
+                              v(x)+=neumann[ix][iy][1].Eval()*dx[iy];
+                              std::swap(coord[iy],coord_save);
+                            }
                         }
                     }
                 }
@@ -198,20 +224,26 @@ void Elastic::Boundary_Conditions::set_boundary
                           if(x[iz]<pbox.lower(iz) 
                              && geom->getTouchesRegularBoundary(iz,0))
                             {
-                              double coord_save(geom->getXLower()[iz]);
-                              std::swap(coord[iz],coord_save);
-                              v(x)=v(x+pp[iz])
-                                - neumann[ix][iz][0].Eval()*dx[iz];
-                              std::swap(coord[iz],coord_save);
+                              v(x)=v(x+pp[iz]);
+                              if(!rhs)
+                                {
+                                  double coord_save(geom->getXLower()[iz]);
+                                  std::swap(coord[iz],coord_save);
+                                  v(x)-=neumann[ix][iz][0].Eval()*dx[iz];
+                                  std::swap(coord[iz],coord_save);
+                                }
                             }
                           else if(x[iz]>pbox.upper(iz) 
                                   && geom->getTouchesRegularBoundary(iz,1))
                             {
-                              double coord_save(geom->getXUpper()[iz]);
-                              std::swap(coord[iz],coord_save);
-                              v(x)=v(x-pp[iz])
-                                + neumann[ix][iz][1].Eval()*dx[iz];
-                              std::swap(coord[iz],coord_save);
+                              v(x)=v(x-pp[iz]);
+                              if(!rhs)
+                                {
+                                  double coord_save(geom->getXUpper()[iz]);
+                                  std::swap(coord[iz],coord_save);
+                                  v(x)+=neumann[ix][iz][1].Eval()*dx[iz];
+                                  std::swap(coord[iz],coord_save);
+                                }
                             }
                         }
                     }
