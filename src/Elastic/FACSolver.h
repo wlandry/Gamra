@@ -437,7 +437,7 @@ namespace Elastic {
 
     Boundary_Conditions &d_boundary_conditions;
     /*!
-     * @brief FAC operator implementation corresponding to cell-centered
+     * @brief FAC operator implementation corresponding to staggered
      * Elastic discretization.
      */
     FACOps d_fac_ops;
