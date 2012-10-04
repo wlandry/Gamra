@@ -155,7 +155,7 @@ void Elastic::V_Boundary_Refine::Update_V_2D
                   const double dv_plus_plus=v(center+ip+ip-jp_s)-v(center+ip+ip);
                   const double dv_minus_minus=v(center-ip-jp_s)-v(center-ip);
                   v_fine(fine+ip)=v_fine(fine+ip-jp_s)
-                    - (-dv_minus_minus + 4*dv_minus + 4*dv_plus - dv_plus_plus)/12;
+                    - (-dv_minus_minus + 9*dv_minus + 9*dv_plus - dv_plus_plus)/32;
                 }
 
               /* Since we update two points on 'i' at once, we
@@ -196,7 +196,7 @@ void Elastic::V_Boundary_Refine::Update_V_2D
               const double dv_plus_plus=v(center+ip+ip-jp_s)-v(center+ip+ip);
               const double dv_minus_minus=v(center-ip-jp_s)-v(center-ip);
               v_fine(fine)=v_fine(fine-jp_s)
-                - (-dv_minus_minus + 4*dv_minus + 4*dv_plus - dv_plus_plus)/12;
+                - (-dv_minus_minus + 9*dv_minus + 9*dv_plus - dv_plus_plus)/32;
             }
 
           // v_fine(fine)=v_fine(fine-jp_s)
