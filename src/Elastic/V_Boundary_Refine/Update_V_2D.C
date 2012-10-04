@@ -132,11 +132,12 @@ void Elastic::V_Boundary_Refine::Update_V_2D
 
       SAMRAI::hier::Index jp_s(boundary_positive ? jp : -jp);
 
-      const double dv_minus=v(center-jp_s)-v(center);
+      const double v_minus=
+        quad_offset_interpolate(v(center-jp_s),v(center),v(center+jp_s));
 
       if(i%2==0)
         {
-          v_fine(fine)=v_fine(fine-jp_s) - dv_minus/2;
+          v_fine(fine)=v_minus;
 
           if(i<i_max)
             {
@@ -144,18 +145,24 @@ void Elastic::V_Boundary_Refine::Update_V_2D
                * twice.  Once for the in-between point, and again
                * later for the actual point. */
 
-              const double dv_plus=v(center+ip-jp_s)-v(center+ip);
+              const double v_plus=quad_offset_interpolate(v(center+ip-jp_s),
+                                                          v(center+ip),
+                                                          v(center+ip+jp_s));
               if(v(center+ip+ip)==boundary_value || v(center-ip)==boundary_value)
                 {
-                  v_fine(fine+ip)=v_fine(fine+ip-jp_s)
-                    - (dv_minus + dv_plus)/4;
+                  v_fine(fine+ip)=(v_plus+v_minus)/2;
                 }
               else
                 {
-                  const double dv_plus_plus=v(center+ip+ip-jp_s)-v(center+ip+ip);
-                  const double dv_minus_minus=v(center-ip-jp_s)-v(center-ip);
-                  v_fine(fine+ip)=v_fine(fine+ip-jp_s)
-                    - (-dv_minus_minus + 9*dv_minus + 9*dv_plus - dv_plus_plus)/32;
+                  const double v_plus_plus=
+                    quad_offset_interpolate(v(center+ip+ip-jp_s),v(center+ip+ip),
+                                            v(center+ip+ip+jp_s));
+                  const double v_minus_minus=
+                    quad_offset_interpolate(v(center-ip-jp_s),
+                                            v(center-ip),
+                                            v(center-ip+jp_s));
+                  v_fine(fine+ip)=(-v_minus_minus + 9*v_minus
+                                   + 9*v_plus - v_plus_plus)/16;
                 }
 
               /* Since we update two points on 'i' at once, we
@@ -176,27 +183,33 @@ void Elastic::V_Boundary_Refine::Update_V_2D
                           << v(center+ip) << " "
                           << v(center) << " "
                           << v(center-ip) << " "
-                          << dv_plus << " "
+                          // << dv_plus << " "
                           // << dv_plus_plus << " "
-                          << dv_minus << " "
+                          // << dv_minus << " "
                           // << dv_minus_minus << " "
                           << "\n";
             }
         }
       else
         {
-          const double dv_plus=v(center+ip-jp_s)-v(center+ip);
+          const double v_plus=quad_offset_interpolate(v(center+ip-jp_s),
+                                                      v(center+ip),
+                                                      v(center+ip+jp_s));
           if(v(center+ip+ip)==boundary_value || v(center-ip)==boundary_value)
             {
-              v_fine(fine)=v_fine(fine-jp_s)
-                - (dv_minus + dv_plus)/4;
+              v_fine(fine)=(v_plus+v_minus)/2;
             }
           else
             {
-              const double dv_plus_plus=v(center+ip+ip-jp_s)-v(center+ip+ip);
-              const double dv_minus_minus=v(center-ip-jp_s)-v(center-ip);
-              v_fine(fine)=v_fine(fine-jp_s)
-                - (-dv_minus_minus + 9*dv_minus + 9*dv_plus - dv_plus_plus)/32;
+              const double v_plus_plus=
+                quad_offset_interpolate(v(center+ip+ip-jp_s),v(center+ip+ip),
+                                        v(center+ip+ip+jp_s));
+              const double v_minus_minus=
+                quad_offset_interpolate(v(center-ip-jp_s),
+                                        v(center-ip),
+                                        v(center-ip+jp_s));
+              v_fine(fine)=(-v_minus_minus + 9*v_minus
+                            + 9*v_plus - v_plus_plus)/16;
             }
 
           // v_fine(fine)=v_fine(fine-jp_s)
