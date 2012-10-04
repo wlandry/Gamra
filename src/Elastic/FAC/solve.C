@@ -12,9 +12,6 @@
 #include "SAMRAI/hier/IntVector.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
-#include "SAMRAI/solv/SimpleCellRobinBcCoefs.h"
-#include "SAMRAI/pdat/CellData.h"
-#include "SAMRAI/math/HierarchyCellDataOpsReal.h"
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/hier/Variable.h"
@@ -35,11 +32,10 @@ int Elastic::FAC::solve()
                << "Cannot solve using an uninitialized object.\n");
   }
 
-  int ln;
   /*
    * Fill in the initial guess.
    */
-  for (ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln) {
+  for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln) {
     SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
       level = d_hierarchy->getPatchLevel(ln);
     SAMRAI::hier::PatchLevel::Iterator ip(*level);
@@ -52,6 +48,7 @@ int Elastic::FAC::solve()
       SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
         v = patch->getPatchData(v_id);
       v->fill(0.0);
+      // v->fill(13.0);
     }
     d_elastic_fac_solver.set_boundaries(v_id,level,false);
   }
