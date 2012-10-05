@@ -61,10 +61,37 @@ void Elastic::FACOps::smooth_V_2D
         - v_operator_2D(v,cell_moduli,edge_moduli,center,
                         edge,x,y,ip,jp,dx,dy);
 
-      /* No scaling here, though there should be. */
-      maxres=std::max(maxres,std::fabs(delta_Rx));
+      if(axis==0)
+        {
 
-      v(x)+=delta_Rx*theta_momentum/C_vx;
+      SAMRAI::tbox::plog << "smooth "
+                         << axis << " "
+                         << x << " "
+                         << v(x) << " "
+                         << v_rhs(x) << " "
+                         << delta_Rx << " "
+                         << v(x+ip) << " "
+                         << v(x-ip) << " "
+                         << v(x+jp) << " "
+                         << v(x-jp) << " "
+                         << v(y) << " "
+                         << v(y+jp) << " "
+                         << v(y-ip) << " "
+                         << v(y-ip+jp) << " ";
+
+        maxres=std::max(maxres,std::fabs(delta_Rx));
+        v(x)+=delta_Rx*theta_momentum/C_vx;
+
+        SAMRAI::tbox::plog << v(x) << " "
+                         << "\n";
+
+        }
+
+      /* No scaling here, though there should be. */
+      // maxres=std::max(maxres,std::fabs(delta_Rx));
+      // v(x)+=delta_Rx*theta_momentum/C_vx;
+
+
 
       // /* Set the boundary elements so that the derivative is
       //    unchanged. */

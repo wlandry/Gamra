@@ -43,6 +43,11 @@ void Elastic::FACOps::residual_2D
               v_resid(x)=v_rhs(x)
                 - v_operator_2D(v,cell_moduli,edge_moduli,center,
                                 edge,x,y,ip,jp,dx,dy);
+
+          SAMRAI::tbox::plog << "vx resid "
+                             << x << " "
+                             << v_resid(x) << " "
+                             << "\n";
             }
         }
 
@@ -60,6 +65,13 @@ void Elastic::FACOps::residual_2D
               v_resid(y)=v_rhs(y)
                 - v_operator_2D(v,cell_moduli,edge_moduli,center,
                                 edge,y,x,jp,ip,dy,dx);
+
+
+          // SAMRAI::tbox::plog << "vy resid "
+          //                    << y << " "
+          //                    << v_resid(y) << " "
+          //                    << "\n";
+          v_resid(y)=0;
             }
         }
     }
