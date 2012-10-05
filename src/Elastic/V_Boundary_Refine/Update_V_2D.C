@@ -158,12 +158,10 @@ void Elastic::V_Boundary_Refine::Update_V_2D
               if(v(center+ip+ip)==boundary_value)
                 {
                   v_fine(fine+ip)=(-v_minus_minus + 6*v_minus + 3*v_plus)/8;
-                  // v_fine(fine+ip)=(v_minus + v_plus)/2;
                 }
               else if(v(center-ip)==boundary_value)
                 {
                   v_fine(fine+ip)=(-v_plus_plus + 6*v_plus + 3*v_minus)/8;
-                  // v_fine(fine+ip)=(v_minus + v_plus)/2;
                 }
               else
                 {
@@ -176,24 +174,6 @@ void Elastic::V_Boundary_Refine::Update_V_2D
                  the 'j' direction is defined to be only one cell
                  wide */
               ++i;
-
-       SAMRAI::tbox::plog << "Update V "
-                          << axis << " "
-                          << boundary_direction << " "
-                          << fine << " "
-                          << v_fine(fine) << " "
-                          << v_fine(fine-jp_s) << " "
-                          << v_fine(fine+ip) << " "
-                          << v_fine(fine+ip-jp_s) << " "
-                          << v(center+ip+ip) << " "
-                          << v(center+ip) << " "
-                          << v(center) << " "
-                          << v(center-ip) << " "
-                          // << dv_plus << " "
-                          // << dv_plus_plus << " "
-                          // << dv_minus << " "
-                          // << dv_minus_minus << " "
-                          << "\n";
             }
         }
       else
@@ -211,21 +191,16 @@ void Elastic::V_Boundary_Refine::Update_V_2D
           if(v(center+ip+ip)==boundary_value)
             {
               v_fine(fine)=(-v_minus_minus + 6*v_minus + 3*v_plus)/8;
-              // v_fine(fine)=(v_minus + v_plus)/2;
             }
           else if(v(center-ip)==boundary_value)
             {
               v_fine(fine)=(-v_plus_plus + 6*v_plus + 3*v_minus)/8;
-              // v_fine(fine)=(v_minus + v_plus)/2;
             }
           else
             {
               v_fine(fine)=(-v_minus_minus + 9*v_minus
                             + 9*v_plus - v_plus_plus)/16;
             }
-
-          // v_fine(fine)=v_fine(fine-jp_s)
-          //   - (dv_minus + dv_plus)/4;
         }
     }
 }
