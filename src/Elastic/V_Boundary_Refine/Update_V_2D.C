@@ -148,19 +148,25 @@ void Elastic::V_Boundary_Refine::Update_V_2D
               const double v_plus=quad_offset_interpolate(v(center+ip-jp_s),
                                                           v(center+ip),
                                                           v(center+ip+jp_s));
-              if(v(center+ip+ip)==boundary_value || v(center-ip)==boundary_value)
+              const double v_plus_plus=
+                quad_offset_interpolate(v(center+ip+ip-jp_s),v(center+ip+ip),
+                                        v(center+ip+ip+jp_s));
+              const double v_minus_minus=
+                quad_offset_interpolate(v(center-ip-jp_s),
+                                        v(center-ip),
+                                        v(center-ip+jp_s));
+              if(v(center+ip+ip)==boundary_value)
                 {
-                  v_fine(fine+ip)=(v_plus+v_minus)/2;
+                  v_fine(fine+ip)=(-v_minus_minus + 6*v_minus + 3*v_plus)/8;
+                  // v_fine(fine+ip)=(v_minus + v_plus)/2;
+                }
+              else if(v(center-ip)==boundary_value)
+                {
+                  v_fine(fine+ip)=(-v_plus_plus + 6*v_plus + 3*v_minus)/8;
+                  // v_fine(fine+ip)=(v_minus + v_plus)/2;
                 }
               else
                 {
-                  const double v_plus_plus=
-                    quad_offset_interpolate(v(center+ip+ip-jp_s),v(center+ip+ip),
-                                            v(center+ip+ip+jp_s));
-                  const double v_minus_minus=
-                    quad_offset_interpolate(v(center-ip-jp_s),
-                                            v(center-ip),
-                                            v(center-ip+jp_s));
                   v_fine(fine+ip)=(-v_minus_minus + 9*v_minus
                                    + 9*v_plus - v_plus_plus)/16;
                 }
@@ -195,19 +201,25 @@ void Elastic::V_Boundary_Refine::Update_V_2D
           const double v_plus=quad_offset_interpolate(v(center+ip-jp_s),
                                                       v(center+ip),
                                                       v(center+ip+jp_s));
-          if(v(center+ip+ip)==boundary_value || v(center-ip)==boundary_value)
+          const double v_plus_plus=
+            quad_offset_interpolate(v(center+ip+ip-jp_s),v(center+ip+ip),
+                                    v(center+ip+ip+jp_s));
+          const double v_minus_minus=
+            quad_offset_interpolate(v(center-ip-jp_s),
+                                    v(center-ip),
+                                    v(center-ip+jp_s));
+          if(v(center+ip+ip)==boundary_value)
             {
-              v_fine(fine)=(v_plus+v_minus)/2;
+              v_fine(fine)=(-v_minus_minus + 6*v_minus + 3*v_plus)/8;
+              // v_fine(fine)=(v_minus + v_plus)/2;
+            }
+          else if(v(center-ip)==boundary_value)
+            {
+              v_fine(fine)=(-v_plus_plus + 6*v_plus + 3*v_minus)/8;
+              // v_fine(fine)=(v_minus + v_plus)/2;
             }
           else
             {
-              const double v_plus_plus=
-                quad_offset_interpolate(v(center+ip+ip-jp_s),v(center+ip+ip),
-                                        v(center+ip+ip+jp_s));
-              const double v_minus_minus=
-                quad_offset_interpolate(v(center-ip-jp_s),
-                                        v(center-ip),
-                                        v(center-ip+jp_s));
               v_fine(fine)=(-v_minus_minus + 9*v_minus
                             + 9*v_plus - v_plus_plus)/16;
             }
