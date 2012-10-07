@@ -4,7 +4,7 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Operator class for cell-centered scalar Elastic using FAC 
+ * Description:   Operator class for Elastic using FAC 
  *
  ************************************************************************/
 #include "Elastic/FACOps.h"
