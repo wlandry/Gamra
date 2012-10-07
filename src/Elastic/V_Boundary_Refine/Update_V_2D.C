@@ -17,7 +17,7 @@ void Elastic::V_Boundary_Refine::Update_V_2D
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
-  /* Dirichlet conditions for the normal direction
+  /* Neumann'ish conditions for the normal direction
 
       i-1      i      i+1
 
@@ -48,43 +48,26 @@ void Elastic::V_Boundary_Refine::Update_V_2D
       SAMRAI::pdat::SideIndex center(fine-ip_s);
       center.coarsen(SAMRAI::hier::Index(2,2));
 
-      const double v_center=
-        (-v(center-ip_s) + 6*v(center) + 3*v(center+ip_s))/8;
-      const double v_plus=
-        (-v(center-ip_s+jp) + 6*v(center+jp) + 3*v(center+ip_s+jp))/8;
-      const double v_minus=
-        (-v(center-ip_s-jp) + 6*v(center-jp) + 3*v(center+ip_s-jp))/8;
-                            
       double v_p, v_m;
-      quad_offset_interpolate(v_plus,v_center,v_minus,v_p,v_m);
+      quad_offset_interpolate(v(center+ip_s+jp),v(center+ip_s),
+                              v(center+ip_s-jp),v_p,v_m);
 
       if(j%2==0)
         {
-          v_fine(fine)=v_m;
+          v_fine(fine)=v_fine(fine-ip_s) + (v_m - v_fine(fine-ip_s-ip_s))/3;
           if(j<j_max)
-            v_fine(fine+jp)=v_p;
+            {
+              v_fine(fine+jp)=v_fine(fine-ip_s+jp)
+                + (v_p - v_fine(fine-ip_s-ip_s+jp))/3;
+            }
           ++j;
         }
       else
         {
-          v_fine(fine)=v_p;
+          v_fine(fine)=v_fine(fine-ip_s) + (v_p - v_fine(fine-ip_s-ip_s))/3;
         }
-
-      SAMRAI::tbox::plog << "Update V "
-                         << fine << " "
-                         << center << " "
-                         << ip_s << " "
-                         << jp << " "
-                         << v_fine(fine) << " "
-                         << v(center-ip_s) << " "
-                         << v(center) << " "
-                         << v(center+ip_s) << " "
-                         << v_center << " "
-                         << v_plus << " "
-                         << v_minus << " "
-                         << "\n";
     }
-  /* Dirichlet conditions for the tangential direction
+  /* Neumann'ish conditions for the tangential direction
 
       i-1      i      i+1
 
