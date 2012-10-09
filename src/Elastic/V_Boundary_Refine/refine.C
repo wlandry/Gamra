@@ -117,13 +117,11 @@ void Elastic::V_Boundary_Refine::refine
              switch(axis)
                {
                case 0:
-                 Update_V_2D(axis,coarse,
-                             boundary_direction,boundary_positive,fine,
+                 Update_V_2D(axis,boundary_direction,boundary_positive,fine,
                              ip,jp,i,j,p_max[0],p_min[1],p_max[1],*v,*v_fine);
                  break;
                case 1:
-                 Update_V_2D(axis,coarse,
-                             boundary_direction,boundary_positive,fine,
+                 Update_V_2D(axis,boundary_direction,boundary_positive,fine,
                              jp,ip,j,i,p_max[1],p_min[0],p_max[0],*v,*v_fine);
                  break;
                default:

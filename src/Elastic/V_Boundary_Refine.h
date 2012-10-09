@@ -137,7 +137,6 @@ namespace Elastic {
 
     void Update_V_2D
     (const int &axis,
-     const SAMRAI::hier::Patch& coarse_patch,
      const int &boundary_direction,
      const bool &boundary_positive,
      const SAMRAI::pdat::SideIndex &fine,

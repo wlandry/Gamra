@@ -6,7 +6,6 @@
    switch i and j and everything works out. */
 void Elastic::V_Boundary_Refine::Update_V_2D
 (const int &axis,
- const SAMRAI::hier::Patch& coarse_patch,
  const int &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
@@ -50,34 +49,8 @@ void Elastic::V_Boundary_Refine::Update_V_2D
       center.coarsen(SAMRAI::hier::Index(2,2));
 
       double v_p, v_m;
-      SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
-        geom=coarse_patch.getPatchGeometry();
-      const int off_axis(axis==0 ? 1 : 0);
-      if(center[off_axis]==coarse_patch.getBox().lower(off_axis)
-         && geom->getTouchesRegularBoundary(off_axis,0))
-        {
-          /* TODO: Incorporate correct BC's from Boundary_Condition */
-          const double deriv=0;
-          v_m=(10*geom->getDx()[off_axis]*deriv
-               + 35*v(center+ip_s) - 3*v(center+ip_s+jp))/32;
-          v_p=(6*geom->getDx()[off_axis]*deriv
-               + 27*v(center+ip_s) + 5*v(center+ip_s+jp))/32;
-        }
-      else if(center[off_axis]==coarse_patch.getBox().upper(off_axis)
-              && coarse_patch.getPatchGeometry()->getTouchesRegularBoundary(off_axis,1))
-        {
-          /* TODO: Incorporate correct BC's from Boundary_Condition */
-          const double deriv=0;
-          v_p=(-10*geom->getDx()[off_axis]*deriv
-               + 35*v(center+ip_s) - 3*v(center+ip_s-jp))/32;
-          v_m=(-6*geom->getDx()[off_axis]*deriv
-               + 27*v(center+ip_s) + 5*v(center+ip_s-jp))/32;
-        }
-      else
-        {
-          quad_offset_interpolate(v(center+ip_s+jp),v(center+ip_s),
-                                  v(center+ip_s-jp),v_p,v_m);
-        }
+      quad_offset_interpolate(v(center+ip_s+jp),v(center+ip_s),
+                              v(center+ip_s-jp),v_p,v_m);
 
       if(j%2==0)
         {
