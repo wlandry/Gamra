@@ -6,6 +6,7 @@
    switch i and j and everything works out. */
 void Elastic::V_Boundary_Refine::Update_V_2D
 (const int &axis,
+ const SAMRAI::hier::Patch& coarse_patch,
  const int &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
@@ -49,8 +50,34 @@ void Elastic::V_Boundary_Refine::Update_V_2D
       center.coarsen(SAMRAI::hier::Index(2,2));
 
       double v_p, v_m;
-      quad_offset_interpolate(v(center+ip_s+jp),v(center+ip_s),
-                              v(center+ip_s-jp),v_p,v_m);
+      SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
+        geom=coarse_patch.getPatchGeometry();
+      const int off_axis(axis==0 ? 1 : 0);
+      if(center[off_axis]==coarse_patch.getBox().lower(off_axis)
+         && geom->getTouchesRegularBoundary(off_axis,0))
+        {
+          /* TODO: Incorporate correct BC's from Boundary_Condition */
+          const double deriv=0;
+          v_m=(10*geom->getDx()[off_axis]*deriv
+               + 35*v(center+ip_s) - 3*v(center+ip_s+jp))/32;
+          v_p=(6*geom->getDx()[off_axis]*deriv
+               + 27*v(center+ip_s) + 5*v(center+ip_s+jp))/32;
+        }
+      else if(center[off_axis]==coarse_patch.getBox().upper(off_axis)
+              && coarse_patch.getPatchGeometry()->getTouchesRegularBoundary(off_axis,1))
+        {
+          /* TODO: Incorporate correct BC's from Boundary_Condition */
+          const double deriv=0;
+          v_p=(-10*geom->getDx()[off_axis]*deriv
+               + 35*v(center+ip_s) - 3*v(center+ip_s-jp))/32;
+          v_m=(-6*geom->getDx()[off_axis]*deriv
+               + 27*v(center+ip_s) + 5*v(center+ip_s-jp))/32;
+        }
+      else
+        {
+          quad_offset_interpolate(v(center+ip_s+jp),v(center+ip_s),
+                                  v(center+ip_s-jp),v_p,v_m);
+        }
 
       if(j%2==0)
         {
@@ -99,30 +126,44 @@ void Elastic::V_Boundary_Refine::Update_V_2D
 
       if(i%2==0)
         {
-          v_fine(fine)=(8*v(center+jp_s) + 10*v_fine(fine-jp_s)
+          v_fine(fine)=(8*v(center) + 10*v_fine(fine-jp_s)
                         - 3*v_fine(fine-jp_s-jp_s))/15;
 
           if(i<i_max)
             {
+              /* TODO: This works for Dirichlet normal boundaries, but
+                 does not work for Neumann normal boundaries */
               double v_coarse;
-              if(v(center+ip+ip+jp_s)==boundary_value)
+              if(v(center+ip+ip)==boundary_value)
                 {
-                  v_coarse=(-v(center+jp_s-ip) + 6*v(center+jp_s)
-                            + 3*v(center+jp_s+ip))/8;
+                  v_coarse=(-v(center-ip) + 6*v(center)
+                            + 3*v(center+ip))/8;
                 }
-              else if(v(center-ip+jp_s)==boundary_value)
+              else if(v(center-ip)==boundary_value)
                 {
-                  v_coarse=(-v(center+jp_s+ip+ip) + 6*v(center+jp_s+ip)
-                            + 3*v(center+jp_s))/8;
+                  v_coarse=(-v(center+ip+ip) + 6*v(center+ip)
+                            + 3*v(center))/8;
                 }
               else
                 {
-                  v_coarse=(-v(center+jp_s-ip) + 9*v(center+jp_s)
-                            + 9*v(center+jp_s+ip) - v(center+jp_s+ip+ip))/16;
+                  v_coarse=(-v(center-ip) + 9*v(center)
+                            + 9*v(center+ip) - v(center+ip+ip))/16;
                 }
               v_fine(fine+ip)=(8*v_coarse + 10*v_fine(fine-jp_s+ip)
                                - 3*v_fine(fine-jp_s-jp_s+ip))/15;
 
+
+              SAMRAI::tbox::plog << "Update V "
+                                 << fine << " "
+                                 << center << " "
+                                 << v_fine(fine) << " "
+                                 << v_fine(fine+ip) << " "
+                                 << v_coarse << " "
+                                 << v(center-ip) << " "
+                                 << v(center) << " "
+                                 << v(center+ip) << " "
+                                 << v(center+ip+ip) << " "
+                                 << "\n";
 
               /* Since we update two points on 'i' at once, we
                  increment 'i' again.  This is ok, since the box in
