@@ -124,10 +124,6 @@ void Elastic::FAC::initializeLevelData
       patch->getPatchData(v_rhs_id);
 
     v_rhs_data->fill(0,0);
-    // if(v_rhs.empty())
-    //   {
-    //     v_rhs_data->fill(0,0);
-    //   }
 
     /* Iterate over the faults */
     for(int fault_index=0;fault_index<faults.size();fault_index+=9)
@@ -139,8 +135,8 @@ void Elastic::FAC::initializeLevelData
          * invert the depth and width to convert to a right-handed
          * coordinate system.  Strike is opposite in direction, and
          * dip is measured from a plane lying flat. */
-        double scale(faults[fault_index+0]), x(faults[fault_index+1]),
-          y(faults[fault_index+2]), z(-faults[fault_index+3]),
+        double scale(faults[fault_index+0]), x(faults[fault_index+2]),
+          y(faults[fault_index+1]), z(-faults[fault_index+3]),
           L(faults[fault_index+4]), W(-faults[fault_index+5]),
           strike(faults[fault_index+6]*pi/180),
           dip(faults[fault_index+7]*pi/180),
