@@ -20,15 +20,6 @@ void Elastic::Boundary_Conditions::set_boundary
   for(int i=0;i<dim;++i)
     pp[i][i]=1;
 
-  if(!homogeneous)
-    {
-      SAMRAI::tbox::plog << "Setting physical boundary\n";
-    }
-  else
-    {
-      SAMRAI::tbox::plog << "Setting homogeneous boundary\n";
-    }
-
   /* This should really get read from the input file. */
   const double *dx=geom->getDx();
 

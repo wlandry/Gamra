@@ -43,11 +43,6 @@ void Elastic::FACOps::residual_2D
               v_resid(x)=v_rhs(x)
                 - v_operator_2D(v,cell_moduli,edge_moduli,center,
                                 edge,x,y,ip,jp,dx,dy);
-
-          SAMRAI::tbox::plog << "vx resid "
-                             << x << " "
-                             << v_resid(x) << " "
-                             << "\n";
             }
         }
 
