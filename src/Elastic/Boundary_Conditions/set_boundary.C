@@ -6,7 +6,7 @@
 #include "Elastic/Boundary_Conditions.h"
 
 void Elastic::Boundary_Conditions::set_boundary
-(const SAMRAI::hier::Patch& patch, const int &v_id, const bool &rhs)
+(const SAMRAI::hier::Patch& patch, const int &v_id, const bool &homogeneous)
 {
   SAMRAI::hier::Box pbox=patch.getBox();
 
@@ -20,9 +20,13 @@ void Elastic::Boundary_Conditions::set_boundary
   for(int i=0;i<dim;++i)
     pp[i][i]=1;
 
-  if(!rhs)
+  if(!homogeneous)
     {
       SAMRAI::tbox::plog << "Setting physical boundary\n";
+    }
+  else
+    {
+      SAMRAI::tbox::plog << "Setting homogeneous boundary\n";
     }
 
   /* This should really get read from the input file. */
@@ -57,7 +61,7 @@ void Elastic::Boundary_Conditions::set_boundary
                   else
                     {
                       v(x)=v(x+pp[ix]*2);
-                      if(!rhs)
+                      if(!homogeneous)
                         v(x)-=neumann[ix][ix][0].Eval()*2*dx[ix];
                     }
                 }
@@ -69,7 +73,7 @@ void Elastic::Boundary_Conditions::set_boundary
                   else
                     {
                       v(x)=v(x-pp[ix]*2);
-                      if(!rhs)
+                      if(!homogeneous)
                         v(x)+=neumann[ix][ix][1].Eval()*2*dx[ix];
                     }
                 }
@@ -77,18 +81,18 @@ void Elastic::Boundary_Conditions::set_boundary
                * components. */
               else if(x[ix]==pbox.lower(ix)
                       && geom->getTouchesRegularBoundary(ix,0)
-                      && !rhs && is_dirichlet[ix][ix][0])
+                      && !homogeneous && is_dirichlet[ix][ix][0])
                 {
-                  if(!rhs)
+                  if(!homogeneous)
                     v(x)=dirichlet[ix][ix][0].Eval();
                   else
                     v(x)=0;
                 }
               else if(x[ix]==pbox.upper(ix)+1
                       && geom->getTouchesRegularBoundary(ix,1)
-                      && !rhs && is_dirichlet[ix][ix][1])
+                      && !homogeneous && is_dirichlet[ix][ix][1])
                 {
-                  if(!rhs)
+                  if(!homogeneous)
                     v(x)=dirichlet[ix][ix][1].Eval();
                   else
                     v(x)=0;
@@ -106,13 +110,13 @@ void Elastic::Boundary_Conditions::set_boundary
                           if(is_dirichlet[ix][iy][0])
                             {
                               v(x)=-v(x+pp[iy]);
-                              if(!rhs)
+                              if(!homogeneous)
                                 v(x)+=2*dirichlet[ix][iy][0].Eval();
                             }
                           else
                             {
                               v(x)=v(x+pp[iy]);
-                              if(!rhs)
+                              if(!homogeneous)
                                 v(x)-=neumann[ix][iy][0].Eval()*dx[iy];
                             }
                           std::swap(coord[iy],coord_save);
@@ -125,24 +129,19 @@ void Elastic::Boundary_Conditions::set_boundary
                           if(is_dirichlet[ix][iy][1])
                             {
                               v(x)=-v(x-pp[iy]);
-                              if(!rhs)
+                              if(!homogeneous)
                                 v(x)+=2*dirichlet[ix][iy][1].Eval();
                             }
                           else
                             {
                               v(x)=v(x-pp[iy]);
-                              if(!rhs)
+                              if(!homogeneous)
                                 v(x)+=neumann[ix][iy][1].Eval()*dx[iy];
                             }
                           std::swap(coord[iy],coord_save);
                         }
                     }
                 }
-              // SAMRAI::tbox::plog << "set boundary "
-              //                    << ix << " "
-              //                    << x << " "
-              //                    << v(x) << " "
-              //                    << "\n";
             }
           /* Fix up the edges.  This has to be done in a different
              loop, because the values on the faces will be used to
@@ -164,16 +163,16 @@ void Elastic::Boundary_Conditions::set_boundary
                      && geom->getTouchesRegularBoundary(ix,1)
                      && !is_dirichlet[ix][ix][1]))
                 {
+                  for(int d=0;d<dim;++d)
+                    coord[d]=geom->getXLower()[d]
+                      + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
                   for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                     {
-                      for(int d=0;d<dim;++d)
-                        coord[d]=geom->getXLower()[d]
-                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
                       if(x[iy]<pbox.lower(iy) 
                          && geom->getTouchesRegularBoundary(iy,0))
                         {
                           v(x)=v(x+pp[iy]);
-                          if(!rhs)
+                          if(!homogeneous)
                             {
                               double coord_save(geom->getXLower()[iy]);
                               std::swap(coord[iy],coord_save);
@@ -185,7 +184,7 @@ void Elastic::Boundary_Conditions::set_boundary
                               && geom->getTouchesRegularBoundary(iy,1))
                         {
                           v(x)=v(x-pp[iy]);
-                          if(!rhs)
+                          if(!homogeneous)
                             {
                               double coord_save(geom->getXUpper()[iy]);
                               std::swap(coord[iy],coord_save);
@@ -225,7 +224,7 @@ void Elastic::Boundary_Conditions::set_boundary
                              && geom->getTouchesRegularBoundary(iz,0))
                             {
                               v(x)=v(x+pp[iz]);
-                              if(!rhs)
+                              if(!homogeneous)
                                 {
                                   double coord_save(geom->getXLower()[iz]);
                                   std::swap(coord[iz],coord_save);
@@ -237,7 +236,7 @@ void Elastic::Boundary_Conditions::set_boundary
                                   && geom->getTouchesRegularBoundary(iz,1))
                             {
                               v(x)=v(x-pp[iz]);
-                              if(!rhs)
+                              if(!homogeneous)
                                 {
                                   double coord_save(geom->getXUpper()[iz]);
                                   std::swap(coord[iz],coord_save);
