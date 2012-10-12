@@ -60,6 +60,28 @@ void Elastic::V_Boundary_Refine::Update_V_2D
               v_fine(fine+jp)=v_fine(fine-ip_s+jp)
                 + (v_p - v_fine(fine-ip_s-ip_s+jp))/3;
             }
+
+
+              SAMRAI::tbox::plog << "Update V "
+                                 << fine << " "
+                                 << (center+ip_s) << " "
+                                 << v_fine(fine) << " "
+                                 << v_fine(fine+jp) << " "
+                                 << v_fine(fine-ip_s) << " "
+                                 << v_fine(fine-ip_s-ip_s) << " "
+                                 << v(center+ip_s+jp) << " "
+                                 << v(center+ip_s) << " "
+                                 << v(center+ip_s-jp) << " "
+                                 << v_m << " "
+                                 << v_p << " "
+                                 // << v_coarse << " "
+                                 // << v(center-ip) << " "
+                                 // << v(center) << " "
+                                 // << v(center+ip) << " "
+                                 // << v(center+ip+ip) << " "
+                                 << "\n";
+
+
           ++j;
         }
       else
@@ -125,19 +147,6 @@ void Elastic::V_Boundary_Refine::Update_V_2D
               v_fine(fine+ip)=(8*v_coarse + 10*v_fine(fine-jp_s+ip)
                                - 3*v_fine(fine-jp_s-jp_s+ip))/15;
 
-
-              SAMRAI::tbox::plog << "Update V "
-                                 << fine << " "
-                                 << center << " "
-                                 << v_fine(fine) << " "
-                                 << v_fine(fine+ip) << " "
-                                 << v_coarse << " "
-                                 << v(center-ip) << " "
-                                 << v(center) << " "
-                                 << v(center+ip) << " "
-                                 << v(center+ip+ip) << " "
-                                 << "\n";
-
               /* Since we update two points on 'i' at once, we
                  increment 'i' again.  This is ok, since the box in
                  the 'j' direction is defined to be only one cell
@@ -150,18 +159,18 @@ void Elastic::V_Boundary_Refine::Update_V_2D
           double v_coarse;
           if(v(center+ip+ip+jp_s)==boundary_value)
             {
-              v_coarse=(-v(center+jp_s-ip) + 6*v(center+jp_s)
-                        + 3*v(center+jp_s+ip))/8;
+              v_coarse=(-v(center-ip) + 6*v(center)
+                        + 3*v(center+ip))/8;
             }
-          else if(v(center-ip+jp_s)==boundary_value)
+          else if(v(center-ip)==boundary_value)
             {
-              v_coarse=(-v(center+jp_s+ip+ip) + 6*v(center+jp_s+ip)
-                        + 3*v(center+jp_s))/8;
+              v_coarse=(-v(center+ip+ip) + 6*v(center+ip)
+                        + 3*v(center))/8;
             }
           else
             {
-              v_coarse=(-v(center+jp_s-ip) + 9*v(center+jp_s)
-                        + 9*v(center+jp_s+ip) - v(center+jp_s+ip+ip))/16;
+              v_coarse=(-v(center-ip) + 9*v(center)
+                        + 9*v(center+ip) - v(center+ip+ip))/16;
             }
           v_fine(fine)=(8*v_coarse + 10*v_fine(fine-jp_s)
                         - 3*v_fine(fine-jp_s-jp_s))/15;
