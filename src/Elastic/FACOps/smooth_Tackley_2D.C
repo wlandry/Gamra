@@ -33,6 +33,7 @@ void Elastic::FACOps::smooth_Tackley_2D
      region so that the update for the velocity inside the box will be
      correct. */
   v_refine_patch_strategy.setTargetDataId(v_id);
+  v_refine_patch_strategy.setHomogeneousBc(true);
   set_boundaries(v_id,level,true);
   xeqScheduleGhostFillNoCoarse(v_rhs_id,ln);
 
@@ -58,6 +59,12 @@ void Elastic::FACOps::smooth_Tackley_2D
    * different processes differently, leading to disagreement on
    * whether to continue smoothing.
    */
+
+  SAMRAI::tbox::plog << "Smoothing "
+                     << ln << " "
+                     << num_sweeps*(1<<(d_ln_max-ln)) << " "
+                     << "\n";
+
   const SAMRAI::hier::Index ip(1,0), jp(0,1);
   bool converged = false;
   for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
@@ -103,7 +110,6 @@ void Elastic::FACOps::smooth_Tackley_2D
                         center(SAMRAI::tbox::Dimension(2));
                       center[0]=i;
                       center[1]=j;
-
                       /* Update v */
                       smooth_V_2D(0,pbox,geom,center,ip,jp,
                                   v,v_rhs,maxres,dx,dy,cell_moduli,
@@ -161,7 +167,6 @@ void Elastic::FACOps::smooth_Tackley_2D
                       SAMRAI::pdat::CellIndex center(SAMRAI::tbox::Dimension(2));
                       center[0]=i;
                       center[1]=j;
-
                       /* Update v */
                       smooth_V_2D(1,pbox,geom,center,jp,ip,
                                   v,v_rhs,maxres,dy,dx,cell_moduli,
@@ -195,10 +200,11 @@ void Elastic::FACOps::smooth_Tackley_2D
             mpi.AllReduce(&tmp, 1, MPI_MIN);
           }
         converged=(tmp==1);
-        // if (d_enable_logging)
-        //   SAMRAI::tbox::plog
-        //     // << d_object_name << "\n"
-        //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
+
+        if (d_enable_logging)
+          SAMRAI::tbox::plog
+            << d_object_name << " "
+            << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
       // }
     }
 }

@@ -26,7 +26,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
    */
   const int v_id = solution.getComponentDescriptorIndex(0);
   v_refine_patch_strategy.setTargetDataId(v_id);
-  // v_refine_patch_strategy.setHomogeneousBc(error_equation_indicator);
+  v_refine_patch_strategy.setHomogeneousBc(error_equation_indicator);
 
   /*
    * Assumptions:
@@ -51,9 +51,6 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
 
   /* S1. Fill solution ghost data. */
 
-  // set_boundaries(v_id,ln,true);
-  set_boundaries(v_id,ln,error_equation_indicator);
-
   if (ln > d_ln_min) {
     /* Fill from current, next coarser level and physical boundary */
     xeqScheduleGhostFill(v_id, ln);
@@ -61,6 +58,8 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
     /* Fill from current and physical boundary */
     xeqScheduleGhostFillNoCoarse(v_id, ln);
   }
+
+  set_boundaries(v_id,ln,error_equation_indicator);
 
   /*
    * S4. Compute residual on patches in level.

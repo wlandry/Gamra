@@ -84,13 +84,13 @@ void Elastic::FACOps::prolongErrorAndCorrect
    * to correct the fine level error.
    */
   v_refine_patch_strategy.setTargetDataId(d_side_scratch_id);
-  // v_refine_patch_strategy.setHomogeneousBc(true);
+  v_refine_patch_strategy.setHomogeneousBc(true);
   xeqScheduleProlongation(d_side_scratch_id,
                           s.getComponentDescriptorIndex(0),
                           d_side_scratch_id,
                           dest_ln);
 
-  set_boundaries(s.getComponentDescriptorIndex(0),fine_level,true);
+  // set_boundaries(s.getComponentDescriptorIndex(0),fine_level,true);
 
   // if (fine_level > d_ln_min) {
   //   /* Fill from current, next coarser level and physical boundary */

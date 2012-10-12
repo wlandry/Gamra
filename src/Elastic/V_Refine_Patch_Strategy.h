@@ -54,231 +54,39 @@ public:
 
    virtual void
    setPhysicalBoundaryConditions(
-      SAMRAI::hier::Patch& ,
+      SAMRAI::hier::Patch& patch,
       const double ,
-      const SAMRAI::hier::IntVector& ) {}
+      const SAMRAI::hier::IntVector& )
+  {
+    /* We only set Dirichlet boundaries once, before the solve. */
+    d_boundary_conditions.set_boundary(patch,v_id,d_homogeneous_bc);
+  }
    SAMRAI::hier::IntVector
    getRefineOpStencilWidth() const
-  { return SAMRAI::hier::IntVector::getOne(d_dim); }
-   // virtual void
-   // preprocessRefineBoxes(
-   //    SAMRAI::hier::Patch& fine,
-   //    const SAMRAI::hier::Patch& coarse,
-   //    const SAMRAI::hier::BoxList& fine_boxes,
-   //    const SAMRAI::hier::IntVector& ratio) {}
-   virtual void
-   preprocessRefine(SAMRAI::hier::Patch& ,
-                    const SAMRAI::hier::Patch& coarse,
-                    const SAMRAI::hier::Box& ,
-                    const SAMRAI::hier::IntVector& )
   {
-    d_boundary_conditions.set_boundary(coarse,v_id,true);
+    return SAMRAI::hier::IntVector::getOne(d_dim);
+  }
+  virtual void
+  preprocessRefine(SAMRAI::hier::Patch& ,
+                   const SAMRAI::hier::Patch& coarse,
+                   const SAMRAI::hier::Box& ,
+                   const SAMRAI::hier::IntVector& )
+  {
+    d_boundary_conditions.set_boundary(coarse,v_id,d_homogeneous_bc);
   }
 
-   virtual void
-   postprocessRefineBoxes(
-      SAMRAI::hier::Patch& ,
-      const SAMRAI::hier::Patch& ,
-      const SAMRAI::hier::BoxList& ,
-      const SAMRAI::hier::IntVector& ) {}
-   virtual void
-   postprocessRefine(
-      SAMRAI::hier::Patch& ,
-      const SAMRAI::hier::Patch& ,
-      const SAMRAI::hier::Box& ,
-      const SAMRAI::hier::IntVector& ) {}
+  virtual void
+  postprocessRefineBoxes(SAMRAI::hier::Patch& ,
+                         const SAMRAI::hier::Patch& ,
+                         const SAMRAI::hier::BoxList& ,
+                         const SAMRAI::hier::IntVector& ) {}
+  virtual void
+  postprocessRefine(SAMRAI::hier::Patch& ,
+                    const SAMRAI::hier::Patch& ,
+                    const SAMRAI::hier::Box& ,
+                    const SAMRAI::hier::IntVector& ) {}
 
    //@}
-
-   //@{
-
-   /*!
-    * @name Functions to set boundary condition values
-    */
-
-   /*!
-    * @brief Set the physical boundary condition by setting the
-    * value of the first ghost cells.
-    *
-    * This function has an interface similar to the virtual function
-    * SAMRAI::xfer::RefinePatchStrategy::setPhysicalBoundaryConditions(),
-    * and it may be used to help implement that function,
-    * but it does not serve the same purpose.  The primary
-    * differences are:
-    * -# It specializes to cell-centered variables.
-    * -# Only one ghost cell width is filled.  Setting a Robin
-    *    boundary condition for cell-centered quantities requires
-    *    only one ghost cell to be set.
-    *    (More ghost cells can be filled by continuing the linear
-    *    distribution of data beyond the first cell, but that is
-    *    not implemented at this time.)
-    * -# User must specify the index of the data whose ghost
-    *    cells need to be filled.  This index is used to determine
-    *    the variable for which to set the boundary coefficients
-    *    and to get the data to be set.
-    *
-    * This function calls RobinBcStrategy::setBcCoefs() to
-    * get the coefficients, then it sets the values in the first
-    * ghost cell on the boundary.
-    *
-    * To determine the value for the ghost cell,
-    * a @em linear approximation in the direction normal to the
-    * boundary is assumed.  We write the following discrete
-    * approximations:
-    * @f[ u_b = \frac{ u_i + u_o }{2} @f]
-    * @f[ [u_n]_b = \frac{ u_o - u_i }{h} @f]
-    * where the subscript b stands for the the boundary,
-    * i stands for the first cell inside the boundary and
-    * o stands for the first cell outside the boundary
-    * and h is the grid spacing normal to the boundary.
-    * Applying this to the Robin formula gives
-    * @f[ u_o = \frac{ h\gamma + u_i( \beta - \frac{h}{2} \alpha ) }
-    * { \beta + \frac{h}{2} \alpha } @f] or equivalently
-    * @f[ u_o = \frac{ hg + u_i (1-a(1+\frac{h}{2})) }{ 1-a(1-\frac{h}{2}) } @f]
-    *
-    * After setting the edge (face in 3D) boundary conditions,
-    * linear approximations are used to set the boundary conditions
-    * of higher boundary types (nodes in 2D, edges and nodes in 3D).
-    *
-    * In some cases, the calling function wants to set the
-    * boundary condition homogeneously, with g=0.
-    * This is useful in problems where the the solution of the
-    * homogeneous problem is required in solving the inhomogeneous
-    * problem.  This function respects such requests specified
-    * through the argument @c homogeneous_bc.
-    *
-    * @internal To be more general to other data types,
-    * there could be versions for other data types also,
-    * such as ...InNodes, ...InFaces, etc.  However, I'm not
-    * sure exactly how to implement the Robin boundary condition
-    * on the faces and nodes when m != 1.  Should the boundary
-    * value be set or should the first ghost value be set?
-    *
-    * @internal I have not addressed possibility of differences
-    * in chosing the discrete formulation with which to compute
-    * the boundary value.  The above formulation is obviously
-    * one specific approximation, but there could be others.
-    * If anoter approximation is required, there should be
-    * another class like this or this class can offer a choice
-    * to be set by the user.  I favor another class.
-    *
-    * @internal Since the data alignment can be found through
-    * the target_data_id, these types of functions may be changed
-    * to just plain setBoundaryValues or setBoundaryValuesInBoundaryBoxes
-    * since it does assume boundary boxes.  This may have to be
-    * expanded to later include coarse-fine boundary boxes
-    * for more generality.
-    *
-    * @param patch SAMRAI::hier::Patch on which to set boundary condition
-    * @param fill_time Solution time corresponding to filling
-    * @param ghost_width_to_fill Max ghost width requiring fill
-    * @param target_data_id SAMRAI::hier::Patch data index of data to be set.
-    *        This data must be a cell-centered double.
-    * @param homogeneous_bc Set a homogeneous boundary condition.
-    *    This means g=0 for the boundary.
-    */
-   // void
-   // setBoundaryValuesInCells(
-   //    SAMRAI::hier::Patch& patch,
-   //    const double fill_time,
-   //    const SAMRAI::hier::IntVector& ghost_width_to_fill,
-   //    int target_data_id,
-   //    bool homogeneous_bc = false) const;
-
-   /*!
-    * @brief Set ghost cells for an entire level.
-    *
-    * Loop through all patches on the given level and call
-    * setBoundaryValuesInCells(SAMRAI::hier::Patch &patch,
-    *                          const double fill_time ,
-    *                          const SAMRAI::hier::IntVector &ghost_width_to_fill ,
-    *                          int target_data_id ,
-    *                          bool homogeneous_bc=false )
-    * for each.
-    *
-    * @param level PatchLevel on which to set boundary condition
-    * @param fill_time Solution time corresponding to filling
-    * @param ghost_width_to_fill Max ghost width requiring fill
-    * @param target_data_id SAMRAI::hier::Patch data index of data to be set.
-    *        This data must be a cell-centered double.
-    * @param homogeneous_bc Set a homogeneous boundary condition.
-    *    This means g=0 for the boundary.
-    */
-   // void
-   // setBoundaryValuesInCells(
-   //    SAMRAI::hier::PatchLevel& level,
-   //    const double fill_time,
-   //    const SAMRAI::hier::IntVector& ghost_width_to_fill,
-   //    int target_data_id,
-   //    bool homogeneous_bc = false) const;
-
-   /*!
-    * @brief Set the physical boundary condition by setting the
-    * value of the boundary nodes.
-    *
-    * This function is not yet implemented!
-    *
-    * There are some decisions that must be made before
-    * the implementation can be written.
-    * -# Do we set the values on the boundary or one cell
-    *    away from the boundary?
-    * -# What is the discrete formulation we should use
-    *    to compute the value to be set?
-    *
-    * This function has an interface similar to the virtual function
-    * SAMRAI::xfer::RefinePatchStrategy::setPhysicalBoundaryConditions(),
-    * and it may be used to help implement that function,
-    * but it does not serve the same purpose.  The primary
-    * differences are:
-    * -# It specializes to node-centered variables.
-    * -# User must specify the index of the data whose ghost
-    *    cells need to be filled.  This index is used to determine
-    *    the variable for which to set the boundary coefficients
-    *    and to get the data to be set.
-    *
-    * This function calls RobinBcStrategy::setBcCoefs() to get the
-    * coefficients, then it sets the values at the boundary nodes.
-    *
-    * In some cases, the calling function wants to set the
-    * boundary condition homogeneously, with g=0.
-    * This is useful in problems where the the solution of the
-    * homogeneous problem is required to solving the inhomogeneous
-    * problem.  This function respects such requests specified
-    * through the argument @c homogeneous_bc.
-    *
-    * @param patch SAMRAI::hier::Patch on which to set boundary condition
-    * @param fill_time Solution time corresponding to filling
-    * @param target_data_id SAMRAI::hier::Patch data index of data to be set.
-    * @param homogeneous_bc Set a homogeneous boundary condition.
-    *    This means g=0 for the boundary.
-    */
-   // void
-   // setBoundaryValuesAtNodes(
-   //    SAMRAI::hier::Patch& patch,
-   //    const double fill_time,
-   //    int target_data_id,
-   //    bool homogeneous_bc = false) const;
-
-   //@}
-
-   //@{
-   /*!
-    * @name Ways to provide the Robin bc coefficients
-    */
-
-   /*!
-    * @brief Provide an implementation of the RobinBcCoefStrategy
-    * for determining the boundary coefficients.
-    *
-    * Provide the implementation that can be used to set the
-    * Robin bc coefficients.
-    *
-    * @param coef_strategy tbox::Pointer to a concrete inmplementation of
-    *        the coefficient strategy.
-    */
-   // void
-   // setCoefImplementation(
-   //    const RobinBcCoefStrategy* coef_strategy);
 
    /*!
     * @brief Set the data id that should be filled when setting
@@ -305,9 +113,11 @@ public:
     * to set a flag that will cause a null pointer to be given to
     * setBcCoefs() to indicate that fact.
     */
-   // void
-   // setHomogeneousBc(
-   //    bool homogeneous_bc);
+  void
+  setHomogeneousBc(bool homogeneous_bc)
+  {
+    d_homogeneous_bc=homogeneous_bc;
+  }
 
    //@}
 
@@ -395,7 +205,7 @@ private:
    /*!
     * @brief Whether to assumg g=0 when filling ghosts.
     */
-   // bool d_homogeneous_bc;
+   bool d_homogeneous_bc;
 
    /*!
     * @brief Timers for performance measurement.

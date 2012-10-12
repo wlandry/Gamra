@@ -65,7 +65,7 @@ void Elastic::FACOps::restrictSolution
 
   SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
     level = d_hierarchy->getPatchLevel(dest_ln);
-  set_boundaries(v_dst,level,true);
+  v_refine_patch_strategy.setHomogeneousBc(false);
   v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));
 
   if (dest_ln == d_ln_min) {
