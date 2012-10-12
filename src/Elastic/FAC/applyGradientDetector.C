@@ -93,21 +93,6 @@ void Elastic::FAC::applyGradientDetector
 	      }
 	    }
 	  }
-          /*
-	   * SAMRAI::tbox::plog << "estimate "
-                     << cell_index << " "
-                     << d_adaption_threshold << " "
-                     << curve << " "
-                     << std::boolalpha
-                     << (curve > d_adaption_threshold)
-                     << " "
-                     << "\n";
-		     */
-
-          if(cell_index[1]<patch.getBox().upper(1)/2)
-            curve=1;
-          else
-            curve=0;
 
           if (maxestimate < curve)
                maxestimate=curve;
