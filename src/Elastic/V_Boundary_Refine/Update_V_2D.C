@@ -10,22 +10,7 @@ namespace {
                                   SAMRAI::pdat::SideData<double> &v,
                                   SAMRAI::pdat::SideData<double> &v_fine)
   {
-    double v_coarse;
-    if(v(center+ip+ip)==boundary_value)
-      {
-        v_coarse=(-v(center-ip) + 6*v(center)
-                  + 3*v(center+ip))/8;
-      }
-    else if(v(center-ip)==boundary_value)
-      {
-        v_coarse=(-v(center+ip+ip) + 6*v(center+ip)
-                  + 3*v(center))/8;
-      }
-    else
-      {
-        v_coarse=(-v(center-ip) + 9*v(center)
-                  + 9*v(center+ip) - v(center+ip+ip))/16;
-      }
+    double v_coarse=(v(center) + v(center+ip))/2;
     v_fine(fine)=(8*v_coarse + 10*v_fine(fine-jp_s)
                   - 3*v_fine(fine-jp_s-jp_s))/15;
   }
@@ -41,12 +26,12 @@ void Elastic::V_Boundary_Refine::Update_V_2D
  const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
  int &i, int &j,
  const int &i_max,
- const int &j_min,
  const int &j_max,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
-  /* Neumann'ish conditions for the normal direction
+  /* Quadratic interpolation involving both coarse and fine grids for
+     the normal direction
 
       i-1      i      i+1
 
