@@ -32,17 +32,14 @@ void Elastic::FACOps::smooth_Tackley_3D
      region so that the update for the velocity inside the box will be
      correct. */
   v_refine_patch_strategy.setTargetDataId(v_id);
+  v_refine_patch_strategy.setHomogeneousBc(true);
   set_boundaries(v_id,level,true);
   xeqScheduleGhostFillNoCoarse(v_rhs_id,ln);
 
-  if (ln > d_ln_min) {
-    /*
-     * Perform a one-time transfer of data from coarser level,
-     * to fill ghost boundaries that will not change through
-     * the smoothing loop.
-     */
-    xeqScheduleGhostFill(v_id, ln);
-  }
+  if (ln > d_ln_min)
+    {
+      xeqScheduleGhostFill(v_id, ln);
+    }
 
   double theta_momentum=1.0;
 
@@ -112,17 +109,13 @@ void Elastic::FACOps::smooth_Tackley_3D
                     }
               }
             set_boundaries(v_id,level,true);
-  if (ln > d_ln_min) {
-    /*
-     * Perform a one-time transfer of data from coarser level,
-     * to fill ghost boundaries that will not change through
-     * the smoothing loop.
-     */
-    xeqScheduleGhostFill(v_id, ln);
-  }
+            if (ln > d_ln_min)
+              {
+                xeqScheduleGhostFill(v_id, ln);
+              }
           }
 
-      // if (residual_tolerance >= 0.0) {
+      if (residual_tolerance >= 0.0) {
         /*
          * Check for early end of sweeps due to convergence
          * only if it is numerically possible (user gave a
@@ -141,7 +134,7 @@ void Elastic::FACOps::smooth_Tackley_3D
         //   SAMRAI::tbox::plog
         //     // << d_object_name << "\n"
         //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
-      // }
+      }
     }
 }
 
