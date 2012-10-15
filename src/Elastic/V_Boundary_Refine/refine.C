@@ -118,11 +118,11 @@ void Elastic::V_Boundary_Refine::refine
                {
                case 0:
                  Update_V_2D(axis,boundary_direction,boundary_positive,fine,
-                             ip,jp,i,j,p_max[0],p_min[1],p_max[1],*v,*v_fine);
+                             ip,jp,i,j,p_max[0],p_max[1],*v,*v_fine);
                  break;
                case 1:
                  Update_V_2D(axis,boundary_direction,boundary_positive,fine,
-                             jp,ip,j,i,p_max[1],p_min[0],p_max[0],*v,*v_fine);
+                             jp,ip,j,i,p_max[1],p_max[0],*v,*v_fine);
                  break;
                default:
                  abort();
@@ -134,14 +134,17 @@ void Elastic::V_Boundary_Refine::refine
      {
        SAMRAI::hier::Index pp[]={ip,jp,kp};
        SAMRAI::hier::Index ijk(dimension);
-       for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]=(ijk[2]/2)*2+2)
-         for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]=(ijk[1]/2)*2+2)
-           for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]=(ijk[0]/2)*2+2)
+       // for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]=(ijk[2]/2)*2+2)
+       //   for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]=(ijk[1]/2)*2+2)
+       //     for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]=(ijk[0]/2)*2+2)
+       for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]+=1)
+         for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]+=1)
+           for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]+=1)
              {
                SAMRAI::pdat::SideIndex
                  fine(ijk,axis,SAMRAI::pdat::SideIndex::Lower);
                Update_V_3D(axis,boundary_direction,boundary_positive,fine,
-                           pp,ijk,p_min,p_max,*v,*v_fine);
+                           pp,ijk,p_max,*v,*v_fine);
              }
      }
 }

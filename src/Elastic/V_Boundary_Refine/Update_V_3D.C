@@ -1,4 +1,5 @@
 #include "Elastic/V_Boundary_Refine.h"
+#include "quad_offset_interpolate.h"
 #include "Constants.h"
 
 /* This is written from the perspective of axis==x.  For axis==y, we
@@ -10,156 +11,150 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::hier::Index pp[],
  const SAMRAI::hier::Index &ijk,
- const SAMRAI::hier::Index &p_min, const SAMRAI::hier::Index &p_max,
+ const SAMRAI::hier::Index &p_max,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
-  /* Set the derivative for the normal direction.
+  /* Quadratic interpolation involving both coarse and fine grids for
+     the normal direction
 
-     We set the derivative on the i=constant plane.  If we look at a
-     slice in that plane.
-
-         k-1      k       k+1
+      i-1      i      i+1
 
         ------- -------
-       |       |       |
-   j-1 |   D   |   D   |   D
-       |       |       |
+       |   f   f   F   |
+   j-1 C       C       C
+       |   f   f   F   |
         ------- -------
-       |       |d-- d+-|
-   j   |   D   |   D   |   D
-       |       |d-+ d++|
+       |   f   f   F   |
+   j   C       C       C
+       |   f   f   F   |
         ------- -------
-       |       |       |
-   j+1 |   D   |   D   |   D
-       |       |       |
+       |   f   f   F   |
+   j+1 C       C       C
+       |   f   f   F   |
         ------- -------
                |
                |
                |
         Coarse-Fine Boundary
 
-  where D are the coarse derivatives, and d are the fine derivatives.
-  This picture is the same as what is seen in P_Boundary_Refine in 2D.
-  So we can use the formula there to compute d--.
+      Interpolate to F.
 
-   d(-,-) = a - b/4 + c/16 - d/4 + e/16 + f/16
-          = D(-,-)/16 + (15/16)*D(0,0)
-            + (3/32)*(-D(+,0) - D(0,+) + D(-,0) + D(0,-))
+      Note that F is offset out of the plane
+
+           --------------------
+          /                   /|
+         /                   / |
+        /                   /  |
+       /            C      /   |
+      /      F     /      /    |
+      -------------------      |
+     |     /     /       |     |
+     |    f     /  f     |     |
+     |         /         |     |
+     |        C          |    /
+     |                   |   /
+     |                   |  /
+     |    f        f     | /
+     |                   |/
+     -------------------
+
+
+     So need to do two interpolations of coarse values on the face and
+     then an interpolation using coarse and fine values to get inside
+     the cube.
 
   */
 
   if(boundary_direction==axis)
     {
-      /* Return early if we are at j==j_max, because that is a corner
-         that we do not care about.  We also skip if j==j_min as long
-         as we do not have to do j_min+1. We have to skip these even
-         though they are not used because otherwise we could end up
-         reading past the end of the array.  */
       const int axis2((axis+1)%3), axis3((axis+2)%3);
-      if(ijk[axis2]==p_max[axis2] || (ijk[axis2]==p_min[axis2] && ijk[axis2]%2!=0)
-         || ijk[axis3]==p_max[axis3] 
-         || (ijk[axis3]==p_min[axis3] && ijk[axis3]%2!=0))
-        return;
-      /* Compute the derivative at all of the interpolation points.  */
-
-      const SAMRAI::hier::Index ip(boundary_positive ? pp[axis] : -pp[axis]),
+      const SAMRAI::hier::Index ip_s(boundary_positive ? pp[axis] : -pp[axis]),
         jp(pp[(axis+1)%3]), kp(pp[(axis+2)%3]);
 
-      SAMRAI::pdat::SideIndex center(fine-ip);
+      SAMRAI::pdat::SideIndex center(fine-ip_s);
       center.coarsen(SAMRAI::hier::Index(2,2,2));
 
-      const double dv_mm=v(center-jp-kp+ip) - v(center-jp-kp-ip);
-      const double dv_m0=v(center-jp+ip) - v(center-jp-ip);
-      const double dv_mp=v(center-jp+kp+ip) - v(center-jp+kp-ip);
+      double v_pp, v_pm, v_mp, v_mm;
+      double v_p[3], v_m[3];
+      quad_offset_interpolate(v(center+ip_s+jp+kp),v(center+ip_s+kp),
+                              v(center+ip_s-jp+kp),v_p[0],v_m[0]);
+      quad_offset_interpolate(v(center+ip_s+jp),v(center+ip_s),
+                              v(center+ip_s-jp),v_p[1],v_m[1]);
+      quad_offset_interpolate(v(center+ip_s+jp-kp),v(center+ip_s-kp),
+                              v(center+ip_s-jp-kp),v_p[2],v_m[2]);
 
-      const double dv_0m=v(center-kp+ip) - v(center-kp-ip);
-      const double dv_00=v(center+ip) - v(center-ip);
-      const double dv_0p=v(center+kp+ip) - v(center+kp-ip);
+      quad_offset_interpolate(v_p[0],v_p[1],v_p[2],v_pp,v_pm);
+      quad_offset_interpolate(v_m[0],v_m[1],v_m[2],v_mp,v_mm);
 
-      const double dv_pm=v(center+jp-kp+ip) - v(center+jp-kp-ip);
-      const double dv_p0=v(center+jp+ip) - v(center+jp-ip);
-      const double dv_pp=v(center+jp+kp+ip) - v(center+jp+kp-ip);
-
-      const double dv_fine_mm=dv_mm/16 + (15.0/16)*dv_00
-        + (3/32)*(-dv_p0 - dv_0p + dv_m0 + dv_0m);
-
-      const double dv_fine_mp=dv_mp/16 + (15.0/16)*dv_00
-        + (3/32)*(-dv_p0 - dv_0m + dv_m0 + dv_0p);
-
-      const double dv_fine_pm=dv_pm/16 + (15.0/16)*dv_00
-        + (3/32)*(-dv_m0 - dv_0p + dv_p0 + dv_0m);
-
-      const double dv_fine_pp=dv_pp/16 + (15.0/16)*dv_00
-        + (3/32)*(-dv_m0 - dv_0m + dv_p0 + dv_0p);
-
-      SAMRAI::hier::Index offset(ip*2);
-
-      /* Be careful about using the right interpolation if the fine
-       * points are not aligned with the coarse points. */
       if(ijk[axis2]%2==0)
         {
           if(ijk[axis3]%2==0)
             {
-              v_fine(fine)=v_fine(fine-offset) + dv_fine_mm/2;
-              if(ijk[axis2]<p_max[axis2])
-                v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pm/2;
-              if(ijk[axis3]<p_max[axis3])
-                v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_mp/2;
-              if(ijk[axis2]<p_max[axis2] && ijk[axis3]<p_max[axis3])
-                v_fine(fine+jp+kp)=v_fine(fine-offset+jp+kp) + dv_fine_pp/2;
+              v_fine(fine)=v_fine(fine-ip_s)
+                + (v_mm - v_fine(fine-ip_s-ip_s))/3;
+              // if(ijk[axis2]<p_max[axis2])
+              //   v_fine(fine+jp)=v_fine(fine-ip_s+jp)
+              //     + (v_pm - v_fine(fine-ip_s-ip_s+jp))/3;
+              // if(ijk[axis3]<p_max[axis3])
+              //   v_fine(fine+kp)=v_fine(fine-ip_s+kp)
+              //     + (v_mp - v_fine(fine-ip_s-ip_s+kp))/3;
+              // if(ijk[axis2]<p_max[axis2] && ijk[axis3]<p_max[axis3])
+              //   v_fine(fine+jp+kp)=v_fine(fine-ip_s+jp+kp)
+              //     + (v_pp - v_fine(fine-ip_s-ip_s+jp+kp))/3;
             }
           else
             {
-              v_fine(fine)=v_fine(fine-offset) + dv_fine_mp/2;
-              if(ijk[axis2]<p_max[axis2])
-                v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pp/2;
+              v_fine(fine)=v_fine(fine-ip_s)
+                + (v_mp - v_fine(fine-ip_s-ip_s))/3;
+              // if(ijk[axis2]<p_max[axis2])
+              //   v_fine(fine+jp)=v_fine(fine-ip_s+jp)
+              //     + (v_pp - v_fine(fine-ip_s-ip_s+jp))/3;
             }
         }
       else
         {
           if(ijk[axis3]%2==0)
             {
-              v_fine(fine)=v_fine(fine-offset) + dv_fine_pm/2;
-              if(ijk[axis3]<p_max[axis3])
-                v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_pp/2;
+              v_fine(fine)=v_fine(fine-ip_s)
+                + (v_pm - v_fine(fine-ip_s-ip_s))/3;
+              // if(ijk[axis3]<p_max[axis3])
+              //   v_fine(fine+kp)=v_fine(fine-ip_s+kp)
+              //     + (v_pp - v_fine(fine-ip_s-ip_s+kp))/3;
             }
           else
             {
-              v_fine(fine)=v_fine(fine-offset) + dv_fine_pp/2;
+              v_fine(fine)=v_fine(fine-ip_s)
+                + (v_pp - v_fine(fine-ip_s-ip_s))/3;
             }
         }          
     }
   /* Set the value for the tangential direction.
 
-     Again, if we look at a slice in the i=constant plane.
+     If we look at a slice in the i=constant plane.
 
           j-1      j      j+1
 
         ------- -------
-       |       |       |
-   k-1 |   V   |   V   |   V
-       |       |       |
+       | f   f | F     |
+   k-1 |   C   |   C   |   C
+       | f   f | F     |
         ------- -------
-       |       |v--    |
-   k   |   V   |   V   |   V
-       |       |v-+    |
+       | f   f | F     |
+   k   |   C   |   C   |   C
+       | f   f | F     |
         ------- -------
-       |       |       |
-   k+1 |   V   |   V   |   V
-       |       |       |
+       | f   f | F     |
+   k+1 |   C   |   C   |   C
+       | f   f | F     |
         ------- -------
                |
                |
                |
         Coarse-Fine Boundary
 
-  where V are the coarse velocities, and v are the fine velocities.
-  This picture is the same as what is seen in P_Boundary_Refine in 2D.
-  So we can use the formula there to compute v--.
-
-   v(-,-) = V(-,-)/16 + (15/16)*V(0,0)
-            + (3/32)*(-V(+,0) - V(0,+) + V(-,0) + V(0,-))
+  where C are the coarse velocities, f are the fine velocities, and we
+  interpolate to the F velocities.
 
  */
   else
@@ -172,79 +167,41 @@ void Elastic::V_Boundary_Refine::Update_V_3D
       SAMRAI::pdat::SideIndex center(fine);
       center.coarsen(SAMRAI::hier::Index(2,2,2));
 
-      double v_minus=v(center-jp-kp)/16 + (15.0/16)*v(center)
-        + (3.0/32)*(-v(center+jp) - v(center+kp) + v(center-jp) + v(center-kp));
-      
-      double v_plus=v(center-jp+kp)/16 + (15.0/16)*v(center)
-        + (3.0/32)*(-v(center+jp) - v(center-kp) + v(center-jp) + v(center+kp));
-
+      double v_m, v_p;
+      quad_offset_interpolate(v(center+kp),v(center),v(center-kp),v_p,v_m);
 
       /* Be careful about using the right interpolation if the fine
-       * points are not aligned with the coarse points. */
+       * points are not aligned with the coarse points.  There is some
+       * double calls to quad_offset_interpolate going on, but fixing
+       * that would require mucking with the iteration order in an
+       * annoying way. */
       if(ijk[axis]%2==0)
         {
           if(ijk[axis3]%2==0)
             {
-              v_fine(fine)=v_minus;
-              if(ijk[axis3]<p_max[axis3])
-                v_fine(fine+kp)=v_plus;
-              if(ijk[axis]<p_max[axis])
-                {
-                  double v_minus_off=v(center-jp-kp+ip)/16
-                    + (15.0/16)*v(center+ip)
-                    + (3.0/32)*(-v(center+jp+ip) - v(center+kp+ip)
-                                + v(center-jp+ip) + v(center-kp+ip));
-      
-                  double v_plus_off=v(center-jp+kp+ip)/16
-                    + (15.0/16)*v(center+ip)
-                    + (3.0/32)*(-v(center+jp+ip) - v(center-kp+ip)
-                                + v(center-jp+ip) + v(center+kp+ip));
-
-                  v_fine(fine+ip)=(v_minus+v_minus_off)/2;
-                  if(ijk[axis3]<p_max[axis3])
-                    v_fine(fine+ip+kp)=(v_plus+v_plus_off)/2;
-                }
+              v_fine(fine)=(8*v_m + 10*v_fine(fine-jp)
+                            - 3*v_fine(fine-jp-jp))/15;
             }
           else
             {
-              v_fine(fine)=v_plus;
-              if(ijk[axis]<p_max[axis])
-                {
-                  double v_plus_off=v(center-jp+kp+ip)/16
-                    + (15.0/16)*v(center+ip)
-                    + (3.0/32)*(-v(center+jp+ip) - v(center-kp+ip)
-                                + v(center-jp+ip) + v(center+kp+ip));
-
-                  v_fine(fine+ip)=(v_plus+v_plus_off)/2;
-                }
+              v_fine(fine)=(8*v_p + 10*v_fine(fine-jp)
+                            - 3*v_fine(fine-jp-jp))/15;
             }
         }
       else
         {
+          double vv_m, vv_p;
+          quad_offset_interpolate(v(center+kp+ip),v(center+ip),
+                                  v(center-kp+ip),vv_p,vv_m);
           if(ijk[axis3]%2==0)
             {
-              double v_minus_off=v(center-jp-kp+ip)/16
-                + (15.0/16)*v(center+ip)
-                + (3.0/32)*(-v(center+jp+ip) - v(center+kp+ip)
-                            + v(center-jp+ip) + v(center-kp+ip));
-      
-              double v_plus_off=v(center-jp+kp+ip)/16
-                + (15.0/16)*v(center+ip)
-                + (3.0/32)*(-v(center+jp+ip) - v(center-kp+ip)
-                            + v(center-jp+ip) + v(center+kp+ip));
-
-              v_fine(fine)=(v_minus+v_minus_off)/2;
-              if(ijk[axis3]<p_max[axis3])
-                v_fine(fine+kp)=(v_plus+v_plus_off)/2;
+              v_fine(fine)=(4*(v_m+vv_m) + 10*v_fine(fine-jp)
+                            - 3*v_fine(fine-jp-jp))/15;
             }
           else
             {
-              double v_plus_off=v(center-jp+kp+ip)/16
-                + (15.0/16)*v(center+ip)
-                + (3.0/32)*(-v(center+jp+ip) - v(center-kp+ip)
-                            + v(center-jp+ip) + v(center+kp+ip));
-
-              v_fine(fine)=(v_plus+v_plus_off)/2;
+              v_fine(fine)=(4*(v_p+vv_p) + 10*v_fine(fine-jp)
+                            - 3*v_fine(fine-jp-jp))/15;
             }
         }
     }

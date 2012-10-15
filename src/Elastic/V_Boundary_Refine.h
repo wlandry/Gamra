@@ -143,7 +143,6 @@ namespace Elastic {
      const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
      int &i, int &j,
      const int &i_max,
-     const int &j_min,
      const int &j_max,
      SAMRAI::pdat::SideData<double> &v,
      SAMRAI::pdat::SideData<double> &v_fine) const;
@@ -155,7 +154,7 @@ namespace Elastic {
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::hier::Index pp[],
      const SAMRAI::hier::Index &ijk,
-     const SAMRAI::hier::Index &p_min, const SAMRAI::hier::Index &p_max,
+     const SAMRAI::hier::Index &p_max,
      SAMRAI::pdat::SideData<double> &v,
      SAMRAI::pdat::SideData<double> &v_fine) const;
 
