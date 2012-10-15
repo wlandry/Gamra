@@ -81,7 +81,8 @@ void Elastic::V_Boundary_Refine::Update_V_2D
           v_fine(fine)=v_fine(fine-ip_s) + (v_p - v_fine(fine-ip_s-ip_s))/3;
         }
     }
-  /* Neumann'ish conditions for the tangential direction
+  /* Quadratic interpolation involving both coarse and fine grids for
+     the tangential direction
 
       i-1      i      i+1
 
