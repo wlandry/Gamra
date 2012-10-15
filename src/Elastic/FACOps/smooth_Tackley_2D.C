@@ -55,11 +55,6 @@ void Elastic::FACOps::smooth_Tackley_2D
    * whether to continue smoothing.
    */
 
-  SAMRAI::tbox::plog << "Smoothing "
-                     << ln << " "
-                     << num_sweeps*(1<<(d_ln_max-ln)) << " "
-                     << "\n";
-
   const SAMRAI::hier::Index ip(1,0), jp(0,1);
   bool converged = false;
   for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
@@ -170,7 +165,7 @@ void Elastic::FACOps::smooth_Tackley_2D
   }
         }
 
-      // if (residual_tolerance >= 0.0) {
+      if (residual_tolerance >= 0.0) {
         /*
          * Check for early end of sweeps due to convergence
          * only if it is numerically possible (user gave a
@@ -186,11 +181,11 @@ void Elastic::FACOps::smooth_Tackley_2D
           }
         converged=(tmp==1);
 
-        if (d_enable_logging)
-          SAMRAI::tbox::plog
-            << d_object_name << " "
-            << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
-      // }
+        // if (d_enable_logging)
+        //   SAMRAI::tbox::plog
+        //     << d_object_name << " "
+        //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
+      }
     }
 }
 
