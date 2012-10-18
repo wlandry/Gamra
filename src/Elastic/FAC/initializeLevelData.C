@@ -146,9 +146,9 @@ void Elastic::FAC::initializeLevelData
         const FTensor::Tensor2<double,3,3>
           rot_strike(std::cos(strike),-std::sin(strike),0,
                      std::sin(strike),std::cos(strike),0,0,0,1),
-          rot_dip(std::sin(dip),0,-std::cos(dip),
+          rot_dip(std::sin(dip),0,std::cos(dip),
                   0,1,0,
-                  std::cos(dip),0,std::sin(dip));
+                  -std::cos(dip),0,std::sin(dip));
 
         FTensor::Tensor2<double,3,3> rot;
         FTensor::Index<'a',3> a;
