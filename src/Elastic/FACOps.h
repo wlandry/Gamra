@@ -448,7 +448,6 @@ namespace Elastic {
     void smooth_V_2D
     (const int &axis,
      const SAMRAI::hier::Box &pbox,
-     SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> &geom,
      const SAMRAI::pdat::CellIndex &center,
      const SAMRAI::hier::Index &ip,
      const SAMRAI::hier::Index &jp,
@@ -464,7 +463,6 @@ namespace Elastic {
     void smooth_V_3D
     (const int &ix,
      const SAMRAI::hier::Box &pbox,
-     SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> &geom,
      SAMRAI::pdat::SideData<double> &v,
      SAMRAI::pdat::SideData<double> &v_rhs,
      SAMRAI::pdat::CellData<double> &cell_moduli,

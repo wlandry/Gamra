@@ -79,11 +79,11 @@ void Elastic::FACOps::smooth_Tackley_3D
                 SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
                 SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> >
-                  cell_visc_ptr= patch->getPatchData(cell_moduli_id);
-                SAMRAI::pdat::CellData<double> &cell_moduli(*cell_visc_ptr);
+                  cell_moduli_ptr= patch->getPatchData(cell_moduli_id);
+                SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
                 SAMRAI::tbox::Pointer<SAMRAI::pdat::EdgeData<double> >
-                  edge_visc_ptr= patch->getPatchData(edge_moduli_id);
-                SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_visc_ptr);
+                  edge_moduli_ptr= patch->getPatchData(edge_moduli_id);
+                SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
 
                 SAMRAI::hier::Box pbox=patch->getBox();
                 SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
@@ -102,7 +102,7 @@ void Elastic::FACOps::smooth_Tackley_3D
                             center(SAMRAI::hier::Index(i,j,k));
 
                           /* Update v */
-                          smooth_V_3D(ix,pbox,geom,v,v_rhs,cell_moduli,
+                          smooth_V_3D(ix,pbox,v,v_rhs,cell_moduli,
                                       edge_moduli,center,
                                       Dx,theta_momentum,pp,maxres);
                         }

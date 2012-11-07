@@ -10,7 +10,6 @@
 void Elastic::FACOps::smooth_V_2D
 (const int &axis,
  const SAMRAI::hier::Box &pbox,
- SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> &geom,
  const SAMRAI::pdat::CellIndex &center,
  const SAMRAI::hier::Index &ip,
  const SAMRAI::hier::Index &jp,

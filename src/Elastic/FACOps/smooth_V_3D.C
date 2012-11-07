@@ -10,7 +10,6 @@
 void Elastic::FACOps::smooth_V_3D
 (const int &ix,
  const SAMRAI::hier::Box &pbox,
- SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> &geom,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_rhs,
  SAMRAI::pdat::CellData<double> &cell_moduli,

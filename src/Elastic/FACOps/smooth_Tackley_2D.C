@@ -78,11 +78,11 @@ void Elastic::FACOps::smooth_Tackley_2D
               SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
               SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> >
-                cell_visc_ptr= patch->getPatchData(cell_moduli_id);
-              SAMRAI::pdat::CellData<double> &cell_moduli(*cell_visc_ptr);
+                cell_moduli_ptr= patch->getPatchData(cell_moduli_id);
+              SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
               SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeData<double> >
-                edge_visc_ptr= patch->getPatchData(edge_moduli_id);
-              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_visc_ptr);
+                edge_moduli_ptr= patch->getPatchData(edge_moduli_id);
+              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
               SAMRAI::hier::Box pbox=patch->getBox();
               SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
@@ -101,7 +101,7 @@ void Elastic::FACOps::smooth_Tackley_2D
                       center[0]=i;
                       center[1]=j;
                       /* Update v */
-                      smooth_V_2D(0,pbox,geom,center,ip,jp,
+                      smooth_V_2D(0,pbox,center,ip,jp,
                                   v,v_rhs,maxres,dx,dy,cell_moduli,
                                   edge_moduli,theta_momentum);
                     }
@@ -131,11 +131,11 @@ void Elastic::FACOps::smooth_Tackley_2D
               SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
               SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> >
-                cell_visc_ptr= patch->getPatchData(cell_moduli_id);
-              SAMRAI::pdat::CellData<double> &cell_moduli(*cell_visc_ptr);
+                cell_moduli_ptr= patch->getPatchData(cell_moduli_id);
+              SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
               SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeData<double> >
-                edge_visc_ptr= patch->getPatchData(edge_moduli_id);
-              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_visc_ptr);
+                edge_moduli_ptr= patch->getPatchData(edge_moduli_id);
+              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
               SAMRAI::hier::Box pbox=patch->getBox();
               SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
@@ -153,7 +153,7 @@ void Elastic::FACOps::smooth_Tackley_2D
                       center[0]=i;
                       center[1]=j;
                       /* Update v */
-                      smooth_V_2D(1,pbox,geom,center,jp,ip,
+                      smooth_V_2D(1,pbox,center,jp,ip,
                                   v,v_rhs,maxres,dy,dx,cell_moduli,
                                   edge_moduli,theta_momentum);
                     }
