@@ -154,7 +154,6 @@ namespace Elastic {
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::hier::Index pp[],
      const SAMRAI::hier::Index &ijk,
-     const SAMRAI::hier::Index &p_max,
      SAMRAI::pdat::SideData<double> &v,
      SAMRAI::pdat::SideData<double> &v_fine) const;
 

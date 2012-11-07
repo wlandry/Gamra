@@ -134,9 +134,6 @@ void Elastic::V_Boundary_Refine::refine
      {
        SAMRAI::hier::Index pp[]={ip,jp,kp};
        SAMRAI::hier::Index ijk(dimension);
-       // for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]=(ijk[2]/2)*2+2)
-       //   for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]=(ijk[1]/2)*2+2)
-       //     for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]=(ijk[0]/2)*2+2)
        for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]+=1)
          for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]+=1)
            for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]+=1)
@@ -144,7 +141,7 @@ void Elastic::V_Boundary_Refine::refine
                SAMRAI::pdat::SideIndex
                  fine(ijk,axis,SAMRAI::pdat::SideIndex::Lower);
                Update_V_3D(axis,boundary_direction,boundary_positive,fine,
-                           pp,ijk,p_max,*v,*v_fine);
+                           pp,ijk,*v,*v_fine);
              }
      }
 }

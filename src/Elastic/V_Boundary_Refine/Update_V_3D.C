@@ -11,7 +11,6 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::hier::Index pp[],
  const SAMRAI::hier::Index &ijk,
- const SAMRAI::hier::Index &p_max,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
@@ -93,23 +92,11 @@ void Elastic::V_Boundary_Refine::Update_V_3D
             {
               v_fine(fine)=v_fine(fine-ip_s)
                 + (v_mm - v_fine(fine-ip_s-ip_s))/3;
-              // if(ijk[axis2]<p_max[axis2])
-              //   v_fine(fine+jp)=v_fine(fine-ip_s+jp)
-              //     + (v_pm - v_fine(fine-ip_s-ip_s+jp))/3;
-              // if(ijk[axis3]<p_max[axis3])
-              //   v_fine(fine+kp)=v_fine(fine-ip_s+kp)
-              //     + (v_mp - v_fine(fine-ip_s-ip_s+kp))/3;
-              // if(ijk[axis2]<p_max[axis2] && ijk[axis3]<p_max[axis3])
-              //   v_fine(fine+jp+kp)=v_fine(fine-ip_s+jp+kp)
-              //     + (v_pp - v_fine(fine-ip_s-ip_s+jp+kp))/3;
             }
           else
             {
               v_fine(fine)=v_fine(fine-ip_s)
                 + (v_mp - v_fine(fine-ip_s-ip_s))/3;
-              // if(ijk[axis2]<p_max[axis2])
-              //   v_fine(fine+jp)=v_fine(fine-ip_s+jp)
-              //     + (v_pp - v_fine(fine-ip_s-ip_s+jp))/3;
             }
         }
       else
@@ -118,9 +105,6 @@ void Elastic::V_Boundary_Refine::Update_V_3D
             {
               v_fine(fine)=v_fine(fine-ip_s)
                 + (v_pm - v_fine(fine-ip_s-ip_s))/3;
-              // if(ijk[axis3]<p_max[axis3])
-              //   v_fine(fine+kp)=v_fine(fine-ip_s+kp)
-              //     + (v_pp - v_fine(fine-ip_s-ip_s+kp))/3;
             }
           else
             {
