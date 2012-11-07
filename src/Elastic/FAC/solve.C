@@ -35,6 +35,8 @@ int Elastic::FAC::solve()
   /*
    * Fill in the initial guess.
    */
+  fix_moduli();
+
   for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln) {
     SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
       level = d_hierarchy->getPatchLevel(ln);
@@ -52,8 +54,6 @@ int Elastic::FAC::solve()
     }
     d_elastic_fac_solver.set_boundaries(v_id,level,false);
   }
-
-  fix_moduli();
 
   d_elastic_fac_solver.initializeSolverState
     (cell_moduli_id,edge_moduli_id,v_id,v_rhs_id,

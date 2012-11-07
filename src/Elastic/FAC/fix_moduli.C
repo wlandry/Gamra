@@ -6,6 +6,8 @@
 
 void Elastic::FAC::fix_moduli()
 {
+  d_boundary_conditions.set_edge_moduli_id(edge_moduli_id);
+
   const int ln_max(d_hierarchy->getFinestLevelNumber());
 
   SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>

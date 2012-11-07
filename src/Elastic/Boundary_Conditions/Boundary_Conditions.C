@@ -2,6 +2,7 @@
 #include "SAMRAI/tbox/Dimension.h"
 #include "SAMRAI/tbox/Database.h"
 #include "Elastic/Boundary_Conditions.h"
+#include "Constants.h"
 #include <string>
 
 #include "SAMRAI/tbox/PIO.h"
@@ -10,7 +11,7 @@ Elastic::Boundary_Conditions::Boundary_Conditions
 (const SAMRAI::tbox::Dimension& dimension,
  const std::string& object_name,
  SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database):
-  d_object_name(object_name)
+  d_object_name(object_name), edge_moduli_id(invalid_id)
 {
   const int dim(dimension.getValue());
   std::string v("v");
@@ -34,14 +35,14 @@ Elastic::Boundary_Conditions::Boundary_Conditions
               dirichlet[vxyz][direction][upper_lower].SetVarFactory(variable_factory, NULL);
               dirichlet[vxyz][direction][upper_lower].SetExpr(database->getString("dirichlet_"+bc_name));
             }
-          else if(database->keyExists("neumann_"+bc_name))
+          else if(database->keyExists("traction_"+bc_name))
             {
               is_dirichlet[vxyz][direction][upper_lower]=false;
-              neumann[vxyz][direction][upper_lower].DefineVar("x",&coord[0]);
-              neumann[vxyz][direction][upper_lower].DefineVar("y",&coord[1]);
-              neumann[vxyz][direction][upper_lower].DefineVar("z",&coord[2]);
-              neumann[vxyz][direction][upper_lower].SetVarFactory(variable_factory, NULL);
-              neumann[vxyz][direction][upper_lower].SetExpr(database->getString("neumann_"+bc_name));
+              traction[vxyz][direction][upper_lower].DefineVar("x",&coord[0]);
+              traction[vxyz][direction][upper_lower].DefineVar("y",&coord[1]);
+              traction[vxyz][direction][upper_lower].DefineVar("z",&coord[2]);
+              traction[vxyz][direction][upper_lower].SetVarFactory(variable_factory, NULL);
+              traction[vxyz][direction][upper_lower].SetExpr(database->getString("traction_"+bc_name));
             }
           else
             {

@@ -63,14 +63,16 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="1-x"
-        dirichlet_vx_x_lower="1-x"
+        dirichlet_vx_x_upper="x"
+        dirichlet_vx_x_lower="x"
+        // traction_vy_y_upper="1"
         dirichlet_vy_y_upper="0"
+        // traction_vy_y_lower="1"
         dirichlet_vy_y_lower="0"
-        neumann_vx_y_upper="0"
-        neumann_vx_y_lower="0"
-        neumann_vy_x_upper="0"
-        neumann_vy_x_lower="0"
+        traction_vx_y_upper="0"
+        traction_vx_y_lower="0"
+        traction_vy_x_upper="0"
+        traction_vy_x_lower="0"
     }
 }
 
@@ -122,7 +124,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 4
+    max_levels = 1
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
@@ -134,10 +136,7 @@ PatchHierarchy {
         level_7            = 2, 2
     }
     largest_patch_size {
-        // level_0 = 32, 32
-        // level_0 = 8, 8
         level_0 = -1, -1
-        // all finer levels will use same values as level_0...
     }
 }
 

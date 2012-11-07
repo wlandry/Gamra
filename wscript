@@ -139,6 +139,7 @@ def build(bld):
                         'src/Elastic/V_Coarsen_Patch_Strategy/postprocessCoarsen_3D.C',
                         'src/Elastic/Boundary_Conditions/Boundary_Conditions.C',
                         'src/Elastic/Boundary_Conditions/set_boundary.C',
+                        'src/Elastic/Boundary_Conditions/set_dirichlet.C',
                         'src/Elastic/FACOps/FACOps.C',
                         'src/Elastic/FACOps/computeCompositeResidualOnLevel.C',
                         'src/Elastic/FACOps/residual_2D.C',

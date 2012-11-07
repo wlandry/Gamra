@@ -28,7 +28,7 @@ Elastic {
     // It owns the solver and contains the code to set up the solver.
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
-    adaption_threshold = 1.0e-2
+    adaption_threshold = 1.0e-3
     min_full_refinement_level = 0
 
     lambda_ijk= 2, 2
@@ -67,10 +67,10 @@ Elastic {
         dirichlet_vx_x_lower="y"
         dirichlet_vy_y_upper="0"
         dirichlet_vy_y_lower="0"
-        neumann_vx_y_upper="1"
-        neumann_vx_y_lower="1"
-        neumann_vy_x_upper="0"
-        neumann_vy_x_lower="0"
+        traction_vx_y_upper="1"
+        traction_vx_y_lower="1"
+        traction_vy_x_upper="1"
+        traction_vy_x_lower="1"
     }
 }
 
@@ -122,7 +122,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 5
+    max_levels = 4
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
@@ -134,10 +134,7 @@ PatchHierarchy {
         level_7            = 2, 2
     }
     largest_patch_size {
-        // level_0 = 32, 32
-        // level_0 = 8, 8
         level_0 = -1, -1
-        // all finer levels will use same values as level_0...
     }
 }
 
