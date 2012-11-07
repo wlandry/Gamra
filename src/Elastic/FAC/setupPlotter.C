@@ -43,7 +43,6 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   plotter.registerPlotQuantity("Cell lambda",
                                "SCALAR",
                                cell_moduli_id,0);
-  // this, below, doesn't seem to work.
   plotter.registerPlotQuantity("Cell mu",
                                "SCALAR",
                                cell_moduli_id,1);
