@@ -15,17 +15,14 @@
 
 Main {
     dim = 3
-    // Base name for output files.
     base_name = "Tohoku"
-    // Whether to log all nodes in a parallel run.
     log_all_nodes = TRUE
-    // Visualization writers to write files for.
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    adaption_threshold = 1.0e-3
-    min_full_refinement_level = 10
+    adaption_threshold = 1.0e-2
+    min_full_refinement_level = 0
 
     lambda_ijk= 2, 2, 2
     lambda_coord_min= -10.001, -10.001, -10.001
@@ -410,9 +407,6 @@ Elastic {
     0.000, -182.20, -193.74, 44.47, 25.00, 20.00, 201.0, 9.0, 139.00,
     0.000, -205.41, -203.10, 44.47, 25.00, 20.00, 201.0, 9.0, 41.00,
     0.000, -228.61, -212.51, 44.47, 25.00, 20.00, 201.0, 9.0, 48.00
-
-    // faults= 200.000, 246.42, 234.46, 3.79, 25.00, 20.00, 201.0, 9.0, 153.00
-    // // faults= 200.000, 246.42, 234.46, 3.79, 25.00, 20.00, 201.0, 9.0, 153.00
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
