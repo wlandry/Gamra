@@ -16,7 +16,7 @@
 Main {
     dim = 3
     base_name = "Tohoku"
-    log_all_nodes = TRUE
+    log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
 
