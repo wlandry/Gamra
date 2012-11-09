@@ -39,8 +39,8 @@ void Elastic::FACOps::smooth_V_2D
         - v_operator_2D(v,cell_moduli,edge_moduli,center,
                         edge,x,y,ip,jp,dx,dy);
 
-        maxres=std::max(maxres,std::fabs(delta_Rx));
-        v(x)+=delta_Rx*theta_momentum/C_vx;
+      maxres=std::max(maxres,std::fabs(delta_Rx));
+      v(x)+=delta_Rx*theta_momentum/C_vx;
     }
 }
 
