@@ -24,10 +24,6 @@ namespace Elastic {
                       const int &v_id, const bool &rhs);
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
                        const int &v_id, const bool &rhs);
-    void set_tangential_traction(const SAMRAI::hier::Patch& patch,
-                                 const int &v_id, const bool &rhs);
-    void set_normal_traction(const SAMRAI::hier::Patch& patch,
-                             const int &v_id, const bool &rhs);
     void set_edge_moduli_id(const int &e_id)
     {
       edge_moduli_id=e_id;
@@ -96,10 +92,8 @@ namespace Elastic {
      const bool &homogeneous);
 
 
-    template<class T>
     void set_tangential_traction
     (SAMRAI::pdat::SideData<double> &v,
-     const T &edge_moduli,
      SAMRAI::hier::Index pp[], const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
@@ -140,8 +134,7 @@ namespace Elastic {
                                   int iz=(iy+1)%dim;
                                   if(iz==ix)
                                     iz=(iz+1)%dim;
-                                  v(x)-=traction[ix][iy][0].Eval()*dx[iy]
-                                    /modulus(edge_moduli,x+pp[iy],iz,1);
+                                  v(x)-=traction[ix][iy][0].Eval()*dx[iy];
                                 }
                               std::swap(coord[iy],coord_save);
                             }
@@ -162,8 +155,7 @@ namespace Elastic {
                                   int iz=(iy+1)%dim;
                                   if(iz==ix)
                                     iz=(iz+1)%dim;
-                                  v(x)+=traction[ix][iy][1].Eval()*dx[iy]
-                                    /modulus(edge_moduli,x,iz,1);
+                                  v(x)+=traction[ix][iy][1].Eval()*dx[iy];
                                 }
                               std::swap(coord[iy],coord_save);
                             }

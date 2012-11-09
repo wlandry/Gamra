@@ -33,26 +33,17 @@ void Elastic::Boundary_Conditions::set_boundary
       const SAMRAI::hier::Box gbox=v.getGhostBox();
 
       set_dirichlet(v,pp,dim,pbox,gbox,geom,dx,homogeneous);
+      set_tangential_traction(v,pp,dim,pbox,gbox,geom,dx,homogeneous);
 
       if(dim==2)
         {
           SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeData<double> >
             edge_moduli_ptr= patch.getPatchData(edge_moduli_id);
-
           if(!edge_moduli_ptr.isNull())
             {
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_tangential_traction(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
-                                      homogeneous);
               set_normal_traction(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
                                   homogeneous);
-            }
-          else
-            {
-              SAMRAI::tbox::plog << "null edge moduli "
-                                 << pbox << " "
-                                 << gbox << " "
-                                 << "\n";
             }
         }
       else
@@ -62,8 +53,6 @@ void Elastic::Boundary_Conditions::set_boundary
           if(!edge_moduli_ptr.isNull())
             {
               SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_tangential_traction(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
-                                      homogeneous);
               set_normal_traction(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
                                   homogeneous);
             }
