@@ -16,7 +16,7 @@
 Main {
     dim = 2
     // Base name for output files.
-    base_name = "fault"
+    base_name = "shear_x_normal"
     // Whether to log all nodes in a parallel run.
     log_all_nodes = TRUE
     // Visualization writers to write files for.
@@ -29,7 +29,7 @@ Elastic {
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
     adaption_threshold = 1.0e-2
-    min_full_refinement_level = 0
+    min_full_refinement_level = 10
 
     lambda_ijk= 2, 2
     lambda_coord_min= -10.001, -10.001
@@ -38,59 +38,34 @@ Elastic {
     1, 1,
     1, 1
 
-    mu_ijk= 3, 3
+    mu_ijk= 2, 2
     mu_coord_min= -10.001, -10.001
     mu_coord_max= 10.001, 10.001
-    mu_data= 1, 1, 1,
-    1, 1, 1,
-    1, 1, 1
+    mu_data= 1, 1,
+    1, 1
 
-    v_rhs_ijk= 11, 11
+    v_rhs_ijk= 2, 2
     v_rhs_coord_min= -10.001, -10.001
     v_rhs_coord_max= 10.001, 10.001
 
-    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-    faults= -10, -.05, -.15, 0.0, 0.2, 0.25, 30, 90, 0
+    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
-        residual_tol = 1e-3     // Residual tolerance to solve for
+        residual_tol = 1e-10     // Residual tolerance to solve for
         num_pre_sweeps = 1      // Number of presmoothing sweeps to use
         num_post_sweeps = 1     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
-        coarse_solver_tolerance = 1e-5
+        coarse_solver_tolerance = 1e-10
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="0"
-        dirichlet_vx_x_lower="0"
-        dirichlet_vy_y_upper="0"
+        dirichlet_vx_x_upper="x"
+        dirichlet_vx_x_lower="x"
+        normal_stress_vy_y_upper="1"
         dirichlet_vy_y_lower="0"
         shear_deriv_vx_y_upper="0"
         shear_deriv_vx_y_lower="0"
@@ -112,16 +87,9 @@ CartesianGridGeometry {
     //                        domain is periodic.  Zero indicates not
     //                        periodic, non-zero value indicates periodicity.
     //                        [0]
-    // domain_boxes = [(0,0), (127,127)]
-    // domain_boxes = [(0,0), (63,63)]
-    // domain_boxes = [(0,0), (31,31)]
-    // domain_boxes = [(0,0), (15,15)]
-    // domain_boxes = [(0,0), (7,7)]
     domain_boxes = [(0,0), (3,3)]
-    x_lo         = -.5, -.5
-    x_up         = .5, .5
-    // x_lo         = -4, -4
-    // x_up         = 4, 4
+    x_lo         = 0, 0
+    x_up         = 1, 1
 }
 
 StandardTagAndInitialize {
@@ -154,7 +122,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 6
+    max_levels = 1
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
@@ -166,10 +134,7 @@ PatchHierarchy {
         level_7            = 2, 2
     }
     largest_patch_size {
-        // level_0 = 32, 32
-        // level_0 = 8, 8
         level_0 = -1, -1
-        // all finer levels will use same values as level_0...
     }
 }
 

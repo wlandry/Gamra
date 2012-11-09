@@ -65,14 +65,12 @@ Elastic {
     boundary_conditions {
         dirichlet_vx_x_upper="x"
         dirichlet_vx_x_lower="x"
-        // traction_vy_y_upper="1"
         dirichlet_vy_y_upper="0"
-        // traction_vy_y_lower="1"
         dirichlet_vy_y_lower="0"
-        traction_vx_y_upper="0"
-        traction_vx_y_lower="0"
-        traction_vy_x_upper="0"
-        traction_vy_x_lower="0"
+        shear_deriv_vx_y_upper="0"
+        shear_deriv_vx_y_lower="0"
+        shear_deriv_vy_x_upper="0"
+        shear_deriv_vy_x_lower="0"
     }
 }
 

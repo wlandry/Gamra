@@ -33,7 +33,7 @@ void Elastic::Boundary_Conditions::set_boundary
       const SAMRAI::hier::Box gbox=v.getGhostBox();
 
       set_dirichlet(v,pp,dim,pbox,gbox,geom,dx,homogeneous);
-      set_tangential_traction(v,pp,dim,pbox,gbox,geom,dx,homogeneous);
+      set_shear_derivs(v,pp,dim,pbox,gbox,geom,dx,homogeneous);
 
       if(dim==2)
         {
@@ -42,8 +42,8 @@ void Elastic::Boundary_Conditions::set_boundary
           if(!edge_moduli_ptr.isNull())
             {
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_traction(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
-                                  homogeneous);
+              set_normal_stress(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
+                                homogeneous);
             }
         }
       else
@@ -53,8 +53,8 @@ void Elastic::Boundary_Conditions::set_boundary
           if(!edge_moduli_ptr.isNull())
             {
               SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_traction(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
-                                  homogeneous);
+              set_normal_stress(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
+                                homogeneous);
             }
         }
     }

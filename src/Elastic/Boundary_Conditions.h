@@ -35,7 +35,7 @@ namespace Elastic {
       variables.push_back(0);
       return &variables.back();
     }
-    mu::Parser dirichlet[3][3][2], traction[3][3][2];
+    mu::Parser dirichlet[3][3][2], normal_stress[3][2], shear_derivs[3][3][2];
     bool is_dirichlet[3][3][2];
     double coord[3];
     std::string d_object_name;
@@ -91,83 +91,17 @@ namespace Elastic {
      const double *dx,
      const bool &homogeneous);
 
-
-    void set_tangential_traction
+    void set_shear_derivs
     (SAMRAI::pdat::SideData<double> &v,
      SAMRAI::hier::Index pp[], const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
-     const bool &homogeneous)
-    {
-      for(int ix=0; ix<dim; ++ix)
-        {
-          double offset[]={0.5,0.5,0.5};
-          offset[ix]=0;
-          for(SAMRAI::pdat::SideIterator si(gbox,ix); si; si++)
-            {
-              SAMRAI::pdat::SideIndex x(*si);
-              
-              /* Set the derivative. */
-              if(x[ix]>=pbox.lower(ix) && x[ix]<=pbox.upper(ix)+1)
-                {
-                  for(int d=0;d<dim;++d)
-                    coord[d]=geom->getXLower()[d]
-                      + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
-
-                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
-                    {
-                      if(x[iy]<pbox.lower(iy)
-                         && geom->getTouchesRegularBoundary(iy,0))
-                        {
-                          if(!is_dirichlet[ix][iy][0])
-                            {
-                              double coord_save(geom->getXLower()[iy]);
-                              std::swap(coord[iy],coord_save);
-                              SAMRAI::pdat::SideIndex
-                                y(x+pp[iy],iy,SAMRAI::pdat::SideIndex::Lower);
-                              const double duyx((v(y)-v(y-pp[ix]))/dx[ix]);
-                              v(x)=v(x+pp[iy]) + duyx*dx[iy];
-                              if(!homogeneous)
-                                {
-                                  int iz=(iy+1)%dim;
-                                  if(iz==ix)
-                                    iz=(iz+1)%dim;
-                                  v(x)-=traction[ix][iy][0].Eval()*dx[iy];
-                                }
-                              std::swap(coord[iy],coord_save);
-                            }
-                        }
-                      else if(x[iy]>pbox.upper(iy)
-                              && geom->getTouchesRegularBoundary(iy,1))
-                        {
-                          if(!is_dirichlet[ix][iy][1])
-                            {
-                              double coord_save(geom->getXUpper()[iy]);
-                              std::swap(coord[iy],coord_save);
-                              SAMRAI::pdat::SideIndex
-                                y(x,iy,SAMRAI::pdat::SideIndex::Lower);
-                              const double duyx((v(y)-v(y-pp[ix]))/dx[ix]);
-                              v(x)=v(x-pp[iy]) - duyx*dx[iy];
-                              if(!homogeneous)
-                                {
-                                  int iz=(iy+1)%dim;
-                                  if(iz==ix)
-                                    iz=(iz+1)%dim;
-                                  v(x)+=traction[ix][iy][1].Eval()*dx[iy];
-                                }
-                              std::swap(coord[iy],coord_save);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+     const bool &homogeneous);
 
     template<class T>
-    void set_normal_traction
+    void set_normal_stress
     (SAMRAI::pdat::SideData<double> &v,
      const T &edge_moduli,
      SAMRAI::hier::Index pp[], const int &dim,
@@ -200,7 +134,7 @@ namespace Elastic {
 
                   /* For normal BC's, for the point just outside the
                      boundary, set a sentinel value for normal dirichlet
-                     BC or the derivative for normal traction BC. */
+                     BC or the derivative for normal stress BC. */
                   if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
                     {
                       if(!is_dirichlet[ix][ix][0])
@@ -214,15 +148,19 @@ namespace Elastic {
                                      - v(y+pp[ix]) - v(y))
                                 /(2*dx[ix]);
                             }
-                          double lambda=modulus_average(edge_moduli,x+pp[ix],ix,pp,0);
-                          double mu=modulus_average(edge_moduli,x+pp[ix],ix,pp,1);
-                          v(x)=v(x+pp[ix]*2) + lambda*duyy*2*dx[ix]/(lambda+2*mu);
+                          double lambda=
+                            modulus_average(edge_moduli,x+pp[ix],ix,pp,0);
+                          double mu=
+                            modulus_average(edge_moduli,x+pp[ix],ix,pp,1);
+                          v(x)=v(x+pp[ix]*2)
+                            + lambda*duyy*2*dx[ix]/(lambda+2*mu);
                         
                           if(!homogeneous)
                             {
                               double coord_save(geom->getXLower()[ix]);
                               std::swap(coord[ix],coord_save);
-                              v(x)-=traction[ix][ix][0].Eval()*2*dx[ix]/(lambda+2*mu);
+                              v(x)-=normal_stress[ix][0].Eval()*2*dx[ix]
+                                /(lambda+2*mu);
                               std::swap(coord[ix],coord_save);
                             }
                         }
@@ -241,8 +179,10 @@ namespace Elastic {
                                      -v(y) - v(y-pp[ix]))
                                 /(2*dx[iy]);
                             }
-                          double lambda=modulus_average(edge_moduli,x-pp[ix],ix,pp,0);
-                          double mu=modulus_average(edge_moduli,x-pp[ix],ix,pp,1);
+                          double lambda=
+                            modulus_average(edge_moduli,x-pp[ix],ix,pp,0);
+                          double mu=
+                            modulus_average(edge_moduli,x-pp[ix],ix,pp,1);
 
                           v(x)=v(x-pp[ix]*2) - lambda*duyy*2*dx[ix]/(lambda+2*mu);
                         
@@ -250,7 +190,8 @@ namespace Elastic {
                             {
                               double coord_save(geom->getXUpper()[ix]);
                               std::swap(coord[ix],coord_save);
-                              v(x)+=traction[ix][ix][1].Eval()*2*dx[ix]/(lambda+2*mu);
+                              v(x)+=normal_stress[ix][1].Eval()*2*dx[ix]
+                                /(lambda+2*mu);
                               std::swap(coord[ix],coord_save);
                             }
                         }
