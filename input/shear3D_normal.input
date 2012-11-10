@@ -14,9 +14,9 @@
 // lead to slower convergence.
 
 Main {
-    dim = 2
+    dim = 3
     // Base name for output files.
-    base_name = "shear_x"
+    base_name = "shear3D_normal"
     // Whether to log all nodes in a parallel run.
     log_all_nodes = TRUE
     // Visualization writers to write files for.
@@ -29,26 +29,36 @@ Elastic {
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
     adaption_threshold = 1.0e-2
-    min_full_refinement_level = 10
+    min_full_refinement_level = 0
 
-    lambda_ijk= 2, 2
-    lambda_coord_min= -10.001, -10.001
-    lambda_coord_max= 10.001, 10.001
+    lambda_ijk= 2, 2, 2
+    lambda_coord_min= -10.001, -10.001, -10.001
+    lambda_coord_max= 10.001, 10.001, 10.001
     lambda_data= 
-    1, 1,
+        1, 1, 1,
+        1, 1, 1,
+        1, 1
+
+    mu_ijk= 2, 2, 2
+    mu_coord_min= -10.001, -10.001, -10.001
+    mu_coord_max= 10.001, 10.001, 10.001
+    mu_data= 1, 1, 1,
+    1, 1, 1,
     1, 1
 
-    mu_ijk= 2, 2
-    mu_coord_min= -10.001, -10.001
-    mu_coord_max= 10.001, 10.001
-    mu_data= 1, 1,
-    1, 1
+    v_rhs_ijk= 2, 2, 2
+    v_rhs_coord_min= -10.001, -10.001, -10.001
+    v_rhs_coord_max= 10.001, 10.001, 10.001
 
-    v_rhs_ijk= 2, 2
-    v_rhs_coord_min= -10.001, -10.001
-    v_rhs_coord_max= 10.001, 10.001
-
-    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0
+    v_rhs_data= 0, 0, 0,
+    0, 0, 0,
+    0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
@@ -63,14 +73,24 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="x"
-        dirichlet_vx_x_lower="x"
+        dirichlet_vx_x_upper="y"
+        dirichlet_vx_x_lower="y"
         dirichlet_vy_y_upper="0"
         dirichlet_vy_y_lower="0"
-        shear_deriv_vx_y_upper="0"
-        shear_deriv_vx_y_lower="0"
-        shear_deriv_vy_x_upper="0"
-        shear_deriv_vy_x_lower="0"
+        normal_stress_vz_z_lower="0"
+        dirichlet_vz_z_upper="0"
+        shear_deriv_vx_y_upper="1"
+        shear_deriv_vx_y_lower="1"
+        shear_deriv_vx_z_upper="0"
+        shear_deriv_vx_z_lower="0"
+        shear_deriv_vy_x_upper="1"
+        shear_deriv_vy_x_lower="1"
+        shear_deriv_vy_z_upper="0"
+        shear_deriv_vy_z_lower="0"
+        shear_deriv_vz_x_upper="0"
+        shear_deriv_vz_x_lower="0"
+        shear_deriv_vz_y_upper="0"
+        shear_deriv_vz_y_lower="0"
     }
 }
 
@@ -87,9 +107,9 @@ CartesianGridGeometry {
     //                        domain is periodic.  Zero indicates not
     //                        periodic, non-zero value indicates periodicity.
     //                        [0]
-    domain_boxes = [(0,0), (3,3)]
-    x_lo         = 0, 0
-    x_up         = 1, 1
+    domain_boxes = [(0,0,0), (3,3,3)]
+    x_lo         = 0, 0, 0
+    x_up         = 1, 1, 1
 }
 
 StandardTagAndInitialize {
@@ -125,16 +145,16 @@ PatchHierarchy {
     max_levels = 2
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
-        level_1            = 2, 2
-        level_2            = 2, 2
-        level_3            = 2, 2
-        level_4            = 2, 2
-        level_5            = 2, 2
-        level_6            = 2, 2
-        level_7            = 2, 2
+        level_1            = 2, 2, 2
+        level_2            = 2, 2, 2
+        level_3            = 2, 2, 2
+        level_4            = 2, 2, 2
+        level_5            = 2, 2, 2
+        level_6            = 2, 2, 2
+        level_7            = 2, 2, 2
     }
     largest_patch_size {
-        level_0 = -1, -1
+        level_0 = -1, -1, -1
     }
 }
 
