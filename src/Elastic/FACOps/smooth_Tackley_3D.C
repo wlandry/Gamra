@@ -33,13 +33,7 @@ void Elastic::FACOps::smooth_Tackley_3D
      correct. */
   v_refine_patch_strategy.setTargetDataId(v_id);
   v_refine_patch_strategy.setHomogeneousBc(true);
-  set_boundaries(v_id,level,true);
   xeqScheduleGhostFillNoCoarse(v_rhs_id,ln);
-
-  if (ln > d_ln_min)
-    {
-      xeqScheduleGhostFill(v_id, ln);
-    }
 
   double theta_momentum=1.0;
 
@@ -67,6 +61,12 @@ void Elastic::FACOps::smooth_Tackley_3D
         for(int rb=0;rb<2;++rb)
           {
             xeqScheduleGhostFillNoCoarse(v_id,ln);
+            if (ln > d_ln_min)
+              {
+                xeqScheduleGhostFill(v_id, ln);
+              }
+            set_boundaries(v_id,level,true);
+
             for (SAMRAI::hier::PatchLevel::Iterator pi(*level); pi; pi++)
               {
                 SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *pi;
@@ -108,11 +108,6 @@ void Elastic::FACOps::smooth_Tackley_3D
                         }
                     }
               }
-            set_boundaries(v_id,level,true);
-            if (ln > d_ln_min)
-              {
-                xeqScheduleGhostFill(v_id, ln);
-              }
           }
 
       if (residual_tolerance >= 0.0) {
@@ -136,5 +131,12 @@ void Elastic::FACOps::smooth_Tackley_3D
         //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
       }
     }
+
+  xeqScheduleGhostFillNoCoarse(v_id,ln);
+  if (ln > d_ln_min)
+    {
+      xeqScheduleGhostFill(v_id, ln);
+    }
+  set_boundaries(v_id,level,true);
 }
 
