@@ -112,11 +112,9 @@ void Elastic::V_Coarsen::coarsen_2D
                                            SAMRAI::pdat::SideIndex::Lower);
             SAMRAI::pdat::SideIndex fine(coarse*2);
             if((i==coarse_box.lower(0)
-                && cgeom->getTouchesRegularBoundary(0,0)
-                && d_boundary_conditions.is_dirichlet[0][0][0])
+                && cgeom->getTouchesRegularBoundary(0,0))
                || (i==coarse_box.upper(0)+1
-                   && cgeom->getTouchesRegularBoundary(0,1)
-                   && d_boundary_conditions.is_dirichlet[0][0][1]))
+                   && cgeom->getTouchesRegularBoundary(0,1)))
               {
                 (*v)(coarse)=((*v_fine)(fine) + (*v_fine)(fine+jp))/2;
               }
@@ -131,11 +129,9 @@ void Elastic::V_Coarsen::coarsen_2D
                                            SAMRAI::pdat::SideIndex::Lower);
             SAMRAI::pdat::SideIndex fine(coarse*2);
             if((j==coarse_box.lower(1)
-                && cgeom->getTouchesRegularBoundary(1,0)
-                && d_boundary_conditions.is_dirichlet[1][1][0])
+                && cgeom->getTouchesRegularBoundary(1,0))
                || (j==coarse_box.upper(1)+1
-                   && cgeom->getTouchesRegularBoundary(1,1)
-                   && d_boundary_conditions.is_dirichlet[1][1][1]))
+                   && cgeom->getTouchesRegularBoundary(1,1)))
               {
                 (*v)(coarse)=((*v_fine)(fine) + (*v_fine)(fine+ip))/2;
               }
