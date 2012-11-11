@@ -44,22 +44,26 @@ void Elastic::Boundary_Conditions::set_dirichlet
           /* If at the boundary line, set values for normal
            * components. */
           else if(x[ix]==pbox.lower(ix)
-                  && geom->getTouchesRegularBoundary(ix,0)
-                  && !homogeneous && is_dirichlet[ix][ix][0])
+                  && geom->getTouchesRegularBoundary(ix,0))
             {
-              if(!homogeneous)
-                v(x)=dirichlet[ix][ix][0].Eval();
-              else
-                v(x)=0;
+              if(is_dirichlet[ix][ix][0])
+                {
+                  if(!homogeneous)
+                    v(x)=dirichlet[ix][ix][0].Eval();
+                  else
+                    v(x)=0;
+                }
             }
           else if(x[ix]==pbox.upper(ix)+1
-                  && geom->getTouchesRegularBoundary(ix,1)
-                  && !homogeneous && is_dirichlet[ix][ix][1])
+                  && geom->getTouchesRegularBoundary(ix,1))
             {
-              if(!homogeneous)
-                v(x)=dirichlet[ix][ix][1].Eval();
-              else
-                v(x)=0;
+              if(is_dirichlet[ix][ix][1])
+                {
+                  if(!homogeneous)
+                    v(x)=dirichlet[ix][ix][1].Eval();
+                  else
+                    v(x)=0;
+                }
             }
           /* Set tangential components. */
           else

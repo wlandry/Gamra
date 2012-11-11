@@ -17,8 +17,16 @@ void Elastic::Boundary_Conditions::set_shear_derivs
         {
           SAMRAI::pdat::SideIndex x(*si);
               
-          /* Set the derivative. */
-          if(x[ix]>=pbox.lower(ix) && x[ix]<=pbox.upper(ix)+1)
+          /* Set the derivative.  Do not set a shear derivative at the
+           * corner where a dirichlet condition is set. */
+          if((x[ix]>pbox.lower(ix)
+              || (x[ix]>=pbox.lower(ix)
+                  && (!is_dirichlet[ix][ix][0]
+                      || !geom->getTouchesRegularBoundary(ix,0))))
+             && (x[ix]<pbox.upper(ix)+1
+                 || (x[ix]<=pbox.upper(ix)+1
+                     && (!is_dirichlet[ix][ix][1] 
+                         || !geom->getTouchesRegularBoundary(ix,1)))))
             {
               for(int d=0;d<dim;++d)
                 coord[d]=geom->getXLower()[d]
@@ -39,9 +47,6 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                           v(x)=v(x+pp[iy]) + duyx*dx[iy];
                           if(!homogeneous)
                             {
-                              int iz=(iy+1)%dim;
-                              if(iz==ix)
-                                iz=(iz+1)%dim;
                               v(x)-=shear_derivs[ix][iy][0].Eval()*dx[iy];
                             }
                           std::swap(coord[iy],coord_save);
@@ -60,9 +65,6 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                           v(x)=v(x-pp[iy]) - duyx*dx[iy];
                           if(!homogeneous)
                             {
-                              int iz=(iy+1)%dim;
-                              if(iz==ix)
-                                iz=(iz+1)%dim;
                               v(x)+=shear_derivs[ix][iy][1].Eval()*dx[iy];
                             }
                           std::swap(coord[iy],coord_save);
