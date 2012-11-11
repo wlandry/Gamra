@@ -29,7 +29,7 @@ Elastic {
     // The inputs for FACStokes is simply the inputs for the individual
     // parts owned by the FACStokes class.
     adaption_threshold = 1.0e-2
-    min_full_refinement_level = 10
+    min_full_refinement_level = 0
 
     lambda_ijk= 2, 2
     lambda_coord_min= -10.001, -10.001
@@ -122,7 +122,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 1
+    max_levels = 2
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
