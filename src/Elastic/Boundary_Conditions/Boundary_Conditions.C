@@ -2,6 +2,7 @@
 #include "SAMRAI/tbox/Dimension.h"
 #include "SAMRAI/tbox/Database.h"
 #include "Elastic/Boundary_Conditions.h"
+#include "../muParser_variable_factory.h"
 #include "Constants.h"
 #include <string>
 
@@ -32,7 +33,7 @@ Elastic::Boundary_Conditions::Boundary_Conditions
               dirichlet[vxyz][direction][upper_lower].DefineVar("x",&coord[0]);
               dirichlet[vxyz][direction][upper_lower].DefineVar("y",&coord[1]);
               dirichlet[vxyz][direction][upper_lower].DefineVar("z",&coord[2]);
-              dirichlet[vxyz][direction][upper_lower].SetVarFactory(variable_factory, NULL);
+              dirichlet[vxyz][direction][upper_lower].SetVarFactory(muParser_variable_factory, NULL);
               dirichlet[vxyz][direction][upper_lower].SetExpr(database->getString("dirichlet_"+bc_name));
             }
           else if(database->keyExists("normal_stress_"+bc_name))
@@ -44,7 +45,7 @@ Elastic::Boundary_Conditions::Boundary_Conditions
               normal_stress[vxyz][upper_lower].DefineVar("x",&coord[0]);
               normal_stress[vxyz][upper_lower].DefineVar("y",&coord[1]);
               normal_stress[vxyz][upper_lower].DefineVar("z",&coord[2]);
-              normal_stress[vxyz][upper_lower].SetVarFactory(variable_factory, NULL);
+              normal_stress[vxyz][upper_lower].SetVarFactory(muParser_variable_factory, NULL);
               normal_stress[vxyz][upper_lower].SetExpr(database->getString("normal_stress_"+bc_name));
             }
           else if(database->keyExists("shear_deriv_"+bc_name))
@@ -56,7 +57,7 @@ Elastic::Boundary_Conditions::Boundary_Conditions
               shear_derivs[vxyz][direction][upper_lower].DefineVar("x",&coord[0]);
               shear_derivs[vxyz][direction][upper_lower].DefineVar("y",&coord[1]);
               shear_derivs[vxyz][direction][upper_lower].DefineVar("z",&coord[2]);
-              shear_derivs[vxyz][direction][upper_lower].SetVarFactory(variable_factory, NULL);
+              shear_derivs[vxyz][direction][upper_lower].SetVarFactory(muParser_variable_factory, NULL);
               shear_derivs[vxyz][direction][upper_lower].SetExpr(database->getString("shear_deriv_"+bc_name));
             }
           else

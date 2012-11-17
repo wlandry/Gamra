@@ -29,12 +29,6 @@ namespace Elastic {
       edge_moduli_id=e_id;
     }
 
-    static double* variable_factory(const char *, void *)
-    {
-      static std::list<double> variables;
-      variables.push_back(0);
-      return &variables.back();
-    }
     mu::Parser dirichlet[3][3][2], normal_stress[3][2], shear_derivs[3][3][2];
     bool is_dirichlet[3][3][2];
     double coord[3];

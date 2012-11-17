@@ -120,6 +120,7 @@ def build(bld):
                         'src/Stokes/FACSolver/setBoundaries.C',
                         'src/Stokes/FACSolver/solveSystem.C',
                         'src/Stokes/HypreSolver.C',
+                        'src/Elastic/muParser_variable_factory.C',
                         'src/Elastic/FAC/FAC.C',
                         'src/Elastic/FAC/fix_moduli.C',
                         'src/Elastic/FAC/applyGradientDetector.C',
