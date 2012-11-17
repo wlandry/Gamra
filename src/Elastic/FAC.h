@@ -185,6 +185,7 @@ namespace Elastic {
   public:
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id;
 
+    std::string moduli[2];
     SAMRAI::tbox::Array<double> lambda, lambda_xyz_max, lambda_xyz_min;
     SAMRAI::tbox::Array<int> lambda_ijk;
 

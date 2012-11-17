@@ -153,6 +153,11 @@ Elastic::FAC::FAC(const std::string& object_name,
                         lambda,dim,"lambda");
     }
 
+  if(database->keyExists("lambda"))
+    moduli[0]=database->getString("lambda");
+  if(database->keyExists("mu"))
+    moduli[1]=database->getString("mu");
+
   if(database->keyExists("mu_data"))
     {
       mu_ijk=database->getIntegerArray("mu_ijk");

@@ -9,6 +9,7 @@
  ************************************************************************/
 #include "Elastic/FAC.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
+#include "../muParser_variable_factory.h"
 #include "FTensor.hpp"
 
 bool intersect_fault(const int &dim,
@@ -58,6 +59,25 @@ void Elastic::FAC::initializeLevelData
     level->allocatePatchData(v_rhs_id);
   }
 
+  mu::Parser lambda_equation, mu_equation;
+  double xyz[3];
+  if(!moduli[0].empty())
+    {
+      lambda_equation.DefineVar("x",&xyz[0]);
+      lambda_equation.DefineVar("y",&xyz[1]);
+      lambda_equation.DefineVar("z",&xyz[2]);
+      lambda_equation.SetVarFactory(muParser_variable_factory, NULL);
+      lambda_equation.SetExpr(moduli[0]);
+    }
+  if(!moduli[1].empty())
+    {
+      mu_equation.DefineVar("x",&xyz[0]);
+      mu_equation.DefineVar("y",&xyz[1]);
+      mu_equation.DefineVar("z",&xyz[2]);
+      mu_equation.SetVarFactory(muParser_variable_factory, NULL);
+      mu_equation.SetExpr(moduli[1]);
+    }
+
   /*
    * Initialize data in all patches in the level.
    */
@@ -82,41 +102,53 @@ void Elastic::FAC::initializeLevelData
     for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
       {
         SAMRAI::pdat::CellIndex c=ci();
-        double xyz[dim];
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
             + dx[d]*(c[d]-cell_moduli_box.lower()[d] + 0.5);
 
-        int ijk(0), factor(1);
-        for(int d=0;d<dim;++d)
+        if(!moduli[0].empty())
           {
-            int i=static_cast<int>(xyz[d]*(lambda_ijk[d]-1)
-                                   /(lambda_xyz_max[d]-lambda_xyz_min[d]));
-            i=std::max(0,std::min(lambda_ijk[d]-1,i));
-            ijk+=i*factor;
-            factor*=lambda_ijk[d];
+            (*cell_moduli)(c,0)=lambda_equation.Eval();
           }
-        (*cell_moduli)(c,0)=lambda[ijk];
+        else
+          {
+            int ijk(0), factor(1);
+            for(int d=0;d<dim;++d)
+              {
+                int i=static_cast<int>(xyz[d]*(lambda_ijk[d]-1)
+                                       /(lambda_xyz_max[d]-lambda_xyz_min[d]));
+                i=std::max(0,std::min(lambda_ijk[d]-1,i));
+                ijk+=i*factor;
+                factor*=lambda_ijk[d];
+              }
+            (*cell_moduli)(c,0)=lambda[ijk];
+          }
       }
 
     for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
       {
         SAMRAI::pdat::CellIndex c=ci();
-        double xyz[dim];
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
             + dx[d]*(c[d]-cell_moduli_box.lower()[d] + 0.5);
 
-        int ijk(0), factor(1);
-        for(int d=0;d<dim;++d)
+        if(!moduli[1].empty())
           {
-            int i=static_cast<int>(xyz[d]*(mu_ijk[d]-1)
-                                   /(mu_xyz_max[d]-mu_xyz_min[d]));
-            i=std::max(0,std::min(mu_ijk[d]-1,i));
-            ijk+=i*factor;
-            factor*=mu_ijk[d];
+            (*cell_moduli)(c,1)=mu_equation.Eval();
           }
-        (*cell_moduli)(c,1)=mu[ijk];
+        else
+          {
+            int ijk(0), factor(1);
+            for(int d=0;d<dim;++d)
+              {
+                int i=static_cast<int>(xyz[d]*(mu_ijk[d]-1)
+                                       /(mu_xyz_max[d]-mu_xyz_min[d]));
+                i=std::max(0,std::min(mu_ijk[d]-1,i));
+                ijk+=i*factor;
+                factor*=mu_ijk[d];
+              }
+            (*cell_moduli)(c,1)=mu[ijk];
+          }
       }
 
     /* v_rhs */
