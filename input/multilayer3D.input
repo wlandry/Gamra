@@ -1,0 +1,128 @@
+/*************************************************************************
+ *
+ * This file is part of the SAMRAI distribution.  For full copyright 
+ * information, see COPYRIGHT and COPYING.LESSER. 
+ *
+ * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
+ * Description:   Input file for example FAC Stokes solver 
+ *
+ ************************************************************************/
+// This is the input file for the 2D FAC example
+// demonstrating changes in boundary conditions.
+//
+// Note that using constant refine prolongation
+// lead to slower convergence.
+
+Main {
+    dim = 3
+    base_name = "multilayer3D"
+    log_all_nodes = TRUE
+    vis_writer = "Vizamrai", "VisIt"
+}
+
+Elastic {
+    adaption_threshold = 1.0e-2
+    min_full_refinement_level = 3
+
+    lambda="y<0.5001 ? 1 : 2"
+    mu="y<0.5001 ? 1 : 2"
+
+    v_rhs_ijk= 2, 2, 2
+    v_rhs_coord_min= -10.001, -10.001, -10.001
+    v_rhs_coord_max= 10.001, 10.001, 10.001
+
+    v_rhs_data= 0, 0, 0,
+    0, 0, 0,
+    0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0
+
+    fac_solver {
+        enable_logging = TRUE   // Bool flag to switch logging on/off
+        max_cycles = 100         // Max number of FAC cycles to use
+        residual_tol = 1e-10     // Residual tolerance to solve for
+        num_pre_sweeps = 1      // Number of presmoothing sweeps to use
+        num_post_sweeps = 1     // Number of postsmoothing sweeps to use
+        smoothing_choice = "Tackley"
+        coarse_solver_choice = "Tackley"
+        coarse_solver_max_iterations = 32
+        coarse_solver_tolerance = 1e-10
+        v_prolongation_method = "V_REFINE"
+    }
+    boundary_conditions {
+        dirichlet_vx_x_upper="0"
+        dirichlet_vx_x_lower="0"
+        dirichlet_vy_y_upper="0"
+        dirichlet_vy_y_lower="0"
+        normal_stress_vz_z_upper="(x-0.5)^2 + (y-0.5)^2 < .05^2 ? -1 : 0"
+        dirichlet_vz_z_lower="0"
+        shear_deriv_vx_y_upper="0"
+        shear_deriv_vx_y_lower="0"
+        shear_deriv_vx_z_upper="0"
+        shear_deriv_vx_z_lower="0"
+        shear_deriv_vy_x_upper="0"
+        shear_deriv_vy_x_lower="0"
+        shear_deriv_vy_z_upper="0"
+        shear_deriv_vy_z_lower="0"
+        shear_deriv_vz_x_upper="0"
+        shear_deriv_vz_x_lower="0"
+        shear_deriv_vz_y_upper="0"
+        shear_deriv_vz_y_lower="0"
+    }
+}
+
+CartesianGridGeometry {
+    domain_boxes = [(0,0,0), (3,3,3)]
+    x_lo         = 0, 0, 0
+    x_up         = 1, 1, 1
+}
+
+StandardTagAndInitialize {
+    tagging_method = "GRADIENT_DETECTOR"
+}
+
+PatchHierarchy {
+    max_levels = 4
+    proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
+    ratio_to_coarser {
+        level_1            = 2, 2, 2
+        level_2            = 2, 2, 2
+        level_3            = 2, 2, 2
+        level_4            = 2, 2, 2
+        level_5            = 2, 2, 2
+        level_6            = 2, 2, 2
+        level_7            = 2, 2, 2
+    }
+    largest_patch_size {
+        level_0 = -1, -1, -1
+    }
+}
+
+GriddingAlgorithm {
+    enforce_proper_nesting = TRUE
+    extend_to_domain_boundary = FALSE
+    proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
+    // load_balance = FALSE
+    efficiency_tolerance = 0.80
+    combine_efficiency = 0.75
+    // write_regrid_boxes = TRUE
+    // read_regrid_boxes = TRUE
+    // regrid_boxes_filename = "grid"
+    check_nonrefined_tags = "ERROR"
+    check_overlapping_patches = "ERROR"
+    extend_tags_to_bdry = TRUE
+    sequentialize_patch_indices = TRUE
+    barrier_before_regrid = TRUE
+    barrier_before_find_refinement = TRUE
+    barrier_before_cluster = TRUE
+    barrier_before_nest = TRUE
+    barrier_before_limit = TRUE
+    barrier_before_extend = TRUE
+    barrier_before_balance = TRUE
+    barrier_after_find_refinement = TRUE
+    coalesce_boxes = FALSE
+}
