@@ -9,9 +9,6 @@
  ************************************************************************/
 // This is the input file for the 2D FAC example
 // demonstrating changes in boundary conditions.
-//
-// Note that using constant refine prolongation
-// lead to slower convergence.
 
 Main {
     dim = 2
@@ -21,8 +18,8 @@ Main {
 }
 
 Elastic {
-    adaption_threshold = 1.0e-2
-    min_full_refinement_level = 3
+    adaption_threshold = 1.0e-3
+    min_full_refinement_level = 1
 
     lambda="y<0.5001 ? 1 : 2"
     mu="y<0.5001 ? 1 : 2"
@@ -37,8 +34,8 @@ Elastic {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
         residual_tol = 1e-10     // Residual tolerance to solve for
-        num_pre_sweeps = 1      // Number of presmoothing sweeps to use
-        num_post_sweeps = 1     // Number of postsmoothing sweeps to use
+        num_pre_sweeps = 2      // Number of presmoothing sweeps to use
+        num_post_sweeps = 2     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
@@ -48,7 +45,7 @@ Elastic {
     boundary_conditions {
         dirichlet_vx_x_upper="0"
         dirichlet_vx_x_lower="0"
-        normal_stress_vy_y_upper="x<.45 || x>.55 ? 0 : -1"
+        normal_stress_vy_y_upper="-exp(-((x-.5)/.1)^2)"
         dirichlet_vy_y_lower="0"
         shear_deriv_vx_y_upper="0"
         shear_deriv_vx_y_lower="0"
@@ -68,7 +65,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 4
+    max_levels = 7
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
