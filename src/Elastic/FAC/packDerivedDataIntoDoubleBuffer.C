@@ -46,10 +46,8 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
   else
     {
       // Did not register this name.
-      TBOX_ERROR(
-                 "Unregistered variable name '" << variable_name << "' in\n"
-                 <<
-                 "Elastic::FAC::packDerivedDataIntoDoubleBuffer");
+      TBOX_ERROR("Unregistered variable name '" << variable_name << "' in\n"
+                 << "Elastic::FAC::packDerivedDataIntoDoubleBuffer");
     }
 
   SAMRAI::pdat::SideData<double>& v = *v_ptr;
@@ -65,6 +63,16 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
 	
         double vx=(v(x+ip) + v(x))/2.;
         double vy=(v(y+jp) + v(y))/2.;
+
+        if(variable_name=="Displacement")
+          SAMRAI::tbox::plog << variable_name << " "
+                             << depth_id << " "
+                             << center << " "
+                             << v(x) << " "
+                             << v(x+ip) << " "
+                             << v(y) << " "
+                             << v(y+jp) << " "
+                             << "\n";
 
         if (0==depth_id)
           {
@@ -91,6 +99,17 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
         double vx=(v(x+ip) + v(x))/2.;
         double vy=(v(y+jp) + v(y))/2.;
         double vz=(v(z+kp) + v(z))/2.;
+
+        // if(variable_name=="Displacement")
+        //   SAMRAI::tbox::plog << variable_name
+        //                      << center << " "
+        //                      << v(x) << " "
+        //                      << v(x+ip) << " "
+        //                      << v(y) << " "
+        //                      << v(y+jp) << " "
+        //                      << v(z) << " "
+        //                      << v(z+kp) << " "
+        //                      << "\n";
 
         if (0==depth_id)
           {

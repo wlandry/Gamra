@@ -59,23 +59,18 @@ void Elastic::FAC::initializeLevelData
     level->allocatePatchData(v_rhs_id);
   }
 
-  mu::Parser lambda_equation, mu_equation;
+  mu::Parser moduli_equation[2];
   double xyz[3];
-  if(!moduli[0].empty())
+  for(int m=0;m<2;++m)
     {
-      lambda_equation.DefineVar("x",&xyz[0]);
-      lambda_equation.DefineVar("y",&xyz[1]);
-      lambda_equation.DefineVar("z",&xyz[2]);
-      lambda_equation.SetVarFactory(muParser_variable_factory, NULL);
-      lambda_equation.SetExpr(moduli[0]);
-    }
-  if(!moduli[1].empty())
-    {
-      mu_equation.DefineVar("x",&xyz[0]);
-      mu_equation.DefineVar("y",&xyz[1]);
-      mu_equation.DefineVar("z",&xyz[2]);
-      mu_equation.SetVarFactory(muParser_variable_factory, NULL);
-      mu_equation.SetExpr(moduli[1]);
+      if(!moduli_expression[m].empty())
+        {
+          moduli_equation[m].DefineVar("x",&xyz[0]);
+          moduli_equation[m].DefineVar("y",&xyz[1]);
+          moduli_equation[m].DefineVar("z",&xyz[2]);
+          moduli_equation[m].SetVarFactory(muParser_variable_factory, NULL);
+          moduli_equation[m].SetExpr(moduli_expression[m]);
+        }
     }
 
   /*
@@ -106,49 +101,8 @@ void Elastic::FAC::initializeLevelData
           xyz[d]=geom->getXLower()[d]
             + dx[d]*(c[d]-cell_moduli_box.lower()[d] + 0.5);
 
-        if(!moduli[0].empty())
-          {
-            (*cell_moduli)(c,0)=lambda_equation.Eval();
-          }
-        else
-          {
-            int ijk(0), factor(1);
-            for(int d=0;d<dim;++d)
-              {
-                int i=static_cast<int>(xyz[d]*(lambda_ijk[d]-1)
-                                       /(lambda_xyz_max[d]-lambda_xyz_min[d]));
-                i=std::max(0,std::min(lambda_ijk[d]-1,i));
-                ijk+=i*factor;
-                factor*=lambda_ijk[d];
-              }
-            (*cell_moduli)(c,0)=lambda[ijk];
-          }
-      }
-
-    for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
-      {
-        SAMRAI::pdat::CellIndex c=ci();
-        for(int d=0;d<dim;++d)
-          xyz[d]=geom->getXLower()[d]
-            + dx[d]*(c[d]-cell_moduli_box.lower()[d] + 0.5);
-
-        if(!moduli[1].empty())
-          {
-            (*cell_moduli)(c,1)=mu_equation.Eval();
-          }
-        else
-          {
-            int ijk(0), factor(1);
-            for(int d=0;d<dim;++d)
-              {
-                int i=static_cast<int>(xyz[d]*(mu_ijk[d]-1)
-                                       /(mu_xyz_max[d]-mu_xyz_min[d]));
-                i=std::max(0,std::min(mu_ijk[d]-1,i));
-                ijk+=i*factor;
-                factor*=mu_ijk[d];
-              }
-            (*cell_moduli)(c,1)=mu[ijk];
-          }
+        for(int m=0;m<2;++m)
+          (*cell_moduli)(c,m)=evaluate_moduli(moduli_equation,xyz,m,dim);
       }
 
     /* v_rhs */

@@ -143,31 +143,31 @@ Elastic::FAC::FAC(const std::string& object_name,
   min_full_refinement_level
     =database->getIntegerWithDefault("min_full_refinement_level",0);
 
-  if(database->keyExists("lambda_data"))
+  std::vector<std::string> moduli_strings(2);
+  moduli_strings[0]="lambda";
+  moduli_strings[1]="mu";
+  for(int m=0;m<2;++m)
     {
-      lambda_ijk=database->getIntegerArray("lambda_ijk");
-      lambda_xyz_min=database->getDoubleArray("lambda_coord_min");
-      lambda_xyz_max=database->getDoubleArray("lambda_coord_max");
-      lambda=database->getDoubleArray("lambda_data");
-      check_array_sizes(lambda_ijk,lambda_xyz_min,lambda_xyz_max,
-                        lambda,dim,"lambda");
+      const std::string &s(moduli_strings[m]);
+      if(database->keyExists(s))
+        {
+          moduli_expression[m]=database->getString(s);
+        }
+      else if(database->keyExists(s+"_data"))
+        {
+          moduli_ijk[m]=database->getIntegerArray(s+"_ijk");
+          moduli_xyz_min[m]=database->getDoubleArray(s+"_coord_min");
+          moduli_xyz_max[m]=database->getDoubleArray(s+"_coord_max");
+          moduli[m]=database->getDoubleArray(s+"_data");
+          check_array_sizes(moduli_ijk[m],moduli_xyz_min[m],moduli_xyz_max[m],
+                            moduli[m],dim,s+"");
+        }
+      else
+        {
+          TBOX_ERROR("Could not find an entry for " + s);
+        }
     }
-
-  if(database->keyExists("lambda"))
-    moduli[0]=database->getString("lambda");
-  if(database->keyExists("mu"))
-    moduli[1]=database->getString("mu");
-
-  if(database->keyExists("mu_data"))
-    {
-      mu_ijk=database->getIntegerArray("mu_ijk");
-      mu_xyz_min=database->getDoubleArray("mu_coord_min");
-      mu_xyz_max=database->getDoubleArray("mu_coord_max");
-      mu=database->getDoubleArray("mu_data");
-      check_array_sizes(mu_ijk,mu_xyz_min,mu_xyz_max,
-                        mu,dim,"mu");
-    }
-
+    
   if(database->keyExists("v_rhs_data"))
     {
       v_rhs_ijk=database->getIntegerArray("v_rhs_ijk");
