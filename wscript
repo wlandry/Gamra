@@ -124,7 +124,6 @@ def build(bld):
                         'src/Elastic/FAC/FAC.C',
                         'src/Elastic/FAC/fix_moduli.C',
                         'src/Elastic/FAC/applyGradientDetector.C',
-                        'src/Elastic/FAC/evaluate_moduli.C',
                         'src/Elastic/FAC/initializeLevelData.C',
                         'src/Elastic/FAC/packDerivedDataIntoDoubleBuffer.C',
                         'src/Elastic/FAC/resetHierarchyConfiguration.C',

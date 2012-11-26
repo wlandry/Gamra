@@ -1,0 +1,107 @@
+#include <muParser.h>
+#include <string>
+#include <list>
+#include "SAMRAI/tbox/Array.h"
+#include "SAMRAI/tbox/Database.h"
+#include "SAMRAI/tbox/Pointer.h"
+
+class Input_Expression
+{
+public:
+  mu::Parser equation;
+  SAMRAI::tbox::Array<double> data, xyz_max, xyz_min;
+  SAMRAI::tbox::Array<int> ijk;
+
+  const int dim;
+  double coord[3];
+  bool use_equation;
+
+  static double* variable_factory(const char *, void *)
+  {
+    static std::list<double> variables;
+    variables.push_back(0);
+    return &variables.back();
+  }
+
+  Input_Expression(const std::string &name,
+                   SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database,
+                   const SAMRAI::tbox::Dimension& dimension,
+                   const int num_components=1):
+    dim(dimension.getValue())
+  {
+    if(database->keyExists(name))
+      {
+        equation.DefineVar("x",&coord[0]);
+        equation.DefineVar("y",&coord[1]);
+        equation.DefineVar("z",&coord[2]);
+        equation.SetVarFactory(variable_factory, NULL);
+        equation.SetExpr(database->getString(name));
+        use_equation=true;
+      }
+    else if(database->keyExists(name+"_data"))
+      {
+        ijk=database->getIntegerArray(name+"_ijk");
+        xyz_min=database->getDoubleArray(name+"_coord_min");
+        xyz_max=database->getDoubleArray(name+"_coord_max");
+        data=database->getDoubleArray(name+"_data");
+        check_array_sizes(name,num_components);
+        use_equation=false;
+      }
+    else
+      {
+        TBOX_ERROR("Could not find an entry for " + name);
+      }
+  }
+
+  /* A little utility routine to validate the sizes of input arrays */
+  void check_array_sizes(const std::string &name, const int &num_components)
+  {
+    if(ijk.size()!=dim)
+      TBOX_ERROR("Bad number of elements in " << name << "_ijk.  Expected "
+                 << dim << " but got " << ijk.size());
+    if(xyz_min.size()!=dim)
+      TBOX_ERROR("Bad number of elements in "
+                 << name << "_coord_min.  Expected "
+                 << dim << " but got " << xyz_min.size());
+    if(xyz_max.size()!=dim)
+      TBOX_ERROR("Bad number of elements in "
+                 << name << "_coord_max.  Expected "
+                 << dim << " but got " << xyz_max.size());
+    int data_size(1);
+    for(int d=0; d<dim; ++d)
+      data_size*=ijk[d];
+
+    if(data.size()!=data_size*num_components)
+      TBOX_ERROR("Bad number of elements in "
+                 << name << "_data.  Expected "
+                 << data_size*num_components << " but got " << data.size());
+  }
+
+  double eval(const double Coord[3])
+  {
+    double result;
+
+    if(use_equation)
+      {
+        coord[0]=Coord[0];
+        coord[1]=Coord[1];
+        coord[2]=Coord[2];
+        result=equation.Eval();
+      }
+    else
+      {
+        int index(0), factor(1);
+        for(int d=0;d<dim;++d)
+          {
+            int i=static_cast<int>(coord[d]*(ijk[d]-1)
+                                   /(xyz_max[d]-xyz_min[d])+0.5);
+            i=std::max(0,std::min(ijk[d]-1,i));
+            index+=i*factor;
+            factor*=ijk[d];
+          }
+        result=data[index];
+      }
+    return result;
+  }
+
+};

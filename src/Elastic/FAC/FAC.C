@@ -20,41 +20,6 @@
 #include "SAMRAI/hier/Variable.h"
 #include "SAMRAI/hier/VariableDatabase.h"
 
-namespace Elastic {
-  /* A little utility routine to validate the sizes of input arrays */
-  void check_array_sizes(const SAMRAI::tbox::Array<int> ijk,
-                         const SAMRAI::tbox::Array<double> min,
-                         const SAMRAI::tbox::Array<double> max,
-                         const SAMRAI::tbox::Array<double> data,
-                         const int dim, const std::string &name,
-                         const int num_components=1)
-  {
-    if(ijk.size()!=dim)
-      TBOX_ERROR("Bad number of elements in " << name << "_ijk.  Expected "
-                 << dim << " but got " << ijk.size());
-    if(min.size()!=dim)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_coord_min.  Expected "
-                 << dim << " but got " << min.size());
-    if(max.size()!=dim)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_coord_max.  Expected "
-                 << dim << " but got " << max.size());
-    int data_size(1);
-    for(int d=0; d<dim; ++d)
-      data_size*=ijk[d];
-    if(data.size()!=data_size*num_components)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_data.  Expected "
-                 << data_size*num_components << " but got " << data.size());
-  }
-}
-/*
-*************************************************************************
-* Constructor creates a unique context for the object and register      *
-* all its internal variables with the variable database.                *
-*************************************************************************
-*/
 Elastic::FAC::FAC(const std::string& object_name,
                   const SAMRAI::tbox::Dimension& dimension,
                   SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database):
@@ -70,7 +35,10 @@ Elastic::FAC::FAC(const std::string& object_name,
                        database->getDatabase("fac_solver"):
                        SAMRAI::tbox::Pointer<SAMRAI::tbox::Database>(NULL),
                        d_boundary_conditions),
-  d_context()
+  d_context(),
+  lambda("lambda",database,dimension),
+  mu("mu",database,dimension),
+  v_rhs("v_rhs",database,dimension,dimension.getValue())
 {
   const int dim(d_dim.getValue());
   SAMRAI::hier::VariableDatabase* vdb =
@@ -142,41 +110,6 @@ Elastic::FAC::FAC(const std::string& object_name,
                                                       1.0e-15);
   min_full_refinement_level
     =database->getIntegerWithDefault("min_full_refinement_level",0);
-
-  std::vector<std::string> moduli_strings(2);
-  moduli_strings[0]="lambda";
-  moduli_strings[1]="mu";
-  for(int m=0;m<2;++m)
-    {
-      const std::string &s(moduli_strings[m]);
-      if(database->keyExists(s))
-        {
-          moduli_expression[m]=database->getString(s);
-        }
-      else if(database->keyExists(s+"_data"))
-        {
-          moduli_ijk[m]=database->getIntegerArray(s+"_ijk");
-          moduli_xyz_min[m]=database->getDoubleArray(s+"_coord_min");
-          moduli_xyz_max[m]=database->getDoubleArray(s+"_coord_max");
-          moduli[m]=database->getDoubleArray(s+"_data");
-          check_array_sizes(moduli_ijk[m],moduli_xyz_min[m],moduli_xyz_max[m],
-                            moduli[m],dim,s+"");
-        }
-      else
-        {
-          TBOX_ERROR("Could not find an entry for " + s);
-        }
-    }
-    
-  if(database->keyExists("v_rhs_data"))
-    {
-      v_rhs_ijk=database->getIntegerArray("v_rhs_ijk");
-      v_rhs_xyz_min=database->getDoubleArray("v_rhs_coord_min");
-      v_rhs_xyz_max=database->getDoubleArray("v_rhs_coord_max");
-      v_rhs=database->getDoubleArray("v_rhs_data");
-      check_array_sizes(v_rhs_ijk,v_rhs_xyz_min,v_rhs_xyz_max,
-                        v_rhs,dim,"v_rhs",dim);
-    }
 
   if(database->keyExists("faults"))
     {

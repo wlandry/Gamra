@@ -25,6 +25,7 @@
 #include "SAMRAI/appu/VisDerivedDataStrategy.h"
 #include "SAMRAI/appu/VisItDataWriter.h"
 #include "Elastic/Boundary_Conditions.h"
+#include "Input_Expression.h"
 
 namespace Elastic {
   /*!
@@ -185,18 +186,9 @@ namespace Elastic {
   public:
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id;
 
-    std::string moduli_expression[2];
-    SAMRAI::tbox::Array<double> moduli[2], moduli_xyz_max[2], moduli_xyz_min[2];
-    SAMRAI::tbox::Array<int> moduli_ijk[2];
-
-    SAMRAI::tbox::Array<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
-    SAMRAI::tbox::Array<int> v_rhs_ijk;
+    Input_Expression lambda, mu, v_rhs;
 
     SAMRAI::tbox::Array<double> faults;
-
-    double evaluate_moduli(mu::Parser moduli_equation[2],
-                           const double xyz[3], const int &m,
-                           const int &dim);
     //@}
 
   };

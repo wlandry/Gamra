@@ -59,20 +59,6 @@ void Elastic::FAC::initializeLevelData
     level->allocatePatchData(v_rhs_id);
   }
 
-  mu::Parser moduli_equation[2];
-  double xyz[3];
-  for(int m=0;m<2;++m)
-    {
-      if(!moduli_expression[m].empty())
-        {
-          moduli_equation[m].DefineVar("x",&xyz[0]);
-          moduli_equation[m].DefineVar("y",&xyz[1]);
-          moduli_equation[m].DefineVar("z",&xyz[2]);
-          moduli_equation[m].SetVarFactory(muParser_variable_factory, NULL);
-          moduli_equation[m].SetExpr(moduli_expression[m]);
-        }
-    }
-
   /*
    * Initialize data in all patches in the level.
    */
@@ -97,12 +83,13 @@ void Elastic::FAC::initializeLevelData
     for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox()); ci; ci++)
       {
         SAMRAI::pdat::CellIndex c=ci();
+        double xyz[3];
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
             + dx[d]*(c[d]-cell_moduli_box.lower()[d] + 0.5);
 
-        for(int m=0;m<2;++m)
-          (*cell_moduli)(c,m)=evaluate_moduli(moduli_equation,xyz,m,dim);
+        (*cell_moduli)(c,0)=lambda.eval(xyz);
+        (*cell_moduli)(c,1)=mu.eval(xyz);
       }
 
     /* v_rhs */
@@ -110,6 +97,7 @@ void Elastic::FAC::initializeLevelData
       patch->getPatchData(v_rhs_id);
 
     v_rhs_data->fill(0,0);
+    /* FIXME: need to add in the v_rhs from the input file */
 
     /* Iterate over the faults */
     for(int fault_index=0;fault_index<faults.size();fault_index+=9)
@@ -206,6 +194,7 @@ void Elastic::FAC::initializeLevelData
 
                     if(sign!=0)
                       {
+                        /* FIXME: lambda and mu should be calculated. */
                         const double lambda_here(1), mu_here(1);
                         double factor(mu_here);
                         if(ix==d)
@@ -227,6 +216,7 @@ void Elastic::FAC::initializeLevelData
                     ntt_dxy[1][1](a)=
                       rot(a,b)*(xyz(b)-Dx[ix](b)/2-Dx[iy](b)/2-center(b));
 
+                    /* FIXME: lambda and mu should be calculated. */
                     const double lambda_here(1), mu_here(1);
                     int l(0), m(0);
                     double j(0);
