@@ -15,7 +15,7 @@ public:
   SAMRAI::tbox::Array<double> data, xyz_min, xyz_max;
   SAMRAI::tbox::Array<int> ijk;
 
-  int dim;
+  int dim, slice;
   double coord[3];
   bool use_equation;
 
@@ -31,8 +31,9 @@ public:
   Input_Expression(const std::string &name,
                    SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database,
                    const SAMRAI::tbox::Dimension& dimension,
-                   const int num_components=1):
-    dim(dimension.getValue())
+                   const int num_components=1,
+                   const int Slice=-1):
+    dim(dimension.getValue()), slice(Slice)
   {
     if(database->keyExists(name))
       {
@@ -71,6 +72,8 @@ public:
     xyz_max=e.xyz_max;
     ijk=e.ijk;
     use_equation=e.use_equation;
+    dim=e.dim;
+    slice=e.slice;
 
     if(use_equation)
       {
@@ -84,21 +87,23 @@ public:
   /* A little utility routine to validate the sizes of input arrays */
   void check_array_sizes(const std::string &name, const int &num_components)
   {
-    if(ijk.size()!=dim)
+    const int array_dim(slice==-1 ? dim : dim-1);
+    if(ijk.size()!=array_dim)
       TBOX_ERROR("Bad number of elements in " << name << "_ijk.  Expected "
-                 << dim << " but got " << ijk.size());
-    if(xyz_min.size()!=dim)
+                 << array_dim << " but got " << ijk.size());
+    if(xyz_min.size()!=array_dim)
       TBOX_ERROR("Bad number of elements in "
                  << name << "_coord_min.  Expected "
-                 << dim << " but got " << xyz_min.size());
-    if(xyz_max.size()!=dim)
+                 << array_dim << " but got " << xyz_min.size());
+    if(xyz_max.size()!=array_dim)
       TBOX_ERROR("Bad number of elements in "
                  << name << "_coord_max.  Expected "
-                 << dim << " but got " << xyz_max.size());
+                 << array_dim << " but got " << xyz_max.size());
     int data_size(1);
     for(int d=0; d<dim; ++d)
-      data_size*=ijk[d];
-
+      if(d!=slice)
+        data_size*=ijk[d];
+    
     if(data.size()!=data_size*num_components)
       TBOX_ERROR("Bad number of elements in "
                  << name << "_data.  Expected "
@@ -118,14 +123,17 @@ public:
       }
     else
       {
-        int index(0), factor(1);
-        for(int d=0;d<dim;++d)
+        int index(0), factor(1), d(0);
+        for(int dd=0; dd<dim; ++dd)
           {
-            int i=static_cast<int>(coord[d]*(ijk[d]-1)
+            if(dd==slice)
+              continue;
+            int i=static_cast<int>(Coord[dd]*(ijk[d]-1)
                                    /(xyz_max[d]-xyz_min[d])+0.5);
             i=std::max(0,std::min(ijk[d]-1,i));
             index+=i*factor;
             factor*=ijk[d];
+            ++d;
           }
         result=data[index];
       }

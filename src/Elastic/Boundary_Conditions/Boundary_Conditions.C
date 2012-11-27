@@ -27,7 +27,7 @@ Elastic::Boundary_Conditions::Boundary_Conditions
           std::string bc_name(v+xyz[vxyz]+"_"+xyz[direction]+"_"
                               +upper_string[upper_lower]);
           expression[vxyz][direction][upper_lower]=
-            Input_Expression(bc_name,database,dimension);
+            Input_Expression(bc_name,database,dimension,1,direction);
           is_dirichlet[vxyz][direction][upper_lower]=
             database->getBool(bc_name + "_is_dirichlet");
         }
