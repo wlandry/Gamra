@@ -124,16 +124,19 @@ public:
     else
       {
         int d(0);
-        int ix[3];
+        int ix[3], ixp[3];
         double dx[3];
         for(int dd=0; dd<dim; ++dd)
           {
             if(dd==slice)
               continue;
 
-            double delta=(xyz_max[d]-xyz_min[d])/(ijk[d]-1);
+            /* Use max(1,ijk-1) rather than (ijk-1) to handle the case
+               when the array is only one element wide */
+            double delta=(xyz_max[d]-xyz_min[d])/std::max(1,ijk[d]-1);
             ix[d]=static_cast<int>((Coord[dd]-xyz_min[d])/delta);
             ix[d]=std::max(0,std::min(ijk[d]-2,ix[d]));
+            ixp[d]=std::max(0,std::min(ijk[d]-1,ix[d]+1));
 
             dx[d]=(Coord[dd]-ix[d]*delta)/delta;
             ++d;
@@ -142,23 +145,23 @@ public:
         switch (d)
           {
           case 1:
-            result=data[ix[0]]*(1-dx[0]) + data[ix[0]+1]*dx[0];
+            result=data[ix[0]]*(1-dx[0]) + data[ixp[0]]*dx[0];
             break;
           case 2:
             result=data[ix[0] + ix[1]*ijk[0]]*(1-dx[0]-dx[1]+dx[0]*dx[1])
-              + data[ix[0]+1 + ix[1]*ijk[0]]*dx[0]*(1-dx[1])
-              + data[ix[0] + (ix[1]+1)*ijk[0]]*dx[1]*(1-dx[0])
-              + data[ix[0]+1 + (ix[1]+1)*ijk[0]]*dx[0]*dx[1];
+              + data[ixp[0] + ix[1] *ijk[0]]*dx[0]*(1-dx[1])
+              + data[ix[0]  + ixp[1]*ijk[0]]*dx[1]*(1-dx[0])
+              + data[ixp[0] + ixp[1]*ijk[0]]*dx[0]*dx[1];
             break;
           case 3:
-            result=data[ix[0] + ijk[0]*(ix[1] + ijk[1]*ix[2])]     *(1-dx[0])*(1-dx[1])*(1-dx[2])
-              + data[ix[0]+1 + ijk[0]*(ix[1]   + ijk[1]*ix[2])]    *dx[0]    *(1-dx[1])*(1-dx[2])
-              + data[ix[0]   + ijk[0]*(ix[1]+1 + ijk[1]*ix[2])]    *(1-dx[0])*dx[1]    *(1-dx[2])
-              + data[ix[0]+1 + ijk[0]*(ix[1]+1 + ijk[1]*ix[2])]    *dx[0]    *dx[1]    *(1-dx[2])
-              + data[ix[0]   + ijk[0]*(ix[1]   + ijk[1]*(ix[2]+1))]*(1-dx[0])*(1-dx[1])*dx[2]
-              + data[ix[0]+1 + ijk[0]*(ix[1]   + ijk[1]*(ix[2]+1))]*dx[0]    *(1-dx[1])*dx[2]
-              + data[ix[0]   + ijk[0]*(ix[1]+1 + ijk[1]*(ix[2]+1))]*(1-dx[0])*dx[1]    *dx[2]
-              + data[ix[0]+1 + ijk[0]*(ix[1]+1 + ijk[1]*(ix[2]+1))]*dx[0]    *dx[1]    *dx[2];
+            result=data[ix[0] + ijk[0]*(ix[1]+ ijk[1]*ix[2])] *(1-dx[0])*(1-dx[1])*(1-dx[2])
+              + data[ixp[0] + ijk[0]*(ix[1]  + ijk[1]*ix[2])] *dx[0]    *(1-dx[1])*(1-dx[2])
+              + data[ix[0]  + ijk[0]*(ixp[1] + ijk[1]*ix[2])] *(1-dx[0])*dx[1]    *(1-dx[2])
+              + data[ixp[0] + ijk[0]*(ixp[1] + ijk[1]*ix[2])] *dx[0]    *dx[1]    *(1-dx[2])
+              + data[ix[0]  + ijk[0]*(ix[1]  + ijk[1]*ixp[2])]*(1-dx[0])*(1-dx[1])*dx[2]
+              + data[ixp[0] + ijk[0]*(ix[1]  + ijk[1]*ixp[2])]*dx[0]    *(1-dx[1])*dx[2]
+              + data[ix[0]  + ijk[0]*(ixp[1] + ijk[1]*ixp[2])]*(1-dx[0])*dx[1]    *dx[2]
+              + data[ixp[0] + ijk[0]*(ixp[1] + ijk[1]*ixp[2])]*dx[0]    *dx[1]    *dx[2];
             break;
           default:
             abort();
