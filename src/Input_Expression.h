@@ -123,19 +123,46 @@ public:
       }
     else
       {
-        int index(0), factor(1), d(0);
+        int d(0);
+        int ix[3];
+        double dx[3];
         for(int dd=0; dd<dim; ++dd)
           {
             if(dd==slice)
               continue;
-            int i=static_cast<int>(Coord[dd]*(ijk[d]-1)
-                                   /(xyz_max[d]-xyz_min[d])+0.5);
-            i=std::max(0,std::min(ijk[d]-1,i));
-            index+=i*factor;
-            factor*=ijk[d];
+
+            double delta=(xyz_max[d]-xyz_min[d])/(ijk[d]-1);
+            ix[d]=static_cast<int>((Coord[dd]-xyz_min[d])/delta);
+            ix[d]=std::max(0,std::min(ijk[d]-2,ix[d]));
+
+            dx[d]=(Coord[dd]-ix[d]*delta)/delta;
             ++d;
           }
-        result=data[index];
+
+        switch (d)
+          {
+          case 1:
+            result=data[ix[0]]*(1-dx[0]) + data[ix[0]+1]*dx[0];
+            break;
+          case 2:
+            result=data[ix[0] + ix[1]*ijk[0]]*(1-dx[0]-dx[1]+dx[0]*dx[1])
+              + data[ix[0]+1 + ix[1]*ijk[0]]*dx[0]*(1-dx[1])
+              + data[ix[0] + (ix[1]+1)*ijk[0]]*dx[1]*(1-dx[0])
+              + data[ix[0]+1 + (ix[1]+1)*ijk[0]]*dx[0]*dx[1];
+            break;
+          case 3:
+            result=data[ix[0] + ijk[0]*(ix[1] + ijk[1]*ix[2])]     *(1-dx[0])*(1-dx[1])*(1-dx[2])
+              + data[ix[0]+1 + ijk[0]*(ix[1]   + ijk[1]*ix[2])]    *dx[0]    *(1-dx[1])*(1-dx[2])
+              + data[ix[0]   + ijk[0]*(ix[1]+1 + ijk[1]*ix[2])]    *(1-dx[0])*dx[1]    *(1-dx[2])
+              + data[ix[0]+1 + ijk[0]*(ix[1]+1 + ijk[1]*ix[2])]    *dx[0]    *dx[1]    *(1-dx[2])
+              + data[ix[0]   + ijk[0]*(ix[1]   + ijk[1]*(ix[2]+1))]*(1-dx[0])*(1-dx[1])*dx[2]
+              + data[ix[0]+1 + ijk[0]*(ix[1]   + ijk[1]*(ix[2]+1))]*dx[0]    *(1-dx[1])*dx[2]
+              + data[ix[0]   + ijk[0]*(ix[1]+1 + ijk[1]*(ix[2]+1))]*(1-dx[0])*dx[1]    *dx[2]
+              + data[ix[0]+1 + ijk[0]*(ix[1]+1 + ijk[1]*(ix[2]+1))]*dx[0]    *dx[1]    *dx[2];
+            break;
+          default:
+            abort();
+          }
       }
     return result;
   }
