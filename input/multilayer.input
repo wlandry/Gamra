@@ -21,12 +21,7 @@ Elastic {
 
     lambda="y<0.5001 ? 1 : 2"
     mu="y<0.5001 ? 1 : 2"
-
-    v_rhs_ijk= 2, 2
-    v_rhs_coord_min= -10.001, -10.001
-    v_rhs_coord_max= 10.001, 10.001
-
-    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0
+    v_rhs="0"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
@@ -45,8 +40,16 @@ Elastic {
         vx_x_upper_is_dirichlet=TRUE
         vx_x_lower="0"
         vx_x_lower_is_dirichlet=TRUE
-        vy_y_upper="-exp(-((x-.5)/.1)^2)"
+
+        vy_y_upper_ijk=20
+        vy_y_upper_coord_min=0
+        vy_y_upper_coord_max=1
+        vy_y_upper_data=0, 0, 0, 0, 0, 0, -1, -1, -2, -4,
+        -4, -2, -1, -1, 0, 0, 0, 0, 0, 0
+        
+        // vy_y_upper="-exp(-((x-.5)/.1)^2)"
         vy_y_upper_is_dirichlet=FALSE
+
         vy_y_lower="0"
         vy_y_lower_is_dirichlet=TRUE
         vx_y_upper="0"
@@ -71,7 +74,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 7
+    max_levels = 5
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
