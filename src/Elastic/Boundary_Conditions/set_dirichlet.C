@@ -49,7 +49,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
               if(is_dirichlet[ix][ix][0])
                 {
                   if(!homogeneous)
-                    v(x)=dirichlet[ix][ix][0].Eval();
+                    v(x)=expression[ix][ix][0].eval(coord);
                   else
                     v(x)=0;
                 }
@@ -60,7 +60,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
               if(is_dirichlet[ix][ix][1])
                 {
                   if(!homogeneous)
-                    v(x)=dirichlet[ix][ix][1].Eval();
+                    v(x)=expression[ix][ix][1].eval(coord);
                   else
                     v(x)=0;
                 }
@@ -79,7 +79,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
                         {
                           v(x)=-v(x+pp[iy]);
                           if(!homogeneous)
-                            v(x)+=2*dirichlet[ix][iy][0].Eval();
+                            v(x)+=2*expression[ix][iy][0].eval(coord);
                         }
                       std::swap(coord[iy],coord_save);
                     }
@@ -92,7 +92,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
                         {
                           v(x)=-v(x-pp[iy]);
                           if(!homogeneous)
-                            v(x)+=2*dirichlet[ix][iy][1].Eval();
+                            v(x)+=2*expression[ix][iy][1].eval(coord);
                         }
                       std::swap(coord[iy],coord_save);
                     }

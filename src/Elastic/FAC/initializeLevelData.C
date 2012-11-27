@@ -9,7 +9,6 @@
  ************************************************************************/
 #include "Elastic/FAC.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
-#include "../muParser_variable_factory.h"
 #include "FTensor.hpp"
 
 bool intersect_fault(const int &dim,

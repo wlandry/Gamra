@@ -47,7 +47,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                           v(x)=v(x+pp[iy]) + duyx*dx[iy];
                           if(!homogeneous)
                             {
-                              v(x)-=shear_derivs[ix][iy][0].Eval()*dx[iy];
+                              v(x)-=expression[ix][iy][0].eval(coord)*dx[iy];
                             }
                           std::swap(coord[iy],coord_save);
                         }
@@ -65,7 +65,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                           v(x)=v(x-pp[iy]) - duyx*dx[iy];
                           if(!homogeneous)
                             {
-                              v(x)+=shear_derivs[ix][iy][1].Eval()*dx[iy];
+                              v(x)+=expression[ix][iy][1].eval(coord)*dx[iy];
                             }
                           std::swap(coord[iy],coord_save);
                         }

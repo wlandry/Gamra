@@ -1,3 +1,6 @@
+#ifndef GAMRA_INPUT_EXPRESSION_H
+#define GAMRA_INPUT_EXPRESSION_H
+
 #include <muParser.h>
 #include <string>
 #include <list>
@@ -9,10 +12,10 @@ class Input_Expression
 {
 public:
   mu::Parser equation;
-  SAMRAI::tbox::Array<double> data, xyz_max, xyz_min;
+  SAMRAI::tbox::Array<double> data, xyz_min, xyz_max;
   SAMRAI::tbox::Array<int> ijk;
 
-  const int dim;
+  int dim;
   double coord[3];
   bool use_equation;
 
@@ -22,6 +25,8 @@ public:
     variables.push_back(0);
     return &variables.back();
   }
+
+  Input_Expression() {}
 
   Input_Expression(const std::string &name,
                    SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database,
@@ -51,6 +56,29 @@ public:
       {
         TBOX_ERROR("Could not find an entry for " + name);
       }
+  }
+
+  Input_Expression(const Input_Expression &e): dim(e.dim)
+  {
+    *this=e;
+  }
+
+  Input_Expression& operator=(const Input_Expression &e)
+  {
+    equation=e.equation;
+    data=e.data;
+    xyz_min=e.xyz_min;
+    xyz_max=e.xyz_max;
+    ijk=e.ijk;
+    use_equation=e.use_equation;
+
+    if(use_equation)
+      {
+        equation.DefineVar("x",&coord[0]);
+        equation.DefineVar("y",&coord[1]);
+        equation.DefineVar("z",&coord[2]);
+      }
+    return *this;
   }
 
   /* A little utility routine to validate the sizes of input arrays */
@@ -105,3 +133,5 @@ public:
   }
 
 };
+
+#endif

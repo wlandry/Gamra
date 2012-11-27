@@ -1,7 +1,6 @@
 #ifndef GAMRA_ELASTIC_BOUNDARY_CONDITIONS_H
 #define GAMRA_ELASTIC_BOUNDARY_CONDITIONS_H
 
-#include <muParser.h>
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/tbox/Dimension.h"
 #include "SAMRAI/tbox/Pointer.h"
@@ -12,6 +11,7 @@
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 #include <string>
 #include <vector>
+#include "Input_Expression.h"
 
 namespace Elastic {
   class Boundary_Conditions
@@ -29,7 +29,7 @@ namespace Elastic {
       edge_moduli_id=e_id;
     }
 
-    mu::Parser dirichlet[3][3][2], normal_stress[3][2], shear_derivs[3][3][2];
+    Input_Expression expression[3][3][2];
     bool is_dirichlet[3][3][2];
     double coord[3];
     std::string d_object_name;
@@ -153,7 +153,7 @@ namespace Elastic {
                             {
                               double coord_save(geom->getXLower()[ix]);
                               std::swap(coord[ix],coord_save);
-                              v(x)-=normal_stress[ix][0].Eval()*2*dx[ix]
+                              v(x)-=expression[ix][ix][0].eval(coord)*2*dx[ix]
                                 /(lambda+2*mu);
                               std::swap(coord[ix],coord_save);
                             }
@@ -184,7 +184,7 @@ namespace Elastic {
                             {
                               double coord_save(geom->getXUpper()[ix]);
                               std::swap(coord[ix],coord_save);
-                              v(x)+=normal_stress[ix][1].Eval()*2*dx[ix]
+                              v(x)+=expression[ix][ix][1].eval(coord)*2*dx[ix]
                                 /(lambda+2*mu);
                               std::swap(coord[ix],coord_save);
                             }
