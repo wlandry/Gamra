@@ -57,8 +57,21 @@ Elastic {
         vy_y_upper_is_dirichlet=TRUE
         vy_y_lower="0"
         vy_y_lower_is_dirichlet=TRUE
-        vz_z_upper="-exp(-((x-.5)^2 + (y-.5)^2)/(.1^2))"
+
+        vz_z_upper_ijk=7,7
+        vz_z_upper_coord_min=0,0
+        vz_z_upper_coord_max=1,1
+        vz_z_upper_data=0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0,-1, 0, 0, 0,
+        0, 0,-1,-2, 1, 0, 0,
+        0,-1,-2,-4,-2,-1, 0,
+        0, 0,-1,-2,-1, 0, 0,
+        0, 0, 0,-1, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0
+
+        // vz_z_upper="-exp(-((x-.5)^2 + (y-.5)^2)/(.1^2))"
         vz_z_upper_is_dirichlet=FALSE
+
         vz_z_lower="0"
         vz_z_lower_is_dirichlet=TRUE
         vx_y_upper="0"
