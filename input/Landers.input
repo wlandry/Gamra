@@ -24,38 +24,9 @@ Elastic {
     adaption_threshold = 1.0e-2
     min_full_refinement_level = 0
 
-    lambda_ijk= 2, 2, 2
-    lambda_coord_min= -10.001, -10.001, -10.001
-    lambda_coord_max= 10.001, 10.001, 10.001
-    lambda_data= 1, 1,
-    1, 1, 
-    1, 1,
-    1, 1
-
-    mu_ijk= 2, 2, 2
-    mu_coord_min= -10.001, -10.001, -10.001
-    mu_coord_max= 10.001, 10.001, 10.001
-    mu_data= 1, 1,
-    1, 1, 
-    1, 1,
-    1, 1
-
-    v_rhs_ijk= 2, 2, 2
-    v_rhs_coord_min= -10.001, -10.001, -10.001
-    v_rhs_coord_max= 10.001, 10.001, 10.001
-    v_rhs_data= 0, 0,
-    0, 0, 
-    0, 0,
-    0, 0,
-    0, 0,
-    0, 0, 
-    0, 0,
-    0, 0,
-    0, 0,
-    0, 0, 
-    0, 0,
-    0, 0
-
+    lambda="1"
+    mu="1"
+    v_rhs="0"
 
     faults= 1.3475, 14.246, -45.439, 10.056, 5.6, 4.94, 132.7, 91.0, -114.7,
     1.8921, 10.446, -41.319, 10.056, 5.6, 4.94, 132.7, 91.0, -151.8,
@@ -498,24 +469,42 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="0"
-        dirichlet_vx_x_lower="0"
-        dirichlet_vy_y_upper="0"
-        dirichlet_vy_y_lower="0"
-        normal_stress_vz_z_upper="0"
-        dirichlet_vz_z_lower="0"
-        shear_deriv_vx_y_upper="0"
-        shear_deriv_vx_y_lower="0"
-        shear_deriv_vx_z_upper="0"
-        shear_deriv_vx_z_lower="0"
-        shear_deriv_vy_x_upper="0"
-        shear_deriv_vy_x_lower="0"
-        shear_deriv_vy_z_upper="0"
-        shear_deriv_vy_z_lower="0"
-        shear_deriv_vz_x_upper="0"
-        shear_deriv_vz_x_lower="0"
-        shear_deriv_vz_y_upper="0"
-        shear_deriv_vz_y_lower="0"
+        vx_x_upper="0"
+        vx_x_upper_is_dirichlet=TRUE
+        vx_x_lower="0"
+        vx_x_lower_is_dirichlet=TRUE
+        vy_y_upper="0"
+        vy_y_upper_is_dirichlet=TRUE
+        vy_y_lower="0"
+        vy_y_lower_is_dirichlet=TRUE
+        vz_z_upper="0"
+        vz_z_upper_is_dirichlet=FALSE
+        vz_z_lower="0"
+        vz_z_lower_is_dirichlet=TRUE
+        vx_y_upper="0"
+        vx_y_upper_is_dirichlet=FALSE
+        vx_y_lower="0"
+        vx_y_lower_is_dirichlet=FALSE
+        vx_z_upper="0"
+        vx_z_upper_is_dirichlet=FALSE
+        vx_z_lower="0"
+        vx_z_lower_is_dirichlet=FALSE
+        vy_x_upper="0"
+        vy_x_upper_is_dirichlet=FALSE
+        vy_x_lower="0"
+        vy_x_lower_is_dirichlet=FALSE
+        vy_z_upper="0"
+        vy_z_upper_is_dirichlet=FALSE
+        vy_z_lower="0"
+        vy_z_lower_is_dirichlet=FALSE
+        vz_x_upper="0"
+        vz_x_upper_is_dirichlet=FALSE
+        vz_x_lower="0"
+        vz_x_lower_is_dirichlet=FALSE
+        vz_y_upper="0"
+        vz_y_upper_is_dirichlet=FALSE
+        vz_y_lower="0"
+        vz_y_lower_is_dirichlet=FALSE
     }
 }
 

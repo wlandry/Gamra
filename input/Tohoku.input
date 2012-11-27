@@ -7,11 +7,6 @@
  * Description:   Input file for example FAC Stokes solver 
  *
  ************************************************************************/
-// This is the input file for the 2D FAC example
-// demonstrating changes in boundary conditions.
-//
-// Note that using constant refine prolongation
-// lead to slower convergence.
 
 Main {
     dim = 3
@@ -24,38 +19,9 @@ Elastic {
     adaption_threshold = 1.0e-2
     min_full_refinement_level = 0
 
-    lambda_ijk= 2, 2, 2
-    lambda_coord_min= -10.001, -10.001, -10.001
-    lambda_coord_max= 10.001, 10.001, 10.001
-    lambda_data= 1, 1,
-    1, 1, 
-    1, 1,
-    1, 1
-
-    mu_ijk= 2, 2, 2
-    mu_coord_min= -10.001, -10.001, -10.001
-    mu_coord_max= 10.001, 10.001, 10.001
-    mu_data= 1, 1,
-    1, 1, 
-    1, 1,
-    1, 1
-
-    v_rhs_ijk= 2, 2, 2
-    v_rhs_coord_min= -10.001, -10.001, -10.001
-    v_rhs_coord_max= 10.001, 10.001, 10.001
-    v_rhs_data= 0, 0,
-    0, 0, 
-    0, 0,
-    0, 0,
-    0, 0,
-    0, 0, 
-    0, 0,
-    0, 0,
-    0, 0,
-    0, 0, 
-    0, 0,
-    0, 0
-
+    lambda="1"
+    mu="1"
+    v_rhs="0"
 
     faults= 200.000, 246.42, 234.46, 3.79, 25.00, 20.00, 201.0, 9.0, 153.00,
     400.000, 222.71, 226.85, 3.79, 25.00, 20.00, 201.0, 9.0, 153.00,
@@ -421,41 +387,46 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="0"
-        dirichlet_vx_x_lower="0"
-        dirichlet_vy_y_upper="0"
-        dirichlet_vy_y_lower="0"
-        normal_stress_vz_z_upper="0"
-        dirichlet_vz_z_lower="0"
-        shear_deriv_vx_y_upper="0"
-        shear_deriv_vx_y_lower="0"
-        shear_deriv_vx_z_upper="0"
-        shear_deriv_vx_z_lower="0"
-        shear_deriv_vy_x_upper="0"
-        shear_deriv_vy_x_lower="0"
-        shear_deriv_vy_z_upper="0"
-        shear_deriv_vy_z_lower="0"
-        shear_deriv_vz_x_upper="0"
-        shear_deriv_vz_x_lower="0"
-        shear_deriv_vz_y_upper="0"
-        shear_deriv_vz_y_lower="0"
+        vx_x_upper="0"
+        vx_x_upper_is_dirichlet=TRUE
+        vx_x_lower="0"
+        vx_x_lower_is_dirichlet=TRUE
+        vy_y_upper="0"
+        vy_y_upper_is_dirichlet=TRUE
+        vy_y_lower="0"
+        vy_y_lower_is_dirichlet=TRUE
+        vz_z_upper="0"
+        vz_z_upper_is_dirichlet=FALSE
+        vz_z_lower="0"
+        vz_z_lower_is_dirichlet=TRUE
+        vx_y_upper="0"
+        vx_y_upper_is_dirichlet=FALSE
+        vx_y_lower="0"
+        vx_y_lower_is_dirichlet=FALSE
+        vx_z_upper="0"
+        vx_z_upper_is_dirichlet=FALSE
+        vx_z_lower="0"
+        vx_z_lower_is_dirichlet=FALSE
+        vy_x_upper="0"
+        vy_x_upper_is_dirichlet=FALSE
+        vy_x_lower="0"
+        vy_x_lower_is_dirichlet=FALSE
+        vy_z_upper="0"
+        vy_z_upper_is_dirichlet=FALSE
+        vy_z_lower="0"
+        vy_z_lower_is_dirichlet=FALSE
+        vz_x_upper="0"
+        vz_x_upper_is_dirichlet=FALSE
+        vz_x_lower="0"
+        vz_x_lower_is_dirichlet=FALSE
+        vz_y_upper="0"
+        vz_y_upper_is_dirichlet=FALSE
+        vz_y_lower="0"
+        vz_y_lower_is_dirichlet=FALSE
     }
 }
 
 CartesianGridGeometry {
-    //  Specify lower/upper corners of the computational domain and a
-    //  set of non-overlapping boxes defining domain interior.  If union 
-    //  of boxes is not a parallelpiped, lower/upper corner data corresponds 
-    //  to min/max corner indices over all boxes given.
-    //  x_lo  -- (double array) lower corner of computational domain [REQD]
-    //  x_up  -- (double array) upper corner of computational domain [REQD]
-    //  domain_boxes  -- (box array) set of boxes that define interior of 
-    //                   physical domain. [REQD]
-    //  periodic_dimension -- (int array) coordinate directions in which 
-    //                        domain is periodic.  Zero indicates not
-    //                        periodic, non-zero value indicates periodicity.
-    //                        [0]
-    // domain_boxes = [(0,0), (15,15)]
     domain_boxes = [(0,0,0), (7,7,1)]
     x_lo         = -500, -500, -250
     x_up         = 500, 500, 0
@@ -466,31 +437,6 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    // Information used to create patches in AMR hierarchy.
-    // max_levels -- (int) max number of mesh levels in hierarchy [REQD]
-    // 
-    // For most of the following parameters, the number of precribed data
-    // values need not match the number of levels in the hierarchy 
-    // (determined by max_levels).  If more values are given than number 
-    // of levels, extraneous values will be ignored.  If less are give, then
-    // values that correspond to individual levels will apply to those 
-    // levels.  Missing values will be taken from those for the finest
-    // level specified.
-    //
-    // ratio_to_coarser {
-    //   level_1 -- (int array) ratio between index spaces on 
-    //              level 1 to level 0 [REQD]
-    //   level_2 -- (int array)  ratio between index spaces on 
-    //              level 2 to level 1 [REQD]
-    //   etc....
-    // }
-    // largest_patch_size {
-    //   level_0 -- (int array) largest patch allowed on level 0. 
-    //              [REQD]    
-    //   level_1 -- (int array)    "       "      "   "  level 1 
-    //              [level 0 entry]
-    //   etc....                       
-    // }
     max_levels = 5
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
@@ -500,10 +446,7 @@ PatchHierarchy {
         level_4            = 2, 2, 2
     }
     largest_patch_size {
-        // level_0 = 32, 32
-        // level_0 = 8, 8
         level_0 = -1, -1, -1
-        // all finer levels will use same values as level_0...
     }
 }
 

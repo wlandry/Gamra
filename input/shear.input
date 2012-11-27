@@ -23,12 +23,7 @@ Elastic {
 
     lambda="1"
     mu="1"
-
-    v_rhs_ijk= 2, 2
-    v_rhs_coord_min= -10.001, -10.001
-    v_rhs_coord_max= 10.001, 10.001
-
-    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0
+    v_rhs="0"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
@@ -43,14 +38,22 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="y"
-        dirichlet_vx_x_lower="y"
-        dirichlet_vy_y_upper="0"
-        dirichlet_vy_y_lower="0"
-        shear_deriv_vx_y_upper="1"
-        shear_deriv_vx_y_lower="1"
-        shear_deriv_vy_x_upper="1"
-        shear_deriv_vy_x_lower="1"
+        vx_x_upper="y"
+        vx_x_upper_is_dirichlet=TRUE
+        vx_x_lower="y"
+        vx_x_lower_is_dirichlet=TRUE
+        vy_y_upper="0"
+        vy_y_upper_is_dirichlet=TRUE
+        vy_y_lower="0"
+        vy_y_lower_is_dirichlet=TRUE
+        vx_y_upper="1"
+        vx_y_upper_is_dirichlet=FALSE
+        vx_y_lower="1"
+        vx_y_lower_is_dirichlet=FALSE
+        vy_x_upper="1"
+        vy_x_upper_is_dirichlet=FALSE
+        vy_x_lower="1"
+        vy_x_lower_is_dirichlet=FALSE
     }
 }
 
