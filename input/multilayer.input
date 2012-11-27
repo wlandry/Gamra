@@ -19,10 +19,10 @@ Elastic {
     adaption_threshold = 1.0e-3
     min_full_refinement_level = 1
 
-    // lambda_ijk=2,2
+    // lambda_ijk=1,2
     // lambda_coord_min=0,0
     // lambda_coord_max=1,1
-    // lambda_data=1, 1, 2, 2
+    // lambda_data=1, 2
 
     // mu_ijk=2,2
     // mu_coord_min=0,0
