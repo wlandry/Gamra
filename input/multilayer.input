@@ -19,6 +19,16 @@ Elastic {
     adaption_threshold = 1.0e-3
     min_full_refinement_level = 1
 
+    // lambda_ijk=2,2
+    // lambda_coord_min=0,0
+    // lambda_coord_max=1,1
+    // lambda_data=1, 1, 2, 2
+
+    // mu_ijk=2,2
+    // mu_coord_min=0,0
+    // mu_coord_max=1,1
+    // mu_data=1, 1.2, 2, 1.8
+
     lambda="y<0.5001 ? 1 : 2"
     mu="y<0.5001 ? 1 : 2"
     v_rhs="0"
@@ -41,11 +51,10 @@ Elastic {
         vx_x_lower="0"
         vx_x_lower_is_dirichlet=TRUE
 
-        vy_y_upper_ijk=20
+        vy_y_upper_ijk=5
         vy_y_upper_coord_min=0
         vy_y_upper_coord_max=1
-        vy_y_upper_data=0, 0, 0, 0, 0, 0, -1, -1, -2, -4,
-        -4, -2, -1, -1, 0, 0, 0, 0, 0, 0
+        vy_y_upper_data=0, 0, -1, 0, 0
         
         // vy_y_upper="-exp(-((x-.5)/.1)^2)"
         vy_y_upper_is_dirichlet=FALSE
