@@ -138,7 +138,14 @@ public:
             ix[d]=std::max(0,std::min(ijk[d]-2,ix[d]));
             ixp[d]=std::max(0,std::min(ijk[d]-1,ix[d]+1));
 
-            dx[d]=(Coord[dd]-ix[d]*delta)/delta;
+            if(ijk[d]==1)
+              {
+                dx[d]=0;
+              }
+            else
+              {
+                dx[d]=(Coord[dd]-xyz_min[d]-ix[d]*delta)/delta;
+              }
             ++d;
           }
 
