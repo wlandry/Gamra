@@ -15,6 +15,28 @@ def options(opt):
                    help='Names of the samrai libraries without prefix or suffix\n'
                    '(e.g. "SAMRAI_appu SAMRAI_algs SAMRAI_solv"')
 
+    muparser=opt.add_option_group('muParser Options')
+    muparser.add_option('--muparser-dir',
+                   help='Base directory where muparser is installed')
+    muparser.add_option('--muparser-incdir',
+                   help='Directory where muparser include files are installed')
+    muparser.add_option('--muparser-libdir',
+                   help='Directory where muparser library files are installed')
+    muparser.add_option('--muparser-libs',
+                   help='Names of the muparser libraries without prefix or suffix\n'
+                   '(e.g. "muparser"')
+
+    hdf5=opt.add_option_group('HDF5 Options')
+    hdf5.add_option('--hdf5-dir',
+                   help='Base directory where HDF5 is installed')
+    hdf5.add_option('--hdf5-incdir',
+                   help='Directory where HDF5 include files are installed')
+    hdf5.add_option('--hdf5-libdir',
+                   help='Directory where HDF5 library files are installed')
+    hdf5.add_option('--hdf5-libs',
+                   help='Names of the HDF5 libraries without prefix or suffix\n'
+                   '(e.g. "hdf5"')
+
 def configure(conf):
     conf.setenv('debug')
     configure_variant(conf);
@@ -32,22 +54,50 @@ def configure_variant(conf):
             conf.options.samrai_libdir=conf.options.samrai_dir + "/lib"
     frag="#include \"SAMRAI/SAMRAI_config.h\"\n" + 'int main()"\n' \
         + "{}\n"
-    if conf.options.samrai_incdir:
-        inc=conf.options.samrai_incdir
-    else:
-        inc='/usr/include'
+    if not conf.options.samrai_incdir:
+        conf.options.samrai_incdir='/usr/include'
 
     conf.check_cxx(msg="Checking for SAMRAI",
                   header_name='SAMRAI/SAMRAI_config.h',
-                  includes=[inc], uselib_store='samrai',
+                  includes=[conf.options.samrai_incdir], uselib_store='samrai',
                   libpath=[conf.options.samrai_libdir],
                   rpath=[conf.options.samrai_libdir],
                   lib=['SAMRAI_appu', 'SAMRAI_algs', 'SAMRAI_solv',
                        'SAMRAI_geom', 'SAMRAI_mesh', 'SAMRAI_math',
                        'SAMRAI_pdat', 'SAMRAI_xfer', 'SAMRAI_hier',
                        'SAMRAI_tbox'])
-    
 
+    # Find muParser
+    if conf.options.muparser_dir:
+        if not conf.options.muparser_incdir:
+            conf.options.muparser_incdir=conf.options.muparser_dir + "/include"
+        if not conf.options.muparser_libdir:
+            conf.options.muparser_libdir=conf.options.muparser_dir + "/lib"
+    frag="#include \"muParser.h\"\n" + 'int main()"\n' \
+        + "{}\n"
+
+    conf.check_cxx(msg="Checking for muParser",
+                  header_name='muParser.h',
+                  includes=[conf.options.muparser_incdir], uselib_store='muparser',
+                  libpath=[conf.options.muparser_libdir],
+                  rpath=[conf.options.muparser_libdir],
+                  lib=['muparser'])
+
+    # Find Parallel HDF5
+    if conf.options.hdf5_dir:
+        if not conf.options.hdf5_incdir:
+            conf.options.hdf5_incdir=conf.options.hdf5_dir + "/include"
+        if not conf.options.hdf5_libdir:
+            conf.options.hdf5_libdir=conf.options.hdf5_dir + "/lib"
+    frag="#include \"mpi.h\"\n#include \"hdf5.h\"\n" + 'int main()"\n' \
+        + "{}\n"
+
+    conf.check_cxx(msg="Checking for hdf5",
+                  header_name='hdf5.h',
+                  includes=[conf.options.hdf5_incdir], uselib_store='hdf5',
+                  libpath=[conf.options.hdf5_libdir],
+                  rpath=[conf.options.hdf5_libdir],
+                  lib=['hdf5'])
 
 def build(bld):
     if not bld.variant:
@@ -178,27 +228,13 @@ def build(bld):
                         'src/Elastic/FACSolver/solveSystem.C'],
         target       = 'gamra',
         cxxflags = variant_flags[bld.variant] + default_flags,
-        lib          = ['petsc', 'hdf5',
-                        'HYPRE',
-                        'HYPRE_sstruct_ls', 'HYPRE_sstruct_mv',
-                        'HYPRE_struct_ls', 'HYPRE_struct_mv',
-                        'HYPRE_parcsr_ls',
-                        'HYPRE_DistributedMatrixPilutSolver',
-                        'HYPRE_ParaSails', 'HYPRE_Euclid',
-                        'HYPRE_MatrixMatrix', 'HYPRE_DistributedMatrix',
-                        'HYPRE_IJ_mv', 'HYPRE_parcsr_mv', 'HYPRE_seq_mv',
-                        'HYPRE_krylov', 'HYPRE_utilities', 'hdf5',
-                        'dl', 'm', 'gfortranbegin', 'gfortran', 'm',
+        lib          = ['dl', 'm', 'gfortranbegin', 'gfortran', 'm',
                         'gfortranbegin', 'gfortran', 'm', 'gfortranbegin',
-                        'gfortran', 'm', 'muparser'],
+                        'gfortran', 'm'],
         libpath      = ['/usr/lib/petsc/linux-gnu-c-opt/lib'],
-        includes = ['src','../FTensor','../../SAMRAI/opt/include',
-                    '../../SAMRAI/SAMRAI-hg/source',
-                    '/usr/lib/petsc/include',
-                    '/usr/lib/petsc/bmake/linux-gnu-c-opt',
-                    '/usr/lib/petsc/src/vec',
+        includes = ['src','../FTensor','/home/walter/Gamra/Samrai/Samrai/source',
                     '/usr/include'],
-        use=['samrai']
+        use=['samrai','muparser','hdf5']
         )
 
 from waflib.Build import BuildContext, CleanContext, \
