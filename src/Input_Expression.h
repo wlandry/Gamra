@@ -6,7 +6,6 @@
 #include <list>
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/Database.h"
-#include "SAMRAI/tbox/Pointer.h"
 
 class Input_Expression
 {
@@ -29,7 +28,7 @@ public:
   Input_Expression() {}
 
   Input_Expression(const std::string &name,
-                   SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database,
+                   boost::shared_ptr<SAMRAI::tbox::Database> database,
                    const SAMRAI::tbox::Dimension& dimension,
                    const int num_components=1,
                    const int Slice=-1):

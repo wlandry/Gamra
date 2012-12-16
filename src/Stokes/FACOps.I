@@ -11,14 +11,14 @@ namespace SAMRAI {
 namespace solv {
 namespace Stokes {
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::setPreconditioner(
    const FACPreconditioner* preconditioner) {
    d_preconditioner = preconditioner;
 }
 
 #ifdef HAVE_HYPRE
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::setUseSMG(
    bool use_smg)
 {
@@ -39,7 +39,7 @@ void FACOps::setUseSMG(
  ********************************************************************
  */
 
-// SAMRAI_INLINE_KEYWORD
+// inline
 // void FACOps::setPhysicalBcCoefObject(
 //    const RobinBcCoefStrategy* physical_bc_coef)
 // {
@@ -55,7 +55,7 @@ void FACOps::setUseSMG(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::enableLogging(
    bool enable_logging)
 {
@@ -68,7 +68,7 @@ void FACOps::enableLogging(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::setSmoothingChoice(
    const std::string& smoothing_choice)
 {
@@ -88,7 +88,7 @@ void FACOps::setSmoothingChoice(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::setCoarsestLevelSolverChoice(
    const std::string& choice) {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -117,7 +117,7 @@ void FACOps::setCoarsestLevelSolverChoice(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::setCoarsestLevelSolverTolerance(
    double tol) {
    d_coarse_solver_tolerance = tol;
@@ -129,7 +129,7 @@ void FACOps::setCoarsestLevelSolverTolerance(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::setCoarsestLevelSolverMaxIterations(
    int max_iterations) {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -146,7 +146,7 @@ void FACOps::setCoarsestLevelSolverMaxIterations(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::setCoarseFineDiscretization(
    const std::string& coarsefine_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -168,7 +168,7 @@ void FACOps::setCoarseFineDiscretization(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::set_P_ProlongationMethod(
    const std::string& prolongation_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -183,7 +183,7 @@ void FACOps::set_P_ProlongationMethod(
    p_prolongation_method = prolongation_method;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACOps::set_V_ProlongationMethod(
    const std::string& prolongation_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS

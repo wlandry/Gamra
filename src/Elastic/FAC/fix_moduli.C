@@ -10,23 +10,22 @@ void Elastic::FAC::fix_moduli()
 
   const int ln_max(d_hierarchy->getFinestLevelNumber());
 
-  SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+  boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
     cell_moduli_coarsen_operator;
-  SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenAlgorithm>
+  boost::shared_ptr<SAMRAI::xfer::CoarsenAlgorithm>
     cell_moduli_coarsen_algorithm;
-  SAMRAI::tbox::Array<SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenSchedule> >
+  SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     cell_moduli_coarsen_schedules;
 
   SAMRAI::hier::VariableDatabase*
     vdb = SAMRAI::hier::VariableDatabase::getDatabase();
-  SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianGridGeometry> geometry =
-    d_hierarchy->getGridGeometry();
-  SAMRAI::tbox::Pointer<SAMRAI::hier::Variable> variable;
+  boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry> geometry =
+    boost::dynamic_pointer_cast<SAMRAI::geom::CartesianGridGeometry>
+    (d_hierarchy->getGridGeometry());
+  boost::shared_ptr<SAMRAI::hier::Variable> variable;
   vdb->mapIndexToVariable(cell_moduli_id, variable);
   cell_moduli_coarsen_operator =
-    geometry->lookupCoarsenOperator(variable,
-                                    "CONSERVATIVE_COARSEN");
-                                    // "CELL_VISCOSITY_COARSEN");
+    geometry->lookupCoarsenOperator(variable,"CONSERVATIVE_COARSEN");
 
   if (!cell_moduli_coarsen_operator) {
     TBOX_ERROR(d_object_name
@@ -34,7 +33,8 @@ void Elastic::FAC::fix_moduli()
   }
 
   cell_moduli_coarsen_schedules.resizeArray(ln_max + 1);
-  cell_moduli_coarsen_algorithm = new SAMRAI::xfer::CoarsenAlgorithm(d_dim);
+  cell_moduli_coarsen_algorithm =
+    boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(d_dim);
   cell_moduli_coarsen_algorithm->
     registerCoarsen(cell_moduli_id,cell_moduli_id,
                     cell_moduli_coarsen_operator);
@@ -61,7 +61,7 @@ void Elastic::FAC::fix_moduli()
         resetSchedule(cell_moduli_coarsen_schedules[dest_ln]);
     }
 
-  cell_moduli_coarsen_algorithm.setNull();
+  cell_moduli_coarsen_algorithm.reset();
   cell_moduli_coarsen_schedules.setNull();
 
   /* Compute edge_moduli by averaging the cell moduli. */
@@ -76,26 +76,32 @@ void Elastic::FAC::fix_moduli()
 
   for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln)
     {
-      SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
+      boost::shared_ptr<SAMRAI::hier::PatchLevel>
         level = d_hierarchy->getPatchLevel(ln);
-      SAMRAI::hier::PatchLevel::Iterator i_p(*level);
-      for ( ; i_p; i_p++)
+      
+      for (SAMRAI::hier::PatchLevel::Iterator i_p(level->begin());
+           i_p!=level->end(); i_p++)
         {
-          SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *i_p;
-          SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> >
-            cell_moduli_ptr = patch->getPatchData(cell_moduli_id);
+          boost::shared_ptr<SAMRAI::hier::Patch> patch = *i_p;
+          boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
+            boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+            (patch->getPatchData(cell_moduli_id));
           SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
           if(2==d_dim.getValue())
             {
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeData<double> >
-                edge_moduli_ptr = patch->getPatchData(edge_moduli_id);
+              boost::shared_ptr<SAMRAI::pdat::NodeData<double> >
+                edge_moduli_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+                (patch->getPatchData(edge_moduli_id));
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
-              for(SAMRAI::pdat::NodeIterator ni(edge_moduli.getBox()); ni; ni++)
+              SAMRAI::pdat::NodeIterator nend(edge_moduli.getBox(),false);
+              for(SAMRAI::pdat::NodeIterator ni(edge_moduli.getBox(),true);
+                  ni!=nend; ni++)
                 {
                   for (int m=0;m<2;++m)
                     {
-                      SAMRAI::pdat::NodeIndex e=ni();
+                      SAMRAI::pdat::NodeIndex e=*ni;
                       SAMRAI::pdat::CellIndex c(e);
                       cell_moduli(c,m);
                       cell_moduli(c-ip,m);
@@ -109,8 +115,10 @@ void Elastic::FAC::fix_moduli()
             }
           else
             {
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::EdgeData<double> >
-                edge_moduli_ptr = patch->getPatchData(edge_moduli_id);
+              boost::shared_ptr<SAMRAI::pdat::EdgeData<double> >
+                edge_moduli_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
+                (patch->getPatchData(edge_moduli_id));
               SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
               for(int axis=0;axis<3;++axis)
                 {
@@ -118,9 +126,11 @@ void Elastic::FAC::fix_moduli()
                   SAMRAI::hier::Box pbox=patch->getBox();
                   pbox.grow(axis,edge_moduli.getGhostCellWidth()[axis]);
 
-                  for(SAMRAI::pdat::EdgeIterator ni(pbox,axis); ni; ni++)
+                  SAMRAI::pdat::EdgeIterator nend(pbox,axis,false);
+                  for(SAMRAI::pdat::EdgeIterator ni(pbox,axis,true);
+                      ni!=nend; ni++)
                     {
-                      SAMRAI::pdat::EdgeIndex e=ni();
+                      SAMRAI::pdat::EdgeIndex e=*ni;
                       SAMRAI::pdat::CellIndex c(e);
 		      for (int m=0;m<2;++m)
                         {
@@ -138,9 +148,9 @@ void Elastic::FAC::fix_moduli()
       SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
       refiner.registerRefine(edge_moduli_id,edge_moduli_id,
                              edge_moduli_id,
-                             SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>(0));
+                             boost::shared_ptr<SAMRAI::hier::RefineOperator>());
 
-      SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineSchedule> schedule=
+      boost::shared_ptr<SAMRAI::xfer::RefineSchedule> schedule=
         refiner.createSchedule(d_hierarchy->getPatchLevel(ln));
         
       schedule->fillData(0.0,false);

@@ -30,7 +30,7 @@ void Elastic::FACSolver::deallocateSolverState()
                                                                       - 1]);
     }
 
-    d_hierarchy.setNull();
+    d_hierarchy.reset();
     d_ln_min = -1;
     d_ln_max = -1;
     d_solver_is_initialized = false;

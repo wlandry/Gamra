@@ -14,11 +14,10 @@
 
 #include "SAMRAI/SAMRAI_config.h"
 
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/hier/Box.h"
 #include "SAMRAI/hier/IntVector.h"
 #include "SAMRAI/hier/Patch.h"
-#include "SAMRAI/tbox/Pointer.h"
+#include "SAMRAI/hier/CoarsenOperator.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "Elastic/Boundary_Conditions.h"
 
@@ -29,7 +28,7 @@ namespace Elastic {
   /**
    * Class V_Coarsen implements averaging 
    * for side-centered double patch data defined over
-   * a Cartesian mesh.  It is derived from the xfer::CoarsenOperator base class.
+   * a Cartesian mesh.  It is derived from the hier::CoarsenOperator base class.
    * The numerical operations for theaveraging use FORTRAN numerical routines.
    *
    * CartesianSideDoubleWeightedAverage averages over the nearest two
@@ -38,11 +37,11 @@ namespace Elastic {
    * function returns true if the input variable is side-centered
    * double, and the std::string is "V_COARSEN".
    *
-   * @see xfer::CoarsenOperator
+   * @see hier::CoarsenOperator
    */
 
   class V_Coarsen:
-    public SAMRAI::xfer::CoarsenOperator
+    public SAMRAI::hier::CoarsenOperator
   {
   public:
     /**
@@ -50,7 +49,7 @@ namespace Elastic {
      */
     explicit V_Coarsen(const SAMRAI::tbox::Dimension& dim,
                        const Boundary_Conditions &bc):
-      SAMRAI::xfer::CoarsenOperator(dim, "V_COARSEN"), 
+      SAMRAI::hier::CoarsenOperator(dim, "V_COARSEN"), 
       d_boundary_conditions(bc), d_name_id("V_COARSEN")
     {}
 
@@ -64,14 +63,14 @@ namespace Elastic {
      * double weighted averaging; otherwise, return false.
      */
   
-    bool findCoarsenOperator(const SAMRAI::tbox::Pointer<SAMRAI::hier::Variable>& var,
+    bool findCoarsenOperator(const boost::shared_ptr<SAMRAI::hier::Variable>& var,
                              const std::string& op_name) const
     {
       TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
 
-      const SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> >
-        cast_var(var);
-      if (!cast_var.isNull() && (op_name == d_name_id)) {
+      const boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
+        cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >(var));
+      if (cast_var && (op_name == d_name_id)) {
         return true;
       } else {
         return false;

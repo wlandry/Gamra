@@ -12,24 +12,26 @@ void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
 {
   const pdat::CellOverlap* t_overlap =
     dynamic_cast<const pdat::CellOverlap *>(&overlap);
-  const hier::BoxList& boxes = t_overlap->getDestinationBoxList();
+  const hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
   const tbox::Dimension& dimension(getDim());
   const int dim(dimension.getValue());
 
   Stokes_set_boundary(coarse,src_component,invalid_id,true);
 
-  for (hier::BoxList::Iterator b(boxes); b; b++)
+  for (hier::BoxContainer::const_iterator b(boxes.begin()); b!=boxes.end(); b++)
     {
-      hier::Box &overlap_box=b();
+      const hier::Box &overlap_box=*b;
       TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension,fine,coarse,overlap_box,ratio);
 
-      tbox::Pointer<pdat::CellData<double> >
-        p = coarse.getPatchData(src_component);
-      tbox::Pointer<pdat::CellData<double> >
-        p_fine = fine.getPatchData(dst_component);
+      boost::shared_ptr<pdat::CellData<double> > p =
+        boost::dynamic_pointer_cast<pdat::CellData<double> >
+        (coarse.getPatchData(src_component));
+      boost::shared_ptr<pdat::CellData<double> > p_fine =
+        boost::dynamic_pointer_cast<pdat::CellData<double> >
+        (fine.getPatchData(dst_component));
 #ifdef DEBUG_CHECK_ASSERTIONS
-      TBOX_ASSERT(!p.isNull());
-      TBOX_ASSERT(!p_fine.isNull());
+      TBOX_ASSERT(p);
+      TBOX_ASSERT(p_fine);
       TBOX_ASSERT(p->getDepth() == p_fine->getDepth());
       TBOX_ASSERT(p->getDepth() == 1);
 #endif
@@ -38,8 +40,8 @@ void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
       hier::Box gbox=p_fine->getGhostBox();
 
       /* We have to infer where the boundary is from the boxes */
-      int boundary_direction;
-      bool boundary_positive;
+      int boundary_direction(-1);
+      bool boundary_positive(true);
 
       for(int d=0;d<dim;++d)
         {

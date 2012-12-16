@@ -11,42 +11,42 @@ namespace SAMRAI {
 namespace solv {
 namespace Stokes {
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::set_P_ProlongationMethod(
    const std::string& p_prolongation_method)
 {
    d_fac_ops.set_P_ProlongationMethod(p_prolongation_method);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::set_V_ProlongationMethod(
    const std::string& v_prolongation_method)
 {
    d_fac_ops.set_V_ProlongationMethod(v_prolongation_method);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setCoarsestLevelSolverChoice(
    const std::string& choice)
 {
    d_fac_ops.setCoarsestLevelSolverChoice(choice);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setCoarsestLevelSolverTolerance(
    double tol)
 {
    d_fac_ops.setCoarsestLevelSolverTolerance(tol);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setCoarsestLevelSolverMaxIterations(
    int max_iterations)
 {
    d_fac_ops.setCoarsestLevelSolverMaxIterations(max_iterations);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setCoarseFineDiscretization(
    const std::string& coarsefine_method)
 {
@@ -54,7 +54,7 @@ void FACSolver::setCoarseFineDiscretization(
 }
 
 #ifdef HAVE_HYPRE
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setUseSMG(
    bool use_smg)
 {
@@ -69,43 +69,43 @@ void FACSolver::setUseSMG(
 }
 #endif
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setPresmoothingSweeps(
    int num_pre_sweeps) {
    d_fac_precond.setPresmoothingSweeps(num_pre_sweeps);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setPostsmoothingSweeps(
    int num_post_sweeps) {
    d_fac_precond.setPostsmoothingSweeps(num_post_sweeps);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setMaxCycles(
    int max_cycles) {
    d_fac_precond.setMaxCycles(max_cycles);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::setResidualTolerance(
    double residual_tol) {
    d_fac_precond.setResidualTolerance(residual_tol);
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 int FACSolver::getNumberOfIterations() const
 {
    return d_fac_precond.getNumberOfIterations();
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 double FACSolver::getResidualNorm() const
 {
    return d_fac_precond.getResidualNorm();
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void FACSolver::getConvergenceFactors(
    double& avg_factor,
    double& final_factor)

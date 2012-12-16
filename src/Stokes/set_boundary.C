@@ -1,6 +1,5 @@
 #include "Stokes/set_boundary.h"
 #include "Constants.h"
-#include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
@@ -12,7 +11,9 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
 {
   hier::Box pbox=patch.getBox();
 
-  tbox::Pointer<geom::CartesianPatchGeometry> geom = patch.getPatchGeometry();
+  boost::shared_ptr<geom::CartesianPatchGeometry> geom =
+    boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+    (patch.getPatchGeometry());
   const tbox::Dimension Dim(patch.getDim());
   const int dim(patch.getDim().getValue());
 
@@ -38,12 +39,15 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
 
   if(p_id!=invalid_id)
     {
-      tbox::Pointer<pdat::CellData<double> > p_ptr = patch.getPatchData(p_id);
+      boost::shared_ptr<pdat::CellData<double> > p_ptr =
+        boost::dynamic_pointer_cast<pdat::CellData<double> >
+        (patch.getPatchData(p_id));
       pdat::CellData<double> &p(*p_ptr);
 
       hier::Box gbox=p.getGhostBox();
-      
-      for(pdat::CellIterator ci(gbox); ci; ci++)
+
+      pdat::CellIterator cend(gbox,false);      
+      for(pdat::CellIterator ci(gbox,true); ci!=cend; ci++)
         {
           pdat::CellIndex center(*ci);
           hier::Index ip(zero), jp(zero), kp(zero);
@@ -97,13 +101,16 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
 
   if(v_id!=invalid_id)
     {
-      tbox::Pointer<pdat::SideData<double> > v_ptr = patch.getPatchData(v_id);
+      boost::shared_ptr<pdat::SideData<double> > v_ptr =
+        boost::dynamic_pointer_cast<pdat::SideData<double> >
+        (patch.getPatchData(v_id));
       pdat::SideData<double> &v(*v_ptr);
 
       hier::Box gbox=v.getGhostBox();
       for(int ix=0; ix<dim; ++ix)
         {
-          for(pdat::SideIterator si(gbox,ix); si; si++)
+          pdat::SideIterator send(gbox,ix,false);
+          for(pdat::SideIterator si(gbox,ix,true); si!=send; si++)
             {
               pdat::SideIndex x(*si);
 
@@ -165,7 +172,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
              same number, as long as we have pure Neumann boundary
              conditions, and not Robin. */
 
-          for(pdat::SideIterator si(gbox,ix); si; si++)
+          for(pdat::SideIterator si(gbox,ix,true); si!=send; si++)
             {
               pdat::SideIndex x(*si);
               if((x[ix]<pbox.lower(ix)
@@ -195,7 +202,8 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
           if(dim==3)
             {
               const int iy((ix+1)%dim), iz((iy+1)%dim);
-              for(pdat::SideIterator si(gbox,ix); si; si++)
+              pdat::SideIterator send(gbox,ix,false);
+              for(pdat::SideIterator si(gbox,ix,true); si!=send; si++)
                 {
                   pdat::SideIndex x(*si);
                   if(((x[ix]<pbox.lower(ix)

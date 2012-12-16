@@ -33,10 +33,8 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
@@ -64,9 +62,9 @@ void SAMRAI::solv::Stokes::FACOps::prolongErrorAndCorrect
   }
 #endif
 
-  tbox::Pointer<hier::PatchLevel> coarse_level =
+  boost::shared_ptr<hier::PatchLevel> coarse_level =
     d_hierarchy->getPatchLevel(dest_ln - 1);
-  tbox::Pointer<hier::PatchLevel> fine_level =
+  boost::shared_ptr<hier::PatchLevel> fine_level =
     d_hierarchy->getPatchLevel(dest_ln);
 
   /*

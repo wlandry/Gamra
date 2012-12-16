@@ -37,10 +37,6 @@
 
 #include <cstdlib>
 
-#ifndef SAMRAI_INLINE
-#include "Stokes/HypreSolver.I"
-#endif
-
 extern "C" {
 
 #ifdef __INTEL_COMPILER
@@ -258,7 +254,7 @@ void F77_FUNC(adjustrhs3d, ADJUSTRHS3D) (double* rhs,
 namespace SAMRAI {
 namespace solv {
 
-tbox::Pointer<pdat::OutersideVariable<double> >
+boost::shared_ptr<pdat::OutersideVariable<double> >
 Stokes::HypreSolver::s_Ak0_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
 tbox::StartupShutdownManager::Handler Stokes::HypreSolver::s_finalize_handler(
@@ -277,19 +273,19 @@ tbox::StartupShutdownManager::Handler Stokes::HypreSolver::s_finalize_handler(
 Stokes::HypreSolver::HypreSolver(
    const tbox::Dimension& dim,
    const std::string& object_name,
-   tbox::Pointer<tbox::Database> database):
+   boost::shared_ptr<tbox::Database> database):
    d_dim(dim),
    d_object_name(object_name),
-   d_hierarchy(NULL),
+   d_hierarchy(),
    d_ln(-1),
    d_context(hier::VariableDatabase::getDatabase()->
              getContext(object_name + "::context")),
    d_cf_boundary(),
    d_physical_bc_coef_strategy(&d_physical_bc_simple_case),
-   d_physical_bc_variable(NULL),
+   d_physical_bc_variable(),
    d_physical_bc_simple_case(dim, d_object_name + "::simple bc"),
    d_cf_bc_coef(dim, object_name + "::coarse-fine bc coefs"),
-   d_coarsefine_bc_variable(NULL),
+   d_coarsefine_bc_variable(),
    d_Ak0_id(-1),
    d_soln_depth(0),
    d_rhs_depth(0),
@@ -300,12 +296,12 @@ Stokes::HypreSolver::HypreSolver(
    d_num_post_relax_steps(1),
    d_relative_residual_norm(-1.0),
    d_use_smg(false),
-   d_grid(NULL),
-   d_stencil(NULL),
-   d_matrix(NULL),
-   d_linear_rhs(NULL),
-   d_linear_sol(NULL),
-   d_mg_data(NULL),
+   d_grid(),
+   d_stencil(),
+   d_matrix(),
+   d_linear_rhs(),
+   d_linear_sol(),
+   d_mg_data(),
    d_print_solver_info(false)
 {
    if (d_dim == tbox::Dimension(1) || d_dim > tbox::Dimension(3)) {
@@ -318,9 +314,10 @@ Stokes::HypreSolver::HypreSolver(
       getTimer("solv::Stokes::HypreSolver::setMatrixCoefficients()");
 
    hier::VariableDatabase* vdb = hier::VariableDatabase::getDatabase();
-   if (s_Ak0_var[d_dim.getValue() - 1].isNull()) {
-      s_Ak0_var[d_dim.getValue() - 1] = new
-         pdat::OutersideVariable<double>(d_dim, d_object_name + "::Ak0", 1);
+   if (!s_Ak0_var[d_dim.getValue() - 1]) {
+     s_Ak0_var[d_dim.getValue() - 1] =
+       boost::make_shared<pdat::OutersideVariable<double> >
+       (d_dim, d_object_name + "::Ak0", 1);
    }
    d_Ak0_id =
       vdb->registerVariableAndContext(s_Ak0_var[d_dim.getValue() - 1],
@@ -338,7 +335,7 @@ Stokes::HypreSolver::HypreSolver(
  */
 
 void Stokes::HypreSolver::getFromInput(
-   tbox::Pointer<tbox::Database> database)
+   boost::shared_ptr<tbox::Database> database)
 {
    if (database) {
       d_print_solver_info = database->getBoolWithDefault("print_solver_info",
@@ -388,10 +385,10 @@ void Stokes::HypreSolver::getFromInput(
  */
 
 void Stokes::HypreSolver::initializeSolverState(
-   tbox::Pointer<hier::PatchHierarchy> hierarchy,
+   boost::shared_ptr<hier::PatchHierarchy> hierarchy,
    int ln)
 {
-   TBOX_ASSERT(!hierarchy.isNull());
+   TBOX_ASSERT(hierarchy);
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
    deallocateSolverState();
@@ -400,14 +397,15 @@ void Stokes::HypreSolver::initializeSolverState(
    d_ln = ln;
 
    hier::IntVector max_gcw(d_dim, 1);
-   d_cf_boundary = new hier::CoarseFineBoundary(*d_hierarchy, d_ln, max_gcw);
+   d_cf_boundary = boost::make_shared<hier::CoarseFineBoundary >
+     (*d_hierarchy, d_ln, max_gcw);
 
    d_physical_bc_simple_case.setHierarchy(d_hierarchy, d_ln, d_ln);
 
    d_number_iterations = -1;
    d_relative_residual_norm = -1.0;
 
-   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
+   boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
    level->allocatePatchData(d_Ak0_id);
    allocateHypreData();
 }
@@ -420,13 +418,13 @@ void Stokes::HypreSolver::initializeSolverState(
 
 void Stokes::HypreSolver::deallocateSolverState()
 {
-   if (d_hierarchy.isNull()) return;
+   if (!d_hierarchy) return;
 
    d_cf_boundary->clear();
-   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
+   boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
    level->deallocatePatchData(d_Ak0_id);
    deallocateHypreData();
-   d_hierarchy.setNull();
+   d_hierarchy.reset();
    d_ln = -1;
 }
 
@@ -446,8 +444,8 @@ void Stokes::HypreSolver::allocateHypreData()
     * Set up the grid data - only set grid data for local boxes
     */
 
-   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
-   tbox::Pointer<geom::CartesianGridGeometry> grid_geometry =
+   boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
+   boost::shared_ptr<geom::CartesianGridGeometry> grid_geometry =
       d_hierarchy->getGridGeometry();
    const hier::IntVector ratio = level->getRatioToLevelZero();
    hier::IntVector periodic_shift =
@@ -462,7 +460,8 @@ void Stokes::HypreSolver::allocateHypreData()
    }
 
    HYPRE_StructGridCreate(communicator, d_dim.getValue(), &d_grid);
-   for (hier::PatchLevel::Iterator p(level); p; p++) {
+   for (hier::PatchLevel::Iterator p(level.begin());
+        p!=level.end(); p++) {
       const hier::Box& box = (*p)->getBox();
       hier::Index lower = box.lower();
       hier::Index upper = box.upper();
@@ -471,7 +470,7 @@ void Stokes::HypreSolver::allocateHypreData()
 
 #ifdef DEBUG_CHECK_ASSERTIONS
    if (is_periodic) {
-      const hier::BoxArray& level_domain = level->getPhysicalDomain();
+      const hier::BoxContainer& level_domain = level->getPhysicalDomain();
       hier::Box domain_bound(level_domain[0]);
       for (int i = 1; i < level_domain.size(); ++i) {
          domain_bound.lower().min(level_domain[i].lower());
@@ -615,8 +614,8 @@ Stokes::HypreSolver::~HypreSolver()
 {
    deallocateHypreData();
 
-   if (!d_hierarchy.isNull()) {
-      tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(0);
+   if (d_hierarchy) {
+      boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(0);
       level->deallocatePatchData(d_Ak0_id);
    }
    hier::VariableDatabase* vdb =
@@ -639,23 +638,23 @@ void Stokes::HypreSolver::deallocateHypreData()
 {
    if (d_stencil) {
       HYPRE_StructStencilDestroy(d_stencil);
-      d_stencil = NULL;
+      d_stencil.reset();
    }
    if (d_grid) {
       HYPRE_StructGridDestroy(d_grid);
-      d_grid = NULL;
+      d_grid.reset();
    }
    if (d_matrix) {
       HYPRE_StructMatrixDestroy(d_matrix);
-      d_matrix = NULL;
+      d_matrix.reset();
    }
    if (d_linear_rhs) {
       HYPRE_StructVectorDestroy(d_linear_rhs);
-      d_linear_rhs = NULL;
+      d_linear_rhs.reset();
    }
    if (d_linear_sol) {
       HYPRE_StructVectorDestroy(d_linear_sol);
-      d_linear_sol = NULL;
+      d_linear_sol.reset();
    }
    destroyHypreSolver();
 }
@@ -719,7 +718,7 @@ void Stokes::HypreSolver::copyFromHypre(
 
 void Stokes::HypreSolver::setMatrixCoefficients()
 {
-   if (d_physical_bc_coef_strategy == NULL) {
+   if (!d_physical_bc_coef_strategy) {
       TBOX_ERROR(
          d_object_name << ": No BC coefficient strategy object!\n"
          <<
@@ -733,8 +732,8 @@ void Stokes::HypreSolver::setMatrixCoefficients()
 
    int i = 0;
 
-   tbox::Pointer<pdat::CellData<double> > C_data;
-   tbox::Pointer<pdat::SideData<double> > D_data;
+   boost::shared_ptr<pdat::CellData<double> > C_data;
+   boost::shared_ptr<pdat::SideData<double> > D_data;
 
    /*
     * Some computations can be done using high-level math objects.
@@ -754,18 +753,19 @@ void Stokes::HypreSolver::setMatrixCoefficients()
     * solving, thus allowing everything that does not affect A to change
     * from solve to solve.
     */
-   tbox::Pointer<pdat::OutersideData<double> > Ak0;
+   boost::shared_ptr<pdat::OutersideData<double> > Ak0;
 
    /*
     * Loop over patches and set matrix entries for each patch.
     */
-   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
+   boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
    const hier::IntVector no_ghosts(d_dim, 0);
-   for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
+   for (hier::PatchLevel::Iterator pi(level->begin());
+        pi!=level->end(); pi++) {
 
       hier::Patch& patch = **pi;
 
-      tbox::Pointer<geom::CartesianPatchGeometry> pg =
+      boost::shared_ptr<geom::CartesianPatchGeometry> pg =
          patch.getPatchGeometry();
 
       const double* h = pg->getDx();
@@ -787,7 +787,7 @@ void Stokes::HypreSolver::setMatrixCoefficients()
        */
       diagonal.fillAll(0.0);
 
-      const tbox::Pointer<geom::CartesianPatchGeometry>
+      const boost::shared_ptr<geom::CartesianPatchGeometry>
       geometry = patch.getPatchGeometry();
 
       const hier::Index ifirst = patch_box.lower();
@@ -852,11 +852,11 @@ void Stokes::HypreSolver::setMatrixCoefficients()
                bbu.trimBoundaryBox(patch.getBox());
             const hier::Box bccoef_box =
                bbu.getSurfaceBoxFromBoundaryBox();
-            tbox::Pointer<pdat::ArrayData<double> >
+            boost::shared_ptr<pdat::ArrayData<double> >
             acoef_data(new pdat::ArrayData<double>(bccoef_box, 1));
-            tbox::Pointer<pdat::ArrayData<double> >
+            boost::shared_ptr<pdat::ArrayData<double> >
             bcoef_data(new pdat::ArrayData<double>(bccoef_box, 1));
-            tbox::Pointer<pdat::ArrayData<double> >
+            boost::shared_ptr<pdat::ArrayData<double> >
             gcoef_data(NULL);
             static const double fill_time = 0.0;
             d_physical_bc_coef_strategy->setBcCoefs(acoef_data,
@@ -914,11 +914,11 @@ void Stokes::HypreSolver::setMatrixCoefficients()
                bbu.trimBoundaryBox(patch.getBox());
             const hier::Box bccoef_box =
                bbu.getSurfaceBoxFromBoundaryBox();
-            tbox::Pointer<pdat::ArrayData<double> >
+            boost::shared_ptr<pdat::ArrayData<double> >
             acoef_data(new pdat::ArrayData<double>(bccoef_box, 1));
-            tbox::Pointer<pdat::ArrayData<double> >
+            boost::shared_ptr<pdat::ArrayData<double> >
             bcoef_data(new pdat::ArrayData<double>(bccoef_box, 1));
-            tbox::Pointer<pdat::ArrayData<double> >
+            boost::shared_ptr<pdat::ArrayData<double> >
             gcoef_data(NULL);
             static const double fill_time = 0.0;
             /*
@@ -1036,9 +1036,9 @@ void Stokes::HypreSolver::add_gAk0_toRhs(
     * and so is moved to the rhs.  Before solving, g*A*k0(a) is added
     * to rhs.
     */
-   tbox::Pointer<pdat::OutersideData<double> > Ak0;
+   boost::shared_ptr<pdat::OutersideData<double> > Ak0;
 
-   tbox::Pointer<geom::CartesianPatchGeometry> pg =
+   boost::shared_ptr<geom::CartesianPatchGeometry> pg =
       patch.getPatchGeometry();
 
    Ak0 = patch.getPatchData(d_Ak0_id);
@@ -1063,11 +1063,11 @@ void Stokes::HypreSolver::add_gAk0_toRhs(
       const hier::Box& Ak0box = Ak0->getArrayData(location_index / 2,
             location_index % 2).getBox();
       const hier::Box bccoef_box = bbu.getSurfaceBoxFromBoundaryBox();
-      tbox::Pointer<pdat::ArrayData<double> >
+      boost::shared_ptr<pdat::ArrayData<double> >
       acoef_data(NULL);
-      tbox::Pointer<pdat::ArrayData<double> >
+      boost::shared_ptr<pdat::ArrayData<double> >
       bcoef_data(NULL);
-      tbox::Pointer<pdat::ArrayData<double> >
+      boost::shared_ptr<pdat::ArrayData<double> >
       gcoef_data(new pdat::ArrayData<double>(bccoef_box, 1));
       static const double fill_time = 0.0;
       robin_bc_coef->setBcCoefs(acoef_data,
@@ -1207,7 +1207,7 @@ int Stokes::HypreSolver::solveSystem(
 
    t_solve_system->start();
 
-   tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
+   boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
 #ifdef DEBUG_CHECK_ASSERTIONS
    TBOX_ASSERT(u >= 0);
    TBOX_ASSERT(
@@ -1243,17 +1243,18 @@ int Stokes::HypreSolver::solveSystem(
     */
    d_cf_bc_coef.setGhostDataId(u, hier::IntVector::getZero(d_dim));
 
-   for (hier::PatchLevel::Iterator p(level); p; p++) {
-      tbox::Pointer<hier::Patch> patch = *p;
+   for (hier::PatchLevel::Iterator p(level.begin());
+        p!=level.end(); p++) {
+      boost::shared_ptr<hier::Patch> patch = *p;
 
       const hier::Box box = patch->getBox();
 
       /*
        * Set up variable data needed to prepare linear system solver.
        */
-      tbox::Pointer<pdat::CellData<double> > u_data_ = patch->getPatchData(u);
+      boost::shared_ptr<pdat::CellData<double> > u_data_ = patch->getPatchData(u);
 #ifdef DEBUG_CHECK_ASSERTIONS
-      TBOX_ASSERT(!u_data_.isNull());
+      TBOX_ASSERT(u_data_);
 #endif
       pdat::CellData<double>& u_data = *u_data_;
       pdat::CellData<double> rhs_data(box, 1, no_ghosts);
@@ -1342,9 +1343,10 @@ int Stokes::HypreSolver::solveSystem(
    /*
     * Pull the solution vector out of the HYPRE structures
     */
-   for (hier::PatchLevel::Iterator ip(level); ip; ip++) {
-      tbox::Pointer<hier::Patch> patch = *ip;
-      tbox::Pointer<pdat::CellData<double> > u_data_ = patch->getPatchData(u);
+   for (hier::PatchLevel::Iterator ip(level.begin());
+        ip!=level.end(); ip++) {
+      boost::shared_ptr<hier::Patch> patch = *ip;
+      boost::shared_ptr<pdat::CellData<double> > u_data_ = patch->getPatchData(u);
       pdat::CellData<double>& u_data = *u_data_;
       copyFromHypre(u_data,
          d_soln_depth,
@@ -1535,7 +1537,7 @@ void
 Stokes::HypreSolver::finalizeCallback()
 {
    for (int d = 0; d < tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
-      s_Ak0_var[d].setNull();
+      s_Ak0_var[d].reset();
    }
 }
 

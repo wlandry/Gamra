@@ -8,7 +8,7 @@
  *
  ************************************************************************/
 
-SAMRAI_INLINE_KEYWORD
+inline
 void Elastic::FACOps::setPreconditioner(
    const SAMRAI::solv::FACPreconditioner* preconditioner) {
    d_preconditioner = preconditioner;
@@ -20,7 +20,7 @@ void Elastic::FACOps::setPreconditioner(
  ********************************************************************
  */
 
-// SAMRAI_INLINE_KEYWORD
+// inline
 // void Elastic::FACOps::setPhysicalBcCoefObject(
 //    const RobinBcCoefStrategy* physical_bc_coef)
 // {
@@ -33,7 +33,7 @@ void Elastic::FACOps::setPreconditioner(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void Elastic::FACOps::enableLogging(
    bool enable_logging)
 {
@@ -46,7 +46,7 @@ void Elastic::FACOps::enableLogging(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void Elastic::FACOps::setSmoothingChoice(
    const std::string& smoothing_choice)
 {
@@ -66,7 +66,7 @@ void Elastic::FACOps::setSmoothingChoice(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void Elastic::FACOps::setCoarsestLevelSolverChoice(
    const std::string& choice) {
    if (choice == "Tackley") {
@@ -86,7 +86,7 @@ void Elastic::FACOps::setCoarsestLevelSolverChoice(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void Elastic::FACOps::setCoarsestLevelSolverTolerance(
    double tol) {
    d_coarse_solver_tolerance = tol;
@@ -98,7 +98,7 @@ void Elastic::FACOps::setCoarsestLevelSolverTolerance(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void Elastic::FACOps::setCoarsestLevelSolverMaxIterations(
    int max_iterations) {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -115,7 +115,7 @@ void Elastic::FACOps::setCoarsestLevelSolverMaxIterations(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void Elastic::FACOps::setCoarseFineDiscretization(
    const std::string& coarsefine_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -137,7 +137,7 @@ void Elastic::FACOps::setCoarseFineDiscretization(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void Elastic::FACOps::set_V_ProlongationMethod(
    const std::string& prolongation_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS

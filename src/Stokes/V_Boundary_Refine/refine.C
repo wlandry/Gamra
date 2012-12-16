@@ -24,16 +24,17 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::refine
    const pdat::SideOverlap* t_overlap =
       dynamic_cast<const pdat::SideOverlap *>(&fine_overlap);
 
-   TBOX_ASSERT(t_overlap != NULL);
+   TBOX_ASSERT(t_overlap);
 
    Stokes_set_boundary(coarse,invalid_id,src_component,true);
 
    for(int axis=0; axis<getDim().getValue(); ++axis)
      {
-       const hier::BoxList& boxes = t_overlap->getDestinationBoxList(axis);
-       for (hier::BoxList::Iterator b(boxes); b; b++)
+       const hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer(axis);
+       for (hier::BoxContainer::const_iterator b(boxes.begin());
+            b!=boxes.end(); b++)
          {
-           refine(fine,coarse,dst_component,src_component,b(),ratio,axis);
+           refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
          }
      }
 }
@@ -51,13 +52,15 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::refine
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);
    const int dim(dimension.getValue());
 
-   tbox::Pointer<pdat::SideData<double> >
-   v = coarse.getPatchData(src_component);
-   tbox::Pointer<pdat::SideData<double> >
-   v_fine = fine.getPatchData(dst_component);
+   boost::shared_ptr<pdat::SideData<double> > v =
+     boost::dynamic_pointer_cast<pdat::SideData<double> >
+     (coarse.getPatchData(src_component));
+   boost::shared_ptr<pdat::SideData<double> > v_fine = 
+     boost::dynamic_pointer_cast<pdat::SideData<double> >
+     (fine.getPatchData(dst_component));
 #ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(!v.isNull());
-   TBOX_ASSERT(!v_fine.isNull());
+   TBOX_ASSERT(v);
+   TBOX_ASSERT(v_fine);
    TBOX_ASSERT(v->getDepth() == v_fine->getDepth());
    TBOX_ASSERT(v->getDepth() == 1);
 #endif

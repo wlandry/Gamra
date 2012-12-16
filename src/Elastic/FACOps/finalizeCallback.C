@@ -32,10 +32,8 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
@@ -43,7 +41,7 @@ void
 Elastic::FACOps::finalizeCallback()
 {
   for (int d = 0; d < SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
-    s_cell_scratch_var[d].setNull();
-    s_side_scratch_var[d].setNull();
+    s_cell_scratch_var[d].reset();
+    s_side_scratch_var[d].reset();
   }
 }

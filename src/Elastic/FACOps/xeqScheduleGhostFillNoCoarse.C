@@ -16,7 +16,7 @@ void Elastic::FACOps::xeqScheduleGhostFillNoCoarse(int v_id, int dest_ln)
   }
   SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
   refiner.registerRefine(v_id,v_id,v_id,
-                         SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>(0));
+                         boost::shared_ptr<SAMRAI::hier::RefineOperator>());
   refiner.resetSchedule(v_nocoarse_refine_schedules[dest_ln]);
   v_nocoarse_refine_schedules[dest_ln]->fillData(0.0,false);
 }

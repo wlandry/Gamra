@@ -21,14 +21,12 @@ using namespace std;
 #include "SAMRAI/mesh/TreeLoadBalancer.h"
 #include "SAMRAI/hier/PatchHierarchy.h"
 #include "SAMRAI/tbox/PIO.h"
-#include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/tbox/SAMRAIManager.h"
 #include "SAMRAI/mesh/StandardTagAndInitialize.h"
 #include "SAMRAI/tbox/SAMRAI_MPI.h"
 #include "SAMRAI/tbox/TimerManager.h"
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/appu/VisItDataWriter.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "Stokes/P_Refine.h"
 #include "Stokes/V_Refine.h"
 #include "Stokes/P_Boundary_Refine.h"
@@ -38,6 +36,7 @@ using namespace std;
 #include "Elastic/V_Refine.h"
 #include "Elastic/V_Boundary_Refine.h"
 #include "Elastic/V_Coarsen.h"
+#include "SAMRAI/geom/CartesianCellDoubleWeightedAverage.h"
 
 #include "Stokes/FAC.h"
 #include "Elastic/FAC.h"
@@ -110,7 +109,7 @@ int main(
      * Create input database and parse all data in input file.
      */
 
-    tbox::Pointer<tbox::Database> input_db(new tbox::InputDatabase("input_db"));
+    boost::shared_ptr<tbox::InputDatabase> input_db(new tbox::InputDatabase("input_db"));
     tbox::InputManager::getManager()->parseInputFile(input_filename, input_db);
 
     /*
@@ -127,7 +126,7 @@ int main(
      * all name strings in this program.
      */
 
-    tbox::Pointer<tbox::Database> main_db = input_db->getDatabase("Main");
+    boost::shared_ptr<tbox::Database> main_db = input_db->getDatabase("Main");
 
     const tbox::Dimension dim(static_cast<unsigned short>(main_db->getInteger("dim")));
 
@@ -155,12 +154,12 @@ int main(
      * for this application, see comments at top of file.
      */
 
-    SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianGridGeometry>
+    boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry>
       grid_geometry(new SAMRAI::geom::CartesianGridGeometry
                     (dim, base_name + "CartesianGridGeometry",
                      input_db->getDatabase("CartesianGridGeometry")));
 
-    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy>
+    boost::shared_ptr<SAMRAI::hier::PatchHierarchy>
       patch_hierarchy(new SAMRAI::hier::PatchHierarchy
                       (base_name + "::PatchHierarchy",
                        grid_geometry,
@@ -179,23 +178,29 @@ int main(
       {
         Stokes::FAC fac_stokes(base_name + "::Stokes::FAC", dim,
                                input_db->getDatabase("Stokes"));
-        grid_geometry->addSpatialRefineOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+        grid_geometry->addRefineOperator
+          (typeid(pdat::CellVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::RefineOperator>
            (new SAMRAI::geom::Stokes::P_Refine(dim)));
-        grid_geometry->addSpatialRefineOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+        grid_geometry->addRefineOperator
+          (typeid(pdat::SideVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::RefineOperator>
            (new SAMRAI::geom::Stokes::V_Refine(dim)));
-        grid_geometry->addSpatialRefineOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+        grid_geometry->addRefineOperator
+          (typeid(pdat::CellVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::RefineOperator>
            (new SAMRAI::geom::Stokes::P_Boundary_Refine(dim)));
-        grid_geometry->addSpatialRefineOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+        grid_geometry->addRefineOperator
+          (typeid(pdat::SideVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::RefineOperator>
            (new SAMRAI::geom::Stokes::V_Boundary_Refine(dim)));
-        grid_geometry->addSpatialCoarsenOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+        grid_geometry->addCoarsenOperator
+          (typeid(pdat::SideVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
            (new SAMRAI::geom::Stokes::V_Coarsen(dim)));
-        grid_geometry->addSpatialCoarsenOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+        grid_geometry->addCoarsenOperator
+          (typeid(pdat::CellVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
            (new SAMRAI::geom::Stokes::Resid_Coarsen(dim,fac_stokes.cell_viscosity_id)));
 
         solve_system(fac_stokes,main_db,input_db,patch_hierarchy,
@@ -205,15 +210,27 @@ int main(
       {
         Elastic::FAC fac_elastic(base_name + "::Elastic::FAC", dim,
                                  input_db->getDatabase("Elastic"));
-        grid_geometry->addSpatialRefineOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+
+        grid_geometry->addRefineOperator
+          (typeid(pdat::SideVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::RefineOperator>
            (new Elastic::V_Refine(dim)));
-        grid_geometry->addSpatialRefineOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+        grid_geometry->addRefineOperator
+          (typeid(pdat::SideVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::RefineOperator>
            (new Elastic::V_Boundary_Refine(dim)));
-        grid_geometry->addSpatialCoarsenOperator
-          (SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+        grid_geometry->addCoarsenOperator
+          (typeid(pdat::SideVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
            (new Elastic::V_Coarsen(dim,fac_elastic.d_boundary_conditions)));
+        grid_geometry->addCoarsenOperator
+          (typeid(pdat::SideVariable<double>).name(),
+           boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
+           (new Elastic::V_Coarsen(dim,fac_elastic.d_boundary_conditions)));
+
+        grid_geometry->addCoarsenOperator
+          (typeid(pdat::CellVariable<double>).name(),
+           boost::make_shared<geom::CartesianCellDoubleWeightedAverage>(dim));
 
         solve_system(fac_elastic,main_db,input_db,patch_hierarchy,
                      base_name,dim);

@@ -16,13 +16,15 @@ SAMRAI::solv::Stokes::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
     (coarse_fine[fine.getPatchLevelNumber()]
      ->getFaceBoundaries(coarse.getGlobalId()));
      
-  tbox::Pointer<pdat::SideData<double> >
-    v_fine = fine.getPatchData(v_id);
-  tbox::Pointer<pdat::SideData<double> >
-    v = coarse.getPatchData(v_id);
+  boost::shared_ptr<pdat::SideData<double> > v_fine = 
+    boost::dynamic_pointer_cast<pdat::SideData<double> >
+    (fine.getPatchData(v_id));
+  boost::shared_ptr<pdat::SideData<double> > v =
+    boost::dynamic_pointer_cast<pdat::SideData<double> >
+    (coarse.getPatchData(v_id));
 
-  TBOX_ASSERT(!v.isNull());
-  TBOX_ASSERT(!v_fine.isNull());
+  TBOX_ASSERT(v);
+  TBOX_ASSERT(v_fine);
   TBOX_ASSERT(v_fine->getDepth() == v->getDepth());
   TBOX_ASSERT(v->getDepth() == 1);
 

@@ -28,7 +28,7 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Tackley_3D
                  "internal hierarchy.");
     }
 #endif
-  tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
+  boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
 
   /* Only need to sync the rhs once. This sync is needed because
      calculating a new pressure update requires computing in the ghost
@@ -77,31 +77,38 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Tackley_3D
         for(int rb=0;rb<2;++rb)
           {
             xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
-            for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+            for (hier::PatchLevel::Iterator pi(level->begin());
+                 pi!=level->end(); pi++)
               {
-                tbox::Pointer<hier::Patch> patch = *pi;
+                boost::shared_ptr<hier::Patch> patch = *pi;
 
-                tbox::Pointer<pdat::CellData<double> > p_ptr =
-                  patch->getPatchData(p_id);
+                boost::shared_ptr<pdat::CellData<double> > p_ptr =
+                  boost::dynamic_pointer_cast<pdat::CellData<double> >
+                  (patch->getPatchData(p_id));
                 pdat::CellData<double> &p(*p_ptr);
                 
-                tbox::Pointer<pdat::SideData<double> > v_ptr =
-                  patch->getPatchData(v_id);
+                boost::shared_ptr<pdat::SideData<double> > v_ptr =
+                  boost::dynamic_pointer_cast<pdat::SideData<double> >
+                  (patch->getPatchData(v_id));
                 pdat::SideData<double> &v(*v_ptr);
-                tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
-                  patch->getPatchData(v_rhs_id);
+                boost::shared_ptr<pdat::SideData<double> > v_rhs_ptr =
+                  boost::dynamic_pointer_cast<pdat::SideData<double> >
+                  (patch->getPatchData(v_rhs_id));
                 pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
-                tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-                  = patch->getPatchData(cell_viscosity_id);
+                boost::shared_ptr<pdat::CellData<double> > cell_visc_ptr =
+                  boost::dynamic_pointer_cast<pdat::CellData<double> >
+                  (patch->getPatchData(cell_viscosity_id));
                 pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-                tbox::Pointer<pdat::EdgeData<double> > edge_visc_ptr
-                  = patch->getPatchData(edge_viscosity_id);
+                boost::shared_ptr<pdat::EdgeData<double> > edge_visc_ptr =
+                  boost::dynamic_pointer_cast<pdat::EdgeData<double> >
+                  (patch->getPatchData(edge_viscosity_id));
                 pdat::EdgeData<double> &edge_viscosity(*edge_visc_ptr);
 
                 hier::Box pbox=patch->getBox();
-                tbox::Pointer<geom::CartesianPatchGeometry>
-                  geom = patch->getPatchGeometry();
+                boost::shared_ptr<geom::CartesianPatchGeometry> geom =
+                  boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+                  (patch->getPatchGeometry());
                 const double *Dx = geom->getDx();
 
                 for(int k=pbox.lower(2); k<=pbox.upper(2)+pp[ix][2]; ++k)
@@ -129,41 +136,50 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Tackley_3D
          the pressure. */
       xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
 
-      for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+      for (hier::PatchLevel::Iterator pi(level->begin());
+           pi!=level->end(); pi++)
         {
-          tbox::Pointer<hier::Patch> patch = *pi;
+          boost::shared_ptr<hier::Patch> patch = *pi;
 
-          tbox::Pointer<pdat::CellData<double> > p_ptr =
-            patch->getPatchData(p_id);
+          boost::shared_ptr<pdat::CellData<double> > p_ptr =
+            boost::dynamic_pointer_cast<pdat::CellData<double> >
+            (patch->getPatchData(p_id));
           pdat::CellData<double> &p(*p_ptr);
-          tbox::Pointer<pdat::CellData<double> > dp_ptr =
-            patch->getPatchData(dp_id);
+          boost::shared_ptr<pdat::CellData<double> > dp_ptr =
+            boost::dynamic_pointer_cast<pdat::CellData<double> >
+            (patch->getPatchData(dp_id));
           pdat::CellData<double> &dp(*dp_ptr);
-          tbox::Pointer<pdat::CellData<double> > p_rhs_ptr =
-            patch->getPatchData(p_rhs_id);
+          boost::shared_ptr<pdat::CellData<double> > p_rhs_ptr =
+            boost::dynamic_pointer_cast<pdat::CellData<double> >
+            (patch->getPatchData(p_rhs_id));
           pdat::CellData<double> &p_rhs(*p_rhs_ptr);
                 
-          tbox::Pointer<pdat::SideData<double> > v_ptr =
-            patch->getPatchData(v_id);
+          boost::shared_ptr<pdat::SideData<double> > v_ptr =
+            boost::dynamic_pointer_cast<pdat::SideData<double> >
+            (patch->getPatchData(v_id));
           pdat::SideData<double> &v(*v_ptr);
 
-          // tbox::Pointer<pdat::SideData<double> > v_rhs_ptr =
+          // boost::shared_ptr<pdat::SideData<double> > v_rhs_ptr =
           //   patch->getPatchData(v_rhs_id);
           // pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
-          tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-            = patch->getPatchData(cell_viscosity_id);
+          boost::shared_ptr<pdat::CellData<double> > cell_visc_ptr =
+            boost::dynamic_pointer_cast<pdat::CellData<double> >
+            (patch->getPatchData(cell_viscosity_id));
           pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-          tbox::Pointer<pdat::EdgeData<double> > edge_visc_ptr
-            = patch->getPatchData(edge_viscosity_id);
+          boost::shared_ptr<pdat::EdgeData<double> > edge_visc_ptr =
+            boost::dynamic_pointer_cast<pdat::EdgeData<double> >
+            (patch->getPatchData(edge_viscosity_id));
           pdat::EdgeData<double> &edge_viscosity(*edge_visc_ptr);
 
           hier::Box pbox=patch->getBox();
-          tbox::Pointer<geom::CartesianPatchGeometry>
-            geom = patch->getPatchGeometry();
+          boost::shared_ptr<geom::CartesianPatchGeometry> geom =
+            boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+            (patch->getPatchGeometry());
           const double *Dx = geom->getDx();
 
-          for(pdat::CellIterator ci(pbox); ci; ci++)
+          pdat::CellIterator cend(pbox,false);
+          for(pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
             {
               pdat::CellIndex center(*ci);
 
@@ -187,33 +203,40 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Tackley_3D
       /* fix v sweep */
       xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
 
-      for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+      for (hier::PatchLevel::Iterator pi(level->begin());
+           pi!=level->end(); pi++)
         {
-          tbox::Pointer<hier::Patch> patch = *pi;
+          boost::shared_ptr<hier::Patch> patch = *pi;
 
-          tbox::Pointer<pdat::CellData<double> > dp_ptr =
-            patch->getPatchData(dp_id);
+          boost::shared_ptr<pdat::CellData<double> > dp_ptr =
+            boost::dynamic_pointer_cast<pdat::CellData<double> >
+            (patch->getPatchData(dp_id));
           pdat::CellData<double> &dp(*dp_ptr);
                 
-          tbox::Pointer<pdat::SideData<double> > v_ptr =
-            patch->getPatchData(v_id);
+          boost::shared_ptr<pdat::SideData<double> > v_ptr =
+            boost::dynamic_pointer_cast<pdat::SideData<double> >
+            (patch->getPatchData(v_id));
           pdat::SideData<double> &v(*v_ptr);
                 
-          tbox::Pointer<pdat::CellData<double> > cell_visc_ptr
-            = patch->getPatchData(cell_viscosity_id);
+          boost::shared_ptr<pdat::CellData<double> > cell_visc_ptr =
+            boost::dynamic_pointer_cast<pdat::CellData<double> >
+            (patch->getPatchData(cell_viscosity_id));
           pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-          tbox::Pointer<pdat::EdgeData<double> > edge_visc_ptr
-            = patch->getPatchData(edge_viscosity_id);
+          boost::shared_ptr<pdat::EdgeData<double> > edge_visc_ptr =
+            boost::dynamic_pointer_cast<pdat::EdgeData<double> >
+            (patch->getPatchData(edge_viscosity_id));
           pdat::EdgeData<double> &edge_viscosity(*edge_visc_ptr);
 
           hier::Box pbox=patch->getBox();
-          tbox::Pointer<geom::CartesianPatchGeometry>
-            geom = patch->getPatchGeometry();
+          boost::shared_ptr<geom::CartesianPatchGeometry> geom =
+            boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+            (patch->getPatchGeometry());
           const double *Dx=geom->getDx();
 
           pbox.growUpper(hier::IntVector::getOne(d_dim));
 
-          for(pdat::CellIterator ci(pbox); ci; ci++)
+          pdat::CellIterator cend(pbox,true);
+          for(pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
             {
               pdat::CellIndex center(*ci);
 
@@ -252,8 +275,7 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Tackley_3D
        * non negative value for residual tolerance).
        */
       converged = maxres < residual_tolerance;
-      const tbox::SAMRAI_MPI&
-        mpi(d_hierarchy->getDomainMappedBoxLevel().getMPI());
+      const tbox::SAMRAI_MPI& mpi(d_hierarchy->getMPI());
       int tmp= converged ? 1 : 0;
       if (mpi.getSize() > 1)
         {

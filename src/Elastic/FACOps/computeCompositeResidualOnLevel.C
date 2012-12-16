@@ -17,7 +17,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
                "internal hierarchy.");
   }
 #endif
-  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
+  boost::shared_ptr<SAMRAI::hier::PatchLevel>
     level = d_hierarchy->getPatchLevel(ln);
 
   /*
@@ -65,21 +65,27 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
    * S4. Compute residual on patches in level.
    */
 
-  for (SAMRAI::hier::PatchLevel::Iterator pi(*level); pi; pi++) {
-    SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *pi;
-    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-      v_ptr = solution.getComponentPatchData(0, *patch);
-    SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> >
-      cell_moduli_ptr = patch->getPatchData(cell_moduli_id);
-    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-      v_rhs_ptr = rhs.getComponentPatchData(0, *patch);
-    SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-      v_resid_ptr = residual.getComponentPatchData(0, *patch);
+  for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
+       pi!=level->end(); pi++) {
+    boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+      (solution.getComponentPatchData(0,(*patch)));
+    boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+      (patch->getPatchData(cell_moduli_id));
+    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+      (rhs.getComponentPatchData(0,*patch));
+    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_resid_ptr =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+      (residual.getComponentPatchData(0,*patch));
 
     SAMRAI::hier::Box pbox=patch->getBox();
     pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
-    SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
-      geom = patch->getPatchGeometry();
+    boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+      boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+      (patch->getPatchGeometry());
 
     switch(d_dim.getValue())
       {

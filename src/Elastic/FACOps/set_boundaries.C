@@ -32,10 +32,8 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
@@ -45,11 +43,12 @@
 
 void Elastic::FACOps::set_boundaries
 (const int &v_id,
- SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
+ boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
 {
-  for (SAMRAI::hier::PatchLevel::Iterator pi(*level); pi; pi++)
+  for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
+       pi!=level->end(); pi++)
     {
-      SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *pi;
+      boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
       d_boundary_conditions.set_boundary(*patch,v_id,rhs);
     }
 }

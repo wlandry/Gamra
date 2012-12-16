@@ -73,12 +73,12 @@ bool Elastic::FACSolver::solveSystem
  const int edge_moduli,
  const int v,
  const int v_rhs,
- SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy>
+ boost::shared_ptr<SAMRAI::hier::PatchHierarchy>
  hierarchy,
  int coarse_ln,
  int fine_ln)
 {
-  TBOX_ASSERT(!hierarchy.isNull());
+  TBOX_ASSERT(hierarchy);
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
   if (d_enable_logging) {

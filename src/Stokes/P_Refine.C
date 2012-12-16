@@ -30,16 +30,12 @@ void SAMRAI::geom::Stokes::P_Refine::refine(
    const pdat::CellOverlap* t_overlap =
       dynamic_cast<const pdat::CellOverlap *>(&fine_overlap);
 
-   TBOX_ASSERT(t_overlap != NULL);
+   TBOX_ASSERT(t_overlap);
 
-   const hier::BoxList& boxes = t_overlap->getDestinationBoxList();
-   for (hier::BoxList::Iterator b(boxes); b; b++) {
-      refine(fine,
-         coarse,
-         dst_component,
-         src_component,
-         b(),
-         ratio);
+   const hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
+   for (hier::BoxContainer::const_iterator b(boxes.begin());
+        b!=boxes.end(); b++) {
+      refine(fine,coarse,dst_component,src_component,*b,ratio);
    }
 }
 
@@ -55,21 +51,25 @@ void SAMRAI::geom::Stokes::P_Refine::refine(
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, fine_patch, coarse_patch,
                                    fine_box, ratio);
 
-   tbox::Pointer<pdat::CellData<double> >
-   p = coarse_patch.getPatchData(src_component);
-   tbox::Pointer<pdat::CellData<double> >
-   p_fine = fine_patch.getPatchData(dst_component);
+   boost::shared_ptr<pdat::CellData<double> > p =
+     boost::dynamic_pointer_cast<pdat::CellData<double> >
+     (coarse_patch.getPatchData(src_component));
+   boost::shared_ptr<pdat::CellData<double> > p_fine = 
+     boost::dynamic_pointer_cast<pdat::CellData<double> >
+     (fine_patch.getPatchData(dst_component));
 #ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(!p.isNull());
-   TBOX_ASSERT(!p_fine.isNull());
+   TBOX_ASSERT(p);
+   TBOX_ASSERT(p_fine);
    TBOX_ASSERT(p->getDepth() == p_fine->getDepth());
 #endif
 
    hier::Box coarse_box=coarse_patch.getBox();
-   tbox::Pointer<geom::CartesianPatchGeometry>
-     geom = coarse_patch.getPatchGeometry();
+   boost::shared_ptr<geom::CartesianPatchGeometry> geom =
+     boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+     (coarse_patch.getPatchGeometry());
 
-   for(pdat::CellIterator ci(fine_box); ci; ci++)
+   pdat::CellIterator cend(fine_box,false);
+   for(pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
      {
        pdat::CellIndex fine(*ci);
 

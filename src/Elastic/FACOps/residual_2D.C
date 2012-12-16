@@ -12,14 +12,16 @@ void Elastic::FACOps::residual_2D
 {
   const SAMRAI::hier::Index ip(1,0), jp(0,1);
 
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeData<double> >
-    edge_moduli_ptr = patch.getPatchData(edge_moduli_id);
+  boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+    (patch.getPatchData(edge_moduli_id));
   SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
   double dx = geom.getDx()[0];
   double dy = geom.getDx()[1];
 
-  for(SAMRAI::pdat::CellIterator ci(pbox); ci; ci++)
+  SAMRAI::pdat::CellIterator cend(pbox,false);
+  for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
     {
       SAMRAI::pdat::CellIndex center(*ci);
 

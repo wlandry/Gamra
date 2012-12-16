@@ -32,10 +32,8 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
@@ -51,7 +49,7 @@ void Elastic::FACOps::deallocateOperatorState()
 {
   if (d_hierarchy) {
     d_cf_boundary.resizeArray(0);
-    d_hierarchy.setNull();
+    d_hierarchy.reset();
     d_ln_min = -1;
     d_ln_max = -1;
 

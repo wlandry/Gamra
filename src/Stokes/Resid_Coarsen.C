@@ -18,35 +18,37 @@ void SAMRAI::geom::Stokes::Resid_Coarsen::coarsen(hier::Patch& coarse,
   const tbox::Dimension& dimension(getDim());
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, coarse, fine, coarse_box, ratio);
   
-  tbox::Pointer<pdat::CellData<double> >
-    r_fine_ptr = fine.getPatchData(src_component);
+  boost::shared_ptr<pdat::CellData<double> > r_fine_ptr =
+    boost::dynamic_pointer_cast<pdat::CellData<double> >
+    (fine.getPatchData(src_component));
   pdat::CellData<double> &r_fine(*r_fine_ptr);
-  tbox::Pointer<pdat::CellData<double> >
-    r_ptr = coarse.getPatchData(dst_component);
+  boost::shared_ptr<pdat::CellData<double> > r_ptr =
+    boost::dynamic_pointer_cast<pdat::CellData<double> >
+    (coarse.getPatchData(dst_component));
   pdat::CellData<double> &r(*r_ptr);
-  tbox::Pointer<pdat::CellData<double> >
-    cell_viscosity_fine_ptr = fine.getPatchData(cell_viscosity_id);
+  boost::shared_ptr<pdat::CellData<double> > cell_viscosity_fine_ptr = 
+    boost::dynamic_pointer_cast<pdat::CellData<double> >
+    (fine.getPatchData(cell_viscosity_id));
   pdat::CellData<double> &cell_viscosity_fine(*cell_viscosity_fine_ptr);
 
-  TBOX_ASSERT(!r_ptr.isNull());
-  TBOX_ASSERT(!r_fine_ptr.isNull());
+  TBOX_ASSERT(r_ptr);
+  TBOX_ASSERT(r_fine_ptr);
   TBOX_ASSERT(r_fine.getDepth() == r.getDepth());
   TBOX_ASSERT(r.getDepth() == 1);
 
-  hier::Box cell_box(hier::Index::getZeroIndex(dimension),
-                     hier::Index::getOneIndex(dimension));
-
-  for(pdat::CellIterator ci(coarse.getBox()); ci; ci++)
+  pdat::CellIterator cend(coarse.getBox(),false);
+  for(pdat::CellIterator ci(coarse.getBox(),true); ci!=cend; ci++)
     {
       pdat::CellIndex coarse(*ci);
       pdat::CellIndex fine(coarse*2);
       double temp(0), viscosity_sum(0);
 
-      for(pdat::CellIterator ii(cell_box); ii; ii++)
+      const int dim(dimension.getValue());
+      for(int i=0;i<(2 << dim); ++i)
         {
-          pdat::CellIndex i(*ii);
-          temp+=r_fine(fine+i)*cell_viscosity_fine(fine+i);
-          viscosity_sum+=cell_viscosity_fine(fine+i);
+          hier::Index j(i%2, (i/2)%2, i/4);
+          temp+=r_fine(fine+j)*cell_viscosity_fine(fine+j);
+          viscosity_sum+=cell_viscosity_fine(fine+j);
         }
       r(coarse)=temp/viscosity_sum;
     }

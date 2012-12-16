@@ -31,12 +31,10 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
   d_hierarchy = solution.getPatchHierarchy();
   d_ln_min = solution.getCoarsestLevelNumber();
   d_ln_max = solution.getFinestLevelNumber();
-  d_hopscell = new math::HierarchyCellDataOpsReal<double>(d_hierarchy,
-                                                          d_ln_min,
-                                                          d_ln_max);
-  d_hopsside = new math::HierarchySideDataOpsReal<double>(d_hierarchy,
-                                                          d_ln_min,
-                                                          d_ln_max);
+  d_hopscell = boost::make_shared<math::HierarchyCellDataOpsReal<double> >
+    (d_hierarchy,d_ln_min,d_ln_max);
+  d_hopsside = boost::make_shared<math::HierarchySideDataOpsReal<double> >
+    (d_hierarchy,d_ln_min,d_ln_max);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
 
@@ -74,7 +72,7 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
    *   are allocated
    *   has sufficient ghost width
    */
-  tbox::Pointer<hier::Variable> var;
+  boost::shared_ptr<hier::Variable> var;
   {
     vdb->mapIndexToVariable(rhs.getComponentDescriptorIndex(0),
                             var);
@@ -82,7 +80,9 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name << ": RHS component does not\n"
                  << "correspond to a variable.\n");
     }
-    tbox::Pointer<pdat::CellVariable<double> > cell_var = var;
+    boost::shared_ptr<pdat::CellVariable<double> > cell_var =
+      boost::dynamic_pointer_cast<pdat::CellVariable<double> >
+      (var);
     if (!cell_var) {
       TBOX_ERROR(d_object_name
                  << ": RHS variable is not cell-centered double\n");
@@ -95,25 +95,29 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name << ": Solution component does not\n"
                  << "correspond to a variable.\n");
     }
-    tbox::Pointer<pdat::CellVariable<double> > cell_var = var;
+    boost::shared_ptr<pdat::CellVariable<double> > cell_var =
+      boost::dynamic_pointer_cast<pdat::CellVariable<double> >
+      (var);
     if (!cell_var) {
       TBOX_ERROR(d_object_name
                  << ": Solution variable is not cell-centered double\n");
     }
   }
   for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-    tbox::Pointer<hier::PatchLevel> level_ptr =
+    boost::shared_ptr<hier::PatchLevel> level_ptr =
       d_hierarchy->getPatchLevel(ln);
     hier::PatchLevel& level = *level_ptr;
-    for (hier::PatchLevel::Iterator pi(level); pi; pi++) {
+    for (hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); pi++) {
       hier::Patch& patch = **pi;
-      tbox::Pointer<hier::PatchData> fd =
+      boost::shared_ptr<hier::PatchData> fd =
         patch.getPatchData(rhs.getComponentDescriptorIndex(0));
       if (fd) {
         /*
          * Some data checks can only be done if the data already exists.
          */
-        tbox::Pointer<pdat::CellData<double> > cd = fd;
+        boost::shared_ptr<pdat::CellData<double> > cd =
+          boost::dynamic_pointer_cast<pdat::CellData<double> >
+          (fd);
         if (!cd) {
           TBOX_ERROR(d_object_name
                      << ": RHS data is not cell-centered double\n");
@@ -124,13 +128,15 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
                        << "Solver is for depth 0 only.\n");
         }
       }
-      tbox::Pointer<hier::PatchData> ud =
+      boost::shared_ptr<hier::PatchData> ud =
         patch.getPatchData(solution.getComponentDescriptorIndex(0));
       if (ud) {
         /*
          * Some data checks can only be done if the data already exists.
          */
-        tbox::Pointer<pdat::CellData<double> > cd = ud;
+        boost::shared_ptr<pdat::CellData<double> > cd =
+          boost::dynamic_pointer_cast<pdat::CellData<double> >
+          (ud);
         if (!cd) {
           TBOX_ERROR(d_object_name
                      << ": Solution data is not cell-centered double\n");
@@ -168,9 +174,8 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
 
   hier::IntVector max_gcw(d_dim, 1);
   for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-    d_cf_boundary[ln] = new hier::CoarseFineBoundary(*d_hierarchy,
-                                                     ln,
-                                                     max_gcw);
+    d_cf_boundary[ln] = boost::make_shared<hier::CoarseFineBoundary>
+      (*d_hierarchy,ln,max_gcw);
   }
 
   v_coarsen_patch_strategy.coarse_fine=d_cf_boundary;
@@ -191,9 +196,10 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
    * Get the transfer operators.
    * Cell (solution, error, etc) coarsening is conservative.
    */
-  tbox::Pointer<geom::CartesianGridGeometry> geometry =
-    d_hierarchy->getGridGeometry();
-  tbox::Pointer<hier::Variable> variable;
+  boost::shared_ptr<geom::CartesianGridGeometry> geometry =
+    boost::dynamic_pointer_cast<geom::CartesianGridGeometry>
+    (d_hierarchy->getGridGeometry());
+  boost::shared_ptr<hier::Variable> variable;
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_prolongation_refine_operator =
@@ -338,23 +344,23 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
-                   tbox::Pointer<xfer::RefineOperator>(0));
+                   boost::shared_ptr<hier::RefineOperator>());
   v_nocoarse_refine_algorithm.
     registerRefine(solution.getComponentDescriptorIndex(1),
                    solution.getComponentDescriptorIndex(1),
                    solution.getComponentDescriptorIndex(1),
-                   tbox::Pointer<xfer::RefineOperator>(0));
+                   boost::shared_ptr<hier::RefineOperator>());
 
   /* Refinement and ghost fill operators */
   for (int dest_ln = d_ln_min + 1; dest_ln <= d_ln_max; ++dest_ln) {
 
-    tbox::Pointer<xfer::PatchLevelFullFillPattern>
+    boost::shared_ptr<xfer::PatchLevelFullFillPattern>
       fill_pattern(new xfer::PatchLevelFullFillPattern());
     p_prolongation_refine_schedules[dest_ln] =
       p_prolongation_refine_algorithm.
       createSchedule(fill_pattern,
                      d_hierarchy->getPatchLevel(dest_ln),
-                     tbox::Pointer<hier::PatchLevel>(),
+                     boost::shared_ptr<hier::PatchLevel>(),
                      dest_ln - 1,
                      d_hierarchy);
     if (!p_prolongation_refine_schedules[dest_ln]) {
@@ -365,7 +371,7 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
       v_prolongation_refine_algorithm.
       createSchedule(fill_pattern,
                      d_hierarchy->getPatchLevel(dest_ln),
-                     tbox::Pointer<hier::PatchLevel>(),
+                     boost::shared_ptr<hier::PatchLevel>(),
                      dest_ln - 1,
                      d_hierarchy);
     if (!v_prolongation_refine_schedules[dest_ln]) {

@@ -228,12 +228,9 @@ def build(bld):
                         'src/Elastic/FACSolver/solveSystem.C'],
         target       = 'gamra',
         cxxflags = variant_flags[bld.variant] + default_flags,
-        lib          = ['dl', 'm', 'gfortranbegin', 'gfortran', 'm',
-                        'gfortranbegin', 'gfortran', 'm', 'gfortranbegin',
-                        'gfortran', 'm'],
+        lib          = ['dl','gfortranbegin', 'gfortran', 'm'],
         libpath      = ['/usr/lib/petsc/linux-gnu-c-opt/lib'],
-        includes = ['src','../FTensor','/home/walter/Gamra/Samrai/Samrai/source',
-                    '/usr/include'],
+        includes = ['src','../FTensor'],
         use=['samrai','muparser','hdf5']
         )
 

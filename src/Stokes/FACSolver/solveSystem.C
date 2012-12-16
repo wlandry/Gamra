@@ -88,12 +88,12 @@ bool SAMRAI::solv::Stokes::FACSolver::solveSystem
  const int p_rhs,
  const int v,
  const int v_rhs,
- tbox::Pointer<hier::PatchHierarchy>
+ boost::shared_ptr<hier::PatchHierarchy>
  hierarchy,
  int coarse_ln,
  int fine_ln)
 {
-  TBOX_ASSERT(!hierarchy.isNull());
+  TBOX_ASSERT(hierarchy);
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
   if (d_enable_logging) {

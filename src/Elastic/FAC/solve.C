@@ -27,7 +27,7 @@
 int Elastic::FAC::solve()
 {
 
-  if (d_hierarchy.isNull()) {
+  if (!d_hierarchy) {
     TBOX_ERROR(d_object_name
                << "Cannot solve using an uninitialized object.\n");
   }
@@ -38,17 +38,16 @@ int Elastic::FAC::solve()
   fix_moduli();
 
   for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln) {
-    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
+    boost::shared_ptr<SAMRAI::hier::PatchLevel>
       level = d_hierarchy->getPatchLevel(ln);
-    SAMRAI::hier::PatchLevel::Iterator ip(*level);
-    for ( ; ip; ip++) {
-      SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *ip;
+    
+    for (SAMRAI::hier::PatchLevel::Iterator ip(level->begin());
+         ip!=level->end(); ip++) {
+      boost::shared_ptr<SAMRAI::hier::Patch> patch = *ip;
 
-      SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
-        geom = patch->getPatchGeometry();
-
-      SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-        v = patch->getPatchData(v_id);
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (patch->getPatchData(v_id));
       v->fill(0.0);
       // v->fill(13.0);
     }

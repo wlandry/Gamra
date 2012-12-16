@@ -17,7 +17,7 @@ void SAMRAI::solv::Stokes::FACOps::computeCompositeResidualOnLevel
                "internal hierarchy.");
   }
 #endif
-  tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
+  boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
 
   /*
    * Set up the bc helper so that when we use a refine schedule
@@ -65,27 +65,35 @@ void SAMRAI::solv::Stokes::FACOps::computeCompositeResidualOnLevel
    * S4. Compute residual on patches in level.
    */
 
-  for (hier::PatchLevel::Iterator pi(*level); pi; pi++) {
-    tbox::Pointer<hier::Patch> patch = *pi;
-    tbox::Pointer<pdat::CellData<double> >
-      p_ptr = solution.getComponentPatchData(0, *patch);
-    tbox::Pointer<pdat::SideData<double> >
-      v_ptr = solution.getComponentPatchData(1, *patch);
-    tbox::Pointer<pdat::CellData<double> >
-      cell_viscosity_ptr = patch->getPatchData(cell_viscosity_id);
-    tbox::Pointer<pdat::CellData<double> >
-      p_rhs_ptr = rhs.getComponentPatchData(0, *patch);
-    tbox::Pointer<pdat::SideData<double> >
-      v_rhs_ptr = rhs.getComponentPatchData(1, *patch);
-    tbox::Pointer<pdat::CellData<double> >
-      p_resid_ptr = residual.getComponentPatchData(0, *patch);
-    tbox::Pointer<pdat::SideData<double> >
-      v_resid_ptr = residual.getComponentPatchData(1, *patch);
+  for (hier::PatchLevel::Iterator pi(level->begin()); pi!=level->end(); pi++) {
+    boost::shared_ptr<hier::Patch> patch = *pi;
+    boost::shared_ptr<pdat::CellData<double> > p_ptr =
+      boost::dynamic_pointer_cast<pdat::CellData<double> >
+      (solution.getComponentPatchData(0, *patch));
+    boost::shared_ptr<pdat::SideData<double> > v_ptr =
+      boost::dynamic_pointer_cast<pdat::SideData<double> >
+      (solution.getComponentPatchData(1, *patch));
+    boost::shared_ptr<pdat::CellData<double> > cell_viscosity_ptr =
+      boost::dynamic_pointer_cast<pdat::CellData<double> >
+      (patch->getPatchData(cell_viscosity_id));
+    boost::shared_ptr<pdat::CellData<double> > p_rhs_ptr =
+      boost::dynamic_pointer_cast<pdat::CellData<double> >
+      (rhs.getComponentPatchData(0, *patch));
+    boost::shared_ptr<pdat::SideData<double> > v_rhs_ptr =
+      boost::dynamic_pointer_cast<pdat::SideData<double> >
+      (rhs.getComponentPatchData(1, *patch));
+    boost::shared_ptr<pdat::CellData<double> > p_resid_ptr =
+      boost::dynamic_pointer_cast<pdat::CellData<double> >
+      (residual.getComponentPatchData(0, *patch));
+    boost::shared_ptr<pdat::SideData<double> > v_resid_ptr =
+      boost::dynamic_pointer_cast<pdat::SideData<double> >
+      (residual.getComponentPatchData(1, *patch));
 
     hier::Box pbox=patch->getBox();
     pbox.growUpper(hier::IntVector::getOne(d_dim));
-    tbox::Pointer<geom::CartesianPatchGeometry>
-      geom = patch->getPatchGeometry();
+    boost::shared_ptr<geom::CartesianPatchGeometry> geom =
+      boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+      (patch->getPatchGeometry());
 
     switch(d_dim.getValue())
       {

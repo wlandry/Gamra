@@ -5,7 +5,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
  SAMRAI::hier::Index pp[], const int &dim,
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::hier::Box &gbox,
- const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> geom,
+ const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
  const double *dx,
  const bool &homogeneous)
 {
@@ -13,7 +13,8 @@ void Elastic::Boundary_Conditions::set_shear_derivs
     {
       double offset[]={0.5,0.5,0.5};
       offset[ix]=0;
-      for(SAMRAI::pdat::SideIterator si(gbox,ix); si; si++)
+      SAMRAI::pdat::SideIterator send(gbox,ix,false);
+      for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; si++)
         {
           SAMRAI::pdat::SideIndex x(*si);
               

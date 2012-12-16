@@ -22,18 +22,18 @@
 
 Elastic::FAC::FAC(const std::string& object_name,
                   const SAMRAI::tbox::Dimension& dimension,
-                  SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database):
+                  boost::shared_ptr<SAMRAI::tbox::Database> database):
   d_object_name(object_name),
   d_dim(dimension),
-  d_hierarchy(NULL),
+  d_hierarchy(),
   d_boundary_conditions(dimension,d_object_name + "::boundary conditions",
                         database->getDatabase("boundary_conditions")),
   d_elastic_fac_solver((d_dim),
                        object_name + "::fac_solver",
-                       (!database.isNull() &&
+                       (database &&
                         database->isDatabase("fac_solver")) ?
                        database->getDatabase("fac_solver"):
-                       SAMRAI::tbox::Pointer<SAMRAI::tbox::Database>(NULL),
+                       boost::shared_ptr<SAMRAI::tbox::Database>(),
                        d_boundary_conditions),
   d_context(),
   lambda("lambda",database,dimension),
@@ -55,7 +55,7 @@ Elastic::FAC::FAC(const std::string& object_name,
    */
 
   int depth=2;
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::CellVariable<double> >
+  boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
     cell_moduli_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim,
                                                    object_name
                                                    + ":cell_moduli",depth));
@@ -67,7 +67,7 @@ Elastic::FAC::FAC(const std::string& object_name,
 
   if(dim==2)
     {
-      SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeVariable<double> >
+      boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
         edge_moduli_ptr(new SAMRAI::pdat::NodeVariable<double>(d_dim,
                                                        object_name
                                                        + ":edge_moduli",depth));
@@ -79,7 +79,7 @@ Elastic::FAC::FAC(const std::string& object_name,
     }
   else if(dim==3)
     {
-      SAMRAI::tbox::Pointer<SAMRAI::pdat::EdgeVariable<double> >
+      boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
         edge_moduli_ptr(new SAMRAI::pdat::EdgeVariable<double>(d_dim,
                                                        object_name
                                                        + ":edge_moduli",depth));
@@ -90,14 +90,14 @@ Elastic::FAC::FAC(const std::string& object_name,
                                            case needed */);
     }
 
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> >
+  boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_ptr(new SAMRAI::pdat::SideVariable<double>(d_dim, object_name + ":v", 1));
   v_id = vdb->registerVariableAndContext(v_ptr, d_context,
                                          SAMRAI::hier::IntVector(d_dim, 1)
                                          /* ghost cell width is 1 for
                                             stencil widths */);
 
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> >
+  boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_rhs_ptr(new SAMRAI::pdat::SideVariable<double>(d_dim,object_name
                                              + ":v right hand side"));
   v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,

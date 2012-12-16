@@ -36,14 +36,14 @@ void SAMRAI::solv::Stokes::FACSolver::initializeSolverState
  const int p_rhs,
  const int v,
  const int v_rhs,
- tbox::Pointer<hier::PatchHierarchy> hierarchy,
+ boost::shared_ptr<hier::PatchHierarchy> hierarchy,
  const int coarse_level,
  const int fine_level)
 {
-  TBOX_ASSERT(!hierarchy.isNull());
+  TBOX_ASSERT(hierarchy);
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
-  if (d_bc_object == NULL) {
+  if (!d_bc_object) {
     TBOX_ERROR(
                d_object_name << ": No BC coefficient strategy object!\n"
                <<

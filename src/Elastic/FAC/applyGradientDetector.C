@@ -4,14 +4,14 @@
 #include "SAMRAI/pdat/ArrayDataAccess.h"
 
 void Elastic::FAC::applyGradientDetector
-(const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> hierarchy_,
+(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy_,
  const int ln,
  const double ,
  const int tag_index,
  const bool ,
  const bool )
 {
-  const SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy>
+  const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>
     hierarchy__ = hierarchy_;
   SAMRAI::hier::PatchHierarchy& hierarchy = *hierarchy__;
   SAMRAI::hier::PatchLevel& level =
@@ -19,43 +19,48 @@ void Elastic::FAC::applyGradientDetector
   
   int ntag = 0, ntotal = 0;
   double maxestimate = 0;
-  for(SAMRAI::hier::PatchLevel::Iterator pi(level); pi; pi++)
+  for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
+      pi!=level.end(); pi++)
     {
       SAMRAI::hier::Patch& patch = **pi;
-      SAMRAI::tbox::Pointer<SAMRAI::hier::PatchData>
+      boost::shared_ptr<SAMRAI::hier::PatchData>
         tag_data = patch.getPatchData(tag_index);
       ntotal += patch.getBox().numberCells().getProduct();
-      if (tag_data.isNull())
+      if (!tag_data)
         {
           TBOX_ERROR("Data index "
                      << tag_index << " does not exist for patch.\n");
         }
-      SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<int> >
-        tag_cell_data_ = tag_data;
-      if (tag_cell_data_.isNull())
+      boost::shared_ptr<SAMRAI::pdat::CellData<int> > tag_cell_data_ =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<int> >
+        (tag_data);
+      if (!tag_cell_data_)
         {
           TBOX_ERROR("Data index " << tag_index << " is not cell int data.\n");
         }
-      SAMRAI::tbox::Pointer<SAMRAI::hier::PatchData>
+      boost::shared_ptr<SAMRAI::hier::PatchData>
         soln_data = patch.getPatchData(v_id);
-      if (soln_data.isNull())
+      if (!soln_data)
         {
           TBOX_ERROR("Data index " << v_id << " does not exist for patch.\n");
         }
-      SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-        soln_side_data_ = soln_data;
-      if (soln_side_data_.isNull())
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > soln_side_data_ =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (soln_data);
+      if (!soln_side_data_)
         {
           TBOX_ERROR("Data index " << v_id << " is not side data.\n");
         }
       SAMRAI::pdat::SideData<double>& v = *soln_side_data_;
       SAMRAI::pdat::CellData<int>& tag_cell_data = *tag_cell_data_;
                               
-      SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
-        geom = patch.getPatchGeometry();
+      boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+        boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+        (patch.getPatchGeometry());
 
       tag_cell_data.fill(0);
-      for (SAMRAI::pdat::CellIterator ci(patch.getBox()); ci; ci++)
+      SAMRAI::pdat::CellIterator cend(patch.getBox(),false);
+      for (SAMRAI::pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ci++)
         {
           const SAMRAI::pdat::CellIndex cell_index(*ci);
 

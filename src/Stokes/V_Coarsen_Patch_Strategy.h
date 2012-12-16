@@ -280,7 +280,7 @@ public:
     * Provide the implementation that can be used to set the
     * Robin bc coefficients.
     *
-    * @param coef_strategy tbox::Pointer to a concrete inmplementation of
+    * @param coef_strategy boost::shared_ptr to a concrete inmplementation of
     *        the coefficient strategy.
     */
    // void
@@ -318,7 +318,7 @@ public:
 
    //@}
 
-  tbox::Array<tbox::Pointer<hier::CoarseFineBoundary> > coarse_fine;
+  tbox::Array<boost::shared_ptr<hier::CoarseFineBoundary> > coarse_fine;
 
 private:
    /*!
@@ -405,8 +405,8 @@ private:
    /*!
     * @brief Timers for performance measurement.
     */
-   // tbox::Pointer<tbox::Timer> t_set_boundary_values_in_cells;
-   // tbox::Pointer<tbox::Timer> t_use_set_bc_coefs;
+   // boost::shared_ptr<tbox::Timer> t_set_boundary_values_in_cells;
+   // boost::shared_ptr<tbox::Timer> t_use_set_bc_coefs;
 };
 
 }

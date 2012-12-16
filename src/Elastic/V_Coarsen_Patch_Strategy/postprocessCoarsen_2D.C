@@ -15,13 +15,15 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
   const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
     &boundaries=coarse_fine[fine.getPatchLevelNumber()]->getEdgeBoundaries(coarse.getGlobalId());
      
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-    v_fine = fine.getPatchData(v_id);
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-    v = coarse.getPatchData(v_id);
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (fine.getPatchData(v_id));
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (coarse.getPatchData(v_id));
 
-  TBOX_ASSERT(!v.isNull());
-  TBOX_ASSERT(!v_fine.isNull());
+  TBOX_ASSERT(v);
+  TBOX_ASSERT(v_fine);
   TBOX_ASSERT(v_fine->getDepth() == v->getDepth());
   TBOX_ASSERT(v->getDepth() == 1);
 

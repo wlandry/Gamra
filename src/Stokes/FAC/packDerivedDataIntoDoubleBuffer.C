@@ -37,16 +37,19 @@ namespace SAMRAI {
   {
     (void)depth_id;
 
-    pdat::CellData<double>::Iterator icell(region);
+    pdat::CellData<double>::iterator icell(region,true);
+    pdat::CellData<double>::iterator iend(region,false);
 
     if (variable_name == "Error") {
-      tbox::Pointer<pdat::CellData<double> > current_solution_ =
-        patch.getPatchData(p_id);
-      tbox::Pointer<pdat::CellData<double> > exact_solution_ =
-        patch.getPatchData(p_exact_id);
+      boost::shared_ptr<pdat::CellData<double> > current_solution_ =
+        boost::dynamic_pointer_cast<pdat::CellData<double> >
+        (patch.getPatchData(p_id));
+      boost::shared_ptr<pdat::CellData<double> > exact_solution_ =
+        boost::dynamic_pointer_cast<pdat::CellData<double> >
+        (patch.getPatchData(p_exact_id));
       pdat::CellData<double>& current_solution = *current_solution_;
       pdat::CellData<double>& exact_solution = *exact_solution_;
-      for ( ; icell; icell++) {
+      for ( ; icell!=iend; icell++) {
         double diff = (current_solution(*icell) - exact_solution(*icell));
         *buffer = diff;
         buffer = buffer + 1;

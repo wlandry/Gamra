@@ -33,15 +33,15 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
                                               variable_name,
                                               int depth_id) const
 {
-  SAMRAI::pdat::CellData<double>::Iterator icell(region);
-
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > v_ptr;
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr;
   if (variable_name == "Displacement") {
-    v_ptr = patch.getPatchData(v_id);
+    v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+      (patch.getPatchData(v_id));
   }
   else if ("Equivalent body force" == variable_name)
     {
-      v_ptr = patch.getPatchData(v_rhs_id);
+      v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (patch.getPatchData(v_rhs_id));
     }
   else
     {
@@ -54,7 +54,10 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
   if(d_dim.getValue()==2)
     {
       const SAMRAI::hier::Index ip(1,0), jp(0,1);
-      for ( ; icell; icell++) {
+
+      SAMRAI::pdat::CellData<double>::iterator iend(region,false);
+      for (SAMRAI::pdat::CellData<double>::iterator icell(region,true);
+           icell!=iend; icell++) {
 
         SAMRAI::pdat::CellIndex center(*icell);
         const SAMRAI::pdat::SideIndex
@@ -88,7 +91,9 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
   else
     {
       const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
-      for ( ; icell; icell++) {
+      SAMRAI::pdat::CellData<double>::iterator iend(region,false);
+      for (SAMRAI::pdat::CellData<double>::iterator icell(region,true);
+           icell!=iend; icell++) {
 
         SAMRAI::pdat::CellIndex center(*icell);
         const SAMRAI::pdat::SideIndex

@@ -26,12 +26,8 @@
 *************************************************************************
 */
 void Elastic::FAC::resetHierarchyConfiguration
-(SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> new_hierarchy,
- int coarsest_level,
- int finest_level)
+(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &new_hierarchy,
+ int , int )
 {
-  (void)coarsest_level;
-  (void)finest_level;
-
   d_hierarchy = new_hierarchy;
 }

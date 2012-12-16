@@ -15,14 +15,16 @@ void SAMRAI::solv::Stokes::FACOps::residual_2D
 {
   const hier::Index ip(1,0), jp(0,1);
 
-  tbox::Pointer<pdat::NodeData<double> >
-    edge_viscosity_ptr = patch.getPatchData(edge_viscosity_id);
+  boost::shared_ptr<pdat::NodeData<double> > edge_viscosity_ptr = 
+    boost::dynamic_pointer_cast<pdat::NodeData<double> >
+    (patch.getPatchData(edge_viscosity_id));
   pdat::NodeData<double> &edge_viscosity(*edge_viscosity_ptr);
 
   double dx = geom.getDx()[0];
   double dy = geom.getDx()[1];
 
-  for(pdat::CellIterator ci(pbox); ci; ci++)
+  pdat::CellIterator cend(pbox,false);
+  for(pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
     {
       pdat::CellIndex center(*ci);
       pdat::CellIndex up(center), down(center), right(center),

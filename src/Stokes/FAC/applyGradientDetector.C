@@ -4,43 +4,45 @@
 #include "SAMRAI/pdat/ArrayDataAccess.h"
 
 void SAMRAI::Stokes::FAC::applyGradientDetector
-(const tbox::Pointer<hier::BasePatchHierarchy> hierarchy_,
+(const boost::shared_ptr<hier::PatchHierarchy> hierarchy_,
  const int ln,
  const double ,
  const int tag_index,
  const bool ,
  const bool )
 {
-  const tbox::Pointer<hier::PatchHierarchy> hierarchy__ = hierarchy_;
+  const boost::shared_ptr<hier::PatchHierarchy> hierarchy__ = hierarchy_;
   hier::PatchHierarchy& hierarchy = *hierarchy__;
   hier::PatchLevel& level =
     (hier::PatchLevel &) * hierarchy.getPatchLevel(ln);
   
   int ntag = 0, ntotal = 0;
   double maxestimate = 0;
-  for(hier::PatchLevel::Iterator pi(level); pi; pi++)
+  for(hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); pi++)
     {
       hier::Patch& patch = **pi;
-      tbox::Pointer<hier::PatchData>
+      boost::shared_ptr<hier::PatchData>
         tag_data = patch.getPatchData(tag_index);
       ntotal += patch.getBox().numberCells().getProduct();
-      if (tag_data.isNull())
+      if (!tag_data)
         {
           TBOX_ERROR("Data index "
                      << tag_index << " does not exist for patch.\n");
         }
-      tbox::Pointer<pdat::CellData<int> > tag_cell_data_ = tag_data;
-      if (tag_cell_data_.isNull())
+      boost::shared_ptr<pdat::CellData<int> > tag_cell_data_ = 
+        boost::dynamic_pointer_cast<pdat::CellData<int> >(tag_data);
+      if (!tag_cell_data_)
         {
           TBOX_ERROR("Data index " << tag_index << " is not cell int data.\n");
         }
-      tbox::Pointer<hier::PatchData> soln_data = patch.getPatchData(p_id);
-      if (soln_data.isNull())
+      boost::shared_ptr<hier::PatchData> soln_data = patch.getPatchData(p_id);
+      if (!soln_data)
         {
           TBOX_ERROR("Data index " << p_id << " does not exist for patch.\n");
         }
-      tbox::Pointer<pdat::CellData<double> > soln_cell_data_ = soln_data;
-      if (soln_cell_data_.isNull())
+      boost::shared_ptr<pdat::CellData<double> > soln_cell_data_ = 
+        boost::dynamic_pointer_cast<pdat::CellData<double> >(soln_data);
+      if (!soln_cell_data_)
         {
           TBOX_ERROR("Data index " << p_id << " is not cell int data.\n");
         }
@@ -51,7 +53,8 @@ void SAMRAI::Stokes::FAC::applyGradientDetector
       computeAdaptionEstimate(estimate_data,soln_cell_data);
                               
       tag_cell_data.fill(0);
-      for (pdat::CellIterator ci(patch.getBox()); ci; ci++)
+      pdat::CellIterator cend(patch.getBox(),false);
+      for (pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ci++)
         {
           const pdat::CellIndex cell_index(*ci);
           if (maxestimate < estimate_data(cell_index))

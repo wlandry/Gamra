@@ -19,9 +19,7 @@ double Elastic::V_Refine::refine_along_line
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::pdat::SideIndex &coarse,
  const SAMRAI::hier::Box &coarse_box,
- const SAMRAI::geom::CartesianPatchGeometry &coarse_geom,
- const FTensor::Tensor1<double,3> &xyz,
- const double *dx) const
+ const SAMRAI::geom::CartesianPatchGeometry &coarse_geom) const
 {
   double result=v(coarse);
 

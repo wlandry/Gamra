@@ -11,19 +11,19 @@ namespace SAMRAI {
 namespace solv {
 namespace Stokes {
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setSolnIdDepth(
    const int depth) {
    d_soln_depth = depth;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setRhsIdDepth(
    const int depth) {
    d_rhs_depth = depth;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setUseSMG(
    bool use_smg) {
    d_use_smg = use_smg;
@@ -36,7 +36,7 @@ void HypreSolver::setUseSMG(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setBoundaries(
    const std::string& boundary_type,
    const int fluxes,
@@ -48,7 +48,7 @@ void HypreSolver::setBoundaries(
       flags,
       bdry_types);
    d_physical_bc_coef_strategy = &d_physical_bc_simple_case;
-   d_physical_bc_variable.setNull();
+   d_physical_bc_variable.reset();
 }
 
 /*
@@ -57,7 +57,7 @@ void HypreSolver::setBoundaries(
  ********************************************************************
  */
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setPhysicalBcCoefObject(
    const RobinBcCoefStrategy* physical_bc_coef_strategy,
    const tbox::Pointer<hier::Variable> variable)
@@ -66,46 +66,46 @@ void HypreSolver::setPhysicalBcCoefObject(
    d_physical_bc_variable = variable;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 int HypreSolver::getNumberOfIterations() const
 {
    return d_number_iterations;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 double HypreSolver::getRelativeResidualNorm() const
 {
    return d_relative_residual_norm;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setNumPreRelaxSteps(
    const int steps)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(!d_hierarchy.isNull());
+   TBOX_ASSERT(d_hierarchy);
 #endif
    d_num_pre_relax_steps = steps;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setNumPostRelaxSteps(
    const int steps)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(!d_hierarchy.isNull());
+   TBOX_ASSERT(d_hierarchy);
 #endif
    d_num_post_relax_steps = steps;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setPrintSolverInfo(
    const bool print)
 {
    d_print_solver_info = print;
 }
 
-SAMRAI_INLINE_KEYWORD
+inline
 void HypreSolver::setStoppingCriteria(
    const int max_iterations,
    const double residual_tol)

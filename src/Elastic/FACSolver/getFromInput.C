@@ -31,7 +31,7 @@
 */
 
 void Elastic::FACSolver::getFromInput
-(SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database)
+(boost::shared_ptr<SAMRAI::tbox::Database> database)
 {
   if (database) {
     if (database->isBool("enable_logging")) {

@@ -15,10 +15,6 @@
 
 #include IOMANIP_HEADER_FILE
 
-#ifndef SAMRAI_INLINE
-#include "Stokes/FACSolver.I"
-#endif
-
 namespace SAMRAI {
   namespace solv {
 
@@ -53,20 +49,20 @@ namespace SAMRAI {
 
     Stokes::FACSolver::FACSolver(const tbox::Dimension& dim,
                                  const std::string& object_name,
-                                 tbox::Pointer<tbox::Database> database):
+                                 boost::shared_ptr<tbox::Database> database):
       d_dim(dim),
       d_object_name(object_name),
       d_fac_ops(d_dim, object_name + "::fac_ops",database),
       d_fac_precond(object_name + "::fac_precond", d_fac_ops),
-      d_bc_object(NULL),
+      d_bc_object(),
       d_simple_bc(d_dim, object_name + "::bc"),
-      d_hierarchy(NULL),
+      d_hierarchy(),
       d_ln_min(-1),
       d_ln_max(-1),
       d_context(hier::VariableDatabase::getDatabase()
                 ->getContext(object_name + "::CONTEXT")),
-      d_uv(NULL),
-      d_fv(NULL),
+      d_uv(),
+      d_fv(),
       d_solver_is_initialized(false),
       d_enable_logging(false)
     {
@@ -104,10 +100,12 @@ namespace SAMRAI {
       {
         static std::string cell_weight_name("Stokes::FACSolver_cell_weight");
 
-        tbox::Pointer<pdat::CellVariable<double> >
-          weight = var_db->getVariable(cell_weight_name);
-        if (weight.isNull()) {
-          weight = new pdat::CellVariable<double>(d_dim, cell_weight_name, 1);
+        boost::shared_ptr<pdat::CellVariable<double> > weight =
+          boost::dynamic_pointer_cast<pdat::CellVariable<double> >
+          (var_db->getVariable(cell_weight_name));
+        if (!weight) {
+          weight = boost::make_shared<pdat::CellVariable<double> >
+            (d_dim, cell_weight_name, 1);
         }
 
         if (s_weight_id[d_dim.getValue() - 1] < 0) {
@@ -120,10 +118,12 @@ namespace SAMRAI {
       {
         static std::string side_weight_name("Stokes::FACSolver_side_weight");
 
-        tbox::Pointer<pdat::SideVariable<double> >
-          weight = var_db->getVariable(side_weight_name);
-        if (weight.isNull()) {
-          weight = new pdat::SideVariable<double>(d_dim, side_weight_name, 1);
+        boost::shared_ptr<pdat::SideVariable<double> > weight =
+          boost::dynamic_pointer_cast<pdat::SideVariable<double> >
+          (var_db->getVariable(side_weight_name));
+        if (!weight) {
+          weight = boost::make_shared<pdat::SideVariable<double> >
+            (d_dim, side_weight_name, 1);
         }
 
         if (s_weight_id[d_dim.getValue() - 2] < 0) {

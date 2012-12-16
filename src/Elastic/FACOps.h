@@ -27,9 +27,7 @@
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/hier/CoarseFineBoundary.h"
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/hier/PatchHierarchy.h"
@@ -38,7 +36,6 @@
 #include "SAMRAI/hier/Box.h"
 #include "SAMRAI/hier/VariableContext.h"
 #include "SAMRAI/tbox/Database.h"
-#include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/tbox/Timer.h"
 #include "Elastic/V_Refine_Patch_Strategy.h"
 #include "Elastic/V_Coarsen_Patch_Strategy.h"
@@ -125,7 +122,7 @@ namespace Elastic {
      */
     FACOps(const SAMRAI::tbox::Dimension& dim,
            const std::string& object_name,
-           SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database,
+           boost::shared_ptr<SAMRAI::tbox::Database> database,
            Boundary_Conditions &bc);
 
     /*!
@@ -275,7 +272,7 @@ namespace Elastic {
      * call this function to provide the implementation for
      * determining the boundary condition coefficients.
      *
-     * @param physical_bc_coef tbox::Pointer to an object that can
+     * @param physical_bc_coef boost::shared_ptr to an object that can
      *        set the Robin bc coefficients.
      */
     // void
@@ -309,7 +306,7 @@ namespace Elastic {
      *        Default to finest level in @c hierarchy.
      */
     void
-    computeVectorWeights(SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> hierarchy,
+    computeVectorWeights(boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
                          int weight_id,
                          int coarsest_ln = -1,
                          int finest_ln = -1) const;
@@ -399,17 +396,17 @@ namespace Elastic {
     }
     void set_boundaries(const int &v_id, const int &l, const bool &rhs)
     {
-      SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> level =
+      boost::shared_ptr<SAMRAI::hier::PatchLevel> level =
         d_hierarchy->getPatchLevel(l);
       set_boundaries(v_id,level,rhs);
     }
     void set_boundaries(const int &v_id,
-                        SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> &level)
+                        boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
     {
       set_boundaries(v_id,level,true);
     }
     void set_boundaries(const int &v_id, 
-                        SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> &level,
+                        boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
                         const bool &rhs);
 
     //@}
@@ -753,7 +750,7 @@ namespace Elastic {
      * function argument lists.  We use it to enforce working on one
      * hierarchy at a time.
      */
-    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> d_hierarchy;
+    boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
 
     /*!
      * @brief Coarsest level for solve.
@@ -782,7 +779,7 @@ namespace Elastic {
      * SAMRAI::hier::CoarseFineBoundary is a light object before
      * it is set for a level.
      */
-    SAMRAI::tbox::Array<SAMRAI::tbox::Pointer<SAMRAI::hier::CoarseFineBoundary> >
+    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
     d_cf_boundary;
 
     //@}
@@ -865,16 +862,16 @@ namespace Elastic {
 
     //@{ @name Internal context and scratch data
 
-    static SAMRAI::tbox::Pointer<SAMRAI::pdat::CellVariable<double> >
+    static boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
     s_cell_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
-    static SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> >
+    static boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     s_side_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
     /*!
      * @brief Default context of internally maintained hierarchy data.
      */
-    SAMRAI::tbox::Pointer<SAMRAI::hier::VariableContext> d_context;
+    boost::shared_ptr<SAMRAI::hier::VariableContext> d_context;
 
     /*!
      * @brief ID of the solution-like scratch data.
@@ -895,31 +892,31 @@ namespace Elastic {
      */
 
     //! @brief Error prolongation (refinement) operator.
-    SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+    boost::shared_ptr<SAMRAI::hier::RefineOperator>
     v_prolongation_refine_operator;
-    SAMRAI::tbox::Array<SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineSchedule> >
+    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_prolongation_refine_schedules;
 
     //! @brief Solution restriction (coarsening) operator.
-    SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+    boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
     v_urestriction_coarsen_operator;
-    SAMRAI::tbox::Array<SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenSchedule> >
+    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     v_urestriction_coarsen_schedules;
 
     //! @brief Residual restriction (coarsening) operator.
-    SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenOperator>
+    boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
     v_rrestriction_coarsen_operator;
-    SAMRAI::tbox::Array<SAMRAI::tbox::Pointer<SAMRAI::xfer::CoarsenSchedule> >
+    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     v_rrestriction_coarsen_schedules;
 
     //! @brief Refine operator for data from coarser level.
-    SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineOperator>
+    boost::shared_ptr<SAMRAI::hier::RefineOperator>
     v_ghostfill_refine_operator;
-    SAMRAI::tbox::Array<SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineSchedule> >
+    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_ghostfill_refine_schedules;
 
     //! @brief Refine operator for data from same level.
-    SAMRAI::tbox::Array<SAMRAI::tbox::Pointer<SAMRAI::xfer::RefineSchedule> >
+    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_nocoarse_refine_schedules;
 
     //@}
@@ -964,19 +961,19 @@ namespace Elastic {
     /*!
      * @brief Hierarchy side operator used in debugging.
      */
-    SAMRAI::tbox::Pointer<SAMRAI::math::HierarchySideDataOpsReal<double> >
+    boost::shared_ptr<SAMRAI::math::HierarchySideDataOpsReal<double> >
     d_hopsside;
 
     /*!
      * @brief Timers for performance measurement.
      */
-    SAMRAI::tbox::Pointer<SAMRAI::tbox::Timer> t_restrict_solution;
-    SAMRAI::tbox::Pointer<SAMRAI::tbox::Timer> t_restrict_residual;
-    SAMRAI::tbox::Pointer<SAMRAI::tbox::Timer> t_prolong;
-    SAMRAI::tbox::Pointer<SAMRAI::tbox::Timer> t_smooth_error;
-    SAMRAI::tbox::Pointer<SAMRAI::tbox::Timer> t_solve_coarsest;
-    SAMRAI::tbox::Pointer<SAMRAI::tbox::Timer> t_compute_composite_residual;
-    SAMRAI::tbox::Pointer<SAMRAI::tbox::Timer> t_compute_residual_norm;
+    boost::shared_ptr<SAMRAI::tbox::Timer> t_restrict_solution;
+    boost::shared_ptr<SAMRAI::tbox::Timer> t_restrict_residual;
+    boost::shared_ptr<SAMRAI::tbox::Timer> t_prolong;
+    boost::shared_ptr<SAMRAI::tbox::Timer> t_smooth_error;
+    boost::shared_ptr<SAMRAI::tbox::Timer> t_solve_coarsest;
+    boost::shared_ptr<SAMRAI::tbox::Timer> t_compute_composite_residual;
+    boost::shared_ptr<SAMRAI::tbox::Timer> t_compute_residual_norm;
 
     static SAMRAI::tbox::StartupShutdownManager::Handler
     s_finalize_handler;
@@ -984,8 +981,6 @@ namespace Elastic {
 
 }
 
-#ifdef SAMRAI_INLINE
 #include "Elastic/FACOps.I"
-#endif
 
 #endif // included_solv_ElasticFACOps

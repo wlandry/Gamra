@@ -10,7 +10,7 @@
 void SAMRAI::solv::Stokes::FACOps::smooth_V_3D
 (const int &ix,
  const hier::Box &pbox,
- tbox::Pointer<geom::CartesianPatchGeometry> &geom,
+ boost::shared_ptr<geom::CartesianPatchGeometry> &geom,
  pdat::CellData<double> &p,
  pdat::SideData<double> &v,
  pdat::SideData<double> &v_rhs,

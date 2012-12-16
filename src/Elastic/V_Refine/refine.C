@@ -36,11 +36,12 @@ void Elastic::V_Refine::refine(SAMRAI::hier::Patch& fine,
 
    for(int axis=0; axis<getDim().getValue(); ++axis)
      {
-       const SAMRAI::hier::BoxList&
-         boxes = t_overlap->getDestinationBoxList(axis);
-       for (SAMRAI::hier::BoxList::Iterator b(boxes); b; b++)
+       const SAMRAI::hier::BoxContainer&
+         boxes = t_overlap->getDestinationBoxContainer(axis);
+       for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
+            b!=boxes.end(); b++)
          {
-           refine(fine,coarse,dst_component,src_component,b(),ratio,axis);
+           refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
          }
      }
 }
@@ -59,29 +60,26 @@ void Elastic::V_Refine::refine
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine_patch, coarse_patch,
                                    fine_box, ratio);
 
-   SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-   v_ptr = coarse_patch.getPatchData(src_component);
+   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+     (coarse_patch.getPatchData(src_component));
    SAMRAI::pdat::SideData<double> &v(*v_ptr);
-   SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-   v_fine_ptr = fine_patch.getPatchData(dst_component);
+   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine_ptr =
+     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+     (fine_patch.getPatchData(dst_component));
    SAMRAI::pdat::SideData<double> &v_fine(*v_fine_ptr);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(!v_ptr.isNull());
-   TBOX_ASSERT(!v_fine_ptr.isNull());
+   TBOX_ASSERT(v_ptr);
+   TBOX_ASSERT(v_fine_ptr);
    TBOX_ASSERT(v.getDepth() == v_fine.getDepth());
    TBOX_ASSERT(v.getDepth() == 1);
 #endif
 
    SAMRAI::hier::Box coarse_box=coarse_patch.getBox();
-   SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
-     coarse_geom = coarse_patch.getPatchGeometry();
-
-   SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
-     fine_geom = fine_patch.getPatchGeometry();
-   const double *dx=fine_geom->getDx();
-
-   const SAMRAI::hier::Box &fine_patch_box(fine_patch.getBox());
+   boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> coarse_geom =
+     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+     (coarse_patch.getPatchGeometry());
 
    SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dimension)),
      jp(ip), kp(ip);
@@ -91,39 +89,25 @@ void Elastic::V_Refine::refine
      kp[2]=1;
    SAMRAI::hier::Index pp[]={ip,jp,kp};
 
-   for(SAMRAI::pdat::CellIterator ci(fine_box); ci; ci++)
+   SAMRAI::pdat::CellIterator cend(fine_box,false);
+   for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
      {
        SAMRAI::pdat::SideIndex fine(*ci,axis,SAMRAI::pdat::SideIndex::Lower);
 
        SAMRAI::pdat::SideIndex coarse(fine);
        coarse.coarsen(SAMRAI::hier::Index::getOneIndex(dimension)*2);
 
-       FTensor::Tensor1<double,3> offset(0,0,0);
-       offset(axis)=dx[axis]/2;
-       FTensor::Tensor1<double,3> xyz(0,0,0);
-       for(int d=0;d<dim;++d)
-         xyz(d)=fine_geom->getXLower()[d]
-           + dx[d]*(fine[d]-fine_patch_box.lower()[d] + 0.5) - offset(d);
-
        if(fine[axis]%2==0)
          {
-           v_fine(fine)=
-             refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
-                               *coarse_geom,xyz,dx);
+           v_fine(fine)=refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
+                                          *coarse_geom);
          }
        else
          {
-           FTensor::Tensor1<double,3> xyz_low, xyz_high;
-           FTensor::Index<'a',3> a;
-
-           xyz_low(a)=xyz(a) - 2*offset(a);
-           xyz_high(a)=xyz(a) + 2*offset(a);
-
-           v_fine(fine)=
-             (refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
-                                *coarse_geom,xyz_low,dx)
-              + refine_along_line(v,axis,dim,pp,fine,coarse+pp[axis],
-                                  coarse_box,*coarse_geom,xyz_high,dx))/2;
+           v_fine(fine)=(refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
+                                           *coarse_geom)
+                         + refine_along_line(v,axis,dim,pp,fine,coarse+pp[axis],
+                                             coarse_box,*coarse_geom))/2;
          }
      }
 }

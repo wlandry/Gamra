@@ -25,7 +25,7 @@ void Elastic::FACOps::smooth_Tackley_2D
                  "internal hierarchy.");
     }
 #endif
-  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
+  boost::shared_ptr<SAMRAI::hier::PatchLevel>
     level = d_hierarchy->getPatchLevel(ln);
 
   /* Only need to sync the rhs once. This sync is needed because
@@ -70,27 +70,33 @@ void Elastic::FACOps::smooth_Tackley_2D
               xeqScheduleGhostFill(v_id, ln);
             }
           set_boundaries(v_id,level,true);
-          for (SAMRAI::hier::PatchLevel::Iterator pi(*level); pi; pi++)
+          for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
+               pi!=level->end(); pi++)
             {
-              SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *pi;
+              boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > v_ptr =
-                patch->getPatchData(v_id);
+              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+                (patch->getPatchData(v_id));
               SAMRAI::pdat::SideData<double> &v(*v_ptr);
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
-                patch->getPatchData(v_rhs_id);
+              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+                (patch->getPatchData(v_rhs_id));
               SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> >
-                cell_moduli_ptr= patch->getPatchData(cell_moduli_id);
+              boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr=
+                boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+                (patch->getPatchData(cell_moduli_id));
               SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeData<double> >
-                edge_moduli_ptr= patch->getPatchData(edge_moduli_id);
+              boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr=
+                boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+                (patch->getPatchData(edge_moduli_id));
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
               SAMRAI::hier::Box pbox=patch->getBox();
-              SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
-                geom = patch->getPatchGeometry();
+              boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+                boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+                (patch->getPatchGeometry());
               double dx = geom->getDx()[0];
               double dy = geom->getDx()[1];
 
@@ -124,27 +130,33 @@ void Elastic::FACOps::smooth_Tackley_2D
               xeqScheduleGhostFill(v_id, ln);
             }
           set_boundaries(v_id,level,true);
-          for (SAMRAI::hier::PatchLevel::Iterator pi(*level); pi; pi++)
+          for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
+               pi!=level->end(); pi++)
             {
-              SAMRAI::tbox::Pointer<SAMRAI::hier::Patch> patch = *pi;
+              boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > v_ptr =
-                patch->getPatchData(v_id);
+              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+                (patch->getPatchData(v_id));
               SAMRAI::pdat::SideData<double> &v(*v_ptr);
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
-                patch->getPatchData(v_rhs_id);
+              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+                (patch->getPatchData(v_rhs_id));
               SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::CellData<double> >
-                cell_moduli_ptr= patch->getPatchData(cell_moduli_id);
+              boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr=
+                boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+                (patch->getPatchData(cell_moduli_id));
               SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
-              SAMRAI::tbox::Pointer<SAMRAI::pdat::NodeData<double> >
-                edge_moduli_ptr= patch->getPatchData(edge_moduli_id);
+              boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr=
+                boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+                (patch->getPatchData(edge_moduli_id));
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
               SAMRAI::hier::Box pbox=patch->getBox();
-              SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry>
-                geom = patch->getPatchGeometry();
+              boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+                boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+                (patch->getPatchGeometry());
               double dx = geom->getDx()[0];
               double dy = geom->getDx()[1];
 
@@ -173,8 +185,7 @@ void Elastic::FACOps::smooth_Tackley_2D
          * non negative value for residual tolerance).
          */
         converged = maxres < residual_tolerance;
-        const SAMRAI::tbox::SAMRAI_MPI&
-          mpi(d_hierarchy->getDomainMappedBoxLevel().getMPI());
+        const SAMRAI::tbox::SAMRAI_MPI& mpi(d_hierarchy->getMPI());
         int tmp= converged ? 1 : 0;
         if (mpi.getSize() > 1)
           {

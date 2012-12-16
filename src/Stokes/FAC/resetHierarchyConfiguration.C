@@ -28,9 +28,9 @@ namespace SAMRAI {
 *************************************************************************
 */
   void Stokes::FAC::resetHierarchyConfiguration
-  (tbox::Pointer<hier::BasePatchHierarchy> new_hierarchy,
-   int coarsest_level,
-   int finest_level)
+  (const boost::shared_ptr<hier::PatchHierarchy>& new_hierarchy,
+   const int coarsest_level,
+   const int finest_level)
   {
     (void)coarsest_level;
     (void)finest_level;

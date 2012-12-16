@@ -59,22 +59,21 @@ namespace SAMRAI {
 */
   Stokes::FAC::FAC(const std::string& object_name,
                    const tbox::Dimension& dimension,
-                   tbox::Pointer<tbox::Database> database):
+                   boost::shared_ptr<tbox::Database> database):
     d_object_name(object_name),
     d_dim(dimension),
-    d_hierarchy(NULL),
     d_stokes_fac_solver((d_dim),
                         object_name + "::stokes_hypre",
-                        (!database.isNull() &&
+                        (database &&
                          database->isDatabase("fac_solver")) ?
                         database->getDatabase("fac_solver"):
-                        tbox::Pointer<tbox::Database>(NULL)),
+                        boost::shared_ptr<tbox::Database>()),
     d_bc_coefs(d_dim,
                object_name + "::bc_coefs",
-               (!database.isNull() &&
+               (database &&
                 database->isDatabase("bc_coefs")) ?
                database->getDatabase("bc_coefs"):
-               tbox::Pointer<tbox::Database>(NULL)),
+               boost::shared_ptr<tbox::Database>()),
     d_context()
   {
     const int dim(d_dim.getValue());
@@ -91,14 +90,14 @@ namespace SAMRAI {
      * and get the descriptor indices for those variables.
      */
 
-    tbox::Pointer<pdat::CellVariable<double> >
+    boost::shared_ptr<pdat::CellVariable<double> >
       p_ptr(new pdat::CellVariable<double>(d_dim, object_name + ":p", 1));
     p_id = vdb->registerVariableAndContext(p_ptr, d_context,
                                            hier::IntVector(d_dim, 1)
                                            /* ghost cell width is 1 for
                                               stencil widths */);
 
-    tbox::Pointer<pdat::CellVariable<double> >
+    boost::shared_ptr<pdat::CellVariable<double> >
       cell_viscosity_ptr(new pdat::CellVariable<double>(d_dim,
                                                         object_name
                                                         + ":cell_viscosity"));
@@ -110,7 +109,7 @@ namespace SAMRAI {
 
     if(dim==2)
       {
-        tbox::Pointer<pdat::NodeVariable<double> >
+        boost::shared_ptr<pdat::NodeVariable<double> >
           edge_viscosity_ptr(new pdat::NodeVariable<double>(d_dim,
                                                             object_name
                                                             + ":edge_viscosity"));
@@ -122,7 +121,7 @@ namespace SAMRAI {
       }
     else if(dim==3)
       {
-        tbox::Pointer<pdat::EdgeVariable<double> >
+        boost::shared_ptr<pdat::EdgeVariable<double> >
           edge_viscosity_ptr(new pdat::EdgeVariable<double>(d_dim,
                                                             object_name
                                                             + ":edge_viscosity"));
@@ -133,34 +132,34 @@ namespace SAMRAI {
                                              case needed */);
       }
 
-    tbox::Pointer<pdat::CellVariable<double> >
+    boost::shared_ptr<pdat::CellVariable<double> >
       dp_ptr(new pdat::CellVariable<double>(d_dim, object_name + ":dp"));
     dp_id = vdb->registerVariableAndContext(dp_ptr,d_context,
                                             hier::IntVector(d_dim, 1)
                                             /* ghost cell width is
                                                     1 in case needed */);
 
-    tbox::Pointer<pdat::CellVariable<double> >
+    boost::shared_ptr<pdat::CellVariable<double> >
       p_exact_ptr(new pdat::CellVariable<double>(d_dim, object_name + ":p exact"));
     p_exact_id = vdb->registerVariableAndContext(p_exact_ptr,d_context,
                                                  hier::IntVector(d_dim, 1)
                                                  /* ghost cell width is
                                                     1 in case needed */);
 
-    tbox::Pointer<pdat::CellVariable<double> >
+    boost::shared_ptr<pdat::CellVariable<double> >
       p_rhs_ptr(new pdat::CellVariable<double>(d_dim,object_name
                                                + ":p right hand side"));
     p_rhs_id = vdb->registerVariableAndContext(p_rhs_ptr,d_context,
                                                hier::IntVector(d_dim, 1));
 
-    tbox::Pointer<pdat::SideVariable<double> >
+    boost::shared_ptr<pdat::SideVariable<double> >
       v_ptr(new pdat::SideVariable<double>(d_dim, object_name + ":v", 1));
     v_id = vdb->registerVariableAndContext(v_ptr, d_context,
                                            hier::IntVector(d_dim, 1)
                                            /* ghost cell width is 1 for
                                               stencil widths */);
 
-    tbox::Pointer<pdat::SideVariable<double> >
+    boost::shared_ptr<pdat::SideVariable<double> >
       v_rhs_ptr(new pdat::SideVariable<double>(d_dim,object_name
                                                + ":v right hand side"));
     v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,

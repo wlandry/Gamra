@@ -10,15 +10,17 @@ void Elastic::FACOps::residual_3D
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::geom::CartesianPatchGeometry &geom)
 {
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::EdgeData<double> >
-    edge_moduli_ptr = patch.getPatchData(edge_moduli_id);
+  boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
+    (patch.getPatchData(edge_moduli_id));
   SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
 
   const double *Dx = geom.getDx();
   const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   const SAMRAI::hier::Index pp[]={ip,jp,kp};
 
-  for(SAMRAI::pdat::CellIterator ci(pbox); ci; ci++)
+  SAMRAI::pdat::CellIterator cend(pbox,false);
+  for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
     {
       SAMRAI::pdat::CellIndex center(*ci);
       SAMRAI::pdat::CellIndex up(center), down(center), right(center),

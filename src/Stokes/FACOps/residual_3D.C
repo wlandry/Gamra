@@ -13,15 +13,17 @@ void SAMRAI::solv::Stokes::FACOps::residual_3D
  const hier::Box &pbox,
  const geom::CartesianPatchGeometry &geom)
 {
-  tbox::Pointer<pdat::EdgeData<double> >
-    edge_viscosity_ptr = patch.getPatchData(edge_viscosity_id);
+  boost::shared_ptr<pdat::EdgeData<double> > edge_viscosity_ptr = 
+    boost::dynamic_pointer_cast<pdat::EdgeData<double> >
+    (patch.getPatchData(edge_viscosity_id));
   pdat::EdgeData<double> &edge_viscosity(*edge_viscosity_ptr);
 
   const double *Dx = geom.getDx();
   const hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   const hier::Index pp[]={ip,jp,kp};
 
-  for(pdat::CellIterator ci(pbox); ci; ci++)
+  pdat::CellIterator cend(pbox,false);
+  for(pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
     {
       pdat::CellIndex center(*ci);
       pdat::CellIndex up(center), down(center), right(center),

@@ -9,17 +9,13 @@
  ************************************************************************/
 #include "Stokes/FACOps.h"
 
-#ifndef SAMRAI_INLINE
-#include "Stokes/FACOps.I"
-#endif
-
 namespace SAMRAI {
   namespace solv {
 
-    tbox::Pointer<pdat::CellVariable<double> >
+    boost::shared_ptr<pdat::CellVariable<double> >
     Stokes::FACOps::s_cell_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
-    tbox::Pointer<pdat::SideVariable<double> >
+    boost::shared_ptr<pdat::SideVariable<double> >
     Stokes::FACOps::s_side_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
     tbox::StartupShutdownManager::Handler
@@ -37,7 +33,7 @@ namespace SAMRAI {
 */
     Stokes::FACOps::FACOps(const tbox::Dimension& dim,
                            const std::string& object_name,
-                           tbox::Pointer<tbox::Database> database):
+                           boost::shared_ptr<tbox::Database> database):
       d_dim(dim),
       d_object_name(object_name),
       d_hierarchy(),
@@ -68,9 +64,9 @@ namespace SAMRAI {
                      object_name + "::hypre_solver",
                      database && database->isDatabase("hypre_solver") ?
                      database->getDatabase("hypre_solver"):
-                     tbox::Pointer<tbox::Database>(NULL)),
+                     boost::shared_ptr<tbox::Database>()),
 #endif
-      // d_physical_bc_coef(NULL),
+      // d_physical_bc_coef(),
       d_context(hier::VariableDatabase::getDatabase()
                 ->getContext(object_name + "::PRIVATE_CONTEXT")),
       d_cell_scratch_id(invalid_id),
@@ -100,7 +96,7 @@ namespace SAMRAI {
       v_coarsen_patch_strategy(dim,
                                d_object_name + "::coarsen patch strategy"),
       d_enable_logging(false),
-      d_preconditioner(NULL),
+      d_preconditioner(),
       d_hopscell(),
       d_hopsside()
     {
@@ -124,18 +120,15 @@ namespace SAMRAI {
         TBOX_ERROR("Stokes::FACOps : DIM == 1 or > 3 not implemented yet.\n");
       }
 
-      if (s_cell_scratch_var[dim.getValue() - 1].isNull()) {
-        TBOX_ASSERT(s_cell_scratch_var[dim.getValue() - 1].isNull());
-        TBOX_ASSERT(s_cell_scratch_var[dim.getValue() - 1].isNull());
-
+      if (!s_cell_scratch_var[dim.getValue() - 1]) {
         std::ostringstream ss;
         ss << "Stokes::FACOps::private_cell_scratch" << dim.getValue();
-        s_cell_scratch_var[dim.getValue() - 1] = new pdat::CellVariable<double>
-          (dim, ss.str());
+        s_cell_scratch_var[dim.getValue() - 1] =
+          boost::make_shared<pdat::CellVariable<double> >(dim, ss.str());
         ss.str("");
         ss << "Stokes::FACOps::private_side_scratch" << dim.getValue();
-        s_side_scratch_var[dim.getValue() - 1] = new pdat::SideVariable<double>
-          (dim, ss.str());
+        s_side_scratch_var[dim.getValue() - 1] =
+          boost::make_shared<pdat::SideVariable<double> >(dim, ss.str());
       }
 
       hier::VariableDatabase* vdb = hier::VariableDatabase::getDatabase();

@@ -16,7 +16,6 @@
 #include "Elastic/FACOps.h"
 #include "SAMRAI/solv/SimpleCellRobinBcCoefs.h"
 #include "SAMRAI/tbox/Database.h"
-#include "SAMRAI/tbox/Pointer.h"
 #include "Elastic/Boundary_Conditions.h"
 
 namespace Elastic {
@@ -108,7 +107,7 @@ namespace Elastic {
      */
     FACSolver(const SAMRAI::tbox::Dimension& dim,
               const std::string& object_name,
-              SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database,
+              boost::shared_ptr<SAMRAI::tbox::Database> database,
               Boundary_Conditions &bc);
 
     /*!
@@ -160,7 +159,7 @@ namespace Elastic {
                 const int edge_moduli,
                 const int v,
                 const int v_rhs,
-                SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> hierarchy,
+                boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
                 int coarse_ln = -1,
                 int fine_ln = -1);
 
@@ -182,7 +181,7 @@ namespace Elastic {
      *
      * @return whether solver converged to specified level
      *
-     * @see solveSystem( const int, const int, tbox::Pointer< SAMRAI::hier::PatchHierarchy >, int, int);
+     * @see solveSystem( const int, const int, boost::shared_ptr< SAMRAI::hier::PatchHierarchy >, int, int);
      */
     bool
     solveSystem(const int v, const int v_rhs);
@@ -337,7 +336,7 @@ namespace Elastic {
                           const int edge_moduli,
                           const int v,
                           const int v_rhs,
-                          SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> hierarchy,
+                          boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
                           const int coarse_level = -1,
                           const int fine_level = -1);
 
@@ -387,7 +386,7 @@ namespace Elastic {
     getResidualNorm() const;
 
     void set_boundaries(const int &v_id,
-                        SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel> &level,
+                        boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
                         const bool &homogeneous)
     {
       d_fac_ops.set_boundaries(v_id,level,homogeneous);
@@ -407,7 +406,7 @@ namespace Elastic {
      * nothing is done.
      */
     void
-    getFromInput(SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database);
+    getFromInput(boost::shared_ptr<SAMRAI::tbox::Database> database);
 
     /*
      * @brief Set @c d_uv and @c d_fv to vectors wrapping the data
@@ -450,24 +449,24 @@ namespace Elastic {
     /*!
      * @brief Robin bc object in use.
      */
-    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> d_hierarchy;
+    boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
     int d_ln_min;
     int d_ln_max;
 
     /*!
      * @brief Context for all internally maintained data.
      */
-    SAMRAI::tbox::Pointer<SAMRAI::hier::VariableContext> d_context;
+    boost::shared_ptr<SAMRAI::hier::VariableContext> d_context;
     /*
      * @brief Vector wrapper for solution.
      * @see createVectorWrappers(), destroyVectorWrappers()
      */
-    SAMRAI::tbox::Pointer<SAMRAI::solv::SAMRAIVectorReal<double> > d_uv;
+    boost::shared_ptr<SAMRAI::solv::SAMRAIVectorReal<double> > d_uv;
     /*
      * @brief Vector wrapper for source.
      * @see createVectorWrappers(), destroyVectorWrappers()
      */
-    SAMRAI::tbox::Pointer<SAMRAI::solv::SAMRAIVectorReal<double> > d_fv;
+    boost::shared_ptr<SAMRAI::solv::SAMRAIVectorReal<double> > d_fv;
 
     bool d_solver_is_initialized;
     bool d_enable_logging;
@@ -479,8 +478,6 @@ namespace Elastic {
 
 }
 
-#ifdef SAMRAI_INLINE
 #include "Elastic/FACSolver.I"
-#endif
 
 #endif  // included_solv_ElasticFACSolver

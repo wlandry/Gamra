@@ -33,10 +33,8 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
@@ -51,12 +49,12 @@ namespace SAMRAI {
 */
 
     void Stokes::FACOps::computeVectorWeights(
-                                              tbox::Pointer<hier::PatchHierarchy> hierarchy,
+                                              boost::shared_ptr<hier::PatchHierarchy> hierarchy,
                                               int weight_id,
                                               int coarsest_ln,
                                               int finest_ln) const
     {
-      TBOX_ASSERT(!hierarchy.isNull());
+      TBOX_ASSERT(hierarchy);
       TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
       if (coarsest_ln == -1) coarsest_ln = 0;
@@ -73,12 +71,14 @@ namespace SAMRAI {
          * On every level, first assign cell volume to vector weight.
          */
 
-        tbox::Pointer<hier::PatchLevel> level =
+        boost::shared_ptr<hier::PatchLevel> level =
           hierarchy->getPatchLevel(ln);
-        for (hier::PatchLevel::Iterator p(level); p; p++) {
-          tbox::Pointer<hier::Patch> patch = *p;
-          tbox::Pointer<geom::CartesianPatchGeometry> patch_geometry =
-            patch->getPatchGeometry();
+        for (hier::PatchLevel::Iterator p(level->begin());
+             p!=level->end(); p++) {
+          boost::shared_ptr<hier::Patch> patch = *p;
+          boost::shared_ptr<geom::CartesianPatchGeometry> patch_geometry =
+            boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+            (patch->getPatchGeometry());
           const double* dx = patch_geometry->getDx();
           double cell_vol = dx[0];
           if (d_dim > tbox::Dimension(1)) {
@@ -89,8 +89,9 @@ namespace SAMRAI {
             cell_vol *= dx[2];
           }
 
-          tbox::Pointer<pdat::CellData<double> > w =
-            patch->getPatchData(weight_id);
+          boost::shared_ptr<pdat::CellData<double> > w =
+            boost::dynamic_pointer_cast<pdat::CellData<double> >
+            (patch->getPatchData(weight_id));
           if (!w) {
             TBOX_ERROR(d_object_name
                        << ": weight id must refer to a pdat::CellVariable");
@@ -111,9 +112,9 @@ namespace SAMRAI {
            * at this level.
            */
 
-          tbox::Pointer<hier::PatchLevel> next_finer_level =
+          boost::shared_ptr<hier::PatchLevel> next_finer_level =
             hierarchy->getPatchLevel(ln + 1);
-          hier::BoxArray coarsened_boxes = next_finer_level->getBoxes();
+          hier::BoxContainer coarsened_boxes = next_finer_level->getBoxes();
           hier::IntVector coarsen_ratio(next_finer_level->getRatioToLevelZero());
           coarsen_ratio /= level->getRatioToLevelZero();
           coarsened_boxes.coarsen(coarsen_ratio);
@@ -124,16 +125,19 @@ namespace SAMRAI {
            * Note that all assignments are local.
            */
 
-          for (hier::PatchLevel::Iterator p(level); p; p++) {
+          for (hier::PatchLevel::Iterator p(level->begin());
+               p!=level->end(); p++) {
 
-            tbox::Pointer<hier::Patch> patch = *p;
-            for (int i = 0; i < coarsened_boxes.getNumberOfBoxes(); i++) {
+            boost::shared_ptr<hier::Patch> patch = *p;
+            for (hier::BoxContainer::iterator i = coarsened_boxes.begin();
+                 i != coarsened_boxes.end(); i++) {
 
-              hier::Box coarse_box = coarsened_boxes[i];
+              hier::Box coarse_box = *i;
               hier::Box intersection = coarse_box * (patch->getBox());
               if (!intersection.empty()) {
-                tbox::Pointer<pdat::CellData<double> > w =
-                  patch->getPatchData(weight_id);
+                boost::shared_ptr<pdat::CellData<double> > w =
+                  boost::dynamic_pointer_cast<pdat::CellData<double> >
+                  (patch->getPatchData(weight_id));
                 w->fillAll(0.0, intersection);
 
               }  // assignment only in non-empty intersection

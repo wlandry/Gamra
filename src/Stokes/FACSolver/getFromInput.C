@@ -34,7 +34,7 @@ namespace SAMRAI {
 ********************************************************************
 */
 
-    void Stokes::FACSolver::getFromInput(tbox::Pointer<tbox::Database> database)
+    void Stokes::FACSolver::getFromInput(boost::shared_ptr<tbox::Database> database)
     {
       if (database) {
         if (database->isBool("enable_logging")) {

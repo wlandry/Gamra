@@ -16,7 +16,6 @@
 #include "Stokes/FACOps.h"
 #include "SAMRAI/solv/SimpleCellRobinBcCoefs.h"
 #include "SAMRAI/tbox/Database.h"
-#include "SAMRAI/tbox/Pointer.h"
 
 namespace SAMRAI {
 namespace solv {
@@ -127,8 +126,8 @@ public:
    FACSolver(
       const tbox::Dimension& dim,
       const std::string& object_name,
-      tbox::Pointer<tbox::Database> database =
-         tbox::Pointer<tbox::Database>());
+      boost::shared_ptr<tbox::Database> database =
+         boost::shared_ptr<tbox::Database>());
 
    /*!
     * @brief Destructor.
@@ -185,7 +184,7 @@ public:
       const int p_rhs,
       const int v,
       const int v_rhs,
-      tbox::Pointer<hier::PatchHierarchy> hierarchy,
+      boost::shared_ptr<hier::PatchHierarchy> hierarchy,
       int coarse_ln = -1,
       int fine_ln = -1);
 
@@ -207,7 +206,7 @@ public:
     *
     * @return whether solver converged to specified level
     *
-    * @see solveSystem( const int, const int, tbox::Pointer< hier::PatchHierarchy >, int, int);
+    * @see solveSystem( const int, const int, boost::shared_ptr< hier::PatchHierarchy >, int, int);
     */
    bool
    solveSystem(const int p, const int p_rhs,
@@ -514,7 +513,7 @@ public:
                          const int p_rhs,
                          const int v,
                          const int v_rhs,
-                         tbox::Pointer<hier::PatchHierarchy> hierarchy,
+                         boost::shared_ptr<hier::PatchHierarchy> hierarchy,
                          const int coarse_level = -1,
                          const int fine_level = -1);
 
@@ -565,7 +564,7 @@ public:
    getResidualNorm() const;
 
   void set_boundaries(const int &p_id, const int &v_id,
-                      tbox::Pointer<hier::PatchLevel> &level,
+                      boost::shared_ptr<hier::PatchLevel> &level,
                       const bool &homogeneous)
   {
     d_fac_ops.set_boundaries(p_id,v_id,level,homogeneous);
@@ -586,7 +585,7 @@ private:
     */
    void
    getFromInput(
-      tbox::Pointer<tbox::Database> database);
+      boost::shared_ptr<tbox::Database> database);
 
    /*
     * @brief Set @c d_uv and @c d_fv to vectors wrapping the data
@@ -635,24 +634,24 @@ private:
     */
    SimpleCellRobinBcCoefs d_simple_bc;
 
-   tbox::Pointer<hier::PatchHierarchy> d_hierarchy;
+   boost::shared_ptr<hier::PatchHierarchy> d_hierarchy;
    int d_ln_min;
    int d_ln_max;
 
    /*!
     * @brief Context for all internally maintained data.
     */
-   tbox::Pointer<hier::VariableContext> d_context;
+   boost::shared_ptr<hier::VariableContext> d_context;
    /*
     * @brief Vector wrapper for solution.
     * @see createVectorWrappers(), destroyVectorWrappers()
     */
-   tbox::Pointer<SAMRAIVectorReal<double> > d_uv;
+   boost::shared_ptr<SAMRAIVectorReal<double> > d_uv;
    /*
     * @brief Vector wrapper for source.
     * @see createVectorWrappers(), destroyVectorWrappers()
     */
-   tbox::Pointer<SAMRAIVectorReal<double> > d_fv;
+   boost::shared_ptr<SAMRAIVectorReal<double> > d_fv;
 
    bool d_solver_is_initialized;
    bool d_enable_logging;
@@ -666,8 +665,6 @@ private:
 }
 }
 
-#ifdef SAMRAI_INLINE
 #include "Stokes/FACSolver.I"
-#endif
 
 #endif  // included_solv_StokesFACSolver

@@ -28,7 +28,7 @@
 *************************************************************************
 */
 int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
-  if (d_hierarchy.isNull()) {
+  if (!d_hierarchy) {
     TBOX_ERROR(d_object_name << ": No hierarchy in\n"
                << " Elastic::FAC::setupPlotter\n"
                << "The hierarchy must be set before calling\n"

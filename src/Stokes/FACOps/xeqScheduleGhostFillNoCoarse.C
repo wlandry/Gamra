@@ -20,7 +20,8 @@ void SAMRAI::solv::Stokes::FACOps::xeqScheduleGhostFillNoCoarse(int p_id,
       TBOX_ERROR("Expected cell schedule not found.");
     }
     xfer::RefineAlgorithm refiner(d_dim);
-    refiner.registerRefine(p_id,p_id,p_id,tbox::Pointer<xfer::RefineOperator>(0));
+    refiner.registerRefine(p_id,p_id,p_id,
+                           boost::shared_ptr<hier::RefineOperator>());
     refiner.resetSchedule(p_nocoarse_refine_schedules[dest_ln]);
     p_nocoarse_refine_schedules[dest_ln]->fillData(0.0,false);
   }
@@ -32,7 +33,8 @@ void SAMRAI::solv::Stokes::FACOps::xeqScheduleGhostFillNoCoarse(int p_id,
       TBOX_ERROR("Expected side schedule not found.");
     }
     xfer::RefineAlgorithm refiner(d_dim);
-    refiner.registerRefine(v_id,v_id,v_id,tbox::Pointer<xfer::RefineOperator>(0));
+    refiner.registerRefine(v_id,v_id,v_id,
+                           boost::shared_ptr<hier::RefineOperator>());
     refiner.resetSchedule(v_nocoarse_refine_schedules[dest_ln]);
     v_nocoarse_refine_schedules[dest_ln]->fillData(0.0,false);
   }

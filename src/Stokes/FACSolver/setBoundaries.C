@@ -24,7 +24,7 @@ namespace SAMRAI {
                                           int* bdry_types)
     {
 #ifdef DEBUG_CHECK_ASSERTIONS
-      if (d_bc_object != NULL && d_bc_object != &d_simple_bc) {
+      if (d_bc_object && d_bc_object != &d_simple_bc) {
         TBOX_ERROR(
                    d_object_name << ": Bad attempt to set boundary condition\n"
                    <<

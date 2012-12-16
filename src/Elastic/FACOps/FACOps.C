@@ -9,14 +9,10 @@
  ************************************************************************/
 #include "Elastic/FACOps.h"
 
-#ifndef SAMRAI_INLINE
-#include "Elastic/FACOps.I"
-#endif
-
-SAMRAI::tbox::Pointer<SAMRAI::pdat::CellVariable<double> >
+boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
 Elastic::FACOps::s_cell_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
-SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> >
+boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
 Elastic::FACOps::s_side_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
 SAMRAI::tbox::StartupShutdownManager::Handler Elastic::FACOps::s_finalize_handler
@@ -33,7 +29,7 @@ SAMRAI::tbox::StartupShutdownManager::Handler Elastic::FACOps::s_finalize_handle
 */
 Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
                         const std::string& object_name,
-                        SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database,
+                        boost::shared_ptr<SAMRAI::tbox::Database> database,
                         Boundary_Conditions &bc):
   d_dim(dim),
   d_object_name(object_name),
@@ -68,7 +64,7 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   v_coarsen_patch_strategy(dim,
                            d_object_name + "::coarsen patch strategy",bc),
   d_enable_logging(false),
-  d_preconditioner(NULL),
+  d_preconditioner(),
   d_boundary_conditions(bc),
   d_hopsside()
 {
@@ -93,19 +89,16 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
     TBOX_ERROR("Elastic::FACOps : DIM == 1 or > 3 not implemented yet.\n");
   }
 
-  if (s_cell_scratch_var[dim.getValue() - 1].isNull()) {
-    TBOX_ASSERT(s_cell_scratch_var[dim.getValue() - 1].isNull());
-    TBOX_ASSERT(s_cell_scratch_var[dim.getValue() - 1].isNull());
-
+  if (!s_cell_scratch_var[dim.getValue() - 1]) {
     std::ostringstream ss;
     ss << "Elastic::FACOps::private_cell_scratch" << dim.getValue();
     s_cell_scratch_var[dim.getValue() - 1] =
-      new SAMRAI::pdat::CellVariable<double>(dim, ss.str());
+      boost::make_shared<SAMRAI::pdat::CellVariable<double> >(dim, ss.str());
       
     ss.str("");
     ss << "Elastic::FACOps::private_side_scratch" << dim.getValue();
     s_side_scratch_var[dim.getValue() - 1] =
-      new SAMRAI::pdat::SideVariable<double>(dim, ss.str());
+      boost::make_shared<SAMRAI::pdat::SideVariable<double> >(dim, ss.str());
   }
 
   SAMRAI::hier::VariableDatabase*

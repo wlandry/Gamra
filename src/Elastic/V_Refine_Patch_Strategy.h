@@ -78,7 +78,7 @@ public:
   virtual void
   postprocessRefineBoxes(SAMRAI::hier::Patch& ,
                          const SAMRAI::hier::Patch& ,
-                         const SAMRAI::hier::BoxList& ,
+                         const SAMRAI::hier::BoxContainer& ,
                          const SAMRAI::hier::IntVector& ) {}
   virtual void
   postprocessRefine(SAMRAI::hier::Patch& ,
@@ -210,8 +210,8 @@ private:
    /*!
     * @brief Timers for performance measurement.
     */
-   // tbox::Pointer<tbox::Timer> t_set_boundary_values_in_cells;
-   // tbox::Pointer<tbox::Timer> t_use_set_bc_coefs;
+   // boost::shared_ptr<tbox::Timer> t_set_boundary_values_in_cells;
+   // boost::shared_ptr<tbox::Timer> t_use_set_bc_coefs;
 };
 
 }

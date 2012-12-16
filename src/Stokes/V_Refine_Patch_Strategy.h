@@ -65,7 +65,7 @@ public:
    // preprocessRefineBoxes(
    //    hier::Patch& fine,
    //    const hier::Patch& coarse,
-   //    const hier::BoxList& fine_boxes,
+   //    const hier::BoxContainer& fine_boxes,
    //    const hier::IntVector& ratio) {}
    virtual void
    preprocessRefine(hier::Patch& ,
@@ -80,7 +80,7 @@ public:
    postprocessRefineBoxes(
       hier::Patch& ,
       const hier::Patch& ,
-      const hier::BoxList& ,
+      const hier::BoxContainer& ,
       const hier::IntVector& ) {}
    virtual void
    postprocessRefine(
@@ -274,7 +274,7 @@ public:
     * Provide the implementation that can be used to set the
     * Robin bc coefficients.
     *
-    * @param coef_strategy tbox::Pointer to a concrete inmplementation of
+    * @param coef_strategy boost::shared_ptr to a concrete inmplementation of
     *        the coefficient strategy.
     */
    // void
@@ -399,8 +399,8 @@ private:
    /*!
     * @brief Timers for performance measurement.
     */
-   // tbox::Pointer<tbox::Timer> t_set_boundary_values_in_cells;
-   // tbox::Pointer<tbox::Timer> t_use_set_bc_coefs;
+   // boost::shared_ptr<tbox::Timer> t_set_boundary_values_in_cells;
+   // boost::shared_ptr<tbox::Timer> t_use_set_bc_coefs;
 };
 
 }

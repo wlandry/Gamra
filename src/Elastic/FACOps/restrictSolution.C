@@ -32,10 +32,8 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
@@ -63,7 +61,7 @@ void Elastic::FACOps::restrictSolution
 
   xeqScheduleURestriction(v_dst,v_src,dest_ln);
 
-  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchLevel>
+  boost::shared_ptr<SAMRAI::hier::PatchLevel>
     level = d_hierarchy->getPatchLevel(dest_ln);
   v_refine_patch_strategy.setHomogeneousBc(false);
   v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));

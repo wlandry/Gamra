@@ -33,11 +33,11 @@ void Elastic::FACSolver::initializeSolverState
  const int edge_moduli,
  const int v,
  const int v_rhs,
- SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> hierarchy,
+ boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
  const int coarse_level,
  const int fine_level)
 {
-  TBOX_ASSERT(!hierarchy.isNull());
+  TBOX_ASSERT(hierarchy);
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
 #ifdef DEBUG_CHECK_ASSERTIONS

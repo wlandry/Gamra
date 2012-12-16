@@ -1,8 +1,8 @@
 #ifndef GAMRA_STOKES_STOKES_RESID_COARSEN_H
 #define GAMRA_STOKES_STOKES_RESID_COARSEN_H
 
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/pdat/CellVariable.h"
+#include "SAMRAI/hier/CoarsenOperator.h"
 #include <string>
 
 namespace SAMRAI {
@@ -14,16 +14,16 @@ namespace Stokes {
                    + resid(i,j+1)*viscosity(i,j+1)
                    + resid(i+1,j)*viscosity(i+1,j)
                    + resid(i+1,j+1)*viscosity(i+1,j+1))/(4*viscosity_coarse)
- * @see xfer::CoarsenOperator
+ * @see hier::CoarsenOperator
  */
 
 class Resid_Coarsen:
-   public xfer::CoarsenOperator
+   public hier::CoarsenOperator
 {
 public:
   explicit Resid_Coarsen(const tbox::Dimension& dim,
                          const int &cell_viscosity):
-    xfer::CoarsenOperator(dim, "RESID_COARSEN"),
+    hier::CoarsenOperator(dim, "RESID_COARSEN"),
     cell_viscosity_id(cell_viscosity)
   {
     d_name_id = "RESID_COARSEN";
@@ -31,13 +31,14 @@ public:
 
   virtual ~Resid_Coarsen(){}
 
-  bool findCoarsenOperator(const tbox::Pointer<hier::Variable>& var,
+  bool findCoarsenOperator(const boost::shared_ptr<hier::Variable>& var,
                            const std::string& op_name) const
   {
     TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
 
-    const tbox::Pointer<pdat::CellVariable<double> > cast_var(var);
-    if (!cast_var.isNull() && (op_name == d_name_id)) {
+    const boost::shared_ptr<pdat::CellVariable<double> >
+      cast_var(boost::dynamic_pointer_cast<pdat::CellVariable<double> >(var));
+    if (cast_var && (op_name == d_name_id)) {
       return true;
     } else {
       return false;

@@ -31,11 +31,12 @@ void Elastic::V_Boundary_Refine::refine
 
    for(int axis=0; axis<getDim().getValue(); ++axis)
      {
-       const SAMRAI::hier::BoxList&
-         boxes = t_overlap->getDestinationBoxList(axis);
-       for (SAMRAI::hier::BoxList::Iterator b(boxes); b; b++)
+       const SAMRAI::hier::BoxContainer&
+         boxes = t_overlap->getDestinationBoxContainer(axis);
+       for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
+            b!=boxes.end(); b++)
          {
-           refine(fine,coarse,dst_component,src_component,b(),ratio,axis);
+           refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
          }
      }
 }
@@ -53,13 +54,15 @@ void Elastic::V_Boundary_Refine::refine
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);
    const int dim(dimension.getValue());
 
-   SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-   v = coarse.getPatchData(src_component);
-   SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-   v_fine = fine.getPatchData(dst_component);
+   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
+     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+     (coarse.getPatchData(src_component));
+   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
+     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+     (fine.getPatchData(dst_component));
 #ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(!v.isNull());
-   TBOX_ASSERT(!v_fine.isNull());
+   TBOX_ASSERT(v);
+   TBOX_ASSERT(v_fine);
    TBOX_ASSERT(v->getDepth() == v_fine->getDepth());
    TBOX_ASSERT(v->getDepth() == 1);
 #endif

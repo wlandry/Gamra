@@ -25,8 +25,8 @@ namespace SAMRAI {
 ***********************************************************************
 */
     void Stokes::FACSolver::destroyVectorWrappers() {
-      d_uv.setNull();
-      d_fv.setNull();
+      d_uv.reset();
+      d_fv.reset();
     }
 
   }

@@ -3,7 +3,6 @@
 
 #include "SAMRAI/tbox/Database.h"
 #include "SAMRAI/tbox/Dimension.h"
-#include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/pdat/NodeData.h"
 #include "SAMRAI/pdat/EdgeData.h"
@@ -19,7 +18,7 @@ namespace Elastic {
   public:
     Boundary_Conditions(const SAMRAI::tbox::Dimension& dim,
                         const std::string& object_name,
-                        SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database);
+                        boost::shared_ptr<SAMRAI::tbox::Database> database);
     void set_boundary(const SAMRAI::hier::Patch& patch,
                       const int &v_id, const bool &rhs);
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
@@ -81,7 +80,7 @@ namespace Elastic {
      SAMRAI::hier::Index pp[], const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
-     const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> geom,
+     const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
      const bool &homogeneous);
 
@@ -90,7 +89,7 @@ namespace Elastic {
      SAMRAI::hier::Index pp[], const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
-     const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> geom,
+     const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
      const bool &homogeneous);
 
@@ -101,7 +100,7 @@ namespace Elastic {
      SAMRAI::hier::Index pp[], const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
-     const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> geom,
+     const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
      const bool &homogeneous)
     {
@@ -109,7 +108,8 @@ namespace Elastic {
         {
           double offset[]={0.5,0.5,0.5};
           offset[ix]=0;
-          for(SAMRAI::pdat::SideIterator si(gbox,ix); si; si++)
+          SAMRAI::pdat::SideIterator send(gbox,ix,false);
+          for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; si++)
             {
               SAMRAI::pdat::SideIndex x(*si);
               

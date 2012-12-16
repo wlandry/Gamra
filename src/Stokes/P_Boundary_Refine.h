@@ -14,11 +14,10 @@
 
 #include "SAMRAI/SAMRAI_config.h"
 
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/hier/Box.h"
 #include "SAMRAI/hier/IntVector.h"
 #include "SAMRAI/hier/Patch.h"
-#include "SAMRAI/tbox/Pointer.h"
+#include "SAMRAI/hier/RefineOperator.h"
 #include "SAMRAI/pdat/CellVariable.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 
@@ -35,18 +34,18 @@ namespace Stokes {
  * The findRefineOperator() operator function returns true if the input
  * variable is cell-centered double, and the std::string is "P_BOUNDARY_REFINE".
  *
- * @see xfer::RefineOperator
+ * @see hier::RefineOperator
  */
 
 class P_Boundary_Refine:
-  public xfer::RefineOperator
+  public hier::RefineOperator
 {
 public:
   /**
    * Uninteresting default constructor.
    */
   explicit P_Boundary_Refine(const tbox::Dimension& dim):
-    xfer::RefineOperator(dim, "P_BOUNDARY_REFINE")
+    hier::RefineOperator(dim, "P_BOUNDARY_REFINE")
   {
     d_name_id = "P_BOUNDARY_REFINE";
   }
@@ -61,13 +60,14 @@ public:
    * Return true if the variable and name std::string match cell-centered
    * double linear interpolation; otherwise, return false.
    */
-  bool findRefineOperator(const tbox::Pointer<hier::Variable>& var,
+  bool findRefineOperator(const boost::shared_ptr<hier::Variable>& var,
                           const std::string& op_name) const
   {
     TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
 
-    const tbox::Pointer<pdat::CellVariable<double> > cast_var(var);
-    if (!cast_var.isNull() && (op_name == d_name_id)) {
+    const boost::shared_ptr<pdat::CellVariable<double> >
+      cast_var(boost::dynamic_pointer_cast<pdat::CellVariable<double> >(var));
+    if (cast_var && (op_name == d_name_id)) {
       return true;
     } else {
       return false;

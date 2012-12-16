@@ -18,7 +18,6 @@
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/hier/PatchHierarchy.h"
 #include "SAMRAI/hier/PatchLevel.h"
-#include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/mesh/StandardTagAndInitStrategy.h"
 #include "SAMRAI/hier/VariableContext.h"
@@ -47,8 +46,8 @@ namespace SAMRAI {
        */
       FAC(const std::string& object_name,
           const tbox::Dimension& dim,
-          tbox::Pointer<tbox::Database> database =
-          tbox::Pointer<tbox::Database>(NULL));
+          boost::shared_ptr<tbox::Database> database =
+          boost::shared_ptr<tbox::Database>());
 
       virtual ~FAC() {}
 
@@ -65,26 +64,26 @@ namespace SAMRAI {
        * @see mesh::StandardTagAndInitStrategy::initializeLevelData()
        */
       virtual void
-      initializeLevelData(const tbox::Pointer<hier::BasePatchHierarchy> hierarchy,
+      initializeLevelData(const boost::shared_ptr<hier::PatchHierarchy>& hierarchy,
                           const int level_number,
                           const double init_data_time,
                           const bool can_be_refined,
                           const bool initial_time,
-                          const tbox::Pointer<hier::BasePatchLevel> old_level,
+                          const boost::shared_ptr<hier::PatchLevel>& old_level,
                           const bool allocate_data);
 
       /*!
        * @brief Reset any internal hierarchy-dependent information.
        */
       virtual void
-      resetHierarchyConfiguration(tbox::Pointer<hier::BasePatchHierarchy> new_hierarchy,
-                                  int coarsest_level,
-                                  int finest_level);
+      resetHierarchyConfiguration(const boost::shared_ptr<hier::PatchHierarchy>& new_hierarchy,
+                                  const int coarsest_level,
+                                  const int finest_level);
 
       //@}
 
       virtual void
-      applyGradientDetector(const tbox::Pointer<hier::BasePatchHierarchy> hierarchy,
+      applyGradientDetector(const boost::shared_ptr<hier::PatchHierarchy> hierarchy,
                             const int level_number,
                             const double error_data_time,
                             const int tag_index,
@@ -145,7 +144,7 @@ namespace SAMRAI {
 
       const tbox::Dimension d_dim;
 
-      tbox::Pointer<hier::PatchHierarchy> d_hierarchy;
+      boost::shared_ptr<hier::PatchHierarchy> d_hierarchy;
 
       //@{
       /*!
@@ -173,7 +172,7 @@ namespace SAMRAI {
       /*!
        * @brief Context owned by this object.
        */
-      tbox::Pointer<hier::VariableContext> d_context;
+      boost::shared_ptr<hier::VariableContext> d_context;
   
       /*!
        * @brief Descriptor indices of internal data.

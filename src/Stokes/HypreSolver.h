@@ -40,7 +40,6 @@
 #include "SAMRAI/hier/PatchLevel.h"
 #include "SAMRAI/hier/VariableContext.h"
 #include "SAMRAI/tbox/Database.h"
-#include "SAMRAI/tbox/Pointer.h"
 
 #include <string>
 
@@ -106,8 +105,8 @@ public:
    HypreSolver(
       const tbox::Dimension& dim,
       const std::string& object_name,
-      tbox::Pointer<tbox::Database> database =
-         tbox::Pointer<tbox::Database>(NULL));
+      boost::shared_ptr<tbox::Database> database =
+         boost::shared_ptr<tbox::Database>(NULL));
 
    /*!
     * The Stokes destructor releases all internally managed data.
@@ -124,7 +123,7 @@ public:
     */
    void
    initializeSolverState(
-      tbox::Pointer<hier::PatchHierarchy> hierarchy,
+      boost::shared_ptr<hier::PatchHierarchy> hierarchy,
       int ln = 0);
 
    /*!
@@ -307,7 +306,7 @@ public:
     * cell centers, use the GhostCellRobinBcCoefs
     * implementation of the RobinBcCoefStrategy strategy.
     *
-    * @param physical_bc_coef_strategy tbox::Pointer a concrete
+    * @param physical_bc_coef_strategy boost::shared_ptr a concrete
     *        implementation of the Robin bc strategy.
     * @param variable hier::Variable pointer to be passed
     *        to RobinBcCoefStrategy::setBcCoefs(),
@@ -316,8 +315,8 @@ public:
    void
    setPhysicalBcCoefObject(
       const RobinBcCoefStrategy* physical_bc_coef_strategy,
-      const tbox::Pointer<hier::Variable> variable =
-         tbox::Pointer<hier::Variable>(NULL));
+      const boost::shared_ptr<hier::Variable> variable =
+         boost::shared_ptr<hier::Variable>(NULL));
 
    /*!
     * @brief Set the flag for printing solver information.
@@ -354,7 +353,7 @@ private:
     */
    void
    getFromInput(
-      tbox::Pointer<tbox::Database> database);
+      boost::shared_ptr<tbox::Database> database);
 
    void
    setupHypreSolver();
@@ -461,7 +460,7 @@ private:
    /*!
     * @brief Associated hierarchy.
     */
-   tbox::Pointer<hier::PatchHierarchy> d_hierarchy;
+   boost::shared_ptr<hier::PatchHierarchy> d_hierarchy;
 
    /*!
     * @brief Associated level number.
@@ -473,7 +472,7 @@ private:
    /*!
     * @brief Scratch context for this object.
     */
-   tbox::Pointer<hier::VariableContext> d_context;
+   boost::shared_ptr<hier::VariableContext> d_context;
 
    //@{ @name Boundary condition handling
 
@@ -484,7 +483,7 @@ private:
     * state is initialized.  It is used to allow solves on
     * levels that are not the coarsest in the hierarchy.
     */
-   tbox::Pointer<hier::CoarseFineBoundary> d_cf_boundary;
+   boost::shared_ptr<hier::CoarseFineBoundary> d_cf_boundary;
 
    /*!
     * @brief Robin boundary coefficient object for physical
@@ -494,7 +493,7 @@ private:
     * use d_physical_bc_simple_case.
     */
    const RobinBcCoefStrategy* d_physical_bc_coef_strategy;
-   tbox::Pointer<hier::Variable> d_physical_bc_variable;
+   boost::shared_ptr<hier::Variable> d_physical_bc_variable;
 
    /*!
     * @brief Implementation of Robin boundary conefficients
@@ -511,7 +510,7 @@ private:
     * in the coarse-fine boundaries before solving.
     */
    GhostCellRobinBcCoefs d_cf_bc_coef;
-   tbox::Pointer<hier::Variable> d_coarsefine_bc_variable;
+   boost::shared_ptr<hier::Variable> d_coarsefine_bc_variable;
 
    //@}
 
@@ -538,7 +537,7 @@ private:
     */
    int d_Ak0_id;
 
-   static tbox::Pointer<pdat::OutersideVariable<double> > s_Ak0_var[tbox::
+   static boost::shared_ptr<pdat::OutersideVariable<double> > s_Ak0_var[tbox::
                                                                     Dimension::
                                                                     MAXIMUM_DIMENSION_VALUE];
 
@@ -597,8 +596,8 @@ private:
    /*!
     * @brief Timers for performance measurement.
     */
-   tbox::Pointer<tbox::Timer> t_solve_system;
-   tbox::Pointer<tbox::Timer> t_set_matrix_coefficients;
+   boost::shared_ptr<tbox::Timer> t_solve_system;
+   boost::shared_ptr<tbox::Timer> t_set_matrix_coefficients;
 
    static tbox::StartupShutdownManager::Handler s_finalize_handler;
 };
@@ -607,9 +606,7 @@ private:
 }
 }
 
-#ifdef SAMRAI_INLINE
 #include "Stokes/HypreSolver.I"
-#endif
 
 #endif
 

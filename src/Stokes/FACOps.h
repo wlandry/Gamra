@@ -28,9 +28,7 @@
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/hier/CoarseFineBoundary.h"
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/hier/PatchHierarchy.h"
@@ -39,7 +37,6 @@
 #include "SAMRAI/hier/Box.h"
 #include "SAMRAI/hier/VariableContext.h"
 #include "SAMRAI/tbox/Database.h"
-#include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/tbox/Timer.h"
 #include "Stokes/P_Refine_Patch_Strategy.h"
 #include "Stokes/V_Refine_Patch_Strategy.h"
@@ -130,8 +127,8 @@ public:
    FACOps(
       const tbox::Dimension& dim,
       const std::string& object_name = std::string(),
-      tbox::Pointer<tbox::Database> database =
-         tbox::Pointer<tbox::Database>(NULL));
+      boost::shared_ptr<tbox::Database> database =
+         boost::shared_ptr<tbox::Database>());
 
    /*!
     * @brief Destructor.
@@ -316,7 +313,7 @@ public:
     * call this function to provide the implementation for
     * determining the boundary condition coefficients.
     *
-    * @param physical_bc_coef tbox::Pointer to an object that can
+    * @param physical_bc_coef boost::shared_ptr to an object that can
     *        set the Robin bc coefficients.
     */
    // void
@@ -351,7 +348,7 @@ public:
     */
    void
    computeVectorWeights(
-      tbox::Pointer<hier::PatchHierarchy> hierarchy,
+      boost::shared_ptr<hier::PatchHierarchy> hierarchy,
       int weight_id,
       int coarsest_ln = -1,
       int finest_ln = -1) const;
@@ -457,16 +454,16 @@ public:
   void set_boundaries(const int &p_id, const int &v_id, const int &l,
                       const bool &rhs)
   {
-    tbox::Pointer<hier::PatchLevel> level = d_hierarchy->getPatchLevel(l);
+    boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(l);
     set_boundaries(p_id,v_id,level,rhs);
   }
   void set_boundaries(const int &p_id, const int &v_id,
-                      tbox::Pointer<hier::PatchLevel> &level)
+                      boost::shared_ptr<hier::PatchLevel> &level)
   {
     set_boundaries(p_id,v_id,level,true);
   }
   void set_boundaries(const int &p_id, const int &v_id, 
-                      tbox::Pointer<hier::PatchLevel> &level,
+                      boost::shared_ptr<hier::PatchLevel> &level,
                       const bool &rhs);
 
    //@}
@@ -516,7 +513,7 @@ private:
   void smooth_V_2D
   (const int &axis,
    const hier::Box &pbox,
-   tbox::Pointer<geom::CartesianPatchGeometry> &geom,
+   boost::shared_ptr<geom::CartesianPatchGeometry> &geom,
    const pdat::CellIndex &center,
    const hier::Index &ip,
    const hier::Index &jp,
@@ -533,7 +530,7 @@ private:
   void smooth_V_3D
   (const int &ix,
    const hier::Box &pbox,
-   tbox::Pointer<geom::CartesianPatchGeometry> &geom,
+   boost::shared_ptr<geom::CartesianPatchGeometry> &geom,
    pdat::CellData<double> &p,
    pdat::SideData<double> &v,
    pdat::SideData<double> &v_rhs,
@@ -811,7 +808,7 @@ private:
     * function argument lists.  We use it to enforce working on one
     * hierarchy at a time.
     */
-   tbox::Pointer<hier::PatchHierarchy> d_hierarchy;
+   boost::shared_ptr<hier::PatchHierarchy> d_hierarchy;
 
    /*!
     * @brief Coarsest level for solve.
@@ -840,7 +837,7 @@ private:
     * hier::CoarseFineBoundary is a light object before
     * it is set for a level.
     */
-   tbox::Array<tbox::Pointer<hier::CoarseFineBoundary> > d_cf_boundary;
+   tbox::Array<boost::shared_ptr<hier::CoarseFineBoundary> > d_cf_boundary;
 
    //@}
 
@@ -931,16 +928,16 @@ private:
 
    //@{ @name Internal context and scratch data
 
-   static tbox::Pointer<pdat::CellVariable<double> >
+   static boost::shared_ptr<pdat::CellVariable<double> >
    s_cell_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
-   static tbox::Pointer<pdat::SideVariable<double> >
+   static boost::shared_ptr<pdat::SideVariable<double> >
    s_side_scratch_var[tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
 
    /*!
     * @brief Default context of internally maintained hierarchy data.
     */
-   tbox::Pointer<hier::VariableContext> d_context;
+   boost::shared_ptr<hier::VariableContext> d_context;
 
    /*!
     * @brief ID of the solution-like scratch data.
@@ -961,46 +958,46 @@ private:
     */
 
    //! @brief Error prolongation (refinement) operator.
-   tbox::Pointer<xfer::RefineOperator> p_prolongation_refine_operator;
-   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   boost::shared_ptr<hier::RefineOperator> p_prolongation_refine_operator;
+   tbox::Array<boost::shared_ptr<xfer::RefineSchedule> >
    p_prolongation_refine_schedules;
 
-   tbox::Pointer<xfer::RefineOperator> v_prolongation_refine_operator;
-   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   boost::shared_ptr<hier::RefineOperator> v_prolongation_refine_operator;
+   tbox::Array<boost::shared_ptr<xfer::RefineSchedule> >
    v_prolongation_refine_schedules;
 
    //! @brief Solution restriction (coarsening) operator.
-   tbox::Pointer<xfer::CoarsenOperator> p_urestriction_coarsen_operator;
-   tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
+   boost::shared_ptr<hier::CoarsenOperator> p_urestriction_coarsen_operator;
+   tbox::Array<boost::shared_ptr<xfer::CoarsenSchedule> >
    p_urestriction_coarsen_schedules;
 
-   tbox::Pointer<xfer::CoarsenOperator> v_urestriction_coarsen_operator;
-   tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
+   boost::shared_ptr<hier::CoarsenOperator> v_urestriction_coarsen_operator;
+   tbox::Array<boost::shared_ptr<xfer::CoarsenSchedule> >
    v_urestriction_coarsen_schedules;
 
    //! @brief Residual restriction (coarsening) operator.
-   tbox::Pointer<xfer::CoarsenOperator> p_rrestriction_coarsen_operator;
-   tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
+   boost::shared_ptr<hier::CoarsenOperator> p_rrestriction_coarsen_operator;
+   tbox::Array<boost::shared_ptr<xfer::CoarsenSchedule> >
    p_rrestriction_coarsen_schedules;
 
-   tbox::Pointer<xfer::CoarsenOperator> v_rrestriction_coarsen_operator;
-   tbox::Array<tbox::Pointer<xfer::CoarsenSchedule> >
+   boost::shared_ptr<hier::CoarsenOperator> v_rrestriction_coarsen_operator;
+   tbox::Array<boost::shared_ptr<xfer::CoarsenSchedule> >
    v_rrestriction_coarsen_schedules;
 
    //! @brief Refine operator for data from coarser level.
-   tbox::Pointer<xfer::RefineOperator> p_ghostfill_refine_operator;
-   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   boost::shared_ptr<hier::RefineOperator> p_ghostfill_refine_operator;
+   tbox::Array<boost::shared_ptr<xfer::RefineSchedule> >
    p_ghostfill_refine_schedules;
 
-   tbox::Pointer<xfer::RefineOperator> v_ghostfill_refine_operator;
-   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   boost::shared_ptr<hier::RefineOperator> v_ghostfill_refine_operator;
+   tbox::Array<boost::shared_ptr<xfer::RefineSchedule> >
    v_ghostfill_refine_schedules;
 
    //! @brief Refine operator for data from same level.
-   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   tbox::Array<boost::shared_ptr<xfer::RefineSchedule> >
    p_nocoarse_refine_schedules;
 
-   tbox::Array<tbox::Pointer<xfer::RefineSchedule> >
+   tbox::Array<boost::shared_ptr<xfer::RefineSchedule> >
    v_nocoarse_refine_schedules;
 
    //@}
@@ -1044,23 +1041,23 @@ private:
    /*!
     * @brief Hierarchy cell operator used in debugging.
     */
-   tbox::Pointer<math::HierarchyCellDataOpsReal<double> > d_hopscell;
+   boost::shared_ptr<math::HierarchyCellDataOpsReal<double> > d_hopscell;
 
    /*!
     * @brief Hierarchy side operator used in debugging.
     */
-   tbox::Pointer<math::HierarchySideDataOpsReal<double> > d_hopsside;
+   boost::shared_ptr<math::HierarchySideDataOpsReal<double> > d_hopsside;
 
    /*!
     * @brief Timers for performance measurement.
     */
-   tbox::Pointer<tbox::Timer> t_restrict_solution;
-   tbox::Pointer<tbox::Timer> t_restrict_residual;
-   tbox::Pointer<tbox::Timer> t_prolong;
-   tbox::Pointer<tbox::Timer> t_smooth_error;
-   tbox::Pointer<tbox::Timer> t_solve_coarsest;
-   tbox::Pointer<tbox::Timer> t_compute_composite_residual;
-   tbox::Pointer<tbox::Timer> t_compute_residual_norm;
+   boost::shared_ptr<tbox::Timer> t_restrict_solution;
+   boost::shared_ptr<tbox::Timer> t_restrict_residual;
+   boost::shared_ptr<tbox::Timer> t_prolong;
+   boost::shared_ptr<tbox::Timer> t_smooth_error;
+   boost::shared_ptr<tbox::Timer> t_solve_coarsest;
+   boost::shared_ptr<tbox::Timer> t_compute_composite_residual;
+   boost::shared_ptr<tbox::Timer> t_compute_residual_norm;
 
    static tbox::StartupShutdownManager::Handler
    s_finalize_handler;
@@ -1070,8 +1067,6 @@ private:
 }
 }
 
-#ifdef SAMRAI_INLINE
 #include "Stokes/FACOps.I"
-#endif
 
 #endif // included_solv_StokesFACOps

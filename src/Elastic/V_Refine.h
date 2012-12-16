@@ -14,11 +14,10 @@
 
 #include "SAMRAI/SAMRAI_config.h"
 
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/hier/Box.h"
 #include "SAMRAI/hier/IntVector.h"
 #include "SAMRAI/hier/Patch.h"
-#include "SAMRAI/tbox/Pointer.h"
+#include "SAMRAI/hier/RefineOperator.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 
@@ -30,7 +29,7 @@ namespace Elastic {
   /**
    * Class V_Refine implements linear
    * interpolation for side-centered double patch data defined over a Cartesian
-   * mesh.  It is derived from the xfer::RefineOperator base class.
+   * mesh.  It is derived from the hier::RefineOperator base class.
    * CartesianSideDoubleConservativeLinearRefine does not handle the 
    * boundary for the velocity correctly, so use this instead for
    * velocity.
@@ -38,18 +37,18 @@ namespace Elastic {
    * The findRefineOperator() operator function returns true if the input
    * variable is side-centered double, and the std::string is "V_REFINE".
    *
-   * @see xfer::RefineOperator
+   * @see hier::RefineOperator
    */
 
   class V_Refine:
-    public SAMRAI::xfer::RefineOperator
+    public SAMRAI::hier::RefineOperator
   {
   public:
     /**
      * Uninteresting default constructor.
      */
     explicit V_Refine(const SAMRAI::tbox::Dimension& dim):
-      SAMRAI::xfer::RefineOperator(dim, "V_REFINE")
+      SAMRAI::hier::RefineOperator(dim, "V_REFINE")
     {
       d_name_id = "V_REFINE";
     }
@@ -65,14 +64,14 @@ namespace Elastic {
      * double linear interpolation; otherwise, return false.
      */
     bool
-    findRefineOperator(const SAMRAI::tbox::Pointer<SAMRAI::hier::Variable>& var,
+    findRefineOperator(const boost::shared_ptr<SAMRAI::hier::Variable>& var,
                        const std::string& op_name) const
     {
       TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
 
-      const SAMRAI::tbox::Pointer<SAMRAI::pdat::SideVariable<double> >
-        cast_var(var);
-      if (!cast_var.isNull() && (op_name == d_name_id)) {
+      const boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
+        cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >(var));
+      if (cast_var && (op_name == d_name_id)) {
         return true;
       } else {
         return false;
@@ -144,9 +143,7 @@ namespace Elastic {
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::pdat::SideIndex &coarse,
      const SAMRAI::hier::Box &coarse_box,
-     const SAMRAI::geom::CartesianPatchGeometry &coarse_geom,
-     const FTensor::Tensor1<double,3> &xyz,
-     const double *dx) const;
+     const SAMRAI::geom::CartesianPatchGeometry &coarse_geom) const;
 
   private:
     std::string d_name_id;

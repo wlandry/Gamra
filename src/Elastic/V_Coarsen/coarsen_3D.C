@@ -28,8 +28,8 @@ coarsen_point_3D(const SAMRAI::pdat::SideIndex &coarse,
                  const SAMRAI::hier::Index &ip,
                  const SAMRAI::hier::Index &jp,
                  const SAMRAI::hier::Index &kp,
-                 SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > &v,
-                 SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> > &v_fine)
+                 boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v,
+                 boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_fine)
 {
   SAMRAI::pdat::SideIndex center(coarse*2);
   (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp)
@@ -52,13 +52,15 @@ void Elastic::V_Coarsen::coarsen_3D(SAMRAI::hier::Patch& coarse,
 
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, coarse, fine, coarse_box, ratio);
 
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-    v_fine = fine.getPatchData(src_component);
-  SAMRAI::tbox::Pointer<SAMRAI::pdat::SideData<double> >
-    v = coarse.getPatchData(dst_component);
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (fine.getPatchData(src_component));
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (coarse.getPatchData(dst_component));
 
-  TBOX_ASSERT(!v.isNull());
-  TBOX_ASSERT(!v_fine.isNull());
+  TBOX_ASSERT(v);
+  TBOX_ASSERT(v_fine);
   TBOX_ASSERT(v_fine->getDepth() == v->getDepth());
   TBOX_ASSERT(v->getDepth() == 1);
 
@@ -67,8 +69,9 @@ void Elastic::V_Coarsen::coarsen_3D(SAMRAI::hier::Patch& coarse,
   TBOX_ASSERT(directions ==
               SAMRAI::hier::IntVector::min(directions, v_fine->getDirectionVector()));
 
-  const SAMRAI::tbox::Pointer<SAMRAI::geom::CartesianPatchGeometry> cgeom =
-    coarse.getPatchGeometry();
+  const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> cgeom =
+    boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+    (coarse.getPatchGeometry());
 
   /* Numbering of v nodes is
 

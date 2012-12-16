@@ -30,7 +30,7 @@ namespace SAMRAI {
 *************************************************************************
 */
   int Stokes::FAC::setupPlotter(appu::VisItDataWriter& plotter) const {
-    if (d_hierarchy.isNull()) {
+    if (!d_hierarchy) {
       TBOX_ERROR(d_object_name << ": No hierarchy in\n"
                  << " Stokes::FAC::setupPlotter\n"
                  << "The hierarchy must be set before calling\n"

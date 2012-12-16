@@ -30,14 +30,16 @@ void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
   const pdat::SideOverlap* t_overlap =
     dynamic_cast<const pdat::SideOverlap *>(&fine_overlap);
 
-  TBOX_ASSERT(t_overlap != NULL);
+  TBOX_ASSERT(t_overlap);
 
   for(int axis=0; axis<getDim().getValue(); ++axis)
     {
-      const hier::BoxList& boxes = t_overlap->getDestinationBoxList(axis);
-      for (hier::BoxList::Iterator b(boxes); b; b++)
+      const hier::BoxContainer&
+        boxes = t_overlap->getDestinationBoxContainer(axis);
+      hier::BoxContainer::const_iterator bend(boxes.end());
+      for (hier::BoxContainer::const_iterator b(boxes.begin()); b!=bend; b++)
         {
-          refine(fine,coarse,dst_component,src_component,b(),ratio,axis);
+          refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
         }
     }
 }
@@ -54,23 +56,26 @@ void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
   const int dim(dimension.getValue());
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, fine_box, ratio);
 
-  tbox::Pointer<pdat::SideData<double> >
-    v_ptr = coarse.getPatchData(src_component);
+  boost::shared_ptr<pdat::SideData<double> > v_ptr =
+    boost::dynamic_pointer_cast<pdat::SideData<double> >
+    (coarse.getPatchData(src_component));
   pdat::SideData<double> &v(*v_ptr);
-  tbox::Pointer<pdat::SideData<double> >
-    v_fine_ptr = fine.getPatchData(dst_component);
+  boost::shared_ptr<pdat::SideData<double> > v_fine_ptr = 
+    boost::dynamic_pointer_cast<pdat::SideData<double> >
+    (fine.getPatchData(dst_component));
   pdat::SideData<double> &v_fine(*v_fine_ptr);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-  TBOX_ASSERT(!v_ptr.isNull());
-  TBOX_ASSERT(!v_fine_ptr.isNull());
+  TBOX_ASSERT(v_ptr);
+  TBOX_ASSERT(v_fine_ptr);
   TBOX_ASSERT(v.getDepth() == v_fine.getDepth());
   TBOX_ASSERT(v.getDepth() == 1);
 #endif
 
   hier::Box coarse_box=coarse.getBox();
-  tbox::Pointer<geom::CartesianPatchGeometry>
-    geom = coarse.getPatchGeometry();
+  boost::shared_ptr<geom::CartesianPatchGeometry> geom =
+    boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+    (coarse.getPatchGeometry());
 
   hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
   ip[0]=1;
@@ -79,7 +84,8 @@ void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
     kp[2]=1;
   hier::Index pp[]={ip,jp,kp};
 
-  for(pdat::CellIterator ci(fine_box); ci; ci++)
+  pdat::CellIterator cend(fine_box,false);
+  for(pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
     {
       pdat::SideIndex fine(*ci,axis,pdat::SideIndex::Lower);
 

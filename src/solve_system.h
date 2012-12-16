@@ -3,9 +3,9 @@
 
 template<class T>
 void solve_system(T &fac,
-                  SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> &main_db,
-                  SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> &input_db,
-                  SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> &patch_hierarchy,
+                  boost::shared_ptr<SAMRAI::tbox::Database> &main_db,
+                  boost::shared_ptr<SAMRAI::tbox::InputDatabase> &input_db,
+                  boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &patch_hierarchy,
                   const string &base_name,
                   const SAMRAI::tbox::Dimension &dim)
 {
@@ -14,36 +14,31 @@ void solve_system(T &fac,
    * Create the tag-and-initializer, box-generator and load-balancer
    * object references required by the gridding_algorithm object.
    */
-  SAMRAI::tbox::Pointer<SAMRAI::mesh::StandardTagAndInitialize>
+  boost::shared_ptr<SAMRAI::mesh::StandardTagAndInitialize>
     tag_and_initializer(new SAMRAI::mesh::StandardTagAndInitialize
-                        (dim,
-                         "CellTaggingMethod",
-                         SAMRAI::tbox::Pointer<SAMRAI::mesh::StandardTagAndInitStrategy>
-                         (&fac, false),
-                         input_db->getDatabase("StandardTagAndInitialize")
-                         ));
+                        (dim,"CellTaggingMethod",&fac,
+                         input_db->getDatabase("StandardTagAndInitialize")));
 
-  SAMRAI::tbox::Pointer<SAMRAI::mesh::BergerRigoutsos>
+  boost::shared_ptr<SAMRAI::mesh::BergerRigoutsos>
     box_generator(new SAMRAI::mesh::BergerRigoutsos(dim));
-  SAMRAI::tbox::Pointer<SAMRAI::mesh::TreeLoadBalancer>
+  boost::shared_ptr<SAMRAI::mesh::TreeLoadBalancer>
     load_balancer(new SAMRAI::mesh::TreeLoadBalancer
                   (dim,
                    "load balancer",
-                   SAMRAI::tbox::Pointer<SAMRAI::tbox::Database>()));
+                   boost::shared_ptr<SAMRAI::tbox::Database>()));
   load_balancer->setSAMRAI_MPI(SAMRAI::tbox::SAMRAI_MPI::getSAMRAIWorld());
 
   /*
    * Create the gridding algorithm used to generate the SAMR grid
    * and create the grid.
    */
-  SAMRAI::tbox::Pointer<SAMRAI::mesh::GriddingAlgorithm> gridding_algorithm;
-  gridding_algorithm =
-    new SAMRAI::mesh::GriddingAlgorithm(patch_hierarchy,
-                                        "Gridding Algorithm",
-                                        input_db->getDatabase("GriddingAlgorithm"),
-                                        tag_and_initializer,
-                                        box_generator,
-                                        load_balancer);
+  boost::shared_ptr<SAMRAI::mesh::GriddingAlgorithm>
+    gridding_algorithm(new SAMRAI::mesh::GriddingAlgorithm(patch_hierarchy,
+                                                           "Gridding Algorithm",
+                                                           input_db->getDatabase("GriddingAlgorithm"),
+                                                           tag_and_initializer,
+                                                           box_generator,
+                                                           load_balancer));
   // SAMRAI::tbox::plog << "Gridding algorithm:" << endl;
   // gridding_algorithm->printClassData(SAMRAI::tbox::plog);
 
@@ -75,13 +70,12 @@ void solve_system(T &fac,
     if (vis_writer[i] == "VisIt") use_visit = true;
   }
 #ifdef HAVE_HDF5
-  SAMRAI::tbox::Pointer<SAMRAI::appu::VisItDataWriter> visit_writer;
+  boost::shared_ptr<SAMRAI::appu::VisItDataWriter> visit_writer;
   string vis_filename =
     main_db->getStringWithDefault("vis_filename", base_name);
   if (use_visit) {
-    visit_writer = new SAMRAI::appu::VisItDataWriter(dim,
-                                                     "Visit Writer",
-                                                     vis_filename + ".visit");
+    visit_writer = boost::make_shared<SAMRAI::appu::VisItDataWriter>
+      (dim,"Visit Writer",vis_filename + ".visit");
     fac.setupPlotter(*visit_writer);
   }
 #endif

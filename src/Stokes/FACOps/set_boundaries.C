@@ -33,10 +33,8 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/tbox/MathUtilities.h"
 #include "SAMRAI/xfer/CoarsenAlgorithm.h"
-#include "SAMRAI/xfer/CoarsenOperator.h"
 #include "SAMRAI/xfer/CoarsenSchedule.h"
 #include "SAMRAI/xfer/RefineAlgorithm.h"
-#include "SAMRAI/xfer/RefineOperator.h"
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
@@ -47,11 +45,12 @@
 
 void SAMRAI::solv::Stokes::FACOps::set_boundaries
 (const int &p_id, const int &v_id,
- tbox::Pointer<hier::PatchLevel> &level, const bool &rhs)
+ boost::shared_ptr<hier::PatchLevel> &level, const bool &rhs)
 {
-  for (hier::PatchLevel::Iterator pi(*level); pi; pi++)
+  for (hier::PatchLevel::Iterator pi(level->begin());
+       pi!=level->end(); pi++)
     {
-      tbox::Pointer<hier::Patch> patch = *pi;
+      boost::shared_ptr<hier::Patch> patch = *pi;
       Stokes_set_boundary(*patch,p_id,v_id,rhs);
     }
 }

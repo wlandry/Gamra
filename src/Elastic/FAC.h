@@ -18,7 +18,6 @@
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/hier/PatchHierarchy.h"
 #include "SAMRAI/hier/PatchLevel.h"
-#include "SAMRAI/tbox/Pointer.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/mesh/StandardTagAndInitStrategy.h"
 #include "SAMRAI/hier/VariableContext.h"
@@ -48,8 +47,8 @@ namespace Elastic {
      */
     FAC(const std::string& object_name,
         const SAMRAI::tbox::Dimension& dim,
-        SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> database =
-        SAMRAI::tbox::Pointer<SAMRAI::tbox::Database>(NULL));
+        boost::shared_ptr<SAMRAI::tbox::Database> database =
+        boost::shared_ptr<SAMRAI::tbox::Database>());
 
     virtual ~FAC() {}
 
@@ -66,26 +65,29 @@ namespace Elastic {
      * @see mesh::StandardTagAndInitStrategy::initializeLevelData()
      */
     virtual void
-    initializeLevelData(const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> hierarchy,
+    initializeLevelData(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>&
+                        hierarchy,
                         const int level_number,
                         const double init_data_time,
                         const bool can_be_refined,
                         const bool initial_time,
-                        const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchLevel> old_level,
+                        const boost::shared_ptr<SAMRAI::hier::PatchLevel>&
+                        old_level,
                         const bool allocate_data);
 
     /*!
      * @brief Reset any internal hierarchy-dependent information.
      */
     virtual void
-    resetHierarchyConfiguration(SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> new_hierarchy,
+    resetHierarchyConfiguration(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>&
+                                new_hierarchy,
                                 int coarsest_level,
                                 int finest_level);
 
     //@}
 
     virtual void
-    applyGradientDetector(const SAMRAI::tbox::Pointer<SAMRAI::hier::BasePatchHierarchy> hierarchy,
+    applyGradientDetector(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy,
                           const int level_number,
                           const double error_data_time,
                           const int tag_index,
@@ -148,7 +150,7 @@ namespace Elastic {
 
     const SAMRAI::tbox::Dimension d_dim;
 
-    SAMRAI::tbox::Pointer<SAMRAI::hier::PatchHierarchy> d_hierarchy;
+    boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
 
     //@{
     /*!
@@ -173,7 +175,7 @@ namespace Elastic {
     /*!
      * @brief Context owned by this object.
      */
-    SAMRAI::tbox::Pointer<SAMRAI::hier::VariableContext> d_context;
+    boost::shared_ptr<SAMRAI::hier::VariableContext> d_context;
   
     /*!
      * @brief Descriptor indices of internal data.
