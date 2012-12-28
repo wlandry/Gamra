@@ -1,0 +1,32 @@
+Prerequisites:
+
+  MPI C, C++, and Fortran
+  HDF5 development libraries
+  Boost
+  muparser http://muparser.beltoforion.de/ (tested with v2.2.2)
+
+1) Build SAMRAI
+
+  mkdir SAMRAI
+  cd SAMRAI
+  hg clone -r 3 ssh://$USER@fram.caltech.edu//home/walter/SAMRAI-3.4.1 SAMRAI
+  mkdir opt_objs
+  cd opt_objs
+  ../SAMRAI/configure --with-CC=mpicc --with-CXX=mpicxx --with-F77=mpif77 --with-boost=$BOOST_DIR --with-hdf5=$HDF5_DIR --disable-debug --enable-opt --prefix=$PWD/../opt
+  make
+  make install
+
+
+2) Build Gamra
+
+  hg clone http://geodynamics.org/hg/cs/AMR/FTensor
+  hg clone https://code.google.com/p/gamra/
+  cd gamra
+  CXX=mpicxx ./waf-1.7.2 configure --samrai-dir=$SAMRAI_DIR --hdf5-dir=$HDF5_DIR --muparser-dir=$MUPARSER_DIR
+  ./waf-1.7.2 build_release
+
+3) Simple test
+
+  ./build/release/gamra input/multilayer.input
+    (On a Mac, you may have to set DYLD_LIBRARY_PATH)
+  visit  (open multilayer.visit/dumps.visit)
