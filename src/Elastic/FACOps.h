@@ -249,10 +249,13 @@ namespace Elastic {
      * flux and you would like that to be used, set flux id to the
      * patch data index of that space.
      */
-    void set_moduli_id(const int &cell_moduli, const int &edge_moduli)
+    void set_extra_ids(const int &cell_moduli, const int &edge_moduli,
+                       const int &dv_aligned, const int &dv_perpendicular)
     {
       cell_moduli_id=cell_moduli;
       edge_moduli_id=edge_moduli;
+      dv_aligned_id=dv_aligned;
+      dv_perpendicular_id=dv_perpendicular;
     }
     //@}
 
@@ -503,8 +506,10 @@ namespace Elastic {
                          const SAMRAI::hier::Index &ip,
                          const double &dx)
     {
-      return (( v(x+ip)-v(x   ))*(cell_moduli(center   ,0)+2*cell_moduli(center   ,1))
-              -(v(x   )-v(x-ip))*(cell_moduli(center-ip,0)+2*cell_moduli(center-ip,1)))/(dx*dx);
+      return (( v(x+ip)-v(x   ))
+              *(cell_moduli(center   ,0)+2*cell_moduli(center   ,1))
+              -(v(x   )-v(x-ip))
+              *(cell_moduli(center-ip,0)+2*cell_moduli(center-ip,1)))/(dx*dx);
     }
 
     double lame_mixed(const SAMRAI::pdat::SideData<double> &v,
@@ -556,8 +561,8 @@ namespace Elastic {
       return aligned_terms(v,cell_moduli,center,x,ip,dx)
         +lame_mixed(v,cell_moduli,center,y,ip,jp,dx,dy)
         +lame_mixed(v,cell_moduli,center,z,ip,kp,dx,dz)
-        +shear_noncell(v,edge_moduli,x,y,edge_y,ip,jp,dx,dy)
-        +shear_noncell(v,edge_moduli,x,z,edge_z,ip,kp,dx,dz);
+        +shear_noncell(v,edge_moduli,x,y,edge_z,ip,jp,dx,dy)
+        +shear_noncell(v,edge_moduli,x,z,edge_y,ip,kp,dx,dz);
     }
 
     /*!
@@ -845,11 +850,11 @@ namespace Elastic {
     double d_residual_tolerance_during_smoothing;
 
     /*!
-     * @brief Id of moduli and dp.
+     * @brief Id of extra terms.
      *
-     * @see set_moduli_id.
+     * @see set_extra_ids.
      */
-    int cell_moduli_id, edge_moduli_id;
+    int cell_moduli_id, edge_moduli_id, dv_aligned_id, dv_perpendicular_id;
 
     /*!
      * @brief Externally provided physical boundary condition object.

@@ -28,7 +28,7 @@
 *************************************************************************
 */
 
-bool Elastic::FACSolver::solveSystem(const int v, const int v_rhs)
+bool Elastic::FACSolver::solveSystem(const int v_id, const int v_rhs_id)
 {
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (!d_solver_is_initialized) {
@@ -42,12 +42,12 @@ bool Elastic::FACSolver::solveSystem(const int v, const int v_rhs)
                "solveSystem(int,int,...) to initialize the solver,\n"
                << "solve and deallocate the solver.\n");
   }
-  if (v < 0 || v_rhs < 0) {
+  if (v_id < 0 || v_rhs_id < 0) {
     TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
   }
 #endif
 
-  createVectorWrappers(v, v_rhs);
+  createVectorWrappers(v_id, v_rhs_id);
   bool solver_rval;
 
   solver_rval = d_fac_precond.solveSystem(*d_uv, *d_fv);
@@ -69,10 +69,12 @@ bool Elastic::FACSolver::solveSystem(const int v, const int v_rhs)
 */
 
 bool Elastic::FACSolver::solveSystem
-(const int cell_moduli,
- const int edge_moduli,
- const int v,
- const int v_rhs,
+(const int cell_moduli_id,
+ const int edge_moduli_id,
+ const int dv_aligned_id,
+ const int dv_perpendicular_id, 
+ const int v_id,
+ const int v_rhs_id,
  boost::shared_ptr<SAMRAI::hier::PatchHierarchy>
  hierarchy,
  int coarse_ln,
@@ -101,11 +103,12 @@ bool Elastic::FACSolver::solveSystem
                << "specified.\n");
   }
 #endif
-  initializeSolverState(cell_moduli, edge_moduli, v, v_rhs,
+  initializeSolverState(cell_moduli_id, edge_moduli_id, dv_aligned_id,
+                        dv_perpendicular_id, v_id, v_rhs_id,
                         hierarchy, coarse_ln, fine_ln);
 
   bool solver_rval;
-  solver_rval = solveSystem(v, v_rhs);
+  solver_rval = solveSystem(v_id, v_rhs_id);
 
   deallocateSolverState();
 

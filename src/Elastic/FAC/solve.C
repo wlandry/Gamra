@@ -32,11 +32,15 @@ int Elastic::FAC::solve()
                << "Cannot solve using an uninitialized object.\n");
   }
 
-  /*
-   * Fill in the initial guess.
-   */
+  d_boundary_conditions.set_extra_ids(edge_moduli_id,dv_aligned_id,
+                                      dv_perpendicular_id);
   fix_moduli();
+  if(d_dim.getValue()==2)
+    add_faults<SAMRAI::pdat::NodeData<double> >();
+  else
+    add_faults<SAMRAI::pdat::EdgeData<double> >();
 
+  /* Fill in the initial guess. */
   for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln) {
     boost::shared_ptr<SAMRAI::hier::PatchLevel>
       level = d_hierarchy->getPatchLevel(ln);
@@ -55,8 +59,8 @@ int Elastic::FAC::solve()
   }
 
   d_elastic_fac_solver.initializeSolverState
-    (cell_moduli_id,edge_moduli_id,v_id,v_rhs_id,
-     d_hierarchy,0,d_hierarchy->getFinestLevelNumber());
+    (cell_moduli_id,edge_moduli_id,dv_aligned_id,dv_perpendicular_id,v_id,
+     v_rhs_id,d_hierarchy,0,d_hierarchy->getFinestLevelNumber());
 
   SAMRAI::tbox::plog << "solving..." << std::endl;
   int solver_ret;

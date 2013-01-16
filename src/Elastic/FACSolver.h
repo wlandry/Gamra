@@ -155,10 +155,12 @@ namespace Elastic {
      * @see initializeSolverState
      */
     bool
-    solveSystem(const int cell_moduli,
-                const int edge_moduli,
-                const int v,
-                const int v_rhs,
+    solveSystem(const int cell_moduli_id,
+                const int edge_moduli_id,
+                const int dv_aligned_id,
+                const int dv_perpendicular_id, 
+                const int v_id,
+                const int v_rhs_id,
                 boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
                 int coarse_ln = -1,
                 int fine_ln = -1);
@@ -332,10 +334,12 @@ namespace Elastic {
      * @param fine_level The finest level in the solve
      */
     void
-    initializeSolverState(const int cell_moduli,
-                          const int edge_moduli,
-                          const int v,
-                          const int v_rhs,
+    initializeSolverState(const int cell_moduli_id,
+                          const int edge_moduli_id,
+                          const int dv_aligned_id,
+                          const int dv_perpendicular_id, 
+                          const int v_id,
+                          const int v_rhs_id,
                           boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
                           const int coarse_level = -1,
                           const int fine_level = -1);

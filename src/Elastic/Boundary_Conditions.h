@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include "Input_Expression.h"
+#include "edge_node_eval.h"
 
 namespace Elastic {
   class Boundary_Conditions
@@ -23,57 +24,18 @@ namespace Elastic {
                       const int &v_id, const bool &rhs);
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
                        const int &v_id, const bool &rhs);
-    void set_edge_moduli_id(const int &e_id)
+    void set_extra_ids(const int &e_id, const int &dva, const int &dvp)
     {
       edge_moduli_id=e_id;
+      dv_aligned_id=dva;
+      dv_perpendicular_id=dvp;
     }
 
     Input_Expression expression[3][3][2];
     bool is_dirichlet[3][3][2];
     double coord[3];
     std::string d_object_name;
-    int edge_moduli_id;
-
-    double modulus(const SAMRAI::pdat::NodeData<double> &edge_moduli,
-                   const SAMRAI::pdat::SideIndex &s, const int &,
-                   const int &modulus_number)
-    {
-      SAMRAI::pdat::NodeIndex n(s,SAMRAI::pdat::NodeIndex::LowerLeft);
-      return edge_moduli(n,modulus_number);
-    }
-    double modulus(const SAMRAI::pdat::EdgeData<double> &edge_moduli,
-                   const SAMRAI::pdat::SideIndex &s, const int &ix,
-                   const int &modulus_number)
-    {
-      SAMRAI::pdat::EdgeIndex e(s,ix,SAMRAI::pdat::EdgeIndex::LowerLeft);
-      return edge_moduli(e,modulus_number);
-    }
-    double modulus_average(const SAMRAI::pdat::NodeData<double> &edge_moduli,
-                           const SAMRAI::pdat::SideIndex &s, const int &ix,
-                           const SAMRAI::hier::Index pp[],
-                           const int &modulus_number)
-    {
-      const int dim(2);
-      const int iy((ix+1)%dim);
-      SAMRAI::pdat::NodeIndex n(s,SAMRAI::pdat::NodeIndex::LowerLeft);
-      return (edge_moduli(n,modulus_number)
-              + edge_moduli(n+pp[iy],modulus_number))/2;
-    }
-    double modulus_average(const SAMRAI::pdat::EdgeData<double> &edge_moduli,
-                           const SAMRAI::pdat::SideIndex &s, const int &ix,
-                           const SAMRAI::hier::Index pp[],
-                           const int &modulus_number)
-    {
-      const int dim(3);
-      const int iy((ix+1)%dim);
-      const int iz((iy+1)%dim);
-      SAMRAI::pdat::EdgeIndex ey(s,iy,SAMRAI::pdat::EdgeIndex::LowerLeft),
-        ez(s,iz,SAMRAI::pdat::EdgeIndex::LowerLeft);
-      return (edge_moduli(ey,modulus_number)
-              + edge_moduli(ey+pp[iy],modulus_number)
-              + edge_moduli(ez,modulus_number)
-              + edge_moduli(ez+pp[iz],modulus_number))/4;
-    }
+    int edge_moduli_id,dv_aligned_id,dv_perpendicular_id;
 
     void set_dirichlet
     (SAMRAI::pdat::SideData<double> &v,
@@ -143,9 +105,9 @@ namespace Elastic {
                                 /(2*dx[ix]);
                             }
                           double lambda=
-                            modulus_average(edge_moduli,x+pp[ix],ix,pp,0);
+                            edge_node_average(edge_moduli,x+pp[ix],ix,pp,0);
                           double mu=
-                            modulus_average(edge_moduli,x+pp[ix],ix,pp,1);
+                            edge_node_average(edge_moduli,x+pp[ix],ix,pp,1);
                           v(x)=v(x+pp[ix]*2)
                             + lambda*duyy*2*dx[ix]/(lambda+2*mu);
                         
@@ -174,9 +136,9 @@ namespace Elastic {
                                 /(2*dx[iy]);
                             }
                           double lambda=
-                            modulus_average(edge_moduli,x-pp[ix],ix,pp,0);
+                            edge_node_average(edge_moduli,x-pp[ix],ix,pp,0);
                           double mu=
-                            modulus_average(edge_moduli,x-pp[ix],ix,pp,1);
+                            edge_node_average(edge_moduli,x-pp[ix],ix,pp,1);
 
                           v(x)=v(x-pp[ix]*2) - lambda*duyy*2*dx[ix]/(lambda+2*mu);
                         

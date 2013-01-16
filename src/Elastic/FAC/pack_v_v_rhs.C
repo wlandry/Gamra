@@ -26,12 +26,12 @@
 *************************************************************************
 */
 bool
-Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
-                                              const SAMRAI::hier::Patch& patch,
-                                              const SAMRAI::hier::Box& region,
-                                              const std::string&
-                                              variable_name,
-                                              int depth_id) const
+Elastic::FAC::pack_v_v_rhs(double* buffer,
+                           const SAMRAI::hier::Patch& patch,
+                           const SAMRAI::hier::Box& region,
+                           const std::string&
+                           variable_name,
+                           int depth) const
 {
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr;
   if (variable_name == "Displacement") {
@@ -67,17 +67,17 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
         double vx=(v(x+ip) + v(x))/2.;
         double vy=(v(y+jp) + v(y))/2.;
 
-        if(variable_name=="Displacement")
-          SAMRAI::tbox::plog << variable_name << " "
-                             << depth_id << " "
-                             << center << " "
-                             << v(x) << " "
-                             << v(x+ip) << " "
-                             << v(y) << " "
-                             << v(y+jp) << " "
-                             << "\n";
+        // if(variable_name=="Displacement")
+        //   SAMRAI::tbox::plog << variable_name << " "
+        //                      << depth << " "
+        //                      << center << " "
+        //                      << v(x) << " "
+        //                      << v(x+ip) << " "
+        //                      << v(y) << " "
+        //                      << v(y+jp) << " "
+        //                      << "\n";
 
-        if (0==depth_id)
+        if (0==depth)
           {
             *buffer = vx;
           }
@@ -116,11 +116,11 @@ Elastic::FAC::packDerivedDataIntoDoubleBuffer(double* buffer,
         //                      << v(z+kp) << " "
         //                      << "\n";
 
-        if (0==depth_id)
+        if (0==depth)
           {
             *buffer = vx;
           }
-        else if (1==depth_id)
+        else if (1==depth)
           {
             *buffer = vy;
           }

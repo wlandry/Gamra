@@ -29,10 +29,12 @@
 */
 
 void Elastic::FACSolver::initializeSolverState
-(const int cell_moduli,
- const int edge_moduli,
- const int v,
- const int v_rhs,
+(const int cell_moduli_id,
+ const int edge_moduli_id,
+ const int dv_aligned_id,
+ const int dv_perpendicular_id, 
+ const int v_id,
+ const int v_rhs_id,
  boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
  const int coarse_level,
  const int fine_level)
@@ -41,7 +43,7 @@ void Elastic::FACSolver::initializeSolverState
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-  if (v < 0 || v_rhs < 0) {
+  if (v_id < 0 || v_rhs_id < 0) {
     TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
   }
 #endif
@@ -80,9 +82,10 @@ void Elastic::FACSolver::initializeSolverState
                                  d_ln_min,
                                  d_ln_max);
 
-  d_fac_ops.set_moduli_id(cell_moduli,edge_moduli);
+  d_fac_ops.set_extra_ids(cell_moduli_id,edge_moduli_id,dv_aligned_id,
+                          dv_perpendicular_id);
 
-  createVectorWrappers(v, v_rhs);
+  createVectorWrappers(v_id, v_rhs_id);
 
   d_fac_precond.initializeSolverState(*d_uv, *d_fv);
 

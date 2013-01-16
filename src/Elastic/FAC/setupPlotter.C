@@ -36,16 +36,23 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   }
   plotter.registerDerivedPlotQuantity("Displacement",
                                       "VECTOR",
-                                      (SAMRAI::appu::VisDerivedDataStrategy *)this);
+                                      (SAMRAI::appu::VisDerivedDataStrategy *)
+                                      this);
   plotter.registerDerivedPlotQuantity("Equivalent body force",
                                       "VECTOR",
-                                      (SAMRAI::appu::VisDerivedDataStrategy *)this);
+                                      (SAMRAI::appu::VisDerivedDataStrategy *)
+                                      this);
   plotter.registerPlotQuantity("Cell lambda",
                                "SCALAR",
                                cell_moduli_id,0);
   plotter.registerPlotQuantity("Cell mu",
                                "SCALAR",
                                cell_moduli_id,1);
+  plotter.registerDerivedPlotQuantity("Strain","TENSOR",
+                                      (SAMRAI::appu::VisDerivedDataStrategy *)
+                                      this);
+                               
+
   return 0;
 }
 #endif

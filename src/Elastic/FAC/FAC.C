@@ -20,6 +20,11 @@
 #include "SAMRAI/hier/Variable.h"
 #include "SAMRAI/hier/VariableDatabase.h"
 
+
+const int Elastic::FAC::index_map[3][3]={{-1, 0, 2,},
+                                         { 1,-1, 4,},
+                                         { 3, 5,-1}};
+
 Elastic::FAC::FAC(const std::string& object_name,
                   const SAMRAI::tbox::Dimension& dimension,
                   boost::shared_ptr<SAMRAI::tbox::Database> database):
@@ -49,33 +54,42 @@ Elastic::FAC::FAC(const std::string& object_name,
    */
   d_context = vdb->getContext(d_object_name + ":Context");
 
-  /*
-   * Register variables with SAMRAI::hier::VariableDatabase
-   * and get the descriptor indices for those variables.
+  /* Register variables with SAMRAI::hier::VariableDatabase and get
+     the descriptor indices for those variables.  Ghost cells width
+     are 1 just in case it is needed.
    */
 
   int depth=2;
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    cell_moduli_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim,
-                                                   object_name
-                                                   + ":cell_moduli",depth));
-  cell_moduli_id = vdb->registerVariableAndContext(cell_moduli_ptr,
-                                                   d_context,
-                                                   SAMRAI::hier::IntVector(d_dim, 1)
-                                                   /* ghost cell width is
-                                                      1 in case needed */);
+    cell_moduli_ptr(new SAMRAI::pdat::CellVariable<double>
+                    (d_dim,object_name + ":cell_moduli",depth));
+  cell_moduli_id =
+    vdb->registerVariableAndContext(cell_moduli_ptr, d_context,
+                                    SAMRAI::hier::IntVector(d_dim, 1));
+
+  boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
+    dv_aligned_ptr(new SAMRAI::pdat::CellVariable<double>
+                    (d_dim,object_name + ":dv_aligned",dim));
+  dv_aligned_id =
+    vdb->registerVariableAndContext(dv_aligned_ptr, d_context,
+                                    SAMRAI::hier::IntVector(d_dim, 1));
 
   if(dim==2)
     {
       boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
-        edge_moduli_ptr(new SAMRAI::pdat::NodeVariable<double>(d_dim,
-                                                       object_name
-                                                       + ":edge_moduli",depth));
+        edge_moduli_ptr(new SAMRAI::pdat::NodeVariable<double>
+                        (d_dim,object_name + ":edge_moduli",depth));
       edge_moduli_id =
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
-                                        SAMRAI::hier::IntVector(d_dim,1)
-                                        /* ghost cell width is 1 in
-                                           case needed */);
+                                        SAMRAI::hier::IntVector(d_dim,1));
+
+      /* 2==number of off-diagonal matrix terms in 2D */
+      boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
+        dv_perpendicular_ptr(new SAMRAI::pdat::NodeVariable<double>
+                             (d_dim,object_name + ":dv_perpendicular",2));
+      dv_perpendicular_id =
+        vdb->registerVariableAndContext(dv_perpendicular_ptr,d_context,
+                                        SAMRAI::hier::IntVector(d_dim,1));
     }
   else if(dim==3)
     {
@@ -85,26 +99,27 @@ Elastic::FAC::FAC(const std::string& object_name,
                                                        + ":edge_moduli",depth));
       edge_moduli_id =
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
-                                        SAMRAI::hier::IntVector(d_dim,1)
-                                        /* ghost cell width is 1 in
-                                           case needed */);
+                                        SAMRAI::hier::IntVector(d_dim,1));
+
+      /* 6==number of off-diagonal matrix terms in 3D */
+      boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
+        dv_perpendicular_ptr(new SAMRAI::pdat::EdgeVariable<double>
+                             (d_dim,object_name + ":dv_perpendicular",6));
+      dv_perpendicular_id =
+        vdb->registerVariableAndContext(dv_perpendicular_ptr,d_context,
+                                        SAMRAI::hier::IntVector(d_dim,1));
     }
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_ptr(new SAMRAI::pdat::SideVariable<double>(d_dim, object_name + ":v", 1));
   v_id = vdb->registerVariableAndContext(v_ptr, d_context,
-                                         SAMRAI::hier::IntVector(d_dim, 1)
-                                         /* ghost cell width is 1 for
-                                            stencil widths */);
+                                         SAMRAI::hier::IntVector(d_dim, 1));
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_rhs_ptr(new SAMRAI::pdat::SideVariable<double>(d_dim,object_name
                                              + ":v right hand side"));
   v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,
-                                             SAMRAI::hier::IntVector(d_dim, 1)
-                                             /* ghost cell width is
-                                                1 for coarsening
-                                                operator */);
+                                             SAMRAI::hier::IntVector(d_dim, 1));
 
   d_adaption_threshold=database->getDoubleWithDefault("adaption_threshold",
                                                       1.0e-15);
