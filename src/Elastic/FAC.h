@@ -109,24 +109,32 @@ namespace Elastic {
                                     const std::string& variable_name,
                                     int depth_id) const
     {
-      if(variable_name=="Strain")
-        return pack_strain(buffer,patch,region,depth_id);
+      if(variable_name=="Diagonal_Strain")
+        return pack_diagonal_strain(buffer,patch,region,depth_id);
+      else if(variable_name=="Tangent_Strain")
+        return pack_tangent_strain(buffer,patch,region,depth_id);
       else
         return pack_v_v_rhs(buffer,patch,region,variable_name,depth_id);
     }
 
     bool
-    pack_strain(double* buffer,
-                const SAMRAI::hier::Patch& patch,
-                const SAMRAI::hier::Box& region,
-                int depth_id) const;
+    pack_tangent_strain(double* buffer,
+                        const SAMRAI::hier::Patch& patch,
+                        const SAMRAI::hier::Box& region,
+                        const int &depth_id) const;
+
+    bool
+    pack_diagonal_strain(double* buffer,
+                         const SAMRAI::hier::Patch& patch,
+                         const SAMRAI::hier::Box& region,
+                         const int &depth_id) const;
 
     bool
     pack_v_v_rhs(double* buffer,
                  const SAMRAI::hier::Patch& patch,
                  const SAMRAI::hier::Box& region,
                  const std::string& variable_name,
-                 int depth_id) const;
+                 const int &depth_id) const;
     //@}
 
     /*!

@@ -29,9 +29,8 @@ bool
 Elastic::FAC::pack_v_v_rhs(double* buffer,
                            const SAMRAI::hier::Patch& patch,
                            const SAMRAI::hier::Box& region,
-                           const std::string&
-                           variable_name,
-                           int depth) const
+                           const std::string& variable_name,
+                           const int &depth) const
 {
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr;
   if (variable_name == "Displacement") {
