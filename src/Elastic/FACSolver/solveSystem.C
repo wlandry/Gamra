@@ -71,7 +71,7 @@ bool Elastic::FACSolver::solveSystem(const int v_id, const int v_rhs_id)
 bool Elastic::FACSolver::solveSystem
 (const int cell_moduli_id,
  const int edge_moduli_id,
- const int dv_aligned_id,
+ const int dv_diagonal_id,
  const int dv_perpendicular_id, 
  const int v_id,
  const int v_rhs_id,
@@ -103,7 +103,7 @@ bool Elastic::FACSolver::solveSystem
                << "specified.\n");
   }
 #endif
-  initializeSolverState(cell_moduli_id, edge_moduli_id, dv_aligned_id,
+  initializeSolverState(cell_moduli_id, edge_moduli_id, dv_diagonal_id,
                         dv_perpendicular_id, v_id, v_rhs_id,
                         hierarchy, coarse_ln, fine_ln);
 

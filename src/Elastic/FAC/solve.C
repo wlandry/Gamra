@@ -32,7 +32,7 @@ int Elastic::FAC::solve()
                << "Cannot solve using an uninitialized object.\n");
   }
 
-  d_boundary_conditions.set_extra_ids(edge_moduli_id,dv_aligned_id,
+  d_boundary_conditions.set_extra_ids(edge_moduli_id,dv_diagonal_id,
                                       dv_perpendicular_id);
   fix_moduli();
   if(d_dim.getValue()==2)
@@ -59,7 +59,7 @@ int Elastic::FAC::solve()
   }
 
   d_elastic_fac_solver.initializeSolverState
-    (cell_moduli_id,edge_moduli_id,dv_aligned_id,dv_perpendicular_id,v_id,
+    (cell_moduli_id,edge_moduli_id,dv_diagonal_id,dv_perpendicular_id,v_id,
      v_rhs_id,d_hierarchy,0,d_hierarchy->getFinestLevelNumber());
 
   SAMRAI::tbox::plog << "solving..." << std::endl;

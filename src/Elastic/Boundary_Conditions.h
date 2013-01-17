@@ -27,7 +27,7 @@ namespace Elastic {
     void set_extra_ids(const int &e_id, const int &dva, const int &dvp)
     {
       edge_moduli_id=e_id;
-      dv_aligned_id=dva;
+      dv_diagonal_id=dva;
       dv_perpendicular_id=dvp;
     }
 
@@ -35,7 +35,7 @@ namespace Elastic {
     bool is_dirichlet[3][3][2];
     double coord[3];
     std::string d_object_name;
-    int edge_moduli_id,dv_aligned_id,dv_perpendicular_id;
+    int edge_moduli_id,dv_diagonal_id,dv_perpendicular_id;
 
     void set_dirichlet
     (SAMRAI::pdat::SideData<double> &v,

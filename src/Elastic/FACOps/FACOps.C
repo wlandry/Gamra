@@ -46,7 +46,7 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   d_residual_tolerance_during_smoothing(-1.0),
   cell_moduli_id(invalid_id),
   edge_moduli_id(invalid_id),
-  dv_aligned_id(invalid_id),
+  dv_diagonal_id(invalid_id),
   dv_perpendicular_id(invalid_id),
   d_context(SAMRAI::hier::VariableDatabase::getDatabase()
             ->getContext(object_name + "::PRIVATE_CONTEXT")),

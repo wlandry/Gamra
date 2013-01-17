@@ -13,12 +13,11 @@ Elastic::FAC::pack_diagonal_strain(double* buffer,
     (patch.getPatchData(v_id));
   SAMRAI::pdat::SideData<double>& v = *v_ptr;
 
-  boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_aligned_ptr=
+  boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr=
     boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-    (patch.getPatchData(dv_aligned_id));
-  SAMRAI::pdat::CellData<double> &dv_aligned(*dv_aligned_ptr);
+    (patch.getPatchData(dv_diagonal_id));
+  SAMRAI::pdat::CellData<double> &dv_diagonal(*dv_diagonal_ptr);
 
-  const int dim=d_dim.getValue();
   SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(d_dim));
   ip[ix]=1;
 
@@ -30,7 +29,7 @@ Elastic::FAC::pack_diagonal_strain(double* buffer,
         {
           const SAMRAI::pdat::SideIndex
             s(*icell,ix,SAMRAI::pdat::SideIndex::Lower);
-          *buffer=v(s+ip)-v(s)-dv_aligned(*icell,ix);
+          *buffer=v(s+ip)-v(s)-dv_diagonal(*icell,ix);
           ++buffer;
         }
     }
@@ -42,7 +41,7 @@ Elastic::FAC::pack_diagonal_strain(double* buffer,
         {
           const SAMRAI::pdat::SideIndex
             s(*icell,ix,SAMRAI::pdat::SideIndex::Lower);
-          *buffer=v(s+ip)-v(s)-dv_aligned(*icell,ix);
+          *buffer=v(s+ip)-v(s)-dv_diagonal(*icell,ix);
           ++buffer;
         }
     }

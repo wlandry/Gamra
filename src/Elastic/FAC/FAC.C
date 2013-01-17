@@ -68,10 +68,10 @@ Elastic::FAC::FAC(const std::string& object_name,
                                     SAMRAI::hier::IntVector(d_dim, 1));
 
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    dv_aligned_ptr(new SAMRAI::pdat::CellVariable<double>
-                    (d_dim,object_name + ":dv_aligned",dim));
-  dv_aligned_id =
-    vdb->registerVariableAndContext(dv_aligned_ptr, d_context,
+    dv_diagonal_ptr(new SAMRAI::pdat::CellVariable<double>
+                    (d_dim,object_name + ":dv_diagonal",dim));
+  dv_diagonal_id =
+    vdb->registerVariableAndContext(dv_diagonal_ptr, d_context,
                                     SAMRAI::hier::IntVector(d_dim, 1));
 
   if(dim==2)

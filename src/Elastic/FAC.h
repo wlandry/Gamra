@@ -213,7 +213,7 @@ namespace Elastic {
     double d_adaption_threshold;
     int min_full_refinement_level;
   public:
-    int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id, dv_aligned_id,
+    int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id, dv_diagonal_id,
       dv_perpendicular_id;
 
     Input_Expression lambda, mu, v_rhs;
@@ -236,7 +236,7 @@ namespace Elastic {
      const int &dim,
      const FTensor::Tensor1<double,3> &ntt,
      const FTensor::Tensor1<double,3> &ntt_p,
-     SAMRAI::pdat::CellData<double> &dv_aligned,
+     SAMRAI::pdat::CellData<double> &dv_diagonal,
      T &dv_perpendicular);
 
     bool intersect_fault(const int &dim,
@@ -287,13 +287,13 @@ void Elastic::FAC::add_faults()
             ((*p)->getPatchData(v_rhs_id));
 
           /* dv */
-          boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_aligned =
+          boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-            ((*p)->getPatchData(dv_aligned_id));
+            ((*p)->getPatchData(dv_diagonal_id));
           boost::shared_ptr<T> dv_perpendicular =
             boost::dynamic_pointer_cast<T>
             ((*p)->getPatchData(dv_perpendicular_id));
-          dv_aligned->fillAll(0);
+          dv_diagonal->fillAll(0);
           dv_perpendicular->fillAll(0);
 
           /* moduli */
@@ -387,11 +387,12 @@ void Elastic::FAC::add_faults()
                         {
                           compute_dv_correction(fault,jump,s,unit,ix,d,dim,
                                                 ntt,ntt_dp[d],
-                                                *dv_aligned,*dv_perpendicular);
+                                                *dv_diagonal,*dv_perpendicular);
                           if(s[d]==pbox.lower()[d])
                             compute_dv_correction(fault,jump,s-unit[d],unit,ix,d,
                                                   dim,ntt_dm[d],ntt,
-                                                  *dv_aligned,*dv_perpendicular);
+                                                  *dv_diagonal,
+                                                  *dv_perpendicular);
 
                         }
 
@@ -523,7 +524,7 @@ void Elastic::FAC::compute_dv_correction
  const int &dim,
  const FTensor::Tensor1<double,3> &ntt,
  const FTensor::Tensor1<double,3> &ntt_p,
- SAMRAI::pdat::CellData<double> &dv_aligned,
+ SAMRAI::pdat::CellData<double> &dv_diagonal,
  T &dv_perpendicular)
 {
   int sign(0);
@@ -537,7 +538,7 @@ void Elastic::FAC::compute_dv_correction
       if(ix==d)
         {
           SAMRAI::pdat::CellIndex c(s);
-          dv_aligned(c)+=sign*jump(ix);
+          dv_diagonal(c,ix)+=sign*jump(ix);
         }
       else
         {

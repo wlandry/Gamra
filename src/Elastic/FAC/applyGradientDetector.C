@@ -54,6 +54,17 @@ void Elastic::FAC::applyGradientDetector
       SAMRAI::pdat::SideData<double>& v = *soln_side_data_;
       SAMRAI::pdat::CellData<int>& tag_cell_data = *tag_cell_data_;
                               
+      boost::shared_ptr<SAMRAI::hier::PatchData>
+        dv_diagonal_data = patch.getPatchData(dv_diagonal_id);
+      boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+        (dv_diagonal_data);
+      if (!dv_diagonal_ptr)
+        {
+          TBOX_ERROR("Can not find dv_diagonal in applyGradientDetector.\n");
+        }
+      SAMRAI::pdat::CellData<double>& dv_diagonal = *dv_diagonal_ptr;
+
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
         (patch.getPatchGeometry());
@@ -69,33 +80,48 @@ void Elastic::FAC::applyGradientDetector
 	  {
             const SAMRAI::pdat::SideIndex x(cell_index,ix,
                                             SAMRAI::pdat::SideIndex::Lower);
-	    for (int d=0; d<d_dim.getValue(); ++d){
-		    SAMRAI::hier::Index ip(d_dim,0),
-			        jp(d_dim,0),
-			        kp(d_dim,0);
-		    ip(0)=1;
-		    jp(1)=1;
-		    if (3==d_dim.getValue())
-		    {
-			kp(2)=1;
-		    }
+	    for (int d=0; d<d_dim.getValue(); ++d)
+              {
+                SAMRAI::hier::Index ip(d_dim,0),
+                  jp(d_dim,0),
+                  kp(d_dim,0);
+                ip(0)=1;
+                jp(1)=1;
+                if (3==d_dim.getValue())
+                  {
+                    kp(2)=1;
+                  }
               const SAMRAI::hier::Index pp[]={ip,jp,kp};
 
+              /* Special treatment near the boundary.  For Dirichlet
+                 boundaries, the ghost point may not be valid. */
               if(cell_index[ix]==patch.getBox().lower(ix)
                  && geom->getTouchesRegularBoundary(ix,0))
-	      {
-	      curve=
-                std::max(curve,std::abs(v(x+pp[ix]+pp[ix])-2*v(x+pp[ix])+v(x)));
-	      } else if(cell_index[ix]==patch.getBox().upper(ix)
-                 && geom->getTouchesRegularBoundary(ix,1))
-	      {
-	      curve=std::max(curve,std::abs(v(x+pp[ix])-2*v(x)+v(x-pp[ix])));
-	      }
+                {
+                  curve=std::max(curve,
+                                 std::abs(v(x+pp[ix]+pp[ix])
+                                          - 2*v(x+pp[ix]) + v(x)
+                                          - dv_diagonal(cell_index+pp[ix],ix)
+                                          + dv_diagonal(cell_index,ix)));
+                    
+                }
+              else if(cell_index[ix]==patch.getBox().upper(ix)
+                      && geom->getTouchesRegularBoundary(ix,1))
+                {
+                  curve=std::max(curve,
+                                 std::abs(v(x+pp[ix])
+                                          - 2*v(x) + v(x-pp[ix])
+                                          - dv_diagonal(cell_index,ix)
+                                          + dv_diagonal(cell_index-pp[ix],ix)));
+                }
 	      else
-	      {
-	      curve=std::max(curve,std::abs(v(x+pp[ix]+pp[ix]) - v(x+pp[ix])
-                                            - v(x) + v(x-pp[ix])));
-	      }
+                {
+                  curve=std::max(curve,
+                                 std::abs(v(x+pp[ix]+pp[ix]) - v(x+pp[ix])
+                                          - v(x) + v(x-pp[ix])
+                                          - dv_diagonal(cell_index+pp[ix],ix)
+                                          + dv_diagonal(cell_index-pp[ix],ix)));
+                }
 	    }
 	  }
 

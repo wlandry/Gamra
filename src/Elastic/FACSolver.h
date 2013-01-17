@@ -157,7 +157,7 @@ namespace Elastic {
     bool
     solveSystem(const int cell_moduli_id,
                 const int edge_moduli_id,
-                const int dv_aligned_id,
+                const int dv_diagonal_id,
                 const int dv_perpendicular_id, 
                 const int v_id,
                 const int v_rhs_id,
@@ -336,7 +336,7 @@ namespace Elastic {
     void
     initializeSolverState(const int cell_moduli_id,
                           const int edge_moduli_id,
-                          const int dv_aligned_id,
+                          const int dv_diagonal_id,
                           const int dv_perpendicular_id, 
                           const int v_id,
                           const int v_rhs_id,
