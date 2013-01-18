@@ -5,8 +5,8 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
  const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& rhs,
  int ln,
- bool error_equation_indicator) {
-
+ bool error_equation_indicator)
+{
   t_compute_composite_residual->start();
 
 #ifdef DEBUG_CHECK_ASSERTIONS
