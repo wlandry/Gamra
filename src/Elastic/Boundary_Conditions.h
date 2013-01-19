@@ -28,14 +28,14 @@ namespace Elastic {
     {
       edge_moduli_id=e_id;
       dv_diagonal_id=dva;
-      dv_perpendicular_id=dvp;
+      dv_mixed_id=dvp;
     }
 
     Input_Expression expression[3][3][2];
     bool is_dirichlet[3][3][2];
     double coord[3];
     std::string d_object_name;
-    int edge_moduli_id,dv_diagonal_id,dv_perpendicular_id;
+    int edge_moduli_id,dv_diagonal_id,dv_mixed_id;
 
     void set_dirichlet
     (SAMRAI::pdat::SideData<double> &v,

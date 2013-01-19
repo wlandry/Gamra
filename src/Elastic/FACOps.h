@@ -250,12 +250,12 @@ namespace Elastic {
      * patch data index of that space.
      */
     void set_extra_ids(const int &cell_moduli, const int &edge_moduli,
-                       const int &dv_diagonal, const int &dv_perpendicular)
+                       const int &dv_diagonal, const int &dv_mixed)
     {
       cell_moduli_id=cell_moduli;
       edge_moduli_id=edge_moduli;
       dv_diagonal_id=dv_diagonal;
-      dv_perpendicular_id=dv_perpendicular;
+      dv_mixed_id=dv_mixed;
     }
     //@}
 
@@ -854,7 +854,7 @@ namespace Elastic {
      *
      * @see set_extra_ids.
      */
-    int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_perpendicular_id;
+    int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id;
 
     /*!
      * @brief Externally provided physical boundary condition object.
