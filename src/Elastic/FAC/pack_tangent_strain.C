@@ -20,12 +20,13 @@ Elastic::FAC::pack_tangent_strain(double* buffer,
   ip[ix]=1;
   jp[d]=1;
 
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr=
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (patch.getPatchData(dv_mixed_id));
+  SAMRAI::pdat::SideData<double> &dv_mixed(*dv_mixed_ptr);
+
   if(d_dim.getValue()==2)
     {
-      boost::shared_ptr<SAMRAI::pdat::NodeData<double> > dv_perpendicular_ptr=
-        boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-        (patch.getPatchData(dv_perpendicular_id));
-      SAMRAI::pdat::NodeData<double> &dv_perpendicular(*dv_perpendicular_ptr);
       SAMRAI::pdat::NodeData<double>::iterator iend(region,false);
       for(SAMRAI::pdat::NodeData<double>::iterator inode(region,true);
           inode!=iend; inode++)
@@ -38,18 +39,17 @@ Elastic::FAC::pack_tangent_strain(double* buffer,
             {
               const SAMRAI::pdat::SideIndex
                 s(*inode,ix,SAMRAI::pdat::SideIndex::Lower);
-              *buffer=v(s)-v(s-jp)-dv_perpendicular(*inode,index_map[ix][d]);
+              // *buffer=v(s) - v(s-jp) - dv_mixed(s,1) + dv_mixed(s-jp,0);
+              *buffer=- dv_mixed(s,1) + dv_mixed(s-jp,0);
             }
           ++buffer;
         }
     }
   else
     {
+      /* This is not going to work because Visit can not handle edge
+         data.  So we have to cell centered for it anyway. */
       int other_dim((ix+1)%dim == d ? (d+1)%dim : (ix+1)%dim);
-      boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > dv_perpendicular_ptr=
-        boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-        (patch.getPatchData(dv_perpendicular_id));
-      SAMRAI::pdat::EdgeData<double> &dv_perpendicular(*dv_perpendicular_ptr);
       SAMRAI::pdat::EdgeData<double>::iterator iend(region,other_dim,false);
       for(SAMRAI::pdat::EdgeData<double>::iterator iedge(region,other_dim,true);
           iedge!=iend; iedge++)
@@ -62,7 +62,8 @@ Elastic::FAC::pack_tangent_strain(double* buffer,
             {
               const SAMRAI::pdat::SideIndex
                 s(*iedge,ix,SAMRAI::pdat::SideIndex::Lower);
-              *buffer=v(s)-v(s-jp)-dv_perpendicular(*iedge,index_map[ix][d]);
+              *buffer=v(s) - v(s-jp) - dv_mixed(s,2*((d-ix)%(dim-1))+1)
+                + dv_mixed(s,2*((d-ix)%(dim-1)));
             }
           ++buffer;
         }

@@ -172,6 +172,7 @@ def build(bld):
                         'src/Stokes/HypreSolver.C',
                         'src/Elastic/FAC/FAC.C',
                         'src/Elastic/FAC/fix_moduli.C',
+                        'src/Elastic/FAC/compute_intersection.C',
                         'src/Elastic/FAC/applyGradientDetector.C',
                         'src/Elastic/FAC/initializeLevelData.C',
                         'src/Elastic/FAC/pack_diagonal_strain.C',

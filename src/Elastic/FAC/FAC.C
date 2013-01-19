@@ -57,7 +57,7 @@ Elastic::FAC::FAC(const std::string& object_name,
   /* Register variables with SAMRAI::hier::VariableDatabase and get
      the descriptor indices for those variables.  Ghost cells width
      are 1 just in case it is needed.
-   */
+  */
 
   int depth=2;
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
@@ -74,6 +74,13 @@ Elastic::FAC::FAC(const std::string& object_name,
     vdb->registerVariableAndContext(dv_diagonal_ptr, d_context,
                                     SAMRAI::hier::IntVector(d_dim, 1));
 
+  boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
+    dv_mixed_ptr(new SAMRAI::pdat::SideVariable<double>
+                 (d_dim,object_name + ":dv_mixed",2));
+  dv_mixed_id =
+    vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
+                                    SAMRAI::hier::IntVector(d_dim,1));
+
   if(dim==2)
     {
       boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
@@ -83,30 +90,14 @@ Elastic::FAC::FAC(const std::string& object_name,
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1));
 
-      /* 2==number of off-diagonal matrix terms in 2D */
-      boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
-        dv_perpendicular_ptr(new SAMRAI::pdat::NodeVariable<double>
-                             (d_dim,object_name + ":dv_perpendicular",2));
-      dv_perpendicular_id =
-        vdb->registerVariableAndContext(dv_perpendicular_ptr,d_context,
-                                        SAMRAI::hier::IntVector(d_dim,1));
     }
   else if(dim==3)
     {
       boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
-        edge_moduli_ptr(new SAMRAI::pdat::EdgeVariable<double>(d_dim,
-                                                       object_name
-                                                       + ":edge_moduli",depth));
+        edge_moduli_ptr(new SAMRAI::pdat::EdgeVariable<double>
+                        (d_dim,object_name+ ":edge_moduli",depth));
       edge_moduli_id =
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
-                                        SAMRAI::hier::IntVector(d_dim,1));
-
-      /* 6==number of off-diagonal matrix terms in 3D */
-      boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
-        dv_perpendicular_ptr(new SAMRAI::pdat::EdgeVariable<double>
-                             (d_dim,object_name + ":dv_perpendicular",6));
-      dv_perpendicular_id =
-        vdb->registerVariableAndContext(dv_perpendicular_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1));
     }
 

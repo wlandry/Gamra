@@ -40,7 +40,7 @@ void Elastic::FAC::initializeLevelData
     level->allocatePatchData(v_id);
     level->allocatePatchData(v_rhs_id);
     level->allocatePatchData(dv_diagonal_id);
-    level->allocatePatchData(dv_perpendicular_id);
+    level->allocatePatchData(dv_mixed_id);
   }
 
   /*

@@ -214,7 +214,7 @@ namespace Elastic {
     int min_full_refinement_level;
   public:
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id, dv_diagonal_id,
-      dv_perpendicular_id;
+      dv_mixed_id;
 
     Input_Expression lambda, mu, v_rhs;
 
@@ -224,20 +224,6 @@ namespace Elastic {
     static const int index_map[3][3];
 
     template<class T> void add_faults();
-
-    template<class T>
-    void compute_dv_correction
-    (const double fault[],
-     const FTensor::Tensor1<double,3> &jump,
-     const SAMRAI::pdat::SideIndex &s,
-     const SAMRAI::hier::Index unit[],
-     const int &ix,
-     const int &d,
-     const int &dim,
-     const FTensor::Tensor1<double,3> &ntt,
-     const FTensor::Tensor1<double,3> &ntt_p,
-     SAMRAI::pdat::CellData<double> &dv_diagonal,
-     T &dv_perpendicular);
 
     bool intersect_fault(const int &dim,
                          const FTensor::Tensor1<double,3> &c0,
@@ -251,6 +237,31 @@ namespace Elastic {
           result=result && ((y<=fault[d-1] && y>0) || (y>=fault[d-1] && y<0));
         }
       return result;
+    }
+
+    void compute_intersection(const FTensor::Tensor1<double,3> &ntt,
+                              const FTensor::Tensor1<double,3> &xyz,
+                              const FTensor::Tensor2<double,3,3> &rot,
+                              const FTensor::Tensor1<double,3> dx[],
+                              const double fault[],
+                              const int &dim,
+                              int intersect[][2]);
+
+    void compute_intersections(const FTensor::Tensor1<double,3> &ntt,
+                               const FTensor::Tensor1<double,3> &xyz,
+                               const FTensor::Tensor2<double,3,3> &rot,
+                               const FTensor::Tensor1<double,3> dx[],
+                               const double fault[],
+                               const int &dim,
+                               int intersect[][2],
+                               int intersect_half[][2])
+    {
+      compute_intersection(ntt,xyz,rot,dx,fault,dim,intersect);
+      FTensor::Tensor1<double,3> dx_2[dim];
+      FTensor::Index<'a',3> a;
+      for(int i=0;i<dim;++i)
+        dx_2[i](a)=dx[i](a)/2;
+      compute_intersection(ntt,xyz,rot,dx_2,fault,dim,intersect_half);
     }
   };
 }
@@ -290,11 +301,11 @@ void Elastic::FAC::add_faults()
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
             ((*p)->getPatchData(dv_diagonal_id));
-          boost::shared_ptr<T> dv_perpendicular =
-            boost::dynamic_pointer_cast<T>
-            ((*p)->getPatchData(dv_perpendicular_id));
+          boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed =
+            boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+            ((*p)->getPatchData(dv_mixed_id));
           dv_diagonal->fillAll(0);
-          dv_perpendicular->fillAll(0);
+          dv_mixed->fillAll(0);
 
           /* moduli */
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli =
@@ -368,32 +379,38 @@ void Elastic::FAC::add_faults()
                       FTensor::Tensor1<double,3> xyz(0,0,0);
                       for(int d=0;d<dim;++d)
                         xyz(d)=geom->getXLower()[d]
-                          + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
+                          + dx[d]*(s[d]-pbox.lower()[d]+offset[d]) - center(d);
 
                       /* Rotate the coordinates into the coordinates of the
                          fault.  So in those coordinates, if x<0, you are on
                          the left, and if x>0, you are on the right. */
                       FTensor::Tensor1<double,3> ntt;
-                      FTensor::Tensor1<double,3> ntt_dp[dim], ntt_dm[dim];
-                      ntt(a)=rot(a,b)*(xyz(b)-center(b));
-                      for(int d=0;d<dim;++d)
-                        {
-                          ntt_dp[d](a)=rot(a,b)*(xyz(b)+Dx[d](b)-center(b));
-                          ntt_dm[d](a)=rot(a,b)*(xyz(b)-Dx[d](b)-center(b));
-                        }
+                      ntt(a)=rot(a,b)*xyz(b);
+                      int intersect[dim][2], intersect_half[dim][2];
+                      compute_intersections(ntt,xyz,rot,Dx,fault,dim,
+                                            intersect,intersect_half);
 
                       /* d/dx, d/dy, d/dz */
                       for(int d=0;d<dim;++d)
                         {
-                          compute_dv_correction(fault,jump,s,unit,ix,d,dim,
-                                                ntt,ntt_dp[d],
-                                                *dv_diagonal,*dv_perpendicular);
-                          if(s[d]==pbox.lower()[d])
-                            compute_dv_correction(fault,jump,s-unit[d],unit,ix,d,
-                                                  dim,ntt_dm[d],ntt,
-                                                  *dv_diagonal,
-                                                  *dv_perpendicular);
-
+                          if(ix==d)
+                            {
+                              SAMRAI::pdat::CellIndex c(s);
+                              (*dv_diagonal)(c,ix)+=intersect[d][0]*jump(ix);
+                                                  
+                              if(s[d]==pbox.lower()[d])
+                                {
+                                  c-=unit[d];
+                                  (*dv_diagonal)(c,ix)+=intersect[d][1]*jump(ix);
+                                }
+                            }
+                          else
+                            {
+                              (*dv_mixed)(s,2*((d-ix)%(dim-1)))+=
+                                intersect_half[d][0]*jump(ix);
+                              (*dv_mixed)(s,2*((d-ix)%(dim-1))+1)-=
+                                intersect_half[d][1]*jump(ix);
+                            }
                         }
 
                       /* d/dx^2, d/dy^2, d/dz^2 */
@@ -402,19 +419,14 @@ void Elastic::FAC::add_faults()
                           int sign(0);
                           SAMRAI::hier::Index cell_offset(zero),
                             edge_offset(zero);
-                          if(((ntt(0)<=0 && ntt_dp[d](0)>0)
-                              || (ntt(0)>0 && ntt_dp[d](0)<=0))
-                             && intersect_fault(dim,ntt,ntt_dp[d],fault))
+                          if(intersect[d][0]!=0)
                             {
-                              sign=ntt(0)<=0 ? 1 : -1;
+                              sign=intersect[d][0];
                               edge_offset=unit[d];
                             }
-                          else if(((ntt(0)<=0 && ntt_dm[d](0)>0)
-                                   || (ntt(0)>0 && ntt_dm[d](0)<=0))
-                                  && intersect_fault(dim,ntt,ntt_dm[d],
-                                                     fault))
+                          else if(intersect[d][1]!=0)
                             {
-                              sign=ntt(0)<=0 ? 1 : -1;
+                              sign=-intersect[d][1];
                               cell_offset=-unit[d];
                             }
 
@@ -456,13 +468,13 @@ void Elastic::FAC::add_faults()
                           const int iz((iy+1)%dim==ix ? (iy+2)%dim : (iy+1)%dim);
                           FTensor::Tensor1<double,3> ntt_dxy[2][2];
                           ntt_dxy[0][0](a)=rot(a,b)*(xyz(b)+Dx[ix](b)/2
-                                                     +Dx[iy](b)/2-center(b));
+                                                     +Dx[iy](b)/2);
                           ntt_dxy[0][1](a)=rot(a,b)*(xyz(b)+Dx[ix](b)/2
-                                                     -Dx[iy](b)/2-center(b));
+                                                     -Dx[iy](b)/2);
                           ntt_dxy[1][0](a)=rot(a,b)*(xyz(b)-Dx[ix](b)/2
-                                                     +Dx[iy](b)/2-center(b));
+                                                     +Dx[iy](b)/2);
                           ntt_dxy[1][1](a)=rot(a,b)*(xyz(b)-Dx[ix](b)/2
-                                                     -Dx[iy](b)/2-center(b));
+                                                     -Dx[iy](b)/2);
 
                           double lambda_mu(0);
 
@@ -512,43 +524,5 @@ void Elastic::FAC::add_faults()
         }
     }
 }
-
-template<class T>
-void Elastic::FAC::compute_dv_correction
-(const double fault[],
- const FTensor::Tensor1<double,3> &jump,
- const SAMRAI::pdat::SideIndex &s,
- const SAMRAI::hier::Index unit[],
- const int &ix,
- const int &d,
- const int &dim,
- const FTensor::Tensor1<double,3> &ntt,
- const FTensor::Tensor1<double,3> &ntt_p,
- SAMRAI::pdat::CellData<double> &dv_diagonal,
- T &dv_perpendicular)
-{
-  int sign(0);
-  if(ntt(0)<=0 && ntt_p(0)>0 && intersect_fault(dim,ntt,ntt_p,fault))
-    sign=1;
-  else if(ntt(0)>0 && ntt_p(0)<=0 && intersect_fault(dim,ntt,ntt_p,fault))
-    sign=-1;
-
-  if(sign!=0)
-    {
-      if(ix==d)
-        {
-          SAMRAI::pdat::CellIndex c(s);
-          dv_diagonal(c,ix)+=sign*jump(ix);
-        }
-      else
-        {
-          edge_node_eval(dv_perpendicular,s+unit[d],
-                         (ix+1)%dim!=d ? (ix+1)%dim : (ix+2)%dim,
-                         index_map[ix][d])
-            +=sign*jump(ix);
-        }
-    }
-}
-
 
 #endif  // included_FACElastic
