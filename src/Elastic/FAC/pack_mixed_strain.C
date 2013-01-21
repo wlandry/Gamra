@@ -1,9 +1,12 @@
 #include "Elastic/FAC.h"
 
-/* Strain correction is stored on the cell centers and edges */
+/* Store the mixed derivatives of the displacement.  The derivative
+   correction terms for mixed derivatives are stored on the faces,
+   with one component being the correction 'up' and one component
+   being the correction 'down.  */
 
 bool
-Elastic::FAC::pack_tangent_strain(double* buffer,
+Elastic::FAC::pack_mixed_strain(double* buffer,
                                   const SAMRAI::hier::Patch& patch,
                                   const SAMRAI::hier::Box& region,
                                   const int &depth) const
@@ -39,8 +42,7 @@ Elastic::FAC::pack_tangent_strain(double* buffer,
             {
               const SAMRAI::pdat::SideIndex
                 s(*inode,ix,SAMRAI::pdat::SideIndex::Lower);
-              // *buffer=v(s) - v(s-jp) - dv_mixed(s,1) + dv_mixed(s-jp,0);
-              *buffer=- dv_mixed(s,1) + dv_mixed(s-jp,0);
+              *buffer=v(s) - v(s-jp) + dv_mixed(s,1) - dv_mixed(s-jp,0);
             }
           ++buffer;
         }
@@ -62,8 +64,8 @@ Elastic::FAC::pack_tangent_strain(double* buffer,
             {
               const SAMRAI::pdat::SideIndex
                 s(*iedge,ix,SAMRAI::pdat::SideIndex::Lower);
-              *buffer=v(s) - v(s-jp) - dv_mixed(s,2*((d-ix)%(dim-1))+1)
-                + dv_mixed(s,2*((d-ix)%(dim-1)));
+              *buffer=v(s) - v(s-jp) + dv_mixed(s,2*((d-ix)%(dim-1))+1)
+                - dv_mixed(s,2*((d-ix)%(dim-1)));
             }
           ++buffer;
         }

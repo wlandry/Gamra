@@ -51,7 +51,7 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   plotter.registerDerivedPlotQuantity("Diagonal_Strain","VECTOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
-  plotter.registerDerivedPlotQuantity("Tangent_Strain","TENSOR",
+  plotter.registerDerivedPlotQuantity("Mixed_Strain","TENSOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this,1,"NODE");
                                
