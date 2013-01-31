@@ -15,6 +15,7 @@
 #include <math.h>
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 #include "SAMRAI/hier/Index.h"
+#include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/pdat/SideData.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/tbox/Utilities.h"
@@ -34,6 +35,21 @@ coarsen_point_2D(const SAMRAI::pdat::SideIndex &coarse,
        + (*v_fine)(center+ip) + (*v_fine)(center+jp+ip))/8;
 }
 
+inline double
+coarsen_correction_2D(const SAMRAI::pdat::SideIndex &fine,
+                      const int &axis,
+                      const SAMRAI::hier::Index &ip,
+                      const SAMRAI::hier::Index &jp,
+                      boost::shared_ptr<SAMRAI::pdat::CellData<double> >
+                      &dv_diagonal,
+                      boost::shared_ptr<SAMRAI::pdat::SideData<double> >
+                      &dv_mixed)
+{
+  SAMRAI::pdat::CellIndex cell(fine);
+  return ((*dv_diagonal)(cell-ip,axis) - (*dv_diagonal)(cell,axis)
+          + (*dv_diagonal)(cell-ip+jp,axis) - (*dv_diagonal)(cell+jp,axis))/8
+    + ((*dv_mixed)(fine,0) + (*dv_mixed)(fine+jp,1))/2;
+}
 
 void Elastic::V_Coarsen::coarsen_2D
 (SAMRAI::hier::Patch& coarse,
@@ -53,6 +69,26 @@ void Elastic::V_Coarsen::coarsen_2D
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (coarse.getPatchData(dst_component));
+
+  // std::cout << "coarsen "
+  //           << src_component << " "
+  //           << "\n";
+
+  // const bool is_residual(true);
+  const bool is_residual(src_component!=7);
+  const int dv_diagonal_id(4), dv_mixed_id(5);
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (fine.getPatchData(dv_mixed_id));
+  boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+    (fine.getPatchData(dv_diagonal_id));
+  
+  // std::cout << "dv "
+  //           << std::boolalpha
+  //           << static_cast<bool>(dv_mixed) << " "
+  //           << static_cast<bool>(dv_diagonal) << " "
+  //           << "\n";
 
   TBOX_ASSERT(v);
   TBOX_ASSERT(v_fine);
@@ -106,41 +142,39 @@ void Elastic::V_Coarsen::coarsen_2D
      V_Coarsen_Patch_Strategy::postprocessCoarsen.
   */
   SAMRAI::hier::Index ip(1,0), jp(0,1);
-  for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
-    for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
+  const SAMRAI::hier::Index unit[]={ip,jp};
+  int ijk[2];
+  for(ijk[1]=coarse_box.lower(1); ijk[1]<=coarse_box.upper(1)+1; ++ijk[1])
+    for(ijk[0]=coarse_box.lower(0); ijk[0]<=coarse_box.upper(0)+1; ++ijk[0])
       {
-        if(directions(0) && j!=coarse_box.upper(1)+1)
+        for(int axis=0;axis<2;++axis)
           {
-            SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j),0,
-                                           SAMRAI::pdat::SideIndex::Lower);
-            SAMRAI::pdat::SideIndex fine(coarse*2);
-            if((i==coarse_box.lower(0)
-                && cgeom->getTouchesRegularBoundary(0,0))
-               || (i==coarse_box.upper(0)+1
-                   && cgeom->getTouchesRegularBoundary(0,1)))
+            const int off_axis((axis+1)%2);
+            if(directions(axis)
+               && ijk[off_axis]!=coarse_box.upper(off_axis)+1)
               {
-                (*v)(coarse)=((*v_fine)(fine) + (*v_fine)(fine+jp))/2;
-              }
-            else
-              {
-                coarsen_point_2D(coarse,ip,jp,v,v_fine);
-              }
-          }
-        if(directions(1) && i!=coarse_box.upper(0)+1)
-          {
-            SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j),1,
-                                           SAMRAI::pdat::SideIndex::Lower);
-            SAMRAI::pdat::SideIndex fine(coarse*2);
-            if((j==coarse_box.lower(1)
-                && cgeom->getTouchesRegularBoundary(1,0))
-               || (j==coarse_box.upper(1)+1
-                   && cgeom->getTouchesRegularBoundary(1,1)))
-              {
-                (*v)(coarse)=((*v_fine)(fine) + (*v_fine)(fine+ip))/2;
-              }
-            else
-              {
-                coarsen_point_2D(coarse,jp,ip,v,v_fine);
+                SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(ijk[0],ijk[1]),axis,
+                                               SAMRAI::pdat::SideIndex::Lower);
+                SAMRAI::pdat::SideIndex fine(coarse*2);
+                if((ijk[axis]==coarse_box.lower(axis)
+                    && cgeom->getTouchesRegularBoundary(axis,0))
+                   || (ijk[axis]==coarse_box.upper(axis)+1
+                       && cgeom->getTouchesRegularBoundary(axis,1)))
+                  {
+                    (*v)(coarse)=
+                      ((*v_fine)(fine) + (*v_fine)(fine+unit[off_axis]))/2;
+                    if(!is_residual)
+                      (*v)(coarse)+=((*dv_mixed)(fine,0)
+                                     + (*dv_mixed)(fine+unit[off_axis],1))/2;
+                  }
+                else
+                  {
+                    coarsen_point_2D(coarse,unit[axis],unit[off_axis],v,v_fine);
+                    if(!is_residual)
+                      (*v)(coarse)+=coarsen_correction_2D(fine,axis,unit[axis],
+                                                          unit[off_axis],
+                                                          dv_diagonal,dv_mixed);
+                  }
               }
           }
       }
