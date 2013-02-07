@@ -19,7 +19,7 @@ Prerequisites:
 
 2) Build Gamra
 
-  hg clone http://geodynamics.org/hg/cs/AMR/FTensor
+  hg clone https://code.google.com/p/ftensor/ FTensor
   hg clone https://code.google.com/p/gamra/
   cd gamra
   CXX=mpicxx ./waf-1.7.2 configure --samrai-dir=$SAMRAI_DIR --hdf5-dir=$HDF5_DIR --muparser-dir=$MUPARSER_DIR
