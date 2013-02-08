@@ -223,10 +223,6 @@ int main(
           (typeid(pdat::SideVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
            (new Elastic::V_Coarsen(dim,fac_elastic.d_boundary_conditions)));
-        grid_geometry->addCoarsenOperator
-          (typeid(pdat::SideVariable<double>).name(),
-           boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
-           (new Elastic::V_Coarsen(dim,fac_elastic.d_boundary_conditions)));
 
         grid_geometry->addCoarsenOperator
           (typeid(pdat::CellVariable<double>).name(),
