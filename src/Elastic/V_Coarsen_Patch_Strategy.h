@@ -60,13 +60,9 @@ namespace Elastic {
 
     virtual void
     preprocessCoarsen(SAMRAI::hier::Patch& ,
-                      const SAMRAI::hier::Patch& fine,
+                      const SAMRAI::hier::Patch& ,
                       const SAMRAI::hier::Box& ,
-                      const SAMRAI::hier::IntVector& )
-    {
-      d_boundary_conditions.set_boundary(fine,v_id,true);
-    }
-
+                      const SAMRAI::hier::IntVector& ) {}
     virtual void
     postprocessCoarsen(SAMRAI::hier::Patch& coarse,
                        const SAMRAI::hier::Patch& fine,
