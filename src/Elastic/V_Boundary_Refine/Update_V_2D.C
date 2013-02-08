@@ -2,20 +2,6 @@
 #include "quad_offset_interpolate.h"
 #include "Constants.h"
 
-namespace {
-  void update_offset_tangent_V_2D(const SAMRAI::pdat::SideIndex &fine,
-                                  SAMRAI::pdat::SideIndex &center,
-                                  const SAMRAI::hier::Index &ip,
-                                  SAMRAI::hier::Index &jp_s,
-                                  SAMRAI::pdat::SideData<double> &v,
-                                  SAMRAI::pdat::SideData<double> &v_fine)
-  {
-    double v_coarse=(v(center) + v(center+ip))/2;
-    v_fine(fine)=(8*v_coarse + 10*v_fine(fine-jp_s)
-                  - 3*v_fine(fine-jp_s-jp_s))/15;
-  }
-}
-
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
 void Elastic::V_Boundary_Refine::Update_V_2D
@@ -23,11 +9,11 @@ void Elastic::V_Boundary_Refine::Update_V_2D
  const int &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
- const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
- int &i, int &j,
- const int &i_max,
- const int &j_max,
- SAMRAI::pdat::SideData<double> &v,
+ const SAMRAI::hier::Index &ip,
+ const SAMRAI::hier::Index &jp,
+ const int &i,
+ const int &j,
+ const SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
   /* Quadratic interpolation involving both coarse and fine grids for
@@ -65,21 +51,8 @@ void Elastic::V_Boundary_Refine::Update_V_2D
       double v_p, v_m;
       quad_offset_interpolate(v(center+ip_s+jp),v(center+ip_s),
                               v(center+ip_s-jp),v_p,v_m);
-
-      if(j%2==0)
-        {
-          v_fine(fine)=v_fine(fine-ip_s) + (v_m - v_fine(fine-ip_s-ip_s))/3;
-          if(j<j_max)
-            {
-              v_fine(fine+jp)=v_fine(fine-ip_s+jp)
-                + (v_p - v_fine(fine-ip_s-ip_s+jp))/3;
-            }
-          ++j;
-        }
-      else
-        {
-          v_fine(fine)=v_fine(fine-ip_s) + (v_p - v_fine(fine-ip_s-ip_s))/3;
-        }
+      double v_coarse(j%2==0 ? v_m : v_p);
+      v_fine(fine)=v_fine(fine-ip_s) + (v_coarse - v_fine(fine-ip_s-ip_s))/3;
     }
   /* Quadratic interpolation involving both coarse and fine grids for
      the tangential direction
@@ -109,27 +82,11 @@ void Elastic::V_Boundary_Refine::Update_V_2D
     {
       SAMRAI::pdat::SideIndex center(fine);
       center.coarsen(SAMRAI::hier::Index(2,2));
-
       SAMRAI::hier::Index jp_s(boundary_positive ? jp : -jp);
 
-      if(i%2==0)
-        {
-          v_fine(fine)=(8*v(center) + 10*v_fine(fine-jp_s)
-                        - 3*v_fine(fine-jp_s-jp_s))/15;
+      double v_coarse(i%2==0 ? v(center) : (v(center) + v(center+ip))/2);
+      v_fine(fine)=(8*v_coarse + 10*v_fine(fine-jp_s)
+                    - 3*v_fine(fine-jp_s-jp_s))/15;
 
-          if(i<i_max)
-            {
-              update_offset_tangent_V_2D(fine+ip,center,ip,jp_s,v,v_fine);
-              /* Since we update two points on 'i' at once, we
-                 increment 'i' again.  This is ok, since the box in
-                 the 'j' direction is defined to be only one cell
-                 wide */
-              ++i;
-            }
-        }
-      else
-        {
-          update_offset_tangent_V_2D(fine,center,ip,jp_s,v,v_fine);
-        }
     }
 }
