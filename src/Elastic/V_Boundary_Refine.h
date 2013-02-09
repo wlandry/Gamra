@@ -19,6 +19,7 @@
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/hier/RefineOperator.h"
 #include "SAMRAI/pdat/SideVariable.h"
+#include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 #include "Boundary_Conditions.h"
 
@@ -139,11 +140,28 @@ namespace Elastic {
      const int &boundary_direction,
      const bool &boundary_positive,
      const SAMRAI::pdat::SideIndex &fine,
-     const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
-     int &i, int &j,
-     const int &i_max,
-     const int &j_max,
-     SAMRAI::pdat::SideData<double> &v,
+     const SAMRAI::hier::Index &ip,
+     const SAMRAI::hier::Index &jp,
+     const int &i,
+     const int &j,
+     const SAMRAI::pdat::SideData<double> &v,
+     SAMRAI::pdat::SideData<double> &v_fine) const;
+
+    void Correction_2D
+    (const int &axis,
+     const int &boundary_direction,
+     const bool &boundary_positive,
+     const SAMRAI::pdat::SideIndex &fine,
+     const SAMRAI::hier::Index &ip,
+     const SAMRAI::hier::Index &jp,
+     const int &i,
+     const int &j,
+     const int &i_min,
+     const int &i_max, 
+     const SAMRAI::pdat::CellData<double> &dv_diagonal,
+     const SAMRAI::pdat::CellData<double> &dv_diagonal_fine,
+     const SAMRAI::pdat::SideData<double> &dv_mixed,
+     const SAMRAI::pdat::SideData<double> &dv_mixed_fine,
      SAMRAI::pdat::SideData<double> &v_fine) const;
 
     void Update_V_3D

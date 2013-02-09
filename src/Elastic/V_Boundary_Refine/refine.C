@@ -60,6 +60,27 @@ void Elastic::V_Boundary_Refine::refine
    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
      (fine.getPatchData(dst_component));
+
+  bool is_residual(src_component!=7);
+  const int dv_diagonal_id(4), dv_mixed_id(5);
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed;
+  boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal;
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_fine;
+  boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_fine;
+
+  if(!is_residual)
+    {
+      dv_mixed=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (coarse.getPatchData(dv_mixed_id));
+      dv_diagonal=boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+        (coarse.getPatchData(dv_diagonal_id));
+      dv_mixed_fine=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (fine.getPatchData(dv_mixed_id));
+      dv_diagonal_fine=
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+        (fine.getPatchData(dv_diagonal_id));
+    }
+
 #ifdef DEBUG_CHECK_ASSERTIONS
    TBOX_ASSERT(v);
    TBOX_ASSERT(v_fine);
@@ -115,17 +136,28 @@ void Elastic::V_Boundary_Refine::refine
        for(int j=p_min[1]; j<=p_max[1]; ++j)
          for(int i=p_min[0]; i<=p_max[0]; ++i)
            {
-             SAMRAI::pdat::SideIndex fine(SAMRAI::hier::Index(i,j),axis,
-                                          SAMRAI::pdat::SideIndex::Lower);
+             SAMRAI::pdat::SideIndex fine_index(SAMRAI::hier::Index(i,j),axis,
+                                                SAMRAI::pdat::SideIndex::Lower);
              switch(axis)
                {
                case 0:
-                 Update_V_2D(axis,boundary_direction,boundary_positive,fine,
-                             ip,jp,i,j,p_max[0],p_max[1],*v,*v_fine);
+                 Update_V_2D(axis,boundary_direction,boundary_positive,
+                             fine_index,ip,jp,i,j,*v,*v_fine);
+                 if(!is_residual)
+                   Correction_2D(axis,boundary_direction,boundary_positive,
+                                 fine_index,ip,jp,i,j,p_min[0],p_max[0],*dv_diagonal,
+                                 *dv_diagonal_fine,*dv_mixed,*dv_mixed_fine,
+                                 *v_fine);
                  break;
                case 1:
-                 Update_V_2D(axis,boundary_direction,boundary_positive,fine,
-                             jp,ip,j,i,p_max[1],p_max[0],*v,*v_fine);
+                 Update_V_2D(axis,boundary_direction,boundary_positive,
+                             fine_index,jp,ip,j,i,*v,*v_fine);
+
+                 if(!is_residual)
+                   Correction_2D(axis,boundary_direction,boundary_positive,
+                                 fine_index,jp,ip,j,i,p_min[1],p_max[1],*dv_diagonal,
+                                 *dv_diagonal_fine,*dv_mixed,*dv_mixed_fine,
+                                 *v_fine);
                  break;
                default:
                  abort();

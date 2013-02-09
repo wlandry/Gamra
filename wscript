@@ -187,6 +187,7 @@ def build(bld):
                         'src/Elastic/V_Coarsen/coarsen_3D.C',
                         'src/Elastic/V_Boundary_Refine/refine.C',
                         'src/Elastic/V_Boundary_Refine/Update_V_2D.C',
+                        'src/Elastic/V_Boundary_Refine/Correction_2D.C',
                         'src/Elastic/V_Boundary_Refine/Update_V_3D.C',
                         'src/Elastic/V_Coarsen_Patch_Strategy/postprocessCoarsen_2D.C',
                         'src/Elastic/V_Coarsen_Patch_Strategy/postprocessCoarsen_3D.C',
