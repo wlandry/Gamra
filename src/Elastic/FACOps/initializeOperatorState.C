@@ -247,6 +247,14 @@ void Elastic::FACOps::initializeOperatorState
                    solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
                    v_ghostfill_refine_operator);
+
+  v_ghostfill_refine_algorithm.
+    registerRefine(dv_diagonal_id,dv_diagonal_id,dv_diagonal_id,
+                   boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+  v_ghostfill_refine_algorithm.
+    registerRefine(dv_mixed_id,dv_mixed_id,dv_mixed_id,
+                   boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+
   v_nocoarse_refine_algorithm.
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
