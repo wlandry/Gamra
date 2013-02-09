@@ -18,7 +18,8 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
   /* We only care about edges, not corners, so we only iterate over
      edge boundary boxes. */
   const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
-    &boundaries=coarse_fine[fine.getPatchLevelNumber()]->getEdgeBoundaries(coarse.getGlobalId());
+    &boundaries=coarse_fine[fine.getPatchLevelNumber()]
+    ->getEdgeBoundaries(coarse.getGlobalId());
      
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
