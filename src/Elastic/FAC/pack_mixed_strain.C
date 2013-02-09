@@ -23,6 +23,10 @@ Elastic::FAC::pack_mixed_strain(double* buffer,
   ip[ix]=1;
   jp[d]=1;
 
+  const double *dx(boost::dynamic_pointer_cast
+                   <SAMRAI::geom::CartesianPatchGeometry>
+                   (patch.getPatchGeometry())->getDx());
+
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr=
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (patch.getPatchData(dv_mixed_id));
@@ -42,7 +46,7 @@ Elastic::FAC::pack_mixed_strain(double* buffer,
             {
               const SAMRAI::pdat::SideIndex
                 s(*inode,ix,SAMRAI::pdat::SideIndex::Lower);
-              *buffer=v(s) - v(s-jp) + dv_mixed(s,1) - dv_mixed(s-jp,0);
+              *buffer=(v(s) - v(s-jp) + dv_mixed(s,1) - dv_mixed(s-jp,0))/dx[d];
             }
           ++buffer;
         }
@@ -64,8 +68,8 @@ Elastic::FAC::pack_mixed_strain(double* buffer,
             {
               const SAMRAI::pdat::SideIndex
                 s(*iedge,ix,SAMRAI::pdat::SideIndex::Lower);
-              *buffer=v(s) - v(s-jp) + dv_mixed(s,2*((d-ix)%(dim-1))+1)
-                - dv_mixed(s,2*((d-ix)%(dim-1)));
+              *buffer=(v(s) - v(s-jp) + dv_mixed(s,2*((d-ix)%(dim-1))+1)
+                       - dv_mixed(s,2*((d-ix)%(dim-1))))/dx[d];
             }
           ++buffer;
         }

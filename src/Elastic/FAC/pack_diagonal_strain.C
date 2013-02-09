@@ -21,6 +21,10 @@ Elastic::FAC::pack_diagonal_strain(double* buffer,
   SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(d_dim));
   ip[ix]=1;
 
+  const double *dx(boost::dynamic_pointer_cast
+                   <SAMRAI::geom::CartesianPatchGeometry>
+                   (patch.getPatchGeometry())->getDx());
+
   if(d_dim.getValue()==2)
     {
       SAMRAI::pdat::CellData<double>::iterator iend(region,false);
@@ -29,7 +33,7 @@ Elastic::FAC::pack_diagonal_strain(double* buffer,
         {
           const SAMRAI::pdat::SideIndex
             s(*icell,ix,SAMRAI::pdat::SideIndex::Lower);
-          *buffer=v(s+ip)-v(s)-dv_diagonal(*icell,ix);
+          *buffer=(v(s+ip)-v(s)-dv_diagonal(*icell,ix))/dx[ix];
           ++buffer;
         }
     }
@@ -41,7 +45,7 @@ Elastic::FAC::pack_diagonal_strain(double* buffer,
         {
           const SAMRAI::pdat::SideIndex
             s(*icell,ix,SAMRAI::pdat::SideIndex::Lower);
-          *buffer=v(s+ip)-v(s)-dv_diagonal(*icell,ix);
+          *buffer=(v(s+ip)-v(s)-dv_diagonal(*icell,ix))/dx[ix];
           ++buffer;
         }
     }
