@@ -81,8 +81,8 @@ void Elastic::FACOps::prolongErrorAndCorrect
    * interior in the scratch space, then use that refined data
    * to correct the fine level error.
    */
-  v_refine_patch_strategy.setTargetDataId(d_side_scratch_id);
-  v_refine_patch_strategy.setHomogeneousBc(true);
+  v_refine_patch_strategy.target_id=d_side_scratch_id;
+  v_refine_patch_strategy.is_residual=true;
   xeqScheduleProlongation(d_side_scratch_id,
                           s.getComponentDescriptorIndex(0),
                           d_side_scratch_id,

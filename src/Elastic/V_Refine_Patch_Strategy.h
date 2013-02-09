@@ -59,7 +59,7 @@ public:
       const SAMRAI::hier::IntVector& )
   {
     /* We only set Dirichlet boundaries once, before the solve. */
-    d_boundary_conditions.set_boundary(patch,v_id,d_homogeneous_bc);
+    d_boundary_conditions.set_boundary(patch,target_id,is_residual);
   }
    SAMRAI::hier::IntVector
    getRefineOpStencilWidth() const
@@ -72,7 +72,7 @@ public:
                    const SAMRAI::hier::Box& ,
                    const SAMRAI::hier::IntVector& )
   {
-    d_boundary_conditions.set_boundary(coarse,v_id,d_homogeneous_bc);
+    d_boundary_conditions.set_boundary(coarse,target_id,is_residual);
   }
 
   virtual void
@@ -97,10 +97,7 @@ public:
     * the it is not passed in through the argument list of
     * setPhysicalBounaryConditions.
     */
-  void setTargetDataId(int id)
-  {
-    v_id=id;
-  }
+  int target_id;
 
    /*!
     * @brief Set whether boundary filling should assume homogeneous
@@ -113,105 +110,22 @@ public:
     * to set a flag that will cause a null pointer to be given to
     * setBcCoefs() to indicate that fact.
     */
-  void
-  setHomogeneousBc(bool homogeneous_bc)
-  {
-    d_homogeneous_bc=homogeneous_bc;
-  }
+  bool is_residual;
 
    //@}
 
 private:
-   /*!
-    * @brief Trim a boundary box so that it does not stick out
-    * past a given box.
-    *
-    * Certain boundary-related operations occur on patch data that
-    * do not or cannot extend past the edgr or corner of a patch.
-    * This function is used to trim down the parts of the boundary box
-    * that extend past those points so that a suitable index range
-    * is achieved.
-    *
-    * The boundary box trimmed must be of type 1 or 2.
-    *
-    * @param boundary_box Boundary box to be trimmed.
-    * @param limit_box SAMRAI::hier::Box to not stick past
-    *
-    * @return New trimmed boundary box.
-    */
-   // SAMRAI::hier::BoundaryBox
-   // trimBoundaryBox(
-   //    const SAMRAI::hier::BoundaryBox& boundary_box,
-   //    const SAMRAI::hier::Box& limit_box) const;
+  const SAMRAI::tbox::Dimension d_dim;
 
-   /*!
-    * @brief Return box describing the index space of boundary nodes
-    * defined by a boundary box.
-    *
-    * Define a box describing the indices of the nodes corresponding
-    * to the input boundary box.  These nodes lie on the boundary
-    * itself.
-    *
-    * The input boundary_box must be of type 1
-    * (see SAMRAI::hier::BoundaryBox::getBoundaryType()).
-    *
-    * @param boundary_box input boundary box
-    * @return a box to define the node indices corresponding to
-    *   boundary_box
-    */
-   // SAMRAI::hier::Box
-   // makeNodeBoundaryBox(
-   //    const SAMRAI::hier::BoundaryBox& boundary_box) const;
-
-   /*!
-    * @brief Return box describing the index space of faces
-    * defined by a boundary box.
-    *
-    * Define a box describing the indices of the codimension 1
-    * surface corresponding to the input boundary box.
-    *
-    * The input boundary_box must be of type 1
-    * (see SAMRAI::hier::BoundaryBox::getBoundaryType()).
-    *
-    * This is a utility function for working with the
-    * indices coresponding to a boundary box but coincide
-    * with the patch boundary.
-    *
-    * @param boundary_box input boundary box
-    * @return a box to define the face indices corresponding to
-    *    boundary_box
-    */
-   // SAMRAI::hier::Box
-   // makeFaceBoundaryBox(
-   //    const SAMRAI::hier::BoundaryBox& boundary_box) const;
-
-   const SAMRAI::tbox::Dimension d_dim;
-
-   std::string d_object_name;
-
-   /*!
-    * @brief Coefficient strategy giving a way to get to
-    * Robin bc coefficients.
-    */
-   // const RobinBcCoefStrategy* d_coef_strategy;
-
-   /*!
-    * @brief SAMRAI::hier::Index of target patch data when filling ghosts.
-    */
-   int v_id;
+  std::string d_object_name;
 
   Boundary_Conditions &d_boundary_conditions;
 
-   /*!
-    * @brief Whether to assumg g=0 when filling ghosts.
-    */
-   bool d_homogeneous_bc;
-
-   /*!
-    * @brief Timers for performance measurement.
-    */
-   // boost::shared_ptr<tbox::Timer> t_set_boundary_values_in_cells;
-   // boost::shared_ptr<tbox::Timer> t_use_set_bc_coefs;
+  /*!
+   * @brief Timers for performance measurement.
+   */
+  // boost::shared_ptr<tbox::Timer> t_set_boundary_values_in_cells;
+  // boost::shared_ptr<tbox::Timer> t_use_set_bc_coefs;
 };
 
 }

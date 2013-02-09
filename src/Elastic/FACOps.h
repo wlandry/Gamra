@@ -256,6 +256,9 @@ namespace Elastic {
       edge_moduli_id=edge_moduli;
       dv_diagonal_id=dv_diagonal;
       dv_mixed_id=dv_mixed;
+
+      v_coarsen_patch_strategy.set_extra_ids(cell_moduli_id,edge_moduli_id,
+                                             dv_diagonal_id,dv_mixed_id);
     }
     //@}
 

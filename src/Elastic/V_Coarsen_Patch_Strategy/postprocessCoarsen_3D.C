@@ -18,10 +18,10 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
      
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-    (fine.getPatchData(v_id));
+    (fine.getPatchData(source_id));
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-    (coarse.getPatchData(v_id));
+    (coarse.getPatchData(source_id));
 
   TBOX_ASSERT(v);
   TBOX_ASSERT(v_fine);

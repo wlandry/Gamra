@@ -56,15 +56,16 @@ void Elastic::FACOps::restrictSolution
     v_dst(d.getComponentDescriptorIndex(0));
 
   /* Need to do a sync because the coarsening for v uses ghost zones. */
-  v_coarsen_patch_strategy.setSourceDataId(v_src);
+  v_coarsen_patch_strategy.source_id=v_src;
+  v_coarsen_patch_strategy.is_residual=false;
   xeqScheduleGhostFillNoCoarse(v_src,dest_ln+1);
 
   xeqScheduleURestriction(v_dst,v_src,dest_ln);
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
     level = d_hierarchy->getPatchLevel(dest_ln);
-  v_refine_patch_strategy.setHomogeneousBc(false);
-  v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));
+  v_refine_patch_strategy.is_residual=false;
+  v_refine_patch_strategy.target_id=d.getComponentDescriptorIndex(0);
 
   if (dest_ln == d_ln_min) {
     xeqScheduleGhostFillNoCoarse(v_dst,dest_ln);

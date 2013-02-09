@@ -32,8 +32,8 @@ void Elastic::FACOps::smooth_Tackley_2D
      calculating a new pressure update requires computing in the ghost
      region so that the update for the velocity inside the box will be
      correct. */
-  v_refine_patch_strategy.setTargetDataId(v_id);
-  v_refine_patch_strategy.setHomogeneousBc(true);
+  v_refine_patch_strategy.target_id=v_id;
+  v_refine_patch_strategy.is_residual=true;
   xeqScheduleGhostFillNoCoarse(v_rhs_id,ln);
 
   if (ln > d_ln_min) {

@@ -23,13 +23,11 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
      
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-    (fine.getPatchData(v_id));
+    (fine.getPatchData(source_id));
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-    (coarse.getPatchData(v_id));
+    (coarse.getPatchData(source_id));
 
-  const bool is_residual(v_id!=7);
-  const int dv_mixed_id(5);
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (fine.getPatchData(dv_mixed_id));
