@@ -7,6 +7,11 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
  const SAMRAI::hier::Box& ,
  const SAMRAI::hier::IntVector& )
 {
+  /* FIXME: Why is this required?  Shouldn't the boundary points be
+     ok?  They are partially interpolated from the coarse level, but
+     that should not be a problem.  Unfortunately, it is a problem,
+     because removing this routine generates nan's. */
+
   /* Fix up the boundary elements by iterating through the boundary
      boxes */
 
@@ -21,6 +26,12 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (coarse.getPatchData(v_id));
+
+  const bool is_residual(v_id!=7);
+  const int dv_mixed_id(5);
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (fine.getPatchData(dv_mixed_id));
 
   TBOX_ASSERT(v);
   TBOX_ASSERT(v_fine);
@@ -48,20 +59,24 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
               {
                 SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j),0,
                                                SAMRAI::pdat::SideIndex::Upper);
-                SAMRAI::pdat::SideIndex center(coarse*2);
-                if(center[1]>=gbox.lower(1) && center[1]<gbox.upper(1))
+                SAMRAI::pdat::SideIndex x(coarse*2);
+                if(x[1]>=gbox.lower(1) && x[1]<gbox.upper(1))
                   {
-                    (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
+                    (*v)(coarse)=((*v_fine)(x) + (*v_fine)(x+jp))/2;
+                    if(!is_residual)
+                      (*v)(coarse)+=((*dv_mixed)(x,0) + (*dv_mixed)(x+jp,1))/2;
                   }
               }
             else if(location_index==1)
               {
                 SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j),0,
                                                SAMRAI::pdat::SideIndex::Lower);
-                SAMRAI::pdat::SideIndex center(coarse*2);
-                if(center[1]>=gbox.lower(1) && center[1]<gbox.upper(1))
+                SAMRAI::pdat::SideIndex x(coarse*2);
+                if(x[1]>=gbox.lower(1) && x[1]<gbox.upper(1))
                   {
-                    (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+jp))/2;
+                    (*v)(coarse)=((*v_fine)(x) + (*v_fine)(x+jp))/2;
+                    if(!is_residual)
+                      (*v)(coarse)+=((*dv_mixed)(x,0) + (*dv_mixed)(x+jp,1))/2;
                   }
               }
             /* Fix vy */
@@ -69,20 +84,24 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
               {
                 SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j),1,
                                                SAMRAI::pdat::SideIndex::Upper);
-                SAMRAI::pdat::SideIndex center(coarse*2);
-                if(center[0]>=gbox.lower(0) && center[0]<gbox.upper(0))
+                SAMRAI::pdat::SideIndex y(coarse*2);
+                if(y[0]>=gbox.lower(0) && y[0]<gbox.upper(0))
                   {
-                    (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
+                    (*v)(coarse)=((*v_fine)(y) + (*v_fine)(y+ip))/2;
+                    if(!is_residual)
+                      (*v)(coarse)+=((*dv_mixed)(y,0) + (*dv_mixed)(y+ip,1))/2;
                   }
               }
             else if(location_index==3)
               {
                 SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j),1,
                                                SAMRAI::pdat::SideIndex::Lower);
-                SAMRAI::pdat::SideIndex center(coarse*2);
-                if(center[0]>=gbox.lower(0) && center[0]<gbox.upper(0))
+                SAMRAI::pdat::SideIndex y(coarse*2);
+                if(y[0]>=gbox.lower(0) && y[0]<gbox.upper(0))
                   {
-                    (*v)(coarse)=((*v_fine)(center) + (*v_fine)(center+ip))/2;
+                    (*v)(coarse)=((*v_fine)(y) + (*v_fine)(y+ip))/2;
+                    if(!is_residual)
+                      (*v)(coarse)+=((*dv_mixed)(y,0) + (*dv_mixed)(y+ip,1))/2;
                   }
               }
             else
