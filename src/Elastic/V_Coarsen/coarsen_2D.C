@@ -59,9 +59,7 @@ void Elastic::V_Coarsen::coarsen_2D
  const SAMRAI::hier::Box& coarse_box,
  const SAMRAI::hier::IntVector& ratio) const
 {
-  const SAMRAI::tbox::Dimension& Dim(getDim());
-
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(Dim, coarse, fine, coarse_box, ratio);
+  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(getDim(), coarse, fine, coarse_box, ratio);
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
