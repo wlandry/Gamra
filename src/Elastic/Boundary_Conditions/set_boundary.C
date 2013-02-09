@@ -60,6 +60,73 @@ void Elastic::Boundary_Conditions::set_boundary
                                 homogeneous);
             }
         }
+
+
+      /* FIXME: Why is this even required?  Shouldn't the boundaries
+         be set once and then forgotten?  On coarse levels, the
+         boundaries may not be copied over. Taking this part out
+         certainly breaks the code. */
+
+      /* FIXME: This looping seems really excessive.  It seems like
+         there should be a better way using getBoundaryBoxes. */
+      if(!homogeneous)
+        {
+          boost::shared_ptr<SAMRAI::pdat::SideData<double> >
+            dv_mixed=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+            (patch.getPatchData(dv_mixed_id));
+
+          for(int ix=0; ix<dim; ++ix)
+            {
+              SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
+              for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; si++)
+                {
+                  SAMRAI::pdat::SideIndex s(*si);
+                  if((s[ix]<pbox.lower(ix)
+                      && geom->getTouchesRegularBoundary(ix,0))
+                     || (s[ix]>pbox.upper(ix)+1
+                         && geom->getTouchesRegularBoundary(ix,1)))
+                    {
+                      (*dv_mixed)(s,0)=(*dv_mixed)(s,1)=0;
+                    }
+                  else
+                    {
+                      for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                        {
+                          if((s[iy]<pbox.lower(iy)
+                              && geom->getTouchesRegularBoundary(iy,0))
+                             || (s[iy]>pbox.upper(iy)
+                                 && geom->getTouchesRegularBoundary(iy,1)))
+                            {
+                              (*dv_mixed)(s,0)=(*dv_mixed)(s,1)=0;
+                            }
+                        }
+                    }
+                }
+            }
+
+          boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal=
+            boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+            (patch.getPatchData(dv_diagonal_id));
+
+          SAMRAI::pdat::CellIterator c_end(gbox,false);
+          for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=c_end; ci++)
+            {
+              SAMRAI::pdat::CellIndex c(*ci);
+              bool is_boundary(false);
+              for(int d=0;d<dim;++d)
+                is_boundary= is_boundary
+                  || ((c[d]<pbox.lower(d)
+                       && geom->getTouchesRegularBoundary(d,0))
+                      || (c[d]>pbox.upper(d)
+                          && geom->getTouchesRegularBoundary(d,1)));
+
+              if(is_boundary)
+                {
+                  for(int ix=0;ix<dim;++ix)
+                    (*dv_diagonal)(c,ix)=0;
+                }
+            }
+        }
     }
   catch(mu::Parser::exception_type &e)
     {

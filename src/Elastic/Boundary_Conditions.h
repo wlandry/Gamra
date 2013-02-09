@@ -24,11 +24,11 @@ namespace Elastic {
                       const int &v_id, const bool &rhs);
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
                        const int &v_id, const bool &rhs);
-    void set_extra_ids(const int &e_id, const int &dva, const int &dvp)
+    void set_extra_ids(const int &e_id, const int &dv_d, const int &dv_m)
     {
       edge_moduli_id=e_id;
-      dv_diagonal_id=dva;
-      dv_mixed_id=dvp;
+      dv_diagonal_id=dv_d;
+      dv_mixed_id=dv_m;
     }
 
     Input_Expression expression[3][3][2];
