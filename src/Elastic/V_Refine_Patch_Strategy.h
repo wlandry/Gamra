@@ -59,7 +59,7 @@ public:
       const SAMRAI::hier::IntVector& )
   {
     /* We only set Dirichlet boundaries once, before the solve. */
-    d_boundary_conditions.set_boundary(patch,target_id,is_residual);
+    d_boundary_conditions.set_boundary(patch,data_id,is_residual);
   }
    SAMRAI::hier::IntVector
    getRefineOpStencilWidth() const
@@ -72,7 +72,7 @@ public:
                    const SAMRAI::hier::Box& ,
                    const SAMRAI::hier::IntVector& )
   {
-    d_boundary_conditions.set_boundary(coarse,target_id,is_residual);
+    d_boundary_conditions.set_boundary(coarse,data_id,is_residual);
   }
 
   virtual void
@@ -97,7 +97,7 @@ public:
     * the it is not passed in through the argument list of
     * setPhysicalBounaryConditions.
     */
-  int target_id;
+  int data_id;
 
    /*!
     * @brief Set whether boundary filling should assume homogeneous

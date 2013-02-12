@@ -25,7 +25,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
    * to fill ghosts, the correct data is operated on.
    */
   const int v_id = solution.getComponentDescriptorIndex(0);
-  v_refine_patch_strategy.target_id=v_id;
+  v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=error_equation_indicator;
 
   /*

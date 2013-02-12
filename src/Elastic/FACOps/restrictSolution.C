@@ -65,7 +65,7 @@ void Elastic::FACOps::restrictSolution
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
     level = d_hierarchy->getPatchLevel(dest_ln);
   v_refine_patch_strategy.is_residual=false;
-  v_refine_patch_strategy.target_id=d.getComponentDescriptorIndex(0);
+  v_refine_patch_strategy.data_id=d.getComponentDescriptorIndex(0);
 
   if (dest_ln == d_ln_min) {
     xeqScheduleGhostFillNoCoarse(v_dst,dest_ln);
