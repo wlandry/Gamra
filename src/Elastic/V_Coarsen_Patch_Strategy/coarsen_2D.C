@@ -99,8 +99,11 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
   int ijk[2];
 
 
-  /* FIXME: Is coarse_box always covered by the fine box?  Maybe I
-     need to do an intersection, or is it already done for me? */
+  /* From reading CoarsenSchedule::coarsenSourceData in
+     SAMRAI/source/SAMRAI/xfer/CoarsenSchedule.C, it seems that the
+     coarse box is created from the fine box.  So the coarse box is
+     always covered by the fine box, meaning we do not have to do an
+     intersection. */
   for(ijk[1]=coarse_box.lower(1); ijk[1]<=coarse_box.upper(1)+1; ++ijk[1])
     for(ijk[0]=coarse_box.lower(0); ijk[0]<=coarse_box.upper(0)+1; ++ijk[0])
       {
