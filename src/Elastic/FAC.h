@@ -314,6 +314,15 @@ void Elastic::FAC::add_faults()
           boost::shared_ptr<T> edge_moduli =
             boost::dynamic_pointer_cast<T>((*p)->getPatchData(edge_moduli_id));
 
+          SAMRAI::hier::Box pbox = v_rhs_data->getBox();
+          SAMRAI::hier::Box gbox = v_rhs_data->getGhostBox();
+          for(int ix=0;ix<dim;++ix)
+            {
+              if(geom->getTouchesRegularBoundary(ix,0))
+                gbox.shorten(ix,-1);
+              if(geom->getTouchesRegularBoundary(ix,1))
+                gbox.shorten(ix,1);
+            }
 
           /* Iterate over the faults */
           const int params_per_fault(9);
@@ -364,8 +373,6 @@ void Elastic::FAC::add_faults()
 
               double fault[]={L,W};
 
-              SAMRAI::hier::Box pbox = v_rhs_data->getBox();
-              SAMRAI::hier::Box gbox = v_rhs_data->getGhostBox();
               for(int ix=0;ix<dim;++ix)
                 {
                   double offset[]={0.5,0.5,0.5};
@@ -392,134 +399,72 @@ void Elastic::FAC::add_faults()
                                             intersect,intersect_half);
 
                       /* d/dx, d/dy, d/dz */
-                      for(int d=0;d<dim;++d)
+                      if(gbox.contains(s))
                         {
-                          if(ix==d)
-                            {
-                              if(gbox.contains(s))
-                                {
-                                  SAMRAI::pdat::CellIndex c(s);
-                                  (*dv_diagonal)(c,ix)+=intersect[d][0]*jump(ix);
-                                }
-                            }
-                          else
-                            {
-                              (*dv_mixed)(s,2*((d-ix)%(dim-1)))+=
-                                intersect_half[d][0]*jump(ix);
-                              (*dv_mixed)(s,2*((d-ix)%(dim-1))+1)-=
-                                intersect_half[d][1]*jump(ix);
-                            }
+                          SAMRAI::pdat::CellIndex c(s);
+                          (*dv_diagonal)(c,ix)+=intersect[ix][0]*jump(ix);
                         }
 
-                      if(pbox.contains(s) || pbox.contains(s-unit[ix]))
+                      for(int iy=(ix+1)%dim;iy!=ix;iy=((iy+1)%dim))
                         {
-                          /* d/dx^2, d/dy^2, d/dz^2 */
-                          for(int d=0;d<dim;++d)
-                            {
-                              int sign(0);
-                              SAMRAI::hier::Index cell_offset(zero),
-                                edge_offset(zero);
-                              if(intersect[d][0]!=0)
-                                {
-                                  sign=intersect[d][0];
-                                  edge_offset=unit[d];
-                                }
-                              else if(intersect[d][1]!=0)
-                                {
-                                  sign=-intersect[d][1];
-                                  cell_offset=-unit[d];
-                                }
-
-                              if(sign!=0)
-                                {
-                                  /* This is the lambda and mu that multiply the
-                                     jump term.  So we need the lambda and mu
-                                     that are on the side where the jump
-                                     occurs. */
-                                  double lambda_here, mu_here;
-                                  if(ix==d)
-                                    {
-                                      SAMRAI::pdat::CellIndex c(s+cell_offset);
-                                      lambda_here=(*cell_moduli)(c,0);
-                                      mu_here=(*cell_moduli)(c,1);
-                                    }
-                                  else
-                                    {
-                                      const int iz((ix+1)%dim!=d ? (ix+1)%dim :
-                                                   (ix+2)%dim);
-                                      lambda_here=edge_node_eval(*edge_moduli,
-                                                                 s+edge_offset,
-                                                                 iz,0);
-                                      mu_here=edge_node_eval(*edge_moduli,
-                                                             s+edge_offset,
-                                                             iz,1);
-                                    }
-                                  double factor(mu_here);
-                                  if(ix==d)
-                                    factor=lambda_here+2*mu_here;
-                                  (*v_rhs_data)(s)+=sign*factor*jump(ix)
-                                    /(dx[d]*dx[d]);
-                                }
-                            }
-
-                          /* d/dxy */
-                          for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
-                            {
-                              const int iz((iy+1)%dim==ix ? (iy+2)%dim
-                                           : (iy+1)%dim);
-                              FTensor::Tensor1<double,3> ntt_dxy[2][2];
-                              ntt_dxy[0][0](a)=rot(a,b)*(xyz(b)+Dx[ix](b)/2
-                                                         +Dx[iy](b)/2);
-                              ntt_dxy[0][1](a)=rot(a,b)*(xyz(b)+Dx[ix](b)/2
-                                                         -Dx[iy](b)/2);
-                              ntt_dxy[1][0](a)=rot(a,b)*(xyz(b)-Dx[ix](b)/2
-                                                         +Dx[iy](b)/2);
-                              ntt_dxy[1][1](a)=rot(a,b)*(xyz(b)-Dx[ix](b)/2
-                                                         -Dx[iy](b)/2);
-
-                              double lambda_mu(0);
-
-                              /* mu terms */
-                              if(((ntt_dxy[0][0](0)<=0 && ntt_dxy[1][0](0)>0)
-                                  || (ntt_dxy[0][0](0)>0 && ntt_dxy[1][0](0)<=0))
-                                 && intersect_fault(dim,ntt_dxy[0][0],
-                                                    ntt_dxy[1][0],fault))
-                                {
-                                  lambda_mu+=(ntt_dxy[0][0](0)<=0 ? -1 : 1)*
-                                    edge_node_eval(*edge_moduli,s+unit[iy],iz,1);
-                                }
-                              if(((ntt_dxy[0][1](0)<=0 && ntt_dxy[1][1](0)>0)
-                                  || (ntt_dxy[0][1](0)>0 && ntt_dxy[1][1](0)<=0))
-                                 && intersect_fault(dim,ntt_dxy[0][1],
-                                                    ntt_dxy[1][1],fault))
-                                {
-                                  lambda_mu+=(ntt_dxy[0][1](0)<=0 ? 1 : -1)
-                                    *edge_node_eval(*edge_moduli,s,iz,1);
-                                }
-
-                              /* lambda terms */
-                              if(((ntt_dxy[0][0](0)<=0 && ntt_dxy[0][1](0)>0)
-                                  || (ntt_dxy[0][0](0)>0 && ntt_dxy[0][1](0)<=0))
-                                 && intersect_fault(dim,ntt_dxy[0][0],
-                                                    ntt_dxy[0][1],fault))
-                                {
-                                  SAMRAI::pdat::CellIndex c(s);
-                                  lambda_mu+=(ntt_dxy[0][0](0)<=0 ? -1 : 1)
-                                    *(*cell_moduli)(c,0);
-                                }
-                              if(((ntt_dxy[1][0](0)<=0 && ntt_dxy[1][1](0)>0)
-                                  || (ntt_dxy[1][0](0)>0 && ntt_dxy[1][1](0)<=0))
-                                 && intersect_fault(dim,ntt_dxy[1][0],
-                                                    ntt_dxy[1][1],fault))
-                                {
-                                  SAMRAI::pdat::CellIndex c(s-unit[ix]);
-                                  lambda_mu+=(ntt_dxy[1][0](0)<=0 ? 1 : -1)
-                                    *(*cell_moduli)(c,0);
-                                }
-                              (*v_rhs_data)(s)+=lambda_mu*jump(iy)
-                                /(dx[0]*dx[1]);
-                            }
+                          (*dv_mixed)(s,2*((iy-ix)%(dim-1)))+=
+                            intersect_half[iy][0]*jump(ix);
+                          (*dv_mixed)(s,2*((iy-ix)%(dim-1))+1)-=
+                            intersect_half[iy][1]*jump(ix);
                         }
+                    }
+                }
+            }
+
+          /* Corrections to the rhs */
+          for(int ix=0;ix<dim;++ix)
+            {
+              SAMRAI::pdat::SideIterator s_end(pbox,ix,false);
+              for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=s_end;
+                  si++)
+                {
+                  const SAMRAI::pdat::SideIndex s(*si);
+                  SAMRAI::pdat::CellIndex c(s);
+
+                  /* d/dx^2, d/dy^2, d/dz^2 */
+
+                  double lambda_plus((*cell_moduli)(c,0)),
+                    lambda_minus((*cell_moduli)(c-unit[ix],0)),
+                    mu_plus((*cell_moduli)(c,1)),
+                    mu_minus((*cell_moduli)(c-unit[ix],1));
+                  (*v_rhs_data)(s)+=
+                    ((*dv_diagonal)(c,ix)*(lambda_plus + 2*mu_plus)
+                     - (*dv_diagonal)(c-unit[ix],ix)*(lambda_minus + 2*mu_minus))
+                    /(dx[ix]*dx[ix]);
+
+                  for(int iy=(ix+1)%dim;iy!=ix;iy=(iy+1)%dim)
+                    {
+                      const int iz((ix+1)%dim!=iy ? (ix+1)%dim :
+                                   (ix+2)%dim);
+                      mu_plus=edge_node_eval(*edge_moduli,s+unit[iy],iz,1);
+                      mu_minus=edge_node_eval(*edge_moduli,s,iz,1);
+                      const int iy_ix(2*((iy-ix)%(dim-1)));
+                      (*v_rhs_data)(s)+=
+                        (mu_plus*((*dv_mixed)(s,iy_ix)
+                                  - (*dv_mixed)(s+unit[iy],iy_ix+1))
+                         + mu_minus*((*dv_mixed)(s,iy_ix+1)
+                                     - (*dv_mixed)(s-unit[iy],iy_ix)))
+                        /(dx[iy]*dx[iy]);
+
+                      /* d/dxy */
+                      lambda_plus=(*cell_moduli)(c,0);
+                      lambda_minus=(*cell_moduli)(c-unit[ix],0);
+                      const SAMRAI::pdat::SideIndex
+                        s_y(c,iy,SAMRAI::pdat::SideIndex::Lower);
+                      const int ix_iy(2*((ix-iy)%(dim-1)));
+                      (*v_rhs_data)(s)+=
+                        (lambda_plus*(*dv_diagonal)(c,iy)
+                         - lambda_minus*(*dv_diagonal)(c-unit[ix],iy)
+                         - mu_plus*((*dv_mixed)(s_y+unit[iy],ix_iy+1)
+                                    - (*dv_mixed)(s_y+unit[iy]-unit[ix],ix_iy))
+                         + mu_minus*((*dv_mixed)(s_y,ix_iy+1)
+                                     - (*dv_mixed)(s_y-unit[ix],ix_iy)))
+                        /(dx[ix]*dx[iy]);
                     }
                 }
             }
