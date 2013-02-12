@@ -2,9 +2,9 @@
 
 void
 Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
-(boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v,
- const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_fine,
- const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed,
+(SAMRAI::pdat::SideData<double>& v,
+ const SAMRAI::pdat::SideData<double>& v_fine,
+ const SAMRAI::pdat::SideData<double>& dv_mixed,
  const SAMRAI::hier::Box& coarse_box,
  const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries) const
 {
@@ -14,7 +14,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
   /* We only care about faces, not edges or corners, so we only
      iterate over face boundary boxes. */
 
-  SAMRAI::hier::Box gbox(v_fine->getGhostBox());
+  SAMRAI::hier::Box gbox(v_fine.getGhostBox());
   SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   for(int mm=0; mm<boundaries.size(); ++mm)
     {
@@ -70,9 +70,9 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
                  && center[dir3]>=gbox.lower(dir3)
                  && center[dir3]<gbox.upper(dir3))
                 {
-                  (*v)(coarse)=
-                    ((*v_fine)(center) + (*v_fine)(center+yp)
-                     + (*v_fine)(center+zp) + (*v_fine)(center+yp+zp))/4;
+                  v(coarse)=
+                    (v_fine(center) + v_fine(center+yp)
+                     + v_fine(center+zp) + v_fine(center+yp+zp))/4;
                 }
             }
     }

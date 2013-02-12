@@ -91,35 +91,35 @@ namespace Elastic {
 
     void
     coarsen_2D
-    (boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
-     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
-     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
-     const boost::shared_ptr<SAMRAI::pdat::CellData<double> >& dv_diagonal,
-     const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry>& coarse_geom,
+    (SAMRAI::pdat::SideData<double>& v,
+     const SAMRAI::pdat::SideData<double>& v_fine,
+     const SAMRAI::pdat::SideData<double>& dv_mixed,
+     const SAMRAI::pdat::CellData<double>& dv_diagonal,
+     const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
      const SAMRAI::hier::Box& coarse_box) const;
 
     void
     fix_boundary_elements_2D
-    (boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
-     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
-     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
+    (SAMRAI::pdat::SideData<double>& v,
+     const SAMRAI::pdat::SideData<double>& v_fine,
+     const SAMRAI::pdat::SideData<double>& dv_mixed,
      const SAMRAI::hier::Box& coarse_box,
-     const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries) const;
+     const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
 
     void
     coarsen_3D
-    (boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
-     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
-     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
-     const boost::shared_ptr<SAMRAI::pdat::CellData<double> >& dv_diagonal,
-     const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry>& coarse_geom,
+    (SAMRAI::pdat::SideData<double>& v,
+     const SAMRAI::pdat::SideData<double>& v_fine,
+     const SAMRAI::pdat::SideData<double>& dv_mixed,
+     const SAMRAI::pdat::CellData<double>& dv_diagonal,
+     const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
      const SAMRAI::hier::Box& coarse_box) const;
 
     void
     fix_boundary_elements_3D
-    (boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
-     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
-     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
+    (SAMRAI::pdat::SideData<double>& v,
+     const SAMRAI::pdat::SideData<double>& v_fine,
+     const SAMRAI::pdat::SideData<double>& dv_mixed,
      const SAMRAI::hier::Box& coarse_box,
      const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
 

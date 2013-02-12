@@ -2,11 +2,11 @@
 
 void
 Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
-(boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
- const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
- const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
+(SAMRAI::pdat::SideData<double>& v,
+ const SAMRAI::pdat::SideData<double>& v_fine,
+ const SAMRAI::pdat::SideData<double>& dv_mixed,
  const SAMRAI::hier::Box& coarse_box,
- const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const
+ const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries) const
 {
   /* FIXME: Why is this required?  Shouldn't the boundary points be
      ok?  They are partially interpolated from the coarse level, but
@@ -19,7 +19,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
   /* We only care about edges, not corners, so we only iterate over
      edge boundary boxes. */
 
-  SAMRAI::hier::Box gbox(v_fine->getGhostBox());
+  SAMRAI::hier::Box gbox(v_fine.getGhostBox());
   SAMRAI::hier::Index ip(1,0), jp(0,1);
   for(int mm=0; mm<boundaries.size(); ++mm)
     {
@@ -43,9 +43,9 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 SAMRAI::pdat::SideIndex x(coarse*2);
                 if(x[1]>=gbox.lower(1) && x[1]<gbox.upper(1))
                   {
-                    (*v)(coarse)=((*v_fine)(x) + (*v_fine)(x+jp))/2;
+                    v(coarse)=(v_fine(x) + v_fine(x+jp))/2;
                     if(!is_residual)
-                      (*v)(coarse)+=((*dv_mixed)(x,0) + (*dv_mixed)(x+jp,1))/2;
+                      v(coarse)+=(dv_mixed(x,0) + dv_mixed(x+jp,1))/2;
                   }
               }
             else if(location_index==1)
@@ -55,9 +55,9 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 SAMRAI::pdat::SideIndex x(coarse*2);
                 if(x[1]>=gbox.lower(1) && x[1]<gbox.upper(1))
                   {
-                    (*v)(coarse)=((*v_fine)(x) + (*v_fine)(x+jp))/2;
+                    v(coarse)=(v_fine(x) + v_fine(x+jp))/2;
                     if(!is_residual)
-                      (*v)(coarse)+=((*dv_mixed)(x,0) + (*dv_mixed)(x+jp,1))/2;
+                      v(coarse)+=(dv_mixed(x,0) + dv_mixed(x+jp,1))/2;
                   }
               }
             /* Fix vy */
@@ -68,9 +68,9 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 SAMRAI::pdat::SideIndex y(coarse*2);
                 if(y[0]>=gbox.lower(0) && y[0]<gbox.upper(0))
                   {
-                    (*v)(coarse)=((*v_fine)(y) + (*v_fine)(y+ip))/2;
+                    v(coarse)=(v_fine(y) + v_fine(y+ip))/2;
                     if(!is_residual)
-                      (*v)(coarse)+=((*dv_mixed)(y,0) + (*dv_mixed)(y+ip,1))/2;
+                      v(coarse)+=(dv_mixed(y,0) + dv_mixed(y+ip,1))/2;
                   }
               }
             else if(location_index==3)
@@ -80,9 +80,9 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 SAMRAI::pdat::SideIndex y(coarse*2);
                 if(y[0]>=gbox.lower(0) && y[0]<gbox.upper(0))
                   {
-                    (*v)(coarse)=((*v_fine)(y) + (*v_fine)(y+ip))/2;
+                    v(coarse)=(v_fine(y) + v_fine(y+ip))/2;
                     if(!is_residual)
-                      (*v)(coarse)+=((*dv_mixed)(y,0) + (*dv_mixed)(y+ip,1))/2;
+                      v(coarse)+=(dv_mixed(y,0) + dv_mixed(y+ip,1))/2;
                   }
               }
             else

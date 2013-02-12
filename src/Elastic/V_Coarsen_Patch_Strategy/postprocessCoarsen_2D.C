@@ -26,11 +26,11 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
     (coarse.getPatchGeometry());
 
-  coarsen_2D(v,v_fine,dv_mixed,dv_diagonal,coarse_geom,coarse_box);
+  coarsen_2D(*v,*v_fine,*dv_mixed,*dv_diagonal,*coarse_geom,coarse_box);
 
   const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
     &boundaries=coarse_fine[fine.getPatchLevelNumber()]
     ->getEdgeBoundaries(coarse.getGlobalId());
 
-  fix_boundary_elements_2D(v,v_fine,dv_mixed,coarse_box,boundaries);
+  fix_boundary_elements_2D(*v,*v_fine,*dv_mixed,coarse_box,boundaries);
 }

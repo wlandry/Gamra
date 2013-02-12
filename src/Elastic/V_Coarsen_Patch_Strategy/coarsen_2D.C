@@ -24,39 +24,37 @@
 #include "FTensor.hpp"
 
 inline void
-coarsen_point_2D(const SAMRAI::pdat::SideIndex &coarse,
-                 const SAMRAI::pdat::SideIndex &fine,
-                 const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
-                 boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v,
-                 const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_fine )
+coarsen_point_2D(const SAMRAI::pdat::SideIndex& coarse,
+                 const SAMRAI::pdat::SideIndex& fine,
+                 const SAMRAI::hier::Index& ip, const SAMRAI::hier::Index& jp,
+                 SAMRAI::pdat::SideData<double>& v,
+                 const SAMRAI::pdat::SideData<double>& v_fine )
 {
-  (*v)(coarse)=((*v_fine)(fine) + (*v_fine)(fine+jp))/4
-    + ((*v_fine)(fine-ip) + (*v_fine)(fine-ip+jp)
-       + (*v_fine)(fine+ip) + (*v_fine)(fine+jp+ip))/8;
+  v(coarse)=(v_fine(fine) + v_fine(fine+jp))/4
+    + (v_fine(fine-ip) + v_fine(fine-ip+jp)
+       + v_fine(fine+ip) + v_fine(fine+jp+ip))/8;
 }
 
 inline double
-coarsen_correction_2D(const SAMRAI::pdat::SideIndex &fine,
-                      const int &axis,
-                      const SAMRAI::hier::Index &ip,
-                      const SAMRAI::hier::Index &jp,
-                      const boost::shared_ptr<SAMRAI::pdat::CellData<double> >
-                      &dv_diagonal,
-                      const boost::shared_ptr<SAMRAI::pdat::SideData<double> >
-                      &dv_mixed)
+coarsen_correction_2D(const SAMRAI::pdat::SideIndex& fine,
+                      const int& axis,
+                      const SAMRAI::hier::Index& ip,
+                      const SAMRAI::hier::Index& jp,
+                      const SAMRAI::pdat::CellData<double>& dv_diagonal,
+                      const SAMRAI::pdat::SideData<double>& dv_mixed)
 {
   SAMRAI::pdat::CellIndex cell(fine);
-  return ((*dv_diagonal)(cell-ip,axis) - (*dv_diagonal)(cell,axis)
-          + (*dv_diagonal)(cell-ip+jp,axis) - (*dv_diagonal)(cell+jp,axis))/8
-    + ((*dv_mixed)(fine,0) + (*dv_mixed)(fine+jp,1))/2;
+  return (dv_diagonal(cell-ip,axis) - dv_diagonal(cell,axis)
+          + dv_diagonal(cell-ip+jp,axis) - dv_diagonal(cell+jp,axis))/8
+    + (dv_mixed(fine,0) + dv_mixed(fine+jp,1))/2;
 }
 
 void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
-(boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v,
- const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_fine,
- const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed,
- const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal,
- const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &coarse_geom,
+(SAMRAI::pdat::SideData<double>& v,
+ const SAMRAI::pdat::SideData<double>& v_fine,
+ const SAMRAI::pdat::SideData<double>& dv_mixed,
+ const SAMRAI::pdat::CellData<double>& dv_diagonal,
+ const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
  const SAMRAI::hier::Box& coarse_box) const
 {
   /* Numbering of v nodes is
@@ -116,15 +114,15 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                          SAMRAI::pdat::SideIndex::Lower);
                 SAMRAI::pdat::SideIndex fine(coarse*2);
                 if((ijk[axis]==coarse_box.lower(axis)
-                    && coarse_geom->getTouchesRegularBoundary(axis,0))
+                    && coarse_geom.getTouchesRegularBoundary(axis,0))
                    || (ijk[axis]==coarse_box.upper(axis)+1
-                       && coarse_geom->getTouchesRegularBoundary(axis,1)))
+                       && coarse_geom.getTouchesRegularBoundary(axis,1)))
                   {
-                    (*v)(coarse)=
-                      ((*v_fine)(fine) + (*v_fine)(fine+unit[off_axis]))/2;
+                    v(coarse)=
+                      (v_fine(fine) + v_fine(fine+unit[off_axis]))/2;
                     if(!is_residual)
-                      (*v)(coarse)+=((*dv_mixed)(fine,0)
-                                     + (*dv_mixed)(fine+unit[off_axis],1))/2;
+                      v(coarse)+=(dv_mixed(fine,0)
+                                  + dv_mixed(fine+unit[off_axis],1))/2;
                   }
                 else
                   {
@@ -132,7 +130,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                                      v,v_fine);
                     if(!is_residual)
                       {
-                        (*v)(coarse)+=
+                        v(coarse)+=
                           coarsen_correction_2D(fine,axis,unit[axis],
                                                 unit[off_axis],dv_diagonal,
                                                 dv_mixed);
