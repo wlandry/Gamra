@@ -91,7 +91,8 @@ namespace Elastic {
                   /* For normal BC's, for the point just outside the
                      boundary, set a sentinel value for normal dirichlet
                      BC or the derivative for normal stress BC. */
-                  if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
+                  if(x[ix]<pbox.lower(ix)
+                     && geom->getTouchesRegularBoundary(ix,0))
                     {
                       if(!is_dirichlet[ix][ix][0])
                         {
