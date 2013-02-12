@@ -35,7 +35,6 @@ using namespace std;
 #include "Stokes/Resid_Coarsen.h"
 #include "Elastic/V_Refine.h"
 #include "Elastic/V_Boundary_Refine.h"
-#include "Elastic/V_Coarsen.h"
 #include "SAMRAI/geom/CartesianCellDoubleWeightedAverage.h"
 
 #include "Stokes/FAC.h"
@@ -219,11 +218,6 @@ int main(
           (typeid(pdat::SideVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
            (new Elastic::V_Boundary_Refine(dim)));
-        grid_geometry->addCoarsenOperator
-          (typeid(pdat::SideVariable<double>).name(),
-           boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
-           (new Elastic::V_Coarsen(dim,fac_elastic.d_boundary_conditions)));
-
         grid_geometry->addCoarsenOperator
           (typeid(pdat::CellVariable<double>).name(),
            boost::make_shared<geom::CartesianCellDoubleWeightedAverage>(dim));

@@ -16,6 +16,7 @@
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 #include "SAMRAI/hier/CoarseFineBoundary.h"
 #include "SAMRAI/pdat/SideData.h"
+#include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/pdat/CellIndex.h"
 #include "Constants.h"
 #include "Boundary_Conditions.h"
@@ -87,6 +88,41 @@ namespace Elastic {
                           const SAMRAI::hier::Box& coarse_box,
                           const SAMRAI::hier::IntVector& ratio);
 
+
+    void
+    coarsen_2D
+    (boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
+     const boost::shared_ptr<SAMRAI::pdat::CellData<double> >& dv_diagonal,
+     const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry>& coarse_geom,
+     const SAMRAI::hier::Box& coarse_box) const;
+
+    void
+    fix_boundary_elements_2D
+    (boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
+     const SAMRAI::hier::Box& coarse_box,
+     const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries) const;
+
+    void
+    coarsen_3D
+    (boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
+     const boost::shared_ptr<SAMRAI::pdat::CellData<double> >& dv_diagonal,
+     const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry>& coarse_geom,
+     const SAMRAI::hier::Box& coarse_box) const;
+
+    void
+    fix_boundary_elements_3D
+    (boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& v_fine,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> >& dv_mixed,
+     const SAMRAI::hier::Box& coarse_box,
+     const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
+
     //@}
 
     //@{
@@ -100,11 +136,11 @@ namespace Elastic {
      * setPhysicalBounaryConditions.
      */
 
-    int source_id;
+    int data_id;
     bool is_residual;
 
-    void set_extra_ids(const int &cell_moduli, const int &edge_moduli,
-                       const int &dv_diagonal, const int &dv_mixed)
+    void set_extra_ids(const int& cell_moduli, const int& edge_moduli,
+                       const int& dv_diagonal, const int& dv_mixed)
     {
       cell_moduli_id=cell_moduli;
       edge_moduli_id=edge_moduli;
@@ -124,7 +160,7 @@ namespace Elastic {
      */
     int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id;
 
-    Boundary_Conditions &d_boundary_conditions;
+    Boundary_Conditions& d_boundary_conditions;
 
     /*!
      * @brief Timers for performance measurement.

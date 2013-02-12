@@ -176,11 +176,6 @@ void Elastic::FACOps::initializeOperatorState
     geometry->lookupRefineOperator(variable,v_prolongation_method);
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
-  v_urestriction_coarsen_operator =
-    v_rrestriction_coarsen_operator =
-    geometry->lookupCoarsenOperator(variable,"V_COARSEN");
-
-  vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_ghostfill_refine_operator =
     geometry->lookupRefineOperator(variable,"V_BOUNDARY_REFINE");
 
