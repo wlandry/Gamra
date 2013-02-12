@@ -137,11 +137,8 @@ namespace Elastic {
     int data_id;
     bool is_residual;
 
-    void set_extra_ids(const int& cell_moduli, const int& edge_moduli,
-                       const int& dv_diagonal, const int& dv_mixed)
+    void set_extra_ids(const int& dv_diagonal, const int& dv_mixed)
     {
-      cell_moduli_id=cell_moduli;
-      edge_moduli_id=edge_moduli;
       dv_diagonal_id=dv_diagonal;
       dv_mixed_id=dv_mixed;
     }
@@ -156,7 +153,7 @@ namespace Elastic {
     /*!
      * @brief SAMRAI::hier::Index of target patch data when filling ghosts.
      */
-    int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id;
+    int dv_diagonal_id, dv_mixed_id;
 
     Boundary_Conditions& d_boundary_conditions;
 
