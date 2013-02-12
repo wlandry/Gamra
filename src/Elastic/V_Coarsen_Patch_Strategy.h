@@ -103,7 +103,6 @@ namespace Elastic {
     (SAMRAI::pdat::SideData<double>& v,
      const SAMRAI::pdat::SideData<double>& v_fine,
      const SAMRAI::pdat::SideData<double>& dv_mixed,
-     const SAMRAI::hier::Box& coarse_box,
      const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
 
     void
@@ -120,7 +119,6 @@ namespace Elastic {
     (SAMRAI::pdat::SideData<double>& v,
      const SAMRAI::pdat::SideData<double>& v_fine,
      const SAMRAI::pdat::SideData<double>& dv_mixed,
-     const SAMRAI::hier::Box& coarse_box,
      const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
 
     //@}

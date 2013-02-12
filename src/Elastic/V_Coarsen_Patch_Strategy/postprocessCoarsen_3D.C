@@ -32,5 +32,5 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
     &boundaries=coarse_fine[fine.getPatchLevelNumber()]
     ->getEdgeBoundaries(coarse.getGlobalId());
 
-  fix_boundary_elements_3D(*v,*v_fine,*dv_mixed,coarse_box,boundaries);
+  fix_boundary_elements_3D(*v,*v_fine,*dv_mixed,boundaries);
 }
