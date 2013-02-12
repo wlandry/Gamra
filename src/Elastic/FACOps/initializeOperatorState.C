@@ -185,14 +185,6 @@ void Elastic::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name
                  << ": Cannot find v prolongation refine operator");
 
-    if (!v_urestriction_coarsen_operator)
-      TBOX_ERROR(d_object_name
-                 << ": Cannot find v restriction coarsening operator");
-
-    if (!v_rrestriction_coarsen_operator)
-      TBOX_ERROR(d_object_name
-                 << ": Cannot find v restriction coarsening operator");
-
     if (!v_ghostfill_refine_operator)
       TBOX_ERROR(d_object_name
                  << ": Cannot find ghost filling refinement operator");
