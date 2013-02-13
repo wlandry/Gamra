@@ -78,9 +78,6 @@ void Elastic::Boundary_Conditions::set_dirichlet
                     {
                       if(is_dirichlet[ix][iy][0])
                         {
-          /* FIXME: This is not correct for faults that intersect the
-             boundary.  The derivatives need a correction term. */
-
                           v(x)=-v(x+unit[iy]);
                           if(!homogeneous)
                             {
