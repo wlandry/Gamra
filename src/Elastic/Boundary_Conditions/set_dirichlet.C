@@ -32,40 +32,41 @@ void Elastic::Boundary_Conditions::set_dirichlet
           /* For normal BC's, for the point just outside the
              boundary, set a sentinel value for normal dirichlet
              BC or the derivative for normal traction BC. */
-          if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
+
+          /* A point can be affected by multiple boundaries.  So we
+             have to fall through for every point in case a point is
+             on a corner but the normal direction is not dirichlet. */
+
+          if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0)
+             && is_dirichlet[ix][ix][0])
             {
-              if(is_dirichlet[ix][ix][0])
-                v(x)=boundary_value;
+              v(x)=boundary_value;
             }
           else if(x[ix]>pbox.upper(ix)+1
-                  && geom->getTouchesRegularBoundary(ix,1))
+                  && geom->getTouchesRegularBoundary(ix,1)
+                  && is_dirichlet[ix][ix][1])
             {
-              if(is_dirichlet[ix][ix][1])
-                v(x)=boundary_value;
+              v(x)=boundary_value;
             }
           /* If at the boundary line, set values for normal
            * components. */
           else if(x[ix]==pbox.lower(ix)
-                  && geom->getTouchesRegularBoundary(ix,0))
+                  && geom->getTouchesRegularBoundary(ix,0)
+                  && is_dirichlet[ix][ix][0])
             {
-              if(is_dirichlet[ix][ix][0])
-                {
-                  if(!homogeneous)
-                    v(x)=expression[ix][ix][0].eval(coord);
-                  else
-                    v(x)=0;
-                }
+              if(!homogeneous)
+                v(x)=expression[ix][ix][0].eval(coord);
+              else
+                v(x)=0;
             }
           else if(x[ix]==pbox.upper(ix)+1
-                  && geom->getTouchesRegularBoundary(ix,1))
+                  && geom->getTouchesRegularBoundary(ix,1)
+                  && is_dirichlet[ix][ix][1])
             {
-              if(is_dirichlet[ix][ix][1])
-                {
-                  if(!homogeneous)
-                    v(x)=expression[ix][ix][1].eval(coord);
-                  else
-                    v(x)=0;
-                }
+              if(!homogeneous)
+                v(x)=expression[ix][ix][1].eval(coord);
+              else
+                v(x)=0;
             }
           /* Set tangential components. */
           else
