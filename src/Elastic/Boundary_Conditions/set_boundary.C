@@ -41,7 +41,7 @@ void Elastic::Boundary_Conditions::set_boundary
       const SAMRAI::hier::Box pbox=patch.getBox();
       const SAMRAI::hier::Box gbox=v.getGhostBox();
 
-      set_dirichlet(v,unit,dim,pbox,gbox,geom,dx,homogeneous);
+      set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
       set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
 
       if(dim==2)

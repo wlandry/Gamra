@@ -39,7 +39,9 @@ namespace Elastic {
 
     void set_dirichlet
     (SAMRAI::pdat::SideData<double> &v,
-     SAMRAI::hier::Index unit[], const int &dim,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_ptr,
+     const SAMRAI::hier::Index unit[],
+     const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
