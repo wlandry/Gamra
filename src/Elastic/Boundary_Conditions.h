@@ -39,7 +39,7 @@ namespace Elastic {
 
     void set_dirichlet
     (SAMRAI::pdat::SideData<double> &v,
-     SAMRAI::hier::Index pp[], const int &dim,
+     SAMRAI::hier::Index unit[], const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
@@ -48,7 +48,9 @@ namespace Elastic {
 
     void set_shear_derivs
     (SAMRAI::pdat::SideData<double> &v,
-     SAMRAI::hier::Index pp[], const int &dim,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_ptr,
+     const SAMRAI::hier::Index unit[],
+     const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
@@ -59,13 +61,16 @@ namespace Elastic {
     void set_normal_stress
     (SAMRAI::pdat::SideData<double> &v,
      const T &edge_moduli,
-     SAMRAI::hier::Index pp[], const int &dim,
+     SAMRAI::hier::Index unit[], const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
      const bool &homogeneous)
     {
+          /* FIXME: This is not correct for faults that intersect the
+             boundary.  The derivatives need a correction term. */
+
       for(int ix=0; ix<dim; ++ix)
         {
           double offset[]={0.5,0.5,0.5};
@@ -101,15 +106,15 @@ namespace Elastic {
                             {
                               SAMRAI::pdat::SideIndex
                                 y(x,iy,SAMRAI::pdat::SideIndex::Lower);
-                              duyy+=(v(y+pp[iy]) + v(y+pp[ix]+pp[iy])
-                                     - v(y+pp[ix]) - v(y))
+                              duyy+=(v(y+unit[iy]) + v(y+unit[ix]+unit[iy])
+                                     - v(y+unit[ix]) - v(y))
                                 /(2*dx[ix]);
                             }
                           double lambda=
-                            edge_node_average(edge_moduli,x+pp[ix],ix,pp,0);
+                            edge_node_average(edge_moduli,x+unit[ix],ix,unit,0);
                           double mu=
-                            edge_node_average(edge_moduli,x+pp[ix],ix,pp,1);
-                          v(x)=v(x+pp[ix]*2)
+                            edge_node_average(edge_moduli,x+unit[ix],ix,unit,1);
+                          v(x)=v(x+unit[ix]*2)
                             + lambda*duyy*2*dx[ix]/(lambda+2*mu);
                         
                           if(!homogeneous)
@@ -131,17 +136,17 @@ namespace Elastic {
                           for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                             {
                               SAMRAI::pdat::SideIndex
-                                y(x-pp[ix],iy,SAMRAI::pdat::SideIndex::Lower);
-                              duyy+=(v(y+pp[iy]) + v(y-pp[ix]+pp[iy])
-                                     -v(y) - v(y-pp[ix]))
+                                y(x-unit[ix],iy,SAMRAI::pdat::SideIndex::Lower);
+                              duyy+=(v(y+unit[iy]) + v(y-unit[ix]+unit[iy])
+                                     -v(y) - v(y-unit[ix]))
                                 /(2*dx[iy]);
                             }
                           double lambda=
-                            edge_node_average(edge_moduli,x-pp[ix],ix,pp,0);
+                            edge_node_average(edge_moduli,x-unit[ix],ix,unit,0);
                           double mu=
-                            edge_node_average(edge_moduli,x-pp[ix],ix,pp,1);
+                            edge_node_average(edge_moduli,x-unit[ix],ix,unit,1);
 
-                          v(x)=v(x-pp[ix]*2) - lambda*duyy*2*dx[ix]/(lambda+2*mu);
+                          v(x)=v(x-unit[ix]*2) - lambda*duyy*2*dx[ix]/(lambda+2*mu);
                         
                           if(!homogeneous)
                             {

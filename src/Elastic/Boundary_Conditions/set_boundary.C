@@ -17,13 +17,21 @@ void Elastic::Boundary_Conditions::set_boundary
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (patch.getPatchData(v_id));
       SAMRAI::pdat::SideData<double> &v(*v_ptr);
+
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr;
+      if(!homogeneous)
+        {
+          dv_mixed_ptr=boost::dynamic_pointer_cast
+            <SAMRAI::pdat::SideData<double> >(patch.getPatchData(dv_mixed_id));
+        }
+
       const SAMRAI::tbox::Dimension Dim(patch.getDim());
       const int dim(Dim.getValue());
       const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(Dim));
 
-      SAMRAI::hier::Index pp[]={zero,zero,zero};
+      SAMRAI::hier::Index unit[]={zero,zero,zero};
       for(int i=0;i<dim;++i)
-        pp[i][i]=1;
+        unit[i][i]=1;
 
       const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
@@ -33,8 +41,8 @@ void Elastic::Boundary_Conditions::set_boundary
       const SAMRAI::hier::Box pbox=patch.getBox();
       const SAMRAI::hier::Box gbox=v.getGhostBox();
 
-      set_dirichlet(v,pp,dim,pbox,gbox,geom,dx,homogeneous);
-      set_shear_derivs(v,pp,dim,pbox,gbox,geom,dx,homogeneous);
+      set_dirichlet(v,unit,dim,pbox,gbox,geom,dx,homogeneous);
+      set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
 
       if(dim==2)
         {
@@ -44,7 +52,7 @@ void Elastic::Boundary_Conditions::set_boundary
           if(edge_moduli_ptr)
             {
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_stress(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
+              set_normal_stress(v,edge_moduli,unit,dim,pbox,gbox,geom,dx,
                                 homogeneous);
             }
         }
@@ -56,7 +64,7 @@ void Elastic::Boundary_Conditions::set_boundary
           if(edge_moduli_ptr)
             {
               SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_stress(v,edge_moduli,pp,dim,pbox,gbox,geom,dx,
+              set_normal_stress(v,edge_moduli,unit,dim,pbox,gbox,geom,dx,
                                 homogeneous);
             }
         }
@@ -71,10 +79,7 @@ void Elastic::Boundary_Conditions::set_boundary
          there should be a better way using getBoundaryBoxes. */
       if(!homogeneous)
         {
-          boost::shared_ptr<SAMRAI::pdat::SideData<double> >
-            dv_mixed=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-            (patch.getPatchData(dv_mixed_id));
-
+          SAMRAI::pdat::SideData<double> &dv_mixed(*dv_mixed_ptr);
           for(int ix=0; ix<dim; ++ix)
             {
               SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
@@ -86,7 +91,7 @@ void Elastic::Boundary_Conditions::set_boundary
                      || (s[ix]>pbox.upper(ix)+1
                          && geom->getTouchesRegularBoundary(ix,1)))
                     {
-                      (*dv_mixed)(s,0)=(*dv_mixed)(s,1)=0;
+                      dv_mixed(s,0)=dv_mixed(s,1)=0;
                     }
                   else
                     {
@@ -97,16 +102,17 @@ void Elastic::Boundary_Conditions::set_boundary
                              || (s[iy]>pbox.upper(iy)
                                  && geom->getTouchesRegularBoundary(iy,1)))
                             {
-                              (*dv_mixed)(s,0)=(*dv_mixed)(s,1)=0;
+                              dv_mixed(s,0)=dv_mixed(s,1)=0;
                             }
                         }
                     }
                 }
             }
 
-          boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal=
+          boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr=
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
             (patch.getPatchData(dv_diagonal_id));
+          SAMRAI::pdat::CellData<double>& dv_diagonal(*dv_diagonal_ptr);
 
           SAMRAI::pdat::CellIterator c_end(gbox,false);
           for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=c_end; ci++)
@@ -123,7 +129,7 @@ void Elastic::Boundary_Conditions::set_boundary
               if(is_boundary)
                 {
                   for(int ix=0;ix<dim;++ix)
-                    (*dv_diagonal)(c,ix)=0;
+                    dv_diagonal(c,ix)=0;
                 }
             }
         }

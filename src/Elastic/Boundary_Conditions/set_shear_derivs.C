@@ -2,7 +2,9 @@
 
 void Elastic::Boundary_Conditions::set_shear_derivs
 (SAMRAI::pdat::SideData<double> &v,
- SAMRAI::hier::Index pp[], const int &dim,
+ const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_ptr,
+ const SAMRAI::hier::Index unit[],
+ const int &dim,
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::hier::Box &gbox,
  const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
@@ -35,22 +37,29 @@ void Elastic::Boundary_Conditions::set_shear_derivs
 
               for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                 {
+                  const int iy_ix(2*((iy-ix)%(dim-1)));
+                  const int ix_iy(2*((ix-iy)%(dim-1)));
                   if(x[iy]<pbox.lower(iy)
                      && geom->getTouchesRegularBoundary(iy,0))
                     {
                       if(!is_dirichlet[ix][iy][0])
                         {
-                          double coord_save(geom->getXLower()[iy]);
-                          std::swap(coord[iy],coord_save);
                           SAMRAI::pdat::SideIndex
-                            y(x+pp[iy],iy,SAMRAI::pdat::SideIndex::Lower);
-                          const double duyx((v(y)-v(y-pp[ix]))/dx[ix]);
-                          v(x)=v(x+pp[iy]) + duyx*dx[iy];
+                            y(x+unit[iy],iy,SAMRAI::pdat::SideIndex::Lower);
+                          const double duyx((v(y)-v(y-unit[ix]))/dx[ix]);
+                          v(x)=v(x+unit[iy]) + duyx*dx[iy];
                           if(!homogeneous)
                             {
-                              v(x)-=expression[ix][iy][0].eval(coord)*dx[iy];
+                              SAMRAI::pdat::SideData<double>
+                                &dv_mixed(*dv_mixed_ptr);
+                              double coord_save(geom->getXLower()[iy]);
+                              std::swap(coord[iy],coord_save);
+                              v(x)+=((dv_mixed(y,iy_ix+1)
+                                     - dv_mixed(y-unit[ix],iy_ix))/dx[ix]
+                                     - expression[ix][iy][0].eval(coord))*dx[iy]
+                                + dv_mixed(x+unit[iy],ix_iy+1);
+                              std::swap(coord[iy],coord_save);
                             }
-                          std::swap(coord[iy],coord_save);
                         }
                     }
                   else if(x[iy]>pbox.upper(iy)
@@ -58,17 +67,23 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                     {
                       if(!is_dirichlet[ix][iy][1])
                         {
-                          double coord_save(geom->getXUpper()[iy]);
-                          std::swap(coord[iy],coord_save);
                           SAMRAI::pdat::SideIndex
                             y(x,iy,SAMRAI::pdat::SideIndex::Lower);
-                          const double duyx((v(y)-v(y-pp[ix]))/dx[ix]);
-                          v(x)=v(x-pp[iy]) - duyx*dx[iy];
+                          const double duyx((v(y)- v(y-unit[ix]))/dx[ix]);
+                          v(x)=v(x-unit[iy]) - duyx*dx[iy];
+
                           if(!homogeneous)
                             {
-                              v(x)+=expression[ix][iy][1].eval(coord)*dx[iy];
+                              SAMRAI::pdat::SideData<double>
+                                &dv_mixed(*dv_mixed_ptr);
+                              double coord_save(geom->getXUpper()[iy]);
+                              std::swap(coord[iy],coord_save);
+                              v(x)-=((dv_mixed(y,iy_ix+1)
+                                     - dv_mixed(y-unit[ix],iy_ix))/dx[ix]
+                                     - expression[ix][iy][1].eval(coord))*dx[iy]
+                                - dv_mixed(x-unit[iy],ix_iy);
+                              std::swap(coord[iy],coord_save);
                             }
-                          std::swap(coord[iy],coord_save);
                         }
                     }
                 }
