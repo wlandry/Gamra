@@ -13,7 +13,7 @@ Elastic {
     mu="1"
     v_rhs="0"
 
-    faults= -10, -0.0001, -1,  0.0, 10, 0.25, 90, 90, 0
+    faults= -10, -0.5, -1,  0.0, 10, 0.25, 60, 90, 0
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
@@ -28,22 +28,22 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        vx_x_upper="y<-0.0001 ? -5 : 5"
+        vx_x_upper="y<0.366025403782 ? -4.33012701893 : 4.33012701893"
         vx_x_upper_is_dirichlet=TRUE
-        vx_x_lower="y<-0.0001 ? -5 : 5"
+        vx_x_lower="y<-0.211324865406 ? -4.33012701893 : 4.33012701893"
         vx_x_lower_is_dirichlet=TRUE
-        vy_y_upper="0"
+        vy_y_upper="2.5"
         vy_y_upper_is_dirichlet=TRUE
-        vy_y_lower="0"
+        vy_y_lower="-2.5"
         vy_y_lower_is_dirichlet=TRUE
-        vx_y_upper="0"
-        vx_y_upper_is_dirichlet=FALSE
-        vx_y_lower="0"
-        vx_y_lower_is_dirichlet=FALSE
-        vy_x_upper="0"
-        vy_x_upper_is_dirichlet=FALSE
-        vy_x_lower="0"
-        vy_x_lower_is_dirichlet=FALSE
+        vx_y_upper="4.33012701893"
+        vx_y_upper_is_dirichlet=TRUE
+        vx_y_lower="-4.33012701893"
+        vx_y_lower_is_dirichlet=TRUE
+        vy_x_upper="y<0.366025403782 ? -2.5 : 2.5"
+        vy_x_upper_is_dirichlet=TRUE
+        vy_x_lower="y<-0.211324865406 ? -2.5 : 2.5"
+        vy_x_lower_is_dirichlet=TRUE
     }
 }
 
