@@ -54,10 +54,10 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                                 &dv_mixed(*dv_mixed_ptr);
                               double coord_save(geom->getXLower()[iy]);
                               std::swap(coord[iy],coord_save);
-                              v(x)+=((dv_mixed(y,iy_ix+1)
-                                     - dv_mixed(y-unit[ix],iy_ix))/dx[ix]
+                              v(x)+=((dv_mixed(y,ix_iy+1)
+                                     - dv_mixed(y-unit[ix],ix_iy))/dx[ix]
                                      - expression[ix][iy][0].eval(coord))*dx[iy]
-                                + dv_mixed(x+unit[iy],ix_iy+1);
+                                + dv_mixed(x+unit[iy],iy_ix+1);
                               std::swap(coord[iy],coord_save);
                             }
                         }
@@ -78,10 +78,10 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                                 &dv_mixed(*dv_mixed_ptr);
                               double coord_save(geom->getXUpper()[iy]);
                               std::swap(coord[iy],coord_save);
-                              v(x)-=((dv_mixed(y,iy_ix+1)
-                                     - dv_mixed(y-unit[ix],iy_ix))/dx[ix]
+                              v(x)-=((dv_mixed(y,ix_iy+1)
+                                     - dv_mixed(y-unit[ix],ix_iy))/dx[ix]
                                      - expression[ix][iy][1].eval(coord))*dx[iy]
-                                - dv_mixed(x-unit[iy],ix_iy);
+                                - dv_mixed(x-unit[iy],iy_ix);
                               std::swap(coord[iy],coord_save);
                             }
                         }
