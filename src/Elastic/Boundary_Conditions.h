@@ -7,6 +7,7 @@
 #include "SAMRAI/pdat/NodeData.h"
 #include "SAMRAI/pdat/EdgeData.h"
 #include "SAMRAI/pdat/SideData.h"
+#include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 #include <string>
 #include <vector>
@@ -62,17 +63,16 @@ namespace Elastic {
     template<class T>
     void set_normal_stress
     (SAMRAI::pdat::SideData<double> &v,
+     const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal_ptr,
      const T &edge_moduli,
-     SAMRAI::hier::Index unit[], const int &dim,
+     const SAMRAI::hier::Index unit[],
+     const int &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
      const bool &homogeneous)
     {
-          /* FIXME: This is not correct for faults that intersect the
-             boundary.  The derivatives need a correction term. */
-
       for(int ix=0; ix<dim; ++ix)
         {
           double offset[]={0.5,0.5,0.5};
@@ -88,16 +88,13 @@ namespace Elastic {
                   on_corner=on_corner
                     || !(x[iy]>=pbox.lower(iy) && x[iy]<=pbox.upper(iy));
                 }
-              
+
               if(!on_corner)
                 {
                   for(int d=0;d<dim;++d)
                     coord[d]=geom->getXLower()[d]
                       + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
 
-                  /* For normal BC's, for the point just outside the
-                     boundary, set a sentinel value for normal dirichlet
-                     BC or the derivative for normal stress BC. */
                   if(x[ix]<pbox.lower(ix)
                      && geom->getTouchesRegularBoundary(ix,0))
                     {
@@ -110,7 +107,16 @@ namespace Elastic {
                                 y(x,iy,SAMRAI::pdat::SideIndex::Lower);
                               duyy+=(v(y+unit[iy]) + v(y+unit[ix]+unit[iy])
                                      - v(y+unit[ix]) - v(y))
-                                /(2*dx[ix]);
+                                /(2*dx[iy]);
+                              if(!homogeneous)
+                                {
+                                  /* We only have to correct for one
+                                     of the derivatives because the
+                                     other half is outside the domain
+                                     and defined to regular. */
+                                  SAMRAI::pdat::CellIndex c(y+unit[ix]);
+                                  duyy-=(*dv_diagonal_ptr)(c,iy)/(2*dx[iy]);
+                                }
                             }
                           double lambda=
                             edge_node_average(edge_moduli,x+unit[ix],ix,unit,0);
@@ -121,9 +127,11 @@ namespace Elastic {
                         
                           if(!homogeneous)
                             {
+                              SAMRAI::pdat::CellIndex c(x+unit[ix]);
                               double coord_save(geom->getXLower()[ix]);
                               std::swap(coord[ix],coord_save);
-                              v(x)-=expression[ix][ix][0].eval(coord)*2*dx[ix]
+                              v(x)-=(*dv_diagonal_ptr)(c,ix)
+                                + expression[ix][ix][0].eval(coord)*2*dx[ix]
                                 /(lambda+2*mu);
                               std::swap(coord[ix],coord_save);
                             }
@@ -142,6 +150,15 @@ namespace Elastic {
                               duyy+=(v(y+unit[iy]) + v(y-unit[ix]+unit[iy])
                                      -v(y) - v(y-unit[ix]))
                                 /(2*dx[iy]);
+                              if(!homogeneous)
+                                {
+                                  /* We only have to correct for one
+                                     of the derivatives because the
+                                     other half is outside the domain
+                                     and defined to regular. */
+                                  SAMRAI::pdat::CellIndex c(y-unit[ix]);
+                                  duyy-=(*dv_diagonal_ptr)(c,iy)/(2*dx[iy]);
+                                }
                             }
                           double lambda=
                             edge_node_average(edge_moduli,x-unit[ix],ix,unit,0);
@@ -152,9 +169,11 @@ namespace Elastic {
                         
                           if(!homogeneous)
                             {
+                              SAMRAI::pdat::CellIndex c(x-unit[ix]*2);
                               double coord_save(geom->getXUpper()[ix]);
                               std::swap(coord[ix],coord_save);
-                              v(x)+=expression[ix][ix][1].eval(coord)*2*dx[ix]
+                              v(x)+=(*dv_diagonal_ptr)(c,ix)
+                                + expression[ix][ix][1].eval(coord)*2*dx[ix]
                                 /(lambda+2*mu);
                               std::swap(coord[ix],coord_save);
                             }

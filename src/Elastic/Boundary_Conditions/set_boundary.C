@@ -19,10 +19,14 @@ void Elastic::Boundary_Conditions::set_boundary
       SAMRAI::pdat::SideData<double> &v(*v_ptr);
 
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr;
+      boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr;
       if(!homogeneous)
         {
           dv_mixed_ptr=boost::dynamic_pointer_cast
             <SAMRAI::pdat::SideData<double> >(patch.getPatchData(dv_mixed_id));
+          dv_diagonal_ptr=
+            boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+            (patch.getPatchData(dv_diagonal_id));
         }
 
       const SAMRAI::tbox::Dimension Dim(patch.getDim());
@@ -52,8 +56,8 @@ void Elastic::Boundary_Conditions::set_boundary
           if(edge_moduli_ptr)
             {
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_stress(v,edge_moduli,unit,dim,pbox,gbox,geom,dx,
-                                homogeneous);
+              set_normal_stress(v,dv_diagonal_ptr,edge_moduli,unit,dim,pbox,gbox,
+                                geom,dx,homogeneous);
             }
         }
       else
@@ -64,8 +68,8 @@ void Elastic::Boundary_Conditions::set_boundary
           if(edge_moduli_ptr)
             {
               SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_stress(v,edge_moduli,unit,dim,pbox,gbox,geom,dx,
-                                homogeneous);
+              set_normal_stress(v,dv_diagonal_ptr,edge_moduli,unit,dim,pbox,gbox,
+                                geom,dx,homogeneous);
             }
         }
 
