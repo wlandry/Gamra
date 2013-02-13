@@ -13,11 +13,11 @@ Elastic {
     mu="1"
     v_rhs="0"
 
-    // Put faults just outside of the domain to ensure that we are
+    // Put faults just inside the domain to ensure that we are
     // computing jump terms near the boundary correctly.  We get a
     // very small flow field (1e-16) just from truncation error.
 
-    faults=-10, .49999, -.2, 0.0, 0.2, 0.25, 90, 90, 0,
+    faults=-10, .49999, -.2001, 0.0, 0.2, 0.25, 90, 90, 0,
         -10, -.49999, 0.00001, 0.0, 0.2, 0.25, 90, 90, 0,
         -10, -.2, .49999, 0.0, 0.2, 0.25, 0, 90, 0,
         -10, 0.00001, -.49999, 0.0, 0.2, 0.25, 0, 90, 0
