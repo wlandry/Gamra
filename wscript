@@ -121,6 +121,7 @@ def build(bld):
                         'src/Elastic/FAC/solve.C',
                         'src/Elastic/V_Refine/refine.C',
                         'src/Elastic/V_Refine/refine_along_line.C',
+                        'src/Elastic/V_Boundary_Refine/V_Boundary_Refine.C',
                         'src/Elastic/V_Boundary_Refine/refine.C',
                         'src/Elastic/V_Boundary_Refine/Update_V_2D.C',
                         'src/Elastic/V_Boundary_Refine/Correction_2D.C',

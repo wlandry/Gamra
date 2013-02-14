@@ -41,6 +41,9 @@ namespace Elastic {
     public SAMRAI::hier::RefineOperator
   {
   public:
+
+    static bool is_residual;
+    static int dv_diagonal_id, dv_mixed_id;
     /**
      * Uninteresting default constructor.
      */

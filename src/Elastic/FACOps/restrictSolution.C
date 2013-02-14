@@ -8,6 +8,7 @@
  *
  ************************************************************************/
 #include "Elastic/FACOps.h"
+#include "Elastic/V_Boundary_Refine.h"
 
 #include IOMANIP_HEADER_FILE
 
@@ -66,6 +67,7 @@ void Elastic::FACOps::restrictSolution
     level = d_hierarchy->getPatchLevel(dest_ln);
   v_refine_patch_strategy.is_residual=false;
   v_refine_patch_strategy.data_id=d.getComponentDescriptorIndex(0);
+  V_Boundary_Refine::is_residual=false;
 
   if (dest_ln == d_ln_min) {
     xeqScheduleGhostFillNoCoarse(v_dst,dest_ln);

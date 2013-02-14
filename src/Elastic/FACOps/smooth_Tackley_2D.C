@@ -1,4 +1,5 @@
 #include "Elastic/FACOps.h"
+#include "Elastic/V_Boundary_Refine.h"
 #include "Constants.h"
 /*
 ********************************************************************
@@ -34,6 +35,7 @@ void Elastic::FACOps::smooth_Tackley_2D
      correct. */
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=true;
+  V_Boundary_Refine::is_residual=true;
   xeqScheduleGhostFillNoCoarse(v_rhs_id,ln);
 
   if (ln > d_ln_min) {

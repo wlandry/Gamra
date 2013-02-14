@@ -61,8 +61,6 @@ void Elastic::V_Boundary_Refine::refine
      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
      (fine.getPatchData(dst_component));
 
-  bool is_residual(src_component!=7);
-  const int dv_diagonal_id(4), dv_mixed_id(5);
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed;
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal;
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_fine;

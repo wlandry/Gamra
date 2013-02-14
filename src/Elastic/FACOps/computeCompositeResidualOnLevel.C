@@ -1,4 +1,5 @@
 #include "Elastic/FACOps.h"
+#include "Elastic/V_Boundary_Refine.h"
 
 void Elastic::FACOps::computeCompositeResidualOnLevel
 (SAMRAI::solv::SAMRAIVectorReal<double>& residual,
@@ -27,6 +28,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
   const int v_id = solution.getComponentDescriptorIndex(0);
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=error_equation_indicator;
+  V_Boundary_Refine::is_residual=error_equation_indicator;
 
   /*
    * Assumptions:

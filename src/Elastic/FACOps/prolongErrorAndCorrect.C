@@ -8,6 +8,7 @@
  *
  ************************************************************************/
 #include "Elastic/FACOps.h"
+#include "Elastic/V_Boundary_Refine.h"
 
 #include IOMANIP_HEADER_FILE
 
@@ -83,6 +84,7 @@ void Elastic::FACOps::prolongErrorAndCorrect
    */
   v_refine_patch_strategy.data_id=d_side_scratch_id;
   v_refine_patch_strategy.is_residual=true;
+  V_Boundary_Refine::is_residual=true;
   xeqScheduleProlongation(d_side_scratch_id,
                           s.getComponentDescriptorIndex(0),
                           d_side_scratch_id,
