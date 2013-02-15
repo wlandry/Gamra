@@ -73,7 +73,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
             {
               for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                 {
-                  const int iy_ix(2*((iy-ix)%(dim-1)));
+                  const int ix_iy(index_map[ix][iy]);
                   if(x[iy]<pbox.lower(iy)
                      && geom->getTouchesRegularBoundary(iy,0))
                     {
@@ -86,7 +86,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
                                 &dv_mixed(*dv_mixed_ptr);
                               double coord_save(geom->getXLower()[iy]);
                               std::swap(coord[iy],coord_save);
-                              v(x)+= -dv_mixed(x+unit[iy],iy_ix+1)
+                              v(x)+= -dv_mixed(x+unit[iy],ix_iy+1)
                                 + 2*expression[ix][iy][0].eval(coord);
                               std::swap(coord[iy],coord_save);
                             }
@@ -104,7 +104,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
                                 &dv_mixed(*dv_mixed_ptr);
                               double coord_save(geom->getXUpper()[iy]);
                               std::swap(coord[iy],coord_save);
-                              v(x)+= -dv_mixed(x-unit[iy],iy_ix)
+                              v(x)+= -dv_mixed(x-unit[iy],ix_iy)
                                 + 2*expression[ix][iy][1].eval(coord);
                               std::swap(coord[iy],coord_save);
                             }

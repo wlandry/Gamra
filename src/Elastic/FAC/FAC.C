@@ -21,10 +21,6 @@
 #include "SAMRAI/hier/VariableDatabase.h"
 
 
-const int Elastic::FAC::index_map[3][3]={{-1, 0, 2,},
-                                         { 1,-1, 4,},
-                                         { 3, 5,-1}};
-
 Elastic::FAC::FAC(const std::string& object_name,
                   const SAMRAI::tbox::Dimension& dimension,
                   boost::shared_ptr<SAMRAI::tbox::Database> database):
@@ -76,7 +72,7 @@ Elastic::FAC::FAC(const std::string& object_name,
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     dv_mixed_ptr(new SAMRAI::pdat::SideVariable<double>
-                 (d_dim,object_name + ":dv_mixed",2));
+                 (d_dim,object_name + ":dv_mixed",2*(dim-1)));
   dv_mixed_id =
     vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
                                     SAMRAI::hier::IntVector(d_dim,1));

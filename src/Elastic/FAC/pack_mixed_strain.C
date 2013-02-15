@@ -68,8 +68,8 @@ Elastic::FAC::pack_mixed_strain(double* buffer,
             {
               const SAMRAI::pdat::SideIndex
                 s(*iedge,ix,SAMRAI::pdat::SideIndex::Lower);
-              *buffer=(v(s) - v(s-jp) + dv_mixed(s,2*((d-ix)%(dim-1))+1)
-                       - dv_mixed(s,2*((d-ix)%(dim-1))))/dx[d];
+              *buffer=(v(s) - v(s-jp) + dv_mixed(s,index_map[ix][d]+1)
+                       - dv_mixed(s,index_map[ix][d]+1))/dx[d];
             }
           ++buffer;
         }

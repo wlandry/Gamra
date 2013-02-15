@@ -42,15 +42,15 @@ void Elastic::V_Boundary_Refine::refine
 }
 
 void Elastic::V_Boundary_Refine::refine
-(SAMRAI::hier::Patch& fine,
- const SAMRAI::hier::Patch& coarse,
+(SAMRAI::hier::Patch &fine,
+ const SAMRAI::hier::Patch &coarse,
  const int dst_component,
  const int src_component,
- const SAMRAI::hier::Box& overlap_box,
- const SAMRAI::hier::IntVector& ratio,
+ const SAMRAI::hier::Box &overlap_box,
+ const SAMRAI::hier::IntVector &,
  const int &axis) const
 {
-   const SAMRAI::tbox::Dimension& dimension(getDim());
+   const SAMRAI::tbox::Dimension &dimension(getDim());
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);
    const int dim(dimension.getValue());
 

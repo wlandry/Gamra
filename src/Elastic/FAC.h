@@ -221,8 +221,6 @@ namespace Elastic {
     SAMRAI::tbox::Array<double> faults;
     //@}
 
-    static const int index_map[3][3];
-
     template<class T> void add_faults();
 
     bool intersect_fault(const int &dim,
@@ -293,29 +291,36 @@ void Elastic::FAC::add_faults()
           const double *dx=geom->getDx();
 
           /* v_rhs */
-          boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_data =
+          boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
             ((*p)->getPatchData(v_rhs_id));
+          SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
+
 
           /* dv */
-          boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal =
+          boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
             ((*p)->getPatchData(dv_diagonal_id));
-          boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed =
+          SAMRAI::pdat::CellData<double> &dv_diagonal(*dv_diagonal_ptr);
+          boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
             ((*p)->getPatchData(dv_mixed_id));
-          dv_diagonal->fillAll(0);
-          dv_mixed->fillAll(0);
+          SAMRAI::pdat::SideData<double> &dv_mixed(*dv_mixed_ptr);
+          dv_diagonal.fillAll(0);
+          dv_mixed.fillAll(0);
 
           /* moduli */
-          boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli =
+          boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
             ((*p)->getPatchData(cell_moduli_id));
-          boost::shared_ptr<T> edge_moduli =
-            boost::dynamic_pointer_cast<T>((*p)->getPatchData(edge_moduli_id));
+          SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
 
-          SAMRAI::hier::Box pbox = v_rhs_data->getBox();
-          SAMRAI::hier::Box gbox = v_rhs_data->getGhostBox();
+          boost::shared_ptr<T> edge_moduli_ptr =
+            boost::dynamic_pointer_cast<T>((*p)->getPatchData(edge_moduli_id));
+          T &edge_moduli(*edge_moduli_ptr);
+
+          SAMRAI::hier::Box pbox = v_rhs.getBox();
+          SAMRAI::hier::Box gbox = v_rhs.getGhostBox();
           for(int ix=0;ix<dim;++ix)
             {
               if(geom->getTouchesRegularBoundary(ix,0))
@@ -402,15 +407,14 @@ void Elastic::FAC::add_faults()
                       if(gbox.contains(s))
                         {
                           SAMRAI::pdat::CellIndex c(s);
-                          (*dv_diagonal)(c,ix)+=intersect[ix][0]*jump(ix);
+                          dv_diagonal(c,ix)+=intersect[ix][0]*jump(ix);
                         }
 
                       for(int iy=(ix+1)%dim;iy!=ix;iy=((iy+1)%dim))
                         {
-                          (*dv_mixed)(s,2*((iy-ix)%(dim-1)))+=
-                            intersect_half[iy][0]*jump(ix);
-                          (*dv_mixed)(s,2*((iy-ix)%(dim-1))+1)-=
-                            intersect_half[iy][1]*jump(ix);
+                          const int ix_iy(index_map[ix][iy]);
+                          dv_mixed(s,ix_iy)+=intersect_half[iy][0]*jump(ix);
+                          dv_mixed(s,ix_iy+1)-=intersect_half[iy][1]*jump(ix);
                         }
                     }
                 }
@@ -428,42 +432,43 @@ void Elastic::FAC::add_faults()
 
                   /* d/dx^2, d/dy^2, d/dz^2 */
 
-                  double lambda_plus((*cell_moduli)(c,0)),
-                    lambda_minus((*cell_moduli)(c-unit[ix],0)),
-                    mu_plus((*cell_moduli)(c,1)),
-                    mu_minus((*cell_moduli)(c-unit[ix],1));
-                  (*v_rhs_data)(s)+=
-                    ((*dv_diagonal)(c,ix)*(lambda_plus + 2*mu_plus)
-                     - (*dv_diagonal)(c-unit[ix],ix)*(lambda_minus + 2*mu_minus))
+                  double lambda_plus(cell_moduli(c,0)),
+                    lambda_minus(cell_moduli(c-unit[ix],0)),
+                    mu_plus(cell_moduli(c,1)),
+                    mu_minus(cell_moduli(c-unit[ix],1));
+                  v_rhs(s)+=
+                    (dv_diagonal(c,ix)*(lambda_plus + 2*mu_plus)
+                     - dv_diagonal(c-unit[ix],ix)*(lambda_minus + 2*mu_minus))
                     /(dx[ix]*dx[ix]);
 
                   for(int iy=(ix+1)%dim;iy!=ix;iy=(iy+1)%dim)
                     {
                       const int iz((ix+1)%dim!=iy ? (ix+1)%dim :
                                    (ix+2)%dim);
-                      mu_plus=edge_node_eval(*edge_moduli,s+unit[iy],iz,1);
-                      mu_minus=edge_node_eval(*edge_moduli,s,iz,1);
-                      const int iy_ix(2*((iy-ix)%(dim-1)));
-                      (*v_rhs_data)(s)+=
-                        (mu_plus*((*dv_mixed)(s,iy_ix)
-                                  - (*dv_mixed)(s+unit[iy],iy_ix+1))
-                         + mu_minus*((*dv_mixed)(s,iy_ix+1)
-                                     - (*dv_mixed)(s-unit[iy],iy_ix)))
+                      mu_plus=edge_node_eval(edge_moduli,s+unit[iy],iz,1);
+                      mu_minus=edge_node_eval(edge_moduli,s,iz,1);
+
+                      const int ix_iy(index_map[ix][iy]);
+                      v_rhs(s)+=
+                        (mu_plus*(dv_mixed(s,ix_iy)
+                                  - dv_mixed(s+unit[iy],ix_iy+1))
+                         + mu_minus*(dv_mixed(s,ix_iy+1)
+                                     - dv_mixed(s-unit[iy],ix_iy)))
                         /(dx[iy]*dx[iy]);
 
                       /* d/dxy */
-                      lambda_plus=(*cell_moduli)(c,0);
-                      lambda_minus=(*cell_moduli)(c-unit[ix],0);
+                      lambda_plus=cell_moduli(c,0);
+                      lambda_minus=cell_moduli(c-unit[ix],0);
                       const SAMRAI::pdat::SideIndex
                         s_y(c,iy,SAMRAI::pdat::SideIndex::Lower);
-                      const int ix_iy(2*((ix-iy)%(dim-1)));
-                      (*v_rhs_data)(s)+=
-                        (lambda_plus*(*dv_diagonal)(c,iy)
-                         - lambda_minus*(*dv_diagonal)(c-unit[ix],iy)
-                         - mu_plus*((*dv_mixed)(s_y+unit[iy],ix_iy+1)
-                                    - (*dv_mixed)(s_y+unit[iy]-unit[ix],ix_iy))
-                         + mu_minus*((*dv_mixed)(s_y,ix_iy+1)
-                                     - (*dv_mixed)(s_y-unit[ix],ix_iy)))
+                      const int iy_ix(index_map[iy][ix]);
+                      v_rhs(s)+=
+                        (lambda_plus*dv_diagonal(c,iy)
+                         - lambda_minus*dv_diagonal(c-unit[ix],iy)
+                         - mu_plus*(dv_mixed(s_y+unit[iy],iy_ix+1)
+                                    - dv_mixed(s_y+unit[iy]-unit[ix],iy_ix))
+                         + mu_minus*(dv_mixed(s_y,iy_ix+1)
+                                     - dv_mixed(s_y-unit[ix],iy_ix)))
                         /(dx[ix]*dx[iy]);
                     }
                 }
