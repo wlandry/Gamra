@@ -47,15 +47,15 @@ void Elastic::V_Refine::refine(SAMRAI::hier::Patch& fine,
 }
 
 void Elastic::V_Refine::refine
-(SAMRAI::hier::Patch& fine_patch,
- const SAMRAI::hier::Patch& coarse_patch,
+(SAMRAI::hier::Patch &fine_patch,
+ const SAMRAI::hier::Patch &coarse_patch,
  const int dst_component,
  const int src_component,
- const SAMRAI::hier::Box& fine_box,
- const SAMRAI::hier::IntVector& ratio,
+ const SAMRAI::hier::Box &fine_box,
+ const SAMRAI::hier::IntVector &,
  const int &axis) const
 {
-   const SAMRAI::tbox::Dimension& dimension(getDim());
+   const SAMRAI::tbox::Dimension &dimension(getDim());
    const int dim(dimension.getValue());
    TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine_patch, coarse_patch,
                                    fine_box, ratio);
