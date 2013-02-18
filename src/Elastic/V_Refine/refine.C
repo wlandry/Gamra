@@ -57,8 +57,6 @@ void Elastic::V_Refine::refine
 {
    const SAMRAI::tbox::Dimension &dimension(getDim());
    const int dim(dimension.getValue());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine_patch, coarse_patch,
-                                   fine_box, ratio);
 
    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
