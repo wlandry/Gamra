@@ -17,7 +17,7 @@ void Elastic::FACOps::residual_3D
 
   const double *Dx = geom.getDx();
   const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
-  const SAMRAI::hier::Index pp[]={ip,jp,kp};
+  const SAMRAI::hier::Index unit[]={ip,jp,kp};
 
   SAMRAI::pdat::CellIterator cend(pbox,false);
   for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
@@ -46,8 +46,9 @@ void Elastic::FACOps::residual_3D
 
           if(center[iy]!=pbox.upper(iy) && center[iz]!=pbox.upper(iz))
             {
-              if((center[ix]==pbox.lower(ix) && v(x-pp[ix])==boundary_value)
-                 || (center[ix]==pbox.upper(ix) && v(x+pp[ix])==boundary_value))
+              if((center[ix]==pbox.lower(ix) && v(x-unit[ix])==boundary_value)
+                 || (center[ix]==pbox.upper(ix)
+                     && v(x+unit[ix])==boundary_value))
                 {
                   v_resid(x)=0;
                 }
@@ -56,7 +57,8 @@ void Elastic::FACOps::residual_3D
                   v_resid(x)=v_rhs(x)
                     - v_operator_3D(v,cell_moduli,edge_moduli,
                                     center,edge_y,edge_z,x,y,z,
-                                    pp[ix],pp[iy],pp[iz],Dx[ix],Dx[iy],Dx[iz]);
+                                    unit[ix],unit[iy],unit[iz],
+                                    Dx[ix],Dx[iy],Dx[iz]);
                 }
             }
         }          
