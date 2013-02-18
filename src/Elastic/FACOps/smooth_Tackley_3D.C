@@ -53,7 +53,7 @@ void Elastic::FACOps::smooth_Tackley_3D
   const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   const SAMRAI::hier::Index pp[]={ip,jp,kp};
   bool converged = false;
-  for (int sweep=0; sweep < num_sweeps*(1<<(2*(d_ln_max-ln))) && !converged;
+  for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
        ++sweep)
     {
       maxres=0;
