@@ -50,16 +50,15 @@ void Elastic::V_Boundary_Refine::refine
  const SAMRAI::hier::IntVector &,
  const int &axis) const
 {
-   const SAMRAI::tbox::Dimension &dimension(getDim());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);
-   const int dim(dimension.getValue());
+  const SAMRAI::tbox::Dimension &dimension(getDim());
+  const int dim(dimension.getValue());
 
-   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
-     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-     (coarse.getPatchData(src_component));
-   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
-     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-     (fine.getPatchData(dst_component));
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (coarse.getPatchData(src_component));
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+    (fine.getPatchData(dst_component));
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed;
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal;
@@ -87,7 +86,6 @@ void Elastic::V_Boundary_Refine::refine
 #endif
 
    SAMRAI::hier::Box fine_box=fine.getBox();
-   SAMRAI::hier::Box coarse_box=coarse.getBox();
 
    /* We have to infer where the boundary is from the boxes */
    int boundary_direction;
@@ -165,8 +163,13 @@ void Elastic::V_Boundary_Refine::refine
      }
    else
      {
-       SAMRAI::hier::Index pp[]={ip,jp,kp};
+       SAMRAI::hier::Index unit[]={ip,jp,kp};
        SAMRAI::hier::Index ijk(dimension);
+       SAMRAI::hier::Box coarse_box(coarse.getBox());
+       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+         (coarse.getPatchGeometry());
+
        for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]+=1)
          for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]+=1)
            for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]+=1)
@@ -174,7 +177,7 @@ void Elastic::V_Boundary_Refine::refine
                SAMRAI::pdat::SideIndex
                  fine(ijk,axis,SAMRAI::pdat::SideIndex::Lower);
                Update_V_3D(axis,boundary_direction,boundary_positive,fine,
-                           pp,ijk,*v,*v_fine);
+                           unit,ijk,coarse_box,*geom,*v,*v_fine);
              }
      }
 }

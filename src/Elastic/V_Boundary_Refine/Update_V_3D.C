@@ -5,12 +5,14 @@
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
 void Elastic::V_Boundary_Refine::Update_V_3D
-(const int &axis,
+(const int &ix,
  const int &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
- const SAMRAI::hier::Index pp[],
+ const SAMRAI::hier::Index unit[],
  const SAMRAI::hier::Index &ijk,
+ const SAMRAI::hier::Box &pbox,
+ const SAMRAI::geom::CartesianPatchGeometry &geom,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
@@ -65,53 +67,62 @@ void Elastic::V_Boundary_Refine::Update_V_3D
 
   */
 
-  if(boundary_direction==axis)
+  if(boundary_direction==ix)
     {
-      const int axis2((axis+1)%3), axis3((axis+2)%3);
-      const SAMRAI::hier::Index ip_s(boundary_positive ? pp[axis] : -pp[axis]),
-        jp(pp[(axis+1)%3]), kp(pp[(axis+2)%3]);
+      const int iy((ix+1)%3), iz((ix+2)%3);
+      const SAMRAI::hier::Index ip_s(boundary_positive ? unit[ix] : -unit[ix]);
 
-      SAMRAI::pdat::SideIndex center(fine-ip_s);
-      center.coarsen(SAMRAI::hier::Index(2,2,2));
+      SAMRAI::pdat::SideIndex coarse(fine-ip_s);
+      coarse.coarsen(SAMRAI::hier::Index(2,2,2));
+      coarse+=ip_s;
 
-      double v_pp, v_pm, v_mp, v_mm;
-      double v_p[3], v_m[3];
-      quad_offset_interpolate(v(center+ip_s+jp+kp),v(center+ip_s+kp),
-                              v(center+ip_s-jp+kp),v_p[0],v_m[0]);
-      quad_offset_interpolate(v(center+ip_s+jp),v(center+ip_s),
-                              v(center+ip_s-jp),v_p[1],v_m[1]);
-      quad_offset_interpolate(v(center+ip_s+jp-kp),v(center+ip_s-kp),
-                              v(center+ip_s-jp-kp),v_p[2],v_m[2]);
-
-      quad_offset_interpolate(v_p[0],v_p[1],v_p[2],v_pp,v_pm);
-      quad_offset_interpolate(v_m[0],v_m[1],v_m[2],v_mp,v_mm);
-
-      if(ijk[axis2]%2==0)
+      SAMRAI::hier::Index jp(unit[iy]),kp(unit[iz]);
+      const int ijk_mod_y(ijk[iy]%2), ijk_mod_z(ijk[iz]%2);
+      int lower_y, upper_y, lower_z, upper_z;
+      if(ijk_mod_y==0)
         {
-          if(ijk[axis3]%2==0)
-            {
-              v_fine(fine)=v_fine(fine-ip_s)
-                + (v_mm - v_fine(fine-ip_s-ip_s))/3;
-            }
-          else
-            {
-              v_fine(fine)=v_fine(fine-ip_s)
-                + (v_mp - v_fine(fine-ip_s-ip_s))/3;
-            }
+          lower_y=pbox.lower(iy);
+          upper_y=pbox.upper(iy);
         }
       else
         {
-          if(ijk[axis3]%2==0)
-            {
-              v_fine(fine)=v_fine(fine-ip_s)
-                + (v_pm - v_fine(fine-ip_s-ip_s))/3;
-            }
-          else
-            {
-              v_fine(fine)=v_fine(fine-ip_s)
-                + (v_pp - v_fine(fine-ip_s-ip_s))/3;
-            }
-        }          
+          lower_y=pbox.upper(iy);
+          upper_y=pbox.lower(iy);
+          jp=-jp;
+        }
+
+      if(ijk_mod_z==0)
+        {
+          lower_z=pbox.lower(iz);
+          upper_z=pbox.upper(iz);
+        }
+      else
+        {
+          lower_z=pbox.upper(iz);
+          upper_z=pbox.lower(iz);
+          kp=-kp;
+        }
+
+      double v_coarse;
+      if(ijk[iy]==lower_y && geom.getTouchesRegularBoundary(iy,ijk_mod_y)
+         && ijk[iz]==lower_z && geom.getTouchesRegularBoundary(iz,ijk_mod_z))
+        {
+          v_coarse=(5*v(coarse) - v(coarse+jp+kp))/4;
+        }
+      else if(ijk[iy]==upper_y
+              && geom.getTouchesRegularBoundary(iy,(ijk_mod_y+1)%2)
+              && ijk[iz]==upper_z
+              && geom.getTouchesRegularBoundary(iz,(ijk_mod_z+1)%2))
+        {
+          v_coarse=(3*v(coarse) + v(coarse-jp-kp))/4;
+        }
+      else
+        {
+          v_coarse=
+            quad_offset_interpolate(v(coarse-jp-kp),v(coarse),v(coarse+jp+kp));
+        }
+
+      v_fine(fine)=v_fine(fine-ip_s) + (v_coarse - v_fine(fine-ip_s-ip_s))/3;
     }
   /* Set the value for the tangential direction.
 
@@ -143,10 +154,10 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  */
   else
     {
-      const int axis3((axis+1)%3 != boundary_direction ? (axis+1)%3 : (axis+2)%3);
-      const SAMRAI::hier::Index ip(pp[axis]),
-        jp(boundary_positive ? pp[boundary_direction] : -pp[boundary_direction]),
-        kp(pp[axis3]);
+      const int axis3((ix+1)%3 != boundary_direction ? (ix+1)%3 : (ix+2)%3);
+      const SAMRAI::hier::Index ip(unit[ix]),
+        jp(boundary_positive ? unit[boundary_direction] : -unit[boundary_direction]),
+        kp(unit[axis3]);
 
       SAMRAI::pdat::SideIndex center(fine);
       center.coarsen(SAMRAI::hier::Index(2,2,2));
@@ -159,7 +170,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
        * double calls to quad_offset_interpolate going on, but fixing
        * that would require mucking with the iteration order in an
        * annoying way. */
-      if(ijk[axis]%2==0)
+      if(ijk[ix]%2==0)
         {
           if(ijk[axis3]%2==0)
             {

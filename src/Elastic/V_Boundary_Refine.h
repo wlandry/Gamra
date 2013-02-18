@@ -172,8 +172,10 @@ namespace Elastic {
      const int &boundary_direction,
      const bool &boundary_positive,
      const SAMRAI::pdat::SideIndex &fine,
-     const SAMRAI::hier::Index pp[],
+     const SAMRAI::hier::Index unit[],
      const SAMRAI::hier::Index &ijk,
+     const SAMRAI::hier::Box &pbox,
+     const SAMRAI::geom::CartesianPatchGeometry &geom,
      SAMRAI::pdat::SideData<double> &v,
      SAMRAI::pdat::SideData<double> &v_fine) const;
 
