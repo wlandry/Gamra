@@ -39,30 +39,27 @@ public:
     * @param object_name Name of the object, for general referencing.
     * @param coef_strategy Coefficients strategy being helped.
     */
-   V_Refine_Patch_Strategy(
-      const SAMRAI::tbox::Dimension& dim,
-      std::string object_name, Boundary_Conditions &bc):
-     SAMRAI::xfer::RefinePatchStrategy(dim), d_dim(dim), d_object_name(object_name),
-     d_boundary_conditions(bc) {}
+  V_Refine_Patch_Strategy(const SAMRAI::tbox::Dimension& dim,
+                          std::string object_name, Boundary_Conditions &bc):
+    SAMRAI::xfer::RefinePatchStrategy(dim), d_dim(dim), d_object_name(object_name),
+    d_boundary_conditions(bc) {}
 
-   /*!
-    * @brief Destructor.
-    */
-   virtual ~V_Refine_Patch_Strategy(void) {}
+  /*!
+   * @brief Destructor.
+   */
+  virtual ~V_Refine_Patch_Strategy(void) {}
 
-   //@{ @name SAMRAI::xfer::RefinePatchStrategy virtuals
+  //@{ @name SAMRAI::xfer::RefinePatchStrategy virtuals
 
-   virtual void
-   setPhysicalBoundaryConditions(
-      SAMRAI::hier::Patch& patch,
-      const double ,
-      const SAMRAI::hier::IntVector& )
+  virtual void
+  setPhysicalBoundaryConditions(SAMRAI::hier::Patch& patch,
+                                const double ,
+                                const SAMRAI::hier::IntVector& )
   {
-    /* We only set Dirichlet boundaries once, before the solve. */
     d_boundary_conditions.set_boundary(patch,data_id,is_residual);
   }
-   SAMRAI::hier::IntVector
-   getRefineOpStencilWidth() const
+  SAMRAI::hier::IntVector
+  getRefineOpStencilWidth() const
   {
     return SAMRAI::hier::IntVector::getOne(d_dim);
   }
@@ -86,33 +83,33 @@ public:
                     const SAMRAI::hier::Box& ,
                     const SAMRAI::hier::IntVector& ) {}
 
-   //@}
+  //@}
 
-   /*!
-    * @brief Set the data id that should be filled when setting
-    * physical boundary conditions.
-    *
-    * When setPhysicalBoundaryConditions is called, the data
-    * specified will be set.  This information is required because
-    * the it is not passed in through the argument list of
-    * setPhysicalBounaryConditions.
-    */
+  /*!
+   * @brief Set the data id that should be filled when setting
+   * physical boundary conditions.
+   *
+   * When setPhysicalBoundaryConditions is called, the data
+   * specified will be set.  This information is required because
+   * the it is not passed in through the argument list of
+   * setPhysicalBounaryConditions.
+   */
   int data_id;
 
-   /*!
-    * @brief Set whether boundary filling should assume homogeneous
-    * conditions.
-    *
-    * In certain circumstances, only the value of a is needed, while
-    * the value of g is temporarily not required and taken to be zero.
-    * (An example is in setting the boundary condition for error
-    * value in an iterative method.)  In such cases, use this function
-    * to set a flag that will cause a null pointer to be given to
-    * setBcCoefs() to indicate that fact.
-    */
+  /*!
+   * @brief Set whether boundary filling should assume homogeneous
+   * conditions.
+   *
+   * In certain circumstances, only the value of a is needed, while
+   * the value of g is temporarily not required and taken to be zero.
+   * (An example is in setting the boundary condition for error
+   * value in an iterative method.)  In such cases, use this function
+   * to set a flag that will cause a null pointer to be given to
+   * setBcCoefs() to indicate that fact.
+   */
   bool is_residual;
 
-   //@}
+  //@}
 
 private:
   const SAMRAI::tbox::Dimension d_dim;
