@@ -48,14 +48,9 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   plotter.registerPlotQuantity("Cell mu",
                                "SCALAR",
                                cell_moduli_id,1);
-  plotter.registerDerivedPlotQuantity("Diagonal_Strain","VECTOR",
+  plotter.registerDerivedPlotQuantity("Strain","TENSOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
-  plotter.registerDerivedPlotQuantity("Mixed_Strain","TENSOR",
-                                      (SAMRAI::appu::VisDerivedDataStrategy *)
-                                      this,1,"NODE");
-                               
-
   return 0;
 }
 #endif
