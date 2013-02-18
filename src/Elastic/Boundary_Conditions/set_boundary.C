@@ -45,35 +45,6 @@ void Elastic::Boundary_Conditions::set_boundary
       const SAMRAI::hier::Box pbox=patch.getBox();
       const SAMRAI::hier::Box gbox=v.getGhostBox();
 
-      set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-      set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-
-      if(dim==2)
-        {
-          boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-            (patch.getPatchData(edge_moduli_id));
-          if(edge_moduli_ptr)
-            {
-              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_stress(v,dv_diagonal_ptr,edge_moduli,unit,dim,pbox,gbox,
-                                geom,dx,homogeneous);
-            }
-        }
-      else
-        {
-          boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-            (patch.getPatchData(edge_moduli_id));
-          if(edge_moduli_ptr)
-            {
-              SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_stress(v,dv_diagonal_ptr,edge_moduli,unit,dim,pbox,gbox,
-                                geom,dx,homogeneous);
-            }
-        }
-
-
       /* FIXME: Why is this even required?  Shouldn't the boundaries
          be set once and then forgotten?  On coarse levels, the
          boundaries may not be copied over. Taking this part out
@@ -95,7 +66,8 @@ void Elastic::Boundary_Conditions::set_boundary
                      || (s[ix]>pbox.upper(ix)+1
                          && geom->getTouchesRegularBoundary(ix,1)))
                     {
-                      dv_mixed(s,0)=dv_mixed(s,1)=0;
+                      for(int d=0;d<2*(dim-1);++d)
+                        dv_mixed(s,d)=0;
                     }
                   else
                     {
@@ -106,7 +78,8 @@ void Elastic::Boundary_Conditions::set_boundary
                              || (s[iy]>pbox.upper(iy)
                                  && geom->getTouchesRegularBoundary(iy,1)))
                             {
-                              dv_mixed(s,0)=dv_mixed(s,1)=0;
+                              for(int d=0;d<2*(dim-1);++d)
+                                dv_mixed(s,d)=0;
                             }
                         }
                     }
@@ -135,6 +108,34 @@ void Elastic::Boundary_Conditions::set_boundary
                   for(int ix=0;ix<dim;++ix)
                     dv_diagonal(c,ix)=0;
                 }
+            }
+        }
+
+      set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+      set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+
+      if(dim==2)
+        {
+          boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
+            boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+            (patch.getPatchData(edge_moduli_id));
+          if(edge_moduli_ptr)
+            {
+              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
+              set_normal_stress(v,dv_diagonal_ptr,edge_moduli,unit,dim,pbox,gbox,
+                                geom,dx,homogeneous);
+            }
+        }
+      else
+        {
+          boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
+            boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
+            (patch.getPatchData(edge_moduli_id));
+          if(edge_moduli_ptr)
+            {
+              SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
+              set_normal_stress(v,dv_diagonal_ptr,edge_moduli,unit,dim,pbox,gbox,
+                                geom,dx,homogeneous);
             }
         }
     }
