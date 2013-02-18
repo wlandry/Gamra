@@ -30,7 +30,7 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
 
   const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
     &boundaries=coarse_fine[fine.getPatchLevelNumber()]
-    ->getEdgeBoundaries(coarse.getGlobalId());
+    ->getFaceBoundaries(coarse.getGlobalId());
 
   fix_boundary_elements_3D(*v,*v_fine,*dv_mixed,boundaries);
 }
