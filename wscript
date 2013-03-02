@@ -110,7 +110,7 @@ def build(bld):
         source       = ['src/main.C',
                         'src/Elastic/FAC/FAC.C',
                         'src/Elastic/FAC/fix_moduli.C',
-                        'src/Elastic/FAC/compute_intersection.C',
+                        'src/Elastic/FAC/intersection.C',
                         'src/Elastic/FAC/applyGradientDetector.C',
                         'src/Elastic/FAC/initializeLevelData.C',
                         'src/Elastic/FAC/pack_strain.C',

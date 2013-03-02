@@ -229,29 +229,75 @@ namespace Elastic {
       return result;
     }
 
-    void compute_intersection(const FTensor::Tensor1<double,3> &ntt,
-                              const FTensor::Tensor1<double,3> &xyz,
-                              const FTensor::Tensor2<double,3,3> &rot,
-                              const FTensor::Tensor1<double,3> dx[],
-                              const double fault[],
-                              const int &dim,
-                              int intersect[][2]);
+    int intersection(const FTensor::Tensor1<double,3> &ntt,
+                     const FTensor::Tensor1<double,3> &xyz,
+                     const FTensor::Tensor2<double,3,3> &rot,
+                     const FTensor::Tensor1<double,3> &dx,
+                     const double fault[],
+                     const int &dim);
 
-    void compute_intersections(const FTensor::Tensor1<double,3> &ntt,
-                               const FTensor::Tensor1<double,3> &xyz,
-                               const FTensor::Tensor2<double,3,3> &rot,
-                               const FTensor::Tensor1<double,3> dx[],
-                               const double fault[],
-                               const int &dim,
-                               int intersect[][2],
-                               int intersect_half[][2])
+    void compute_intersections_2D(const FTensor::Tensor1<double,3> &ntt,
+                                  const FTensor::Tensor1<double,3> &xyz,
+                                  const FTensor::Tensor2<double,3,3> &rot,
+                                  const FTensor::Tensor1<double,3> dx[],
+                                  const double fault[],
+                                  const int &dim,
+                                  const int &ix,
+                                  int &intersect_diagonal,
+                                  int intersect_mixed[2])
     {
-      compute_intersection(ntt,xyz,rot,dx,fault,dim,intersect);
-      FTensor::Tensor1<double,3> dx_2[dim];
+      intersect_diagonal=intersection(ntt,xyz,rot,dx[ix],fault,dim);
+
+      FTensor::Tensor1<double,3> dx_2;
       FTensor::Index<'a',3> a;
-      for(int i=0;i<dim;++i)
-        dx_2[i](a)=dx[i](a)/2;
-      compute_intersection(ntt,xyz,rot,dx_2,fault,dim,intersect_half);
+      const int iy((ix+1)%dim);
+      dx_2(a)=dx[iy](a)/2;
+      intersect_mixed[0]=intersection(ntt,xyz,rot,dx_2,fault,dim);
+
+      dx_2(a)=-dx_2(a);
+      intersect_mixed[1]=-intersection(ntt,xyz,rot,dx_2,fault,dim);
+    }
+
+    void compute_intersections_3D(const FTensor::Tensor1<double,3> &ntt,
+                                  const FTensor::Tensor1<double,3> &xyz,
+                                  const FTensor::Tensor2<double,3,3> &rot,
+                                  const FTensor::Tensor1<double,3> dx[],
+                                  const double fault[],
+                                  const int &dim,
+                                  const int &ix,
+                                  int &intersect_diagonal,
+                                  int intersect_mixed[4],
+                                  int intersect_corner[4])
+    {
+      intersect_diagonal=intersection(ntt,xyz,rot,dx[ix],fault,dim);
+
+      FTensor::Tensor1<double,3> dx_2_y, dx_2_z;
+      FTensor::Index<'a',3> a;
+
+      int iy((ix+1)%dim), iz((ix+2)%dim);
+      
+      dx_2_y(a)=dx[iy](a)/2;
+      intersect_mixed[0]=intersection(ntt,xyz,rot,dx_2_y,fault,dim);
+      dx_2_y(a)=-dx_2_y(a);
+      intersect_mixed[1]=intersection(ntt,xyz,rot,dx_2_y,fault,dim);
+
+      dx_2_z(a)=dx[iz](a)/2;
+      intersect_mixed[2]=intersection(ntt,xyz,rot,dx_2_z,fault,dim);
+      dx_2_z(a)=-dx_2_z(a);
+      intersect_mixed[3]=intersection(ntt,xyz,rot,dx_2_z,fault,dim);
+
+      FTensor::Tensor1<double,3> dx_corner;
+      dx_corner(ix)=0;
+      dx_corner(iy)=dx[iy](iy)/2;
+      dx_corner(iz)=dx[iz](iz)/2;
+      intersect_corner[0]=intersection(ntt,xyz,rot,dx_corner,fault,dim);
+      dx_corner(iz)=-dx_corner(iz);
+      intersect_corner[1]=intersection(ntt,xyz,rot,dx_corner,fault,dim);
+
+      dx_corner(iy)=-dx_corner(iy);
+      intersect_corner[2]=intersection(ntt,xyz,rot,dx_corner,fault,dim);
+      dx_corner(iz)=-dx_corner(iz);
+      intersect_corner[3]=intersection(ntt,xyz,rot,dx_corner,fault,dim);
     }
   };
 }
@@ -391,22 +437,45 @@ void Elastic::FAC::add_faults()
                          the left, and if x>0, you are on the right. */
                       FTensor::Tensor1<double,3> ntt;
                       ntt(a)=rot(a,b)*xyz(b);
-                      int intersect[dim][2], intersect_half[dim][2];
-                      compute_intersections(ntt,xyz,rot,Dx,fault,dim,
-                                            intersect,intersect_half);
-
-                      /* d/dx, d/dy, d/dz */
-                      if(gbox.contains(s))
+                      if(dim==2)
                         {
-                          SAMRAI::pdat::CellIndex c(s);
-                          dv_diagonal(c,ix)+=intersect[ix][0]*jump(ix);
+                          int intersect, intersect_mixed[2];
+                          compute_intersections_2D(ntt,xyz,rot,Dx,fault,dim,ix,
+                                                   intersect,intersect_mixed);
+
+                          /* d/dx, d/dy, d/dz */
+                          if(gbox.contains(s))
+                            {
+                              SAMRAI::pdat::CellIndex c(s);
+                              dv_diagonal(c,ix)+=intersect*jump(ix);
+                            }
+
+                          for(int iy=(ix+1)%dim;iy!=ix;iy=((iy+1)%dim))
+                            {
+                              dv_mixed(s,0)+=intersect_mixed[0]*jump(ix);
+                              dv_mixed(s,1)-=intersect_mixed[1]*jump(ix);
+                            }
                         }
-
-                      for(int iy=(ix+1)%dim;iy!=ix;iy=((iy+1)%dim))
+                      else
                         {
-                          const int ix_iy(index_map[ix][iy]);
-                          dv_mixed(s,ix_iy)+=intersect_half[iy][0]*jump(ix);
-                          dv_mixed(s,ix_iy+1)-=intersect_half[iy][1]*jump(ix);
+                          int intersect_diagonal, intersect_mixed[4],
+                            intersect_corner[4];
+                          compute_intersections_3D(ntt,xyz,rot,Dx,fault,dim,ix,
+                                                   intersect_diagonal,intersect_mixed,
+                                                   intersect_corner);
+
+                          /* d/dx, d/dy, d/dz */
+                          if(gbox.contains(s))
+                            {
+                              SAMRAI::pdat::CellIndex c(s);
+                              dv_diagonal(c,ix)+=intersect_diagonal*jump(ix);
+                            }
+
+                          for(int n=0;n<4;++n)
+                            {
+                              dv_mixed(s,n)+=intersect_mixed[n]*jump(ix);
+                              dv_mixed(s,n+4)+=intersect_corner[n]*jump(ix);
+                            }
                         }
                     }
                 }

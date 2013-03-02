@@ -5,6 +5,6 @@
 const double boundary_value=1e100;
 const int invalid_id=-1;
 const int index_map[3][3]={{std::numeric_limits<int>::max(),0,2},
-                           {0,std::numeric_limits<int>::max(),2},
+                           {2,std::numeric_limits<int>::max(),0},
                            {0,2,std::numeric_limits<int>::max()}};
 #endif

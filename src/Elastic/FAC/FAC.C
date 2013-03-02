@@ -72,7 +72,7 @@ Elastic::FAC::FAC(const std::string& object_name,
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     dv_mixed_ptr(new SAMRAI::pdat::SideVariable<double>
-                 (d_dim,object_name + ":dv_mixed",2*(dim-1)));
+                 (d_dim,object_name + ":dv_mixed",dim==2 ? 2 : 8));
   dv_mixed_id =
     vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
                                     SAMRAI::hier::IntVector(d_dim,1));
