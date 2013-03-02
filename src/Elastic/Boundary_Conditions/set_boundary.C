@@ -66,7 +66,7 @@ void Elastic::Boundary_Conditions::set_boundary
                      || (s[ix]>pbox.upper(ix)+1
                          && geom->getTouchesRegularBoundary(ix,1)))
                     {
-                      for(int d=0;d<2*(dim-1);++d)
+                      for(int d=0;d<(dim==2 ? 2 : 8);++d)
                         dv_mixed(s,d)=0;
                     }
                   else
@@ -78,7 +78,7 @@ void Elastic::Boundary_Conditions::set_boundary
                              || (s[iy]>pbox.upper(iy)
                                  && geom->getTouchesRegularBoundary(iy,1)))
                             {
-                              for(int d=0;d<2*(dim-1);++d)
+                              for(int d=0;d<(dim==2 ? 2 : 8);++d)
                                 dv_mixed(s,d)=0;
                             }
                         }
