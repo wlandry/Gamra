@@ -30,26 +30,15 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
          the __lower__ side of that boundary box. */
          
       int location_index=boundaries[mm].getLocationIndex();
-      int direction(location_index/2);
+
+      SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
+      const SAMRAI::hier::Index unit[]={ip,jp,kp};
+      const int dim(3);
+
+      const int ix(location_index/2);
+      const int iy((ix+1)%dim), iz((ix+2)%dim);
       int side(location_index%2==0 ? SAMRAI::pdat::SideIndex::Upper
                : SAMRAI::pdat::SideIndex::Lower);
-      int dir2((direction+1)%3), dir3((direction+2)%3);
-      SAMRAI::hier::Index yp(ip), zp(ip);
-      switch(direction)
-        {
-        case 0:
-          yp=jp;
-          zp=kp;
-          break;
-        case 1:
-          yp=kp;
-          zp=ip;
-          break;
-        case 2:
-          yp=ip;
-          zp=jp;
-          break;
-        }      
 
       SAMRAI::hier::Index
         lower=SAMRAI::hier::Index::coarsen(bbox.lower(),
@@ -57,21 +46,21 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
         upper=SAMRAI::hier::Index::coarsen(bbox.upper(),
                                            SAMRAI::hier::Index(2,2,2));
 
-      for(int k=lower(2); k<=upper(2); ++k)
-        for(int j=lower(1); j<=upper(1); ++j)
-          for(int i=lower(0); i<=upper(0); ++i)
+      int ijk[3];
+      for(ijk[2]=lower(2); ijk[2]<=upper(2); ++ijk[2])
+        for(ijk[1]=lower(1); ijk[1]<=upper(1); ++ijk[1])
+          for(ijk[0]=lower(0); ijk[0]<=upper(0); ++ijk[0])
             {
-              SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j,k),
-                                             direction,side);
-              SAMRAI::pdat::SideIndex center(coarse*2);
-              if(center[dir2]>=gbox.lower(dir2)
-                 && center[dir2]<gbox.upper(dir2)
-                 && center[dir3]>=gbox.lower(dir3)
-                 && center[dir3]<gbox.upper(dir3))
+              SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(ijk[0],ijk[1],
+                                                                 ijk[2]),
+                                             ix,side);
+              SAMRAI::pdat::SideIndex fine(coarse*2);
+              if(fine[iy]>=gbox.lower(iy) && fine[iy]<gbox.upper(iy)
+                 && fine[iz]>=gbox.lower(iz) && fine[iz]<gbox.upper(iz))
                 {
-                  v(coarse)=
-                    (v_fine(center) + v_fine(center+yp)
-                     + v_fine(center+zp) + v_fine(center+yp+zp))/4;
+                  v(coarse)=(v_fine(fine) + v_fine(fine+unit[iy])
+                             + v_fine(fine+unit[iz])
+                             + v_fine(fine+unit[iy]+unit[iz]))/4;
                 }
             }
     }
