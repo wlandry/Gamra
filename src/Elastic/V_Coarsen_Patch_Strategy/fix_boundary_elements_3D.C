@@ -58,9 +58,9 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
               if(fine[iy]>=gbox.lower(iy) && fine[iy]<gbox.upper(iy)
                  && fine[iz]>=gbox.lower(iz) && fine[iz]<gbox.upper(iz))
                 {
-                  v(coarse)=(v_fine(fine) + v_fine(fine+unit[iy])
-                             + v_fine(fine+unit[iz])
-                             + v_fine(fine+unit[iy]+unit[iz]))/4;
+                  v(coarse)=coarsen_plane(v_fine,fine,unit[iy],unit[iz])
+                    + coarsen_plane_correction(dv_mixed,fine,unit[iy],
+                                               unit[iz]);
                 }
             }
     }
