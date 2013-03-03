@@ -108,65 +108,38 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
      V_Coarsen_Patch_Strategy::postprocessCoarsen.
   */
   SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
-  for(int k=coarse_box.lower(2); k<=coarse_box.upper(2)+1; ++k)
-    for(int j=coarse_box.lower(1); j<=coarse_box.upper(1)+1; ++j)
-      for(int i=coarse_box.lower(0); i<=coarse_box.upper(0)+1; ++i)
+  const SAMRAI::hier::Index unit[]={ip,jp,kp};
+  const int dim(3);
+  int ijk[3];
+  for(ijk[2]=coarse_box.lower(2); ijk[2]<=coarse_box.upper(2)+1; ++ijk[2])
+    for(ijk[1]=coarse_box.lower(1); ijk[1]<=coarse_box.upper(1)+1; ++ijk[1])
+      for(ijk[0]=coarse_box.lower(0); ijk[0]<=coarse_box.upper(0)+1; ++ijk[0])
         {
-          if(j!=coarse_box.upper(1)+1 && k!=coarse_box.upper(2)+1)
+          for(int ix=0;ix<dim;++ix)
             {
-              SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j,k),0,
-                                             SAMRAI::pdat::SideIndex::Lower);
-              SAMRAI::pdat::SideIndex center(coarse*2);
-              if((i==coarse_box.lower(0)
-                  && coarse_geom.getTouchesRegularBoundary(0,0))
-                 || (i==coarse_box.upper(0)+1
-                     && coarse_geom.getTouchesRegularBoundary(0,1)))
+              const int iy((ix+1)%dim), iz((ix+2)%dim);
+              if(ijk[iy]!=coarse_box.upper(iy)+1
+                 && ijk[iz]!=coarse_box.upper(iz)+1)
                 {
-                  v(coarse)=
-                    (v_fine(center) + v_fine(center+jp)
-                     + v_fine(center+kp) + v_fine(center+jp+kp))/4;
-                }
-              else
-                {
-                  coarsen_point_3D(coarse,ip,jp,kp,v,v_fine);
-                }
-            }
-          if(i!=coarse_box.upper(0)+1 && k!=coarse_box.upper(2)+1)
-            {
-              SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j,k),1,
-                                             SAMRAI::pdat::SideIndex::Lower);
-              SAMRAI::pdat::SideIndex center(coarse*2);
-              if((j==coarse_box.lower(1)
-                  && coarse_geom.getTouchesRegularBoundary(1,0))
-                 || (j==coarse_box.upper(1)+1
-                     && coarse_geom.getTouchesRegularBoundary(1,1)))
-                {
-                  v(coarse)=
-                    (v_fine(center) + v_fine(center+ip)
-                     + v_fine(center+kp) + v_fine(center+ip+kp))/4;
-                }
-              else
-                {
-                  coarsen_point_3D(coarse,jp,kp,ip,v,v_fine);
-                }
-            }
-          if(i!=coarse_box.upper(0)+1 && j!=coarse_box.upper(1)+1)
-            {
-              SAMRAI::pdat::SideIndex coarse(SAMRAI::hier::Index(i,j,k),2,
-                                             SAMRAI::pdat::SideIndex::Lower);
-              SAMRAI::pdat::SideIndex center(coarse*2);
-              if((k==coarse_box.lower(2)
-                  && coarse_geom.getTouchesRegularBoundary(2,0))
-                 || (k==coarse_box.upper(2)+1
-                     && coarse_geom.getTouchesRegularBoundary(2,1)))
-                {
-                  v(coarse)=
-                    (v_fine(center) + v_fine(center+ip)
-                     + v_fine(center+jp) + v_fine(center+ip+jp))/4;
-                }
-              else
-                {
-                  coarsen_point_3D(coarse,kp,ip,jp,v,v_fine);
+                  SAMRAI::pdat::SideIndex
+                    coarse(SAMRAI::hier::Index(ijk[0],ijk[1],ijk[2]),ix,
+                           SAMRAI::pdat::SideIndex::Lower);
+                  SAMRAI::pdat::SideIndex center(coarse*2);
+                  if((ijk[ix]==coarse_box.lower(ix)
+                      && coarse_geom.getTouchesRegularBoundary(ix,0))
+                     || (ijk[ix]==coarse_box.upper(ix)+1
+                         && coarse_geom.getTouchesRegularBoundary(ix,1)))
+                    {
+                      v(coarse)=
+                        (v_fine(center) + v_fine(center+unit[iy])
+                         + v_fine(center+unit[iz])
+                         + v_fine(center+unit[iy]+unit[iz]))/4;
+                    }
+                  else
+                    {
+                      coarsen_point_3D(coarse,unit[ix],unit[iy],unit[iz],
+                                       v,v_fine);
+                    }
                 }
             }
         }
