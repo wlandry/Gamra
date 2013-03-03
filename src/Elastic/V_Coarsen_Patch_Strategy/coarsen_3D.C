@@ -40,6 +40,23 @@ coarsen_point_3D(const SAMRAI::pdat::SideIndex& coarse,
        + v_fine(center+ip+kp) + v_fine(center+jp+ip+kp))/16;
 }
 
+inline double
+coarsen_correction_3D(const SAMRAI::pdat::SideIndex& fine,
+                      const int& axis,
+                      const SAMRAI::hier::Index& ip,
+                      const SAMRAI::hier::Index& jp,
+                      const SAMRAI::hier::Index& kp,
+                      const SAMRAI::pdat::CellData<double>& dv_diagonal,
+                      const SAMRAI::pdat::SideData<double>& dv_mixed)
+{
+  SAMRAI::pdat::CellIndex cell(fine);
+  return (dv_diagonal(cell-ip,axis) - dv_diagonal(cell,axis)
+          + dv_diagonal(cell-ip+jp,axis) - dv_diagonal(cell+jp,axis)
+          + dv_diagonal(cell-ip+kp,axis) - dv_diagonal(cell+kp,axis)
+          + dv_diagonal(cell-ip+jp+kp,axis) - dv_diagonal(cell+jp+kp,axis))/16
+    + (dv_mixed(fine,4) + dv_mixed(fine+jp,7)
+       + dv_mixed(fine,5) + dv_mixed(fine+jp,6))/4;
+}
 
 void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
 (SAMRAI::pdat::SideData<double>& v,
@@ -124,21 +141,36 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
                   SAMRAI::pdat::SideIndex
                     coarse(SAMRAI::hier::Index(ijk[0],ijk[1],ijk[2]),ix,
                            SAMRAI::pdat::SideIndex::Lower);
-                  SAMRAI::pdat::SideIndex center(coarse*2);
+                  SAMRAI::pdat::SideIndex fine(coarse*2);
                   if((ijk[ix]==coarse_box.lower(ix)
                       && coarse_geom.getTouchesRegularBoundary(ix,0))
                      || (ijk[ix]==coarse_box.upper(ix)+1
                          && coarse_geom.getTouchesRegularBoundary(ix,1)))
                     {
                       v(coarse)=
-                        (v_fine(center) + v_fine(center+unit[iy])
-                         + v_fine(center+unit[iz])
-                         + v_fine(center+unit[iy]+unit[iz]))/4;
+                        (v_fine(fine) + v_fine(fine+unit[iy])
+                         + v_fine(fine+unit[iz])
+                         + v_fine(fine+unit[iy]+unit[iz]))/4;
+
+                      /* The numbering here (4,7,5,6) is determined by
+                         the numbering used in FAC::add_faults */
+                      if(!is_residual)
+                        v(coarse)+=
+                          (dv_mixed(fine,4) + dv_mixed(fine+unit[iy],7)
+                           + dv_mixed(fine+unit[iz],5)
+                           + dv_mixed(fine+unit[iy]+unit[iz],6))/4;
                     }
                   else
                     {
                       coarsen_point_3D(coarse,unit[ix],unit[iy],unit[iz],
                                        v,v_fine);
+                      if(!is_residual)
+                        {
+                          v(coarse)+=coarsen_correction_3D(fine,ix,unit[ix],
+                                                           unit[iy],unit[iz],
+                                                           dv_diagonal,
+                                                           dv_mixed);
+                        }
                     }
                 }
             }
