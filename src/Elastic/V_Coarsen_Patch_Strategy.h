@@ -68,13 +68,7 @@ namespace Elastic {
     postprocessCoarsen(SAMRAI::hier::Patch& coarse,
                        const SAMRAI::hier::Patch& fine,
                        const SAMRAI::hier::Box& coarse_box,
-                       const SAMRAI::hier::IntVector& ratio)
-    {
-      if(getDim().getValue()==2)
-        postprocessCoarsen_2D(coarse,fine,coarse_box,ratio);
-      else
-        postprocessCoarsen_3D(coarse,fine,coarse_box,ratio);
-    }
+                       const SAMRAI::hier::IntVector& ratio);
 
     void
     postprocessCoarsen_2D(SAMRAI::hier::Patch& coarse,

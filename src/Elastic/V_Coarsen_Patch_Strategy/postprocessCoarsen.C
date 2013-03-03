@@ -1,7 +1,7 @@
 #include "Elastic/V_Coarsen_Patch_Strategy.h"
 
 void
-Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
+Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
 (SAMRAI::hier::Patch &coarse,
  const SAMRAI::hier::Patch &fine,
  const SAMRAI::hier::Box &coarse_box,
@@ -26,11 +26,24 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
     (coarse.getPatchGeometry());
 
-  coarsen_2D(*v,*v_fine,*dv_mixed,*dv_diagonal,*coarse_geom,coarse_box);
+  if(getDim().getValue()==2)
+    {
+      coarsen_2D(*v,*v_fine,*dv_mixed,*dv_diagonal,*coarse_geom,coarse_box);
 
-  const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
-    &boundaries=coarse_fine[fine.getPatchLevelNumber()]
-    ->getEdgeBoundaries(coarse.getGlobalId());
+      const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
+        &boundaries=coarse_fine[fine.getPatchLevelNumber()]
+        ->getEdgeBoundaries(coarse.getGlobalId());
 
-  fix_boundary_elements_2D(*v,*v_fine,*dv_mixed,boundaries);
+      fix_boundary_elements_2D(*v,*v_fine,*dv_mixed,boundaries);
+    }
+  else
+    {
+      coarsen_3D(*v,*v_fine,*dv_mixed,*dv_diagonal,*coarse_geom,coarse_box);
+
+      const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
+        &boundaries=coarse_fine[fine.getPatchLevelNumber()]
+        ->getFaceBoundaries(coarse.getGlobalId());
+
+      fix_boundary_elements_3D(*v,*v_fine,*dv_mixed,boundaries);
+    }
 }
