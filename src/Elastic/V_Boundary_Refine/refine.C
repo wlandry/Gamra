@@ -13,7 +13,7 @@
 #include "Constants.h"
 
 void Elastic::V_Boundary_Refine::refine
-(SAMRAI::hier::Patch& fine,
+(SAMRAI::hier::Patch& fine_patch,
  const SAMRAI::hier::Patch& coarse,
  const int dst_component,
  const int src_component,
@@ -36,14 +36,14 @@ void Elastic::V_Boundary_Refine::refine
        for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
             b!=boxes.end(); b++)
          {
-           refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
+           refine(fine_patch,coarse,dst_component,src_component,*b,ratio,axis);
          }
      }
 }
 
 void Elastic::V_Boundary_Refine::refine
-(SAMRAI::hier::Patch &fine,
- const SAMRAI::hier::Patch &coarse,
+(SAMRAI::hier::Patch &fine_patch,
+ const SAMRAI::hier::Patch &coarse_patch,
  const int dst_component,
  const int src_component,
  const SAMRAI::hier::Box &overlap_box,
@@ -55,10 +55,10 @@ void Elastic::V_Boundary_Refine::refine
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-    (coarse.getPatchData(src_component));
+    (coarse_patch.getPatchData(src_component));
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-    (fine.getPatchData(dst_component));
+    (fine_patch.getPatchData(dst_component));
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed;
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal;
@@ -68,14 +68,14 @@ void Elastic::V_Boundary_Refine::refine
   if(!is_residual)
     {
       dv_mixed=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (coarse.getPatchData(dv_mixed_id));
+        (coarse_patch.getPatchData(dv_mixed_id));
       dv_diagonal=boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-        (coarse.getPatchData(dv_diagonal_id));
+        (coarse_patch.getPatchData(dv_diagonal_id));
       dv_mixed_fine=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (fine.getPatchData(dv_mixed_id));
+        (fine_patch.getPatchData(dv_mixed_id));
       dv_diagonal_fine=
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-        (fine.getPatchData(dv_diagonal_id));
+        (fine_patch.getPatchData(dv_diagonal_id));
     }
 
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -85,7 +85,7 @@ void Elastic::V_Boundary_Refine::refine
    TBOX_ASSERT(v->getDepth() == 1);
 #endif
 
-   SAMRAI::hier::Box fine_box=fine.getBox();
+   SAMRAI::hier::Box fine_box=fine_patch.getBox();
 
    /* We have to infer where the boundary is from the boxes */
    int boundary_direction;
@@ -165,10 +165,10 @@ void Elastic::V_Boundary_Refine::refine
      {
        SAMRAI::hier::Index unit[]={ip,jp,kp};
        SAMRAI::hier::Index ijk(dimension);
-       SAMRAI::hier::Box coarse_box(coarse.getBox());
+       SAMRAI::hier::Box coarse_box(coarse_patch.getBox());
        boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
          boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-         (coarse.getPatchGeometry());
+         (coarse_patch.getPatchGeometry());
 
        for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]+=1)
          for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]+=1)
