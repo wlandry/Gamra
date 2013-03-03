@@ -450,18 +450,16 @@ void Elastic::FAC::add_faults()
                               dv_diagonal(c,ix)+=intersect*jump(ix);
                             }
 
-                          for(int iy=(ix+1)%dim;iy!=ix;iy=((iy+1)%dim))
-                            {
-                              dv_mixed(s,0)+=intersect_mixed[0]*jump(ix);
-                              dv_mixed(s,1)-=intersect_mixed[1]*jump(ix);
-                            }
+                          dv_mixed(s,0)+=intersect_mixed[0]*jump(ix);
+                          dv_mixed(s,1)-=intersect_mixed[1]*jump(ix);
                         }
                       else
                         {
                           int intersect_diagonal, intersect_mixed[4],
                             intersect_corner[4];
                           compute_intersections_3D(ntt,xyz,rot,Dx,fault,dim,ix,
-                                                   intersect_diagonal,intersect_mixed,
+                                                   intersect_diagonal,
+                                                   intersect_mixed,
                                                    intersect_corner);
 
                           /* d/dx, d/dy, d/dz */
@@ -509,7 +507,7 @@ void Elastic::FAC::add_faults()
                       mu_plus=edge_node_eval(edge_moduli,s+unit[iy],iz,1);
                       mu_minus=edge_node_eval(edge_moduli,s,iz,1);
 
-                      const int ix_iy(index_map[ix][iy]);
+                      const int ix_iy(index_map(ix,iy,dim));
                       v_rhs(s)+=
                         (mu_plus*(dv_mixed(s,ix_iy)
                                   - dv_mixed(s+unit[iy],ix_iy+1))
@@ -522,7 +520,8 @@ void Elastic::FAC::add_faults()
                       lambda_minus=cell_moduli(c-unit[ix],0);
                       const SAMRAI::pdat::SideIndex
                         s_y(c,iy,SAMRAI::pdat::SideIndex::Lower);
-                      const int iy_ix(index_map[iy][ix]);
+                      const int iy_ix(index_map(iy,ix,dim));
+
                       v_rhs(s)+=
                         (lambda_plus*dv_diagonal(c,iy)
                          - lambda_minus*dv_diagonal(c-unit[ix],iy)

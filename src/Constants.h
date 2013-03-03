@@ -4,7 +4,14 @@
 #include <limits>
 const double boundary_value=1e100;
 const int invalid_id=-1;
-const int index_map[3][3]={{std::numeric_limits<int>::max(),0,2},
-                           {2,std::numeric_limits<int>::max(),0},
-                           {0,2,std::numeric_limits<int>::max()}};
+inline int index_map(const int &ix, const int &iy, const int &dim)
+{
+  if(dim==2)
+    return 0;
+
+  const int index[3][3]={{std::numeric_limits<int>::max(),0,2},
+                         {2,std::numeric_limits<int>::max(),0},
+                         {0,2,std::numeric_limits<int>::max()}};
+  return index[ix][iy];
+}
 #endif

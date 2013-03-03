@@ -46,7 +46,7 @@ Elastic::FAC::pack_strain(double* buffer,
         }
       else
         {
-          const int ix_iy(index_map[ix][iy]);
+          const int ix_iy(index_map(ix,iy,dim));
           *buffer=
             ((v(s) - v(s-jp) + dv_mixed(s,ix_iy+1) - dv_mixed(s-jp,ix_iy))
              + (v(s+ip) - v(s+ip-jp)

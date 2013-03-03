@@ -73,7 +73,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
             {
               for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                 {
-                  const int ix_iy(index_map[ix][iy]);
+                  const int ix_iy(index_map(ix,iy,dim));
                   if(x[iy]<pbox.lower(iy)
                      && geom->getTouchesRegularBoundary(iy,0))
                     {

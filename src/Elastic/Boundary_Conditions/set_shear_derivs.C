@@ -38,8 +38,8 @@ void Elastic::Boundary_Conditions::set_shear_derivs
 
               for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                 {
-                  const int ix_iy(index_map[ix][iy]);
-                  const int iy_ix(index_map[iy][ix]);
+                  const int ix_iy(index_map(ix,iy,dim));
+                  const int iy_ix(index_map(iy,ix,dim));
                   if(x[iy]<pbox.lower(iy)
                      && geom->getTouchesRegularBoundary(iy,0))
                     {
