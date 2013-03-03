@@ -3,13 +3,6 @@
 #include "Constants.h"
 
 namespace {
-  inline void quad_offset_correction(const double &dv_pm, const double &dv_p,
-                                     const double &dv_m, const double &dv_mp,
-                                     double &correction_p, double &correction_m)
-  {
-    quad_offset_interpolate(dv_pm-dv_p,0,dv_mp-dv_m,correction_p,correction_m);
-  }
-
   double complete_correction
   (const bool &boundary_positive,
    const int &axis,
@@ -157,28 +150,21 @@ void Elastic::V_Boundary_Refine::Correction_2D
       SAMRAI::pdat::SideIndex coarse(fine-ip_s);
       coarse.coarsen(SAMRAI::hier::Index(2,2));
 
-      double correction_p,correction_m,correction_diagonal;
+      double correction[2],correction_diagonal;
       quad_offset_correction(dv_mixed(coarse+ip_s+jp,1),
                              dv_mixed(coarse+ip_s,0),
                              dv_mixed(coarse+ip_s,1),
                              dv_mixed(coarse+ip_s-jp,0),
-                             correction_p, correction_m);
+                             correction[1], correction[0]);
 
       SAMRAI::pdat::CellIndex cell(coarse);
       correction_diagonal=(boundary_positive ? -dv_diagonal(cell,axis) :
                            dv_diagonal(cell+ip_s,axis));
-      correction_p+=correction_diagonal;
-      correction_m+=correction_diagonal;
 
       double coarse_correction;
-      if(j%2==0)
-        {
-          coarse_correction=correction_m - dv_mixed_fine(fine-ip_s,0);
-        }
-      else
-        {
-          coarse_correction=correction_p - dv_mixed_fine(fine-ip_s,1);
-        }
+      coarse_correction=correction_diagonal + correction[j%2]
+        - dv_mixed_fine(fine-ip_s,j%2);
+
       v_fine(fine)+=complete_correction(boundary_positive,axis,fine,ip_s,
                                         coarse_correction,dv_diagonal_fine);
     }

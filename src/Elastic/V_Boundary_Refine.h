@@ -22,6 +22,7 @@
 #include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 #include "Boundary_Conditions.h"
+#include "quad_offset_interpolate.h"
 
 #include <string>
 
@@ -111,12 +112,12 @@ namespace Elastic {
      * It is assumed that the coarse patch contains sufficient data for the
      * stencil width of the refinement operator.
      */
-    void refine(SAMRAI::hier::Patch& fine,
-                const SAMRAI::hier::Patch& coarse,
+    void refine(SAMRAI::hier::Patch &fine_patch,
+                const SAMRAI::hier::Patch &coarse_patch,
                 const int dst_component,
                 const int src_component,
-                const SAMRAI::hier::BoxOverlap& fine_overlap,
-                const SAMRAI::hier::IntVector& ratio) const;
+                const SAMRAI::hier::BoxOverlap &fine_overlap,
+                const SAMRAI::hier::IntVector &ratio) const;
 
     /**
      * Refine the source component on the coarse patch to the destination
@@ -127,12 +128,12 @@ namespace Elastic {
      * refinement operator.  This differs from the above refine() method
      * only in that it operates on a single fine box instead of a BoxOverlap.
      */
-    void refine(SAMRAI::hier::Patch& fine,
-                const SAMRAI::hier::Patch& coarse,
+    void refine(SAMRAI::hier::Patch &fine_patch,
+                const SAMRAI::hier::Patch &coarse_patch,
                 const int dst_component,
                 const int src_component,
-                const SAMRAI::hier::Box& fine_box,
-                const SAMRAI::hier::IntVector& ratio,
+                const SAMRAI::hier::Box &fine_box,
+                const SAMRAI::hier::IntVector &ratio,
                 const int &axis) const;
 
   private:
@@ -179,6 +180,18 @@ namespace Elastic {
      SAMRAI::pdat::SideData<double> &v,
      SAMRAI::pdat::SideData<double> &v_fine) const;
 
+    void quad_offset_correction(const double &dv_pm, const double &dv_p,
+                                const double &dv_m, const double &dv_mp,
+                                double &correction_p, double &correction_m) const
+    {
+      quad_offset_interpolate(dv_pm-dv_p,0,dv_mp-dv_m,correction_p,correction_m);
+    }
+
+    double quad_offset_correction(const double &dv_pm, const double &dv_p,
+                                  const double &dv_m, const double &dv_mp) const
+    {
+      return quad_offset_interpolate(dv_pm-dv_p,0,dv_mp-dv_m);
+    }
   };
 
 }
