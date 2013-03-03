@@ -108,6 +108,56 @@ namespace Elastic {
      const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
      const SAMRAI::hier::Box& coarse_box) const;
 
+    double coarsen_plane(const SAMRAI::pdat::SideData<double>& v_fine,
+                         const SAMRAI::pdat::SideIndex &fine,
+                         const SAMRAI::hier::Index jp,
+                         const SAMRAI::hier::Index kp) const
+    {
+      return (v_fine(fine) + v_fine(fine+jp)
+              + v_fine(fine+kp) + v_fine(fine+jp+kp))/4;
+    }
+
+    double coarsen_plane_correction
+    (const SAMRAI::pdat::SideData<double>& dv_mixed,
+     const SAMRAI::pdat::SideIndex &fine,
+     const SAMRAI::hier::Index jp,
+     const SAMRAI::hier::Index kp) const
+    {
+      /* The numbering here (4,7,5,6) is determined by
+         the numbering used in FAC::add_faults */
+      if(!is_residual)
+        return (dv_mixed(fine,4) + dv_mixed(fine+jp,7)
+                + dv_mixed(fine+kp,5) + dv_mixed(fine+jp+kp,6))/4;
+      return 0;
+    }
+
+    double coarsen_point_3D(const SAMRAI::pdat::SideData<double>& v_fine,
+                            const SAMRAI::pdat::CellData<double>& dv_diagonal,
+                            const SAMRAI::pdat::SideData<double>& dv_mixed,
+                            const SAMRAI::pdat::SideIndex& fine,
+                            const int& axis,
+                            const SAMRAI::hier::Index& ip,
+                            const SAMRAI::hier::Index& jp,
+                            const SAMRAI::hier::Index& kp) const
+    {
+      double result=coarsen_plane(v_fine,fine,jp,kp)/2
+        + (coarsen_plane(v_fine,fine+ip,jp,kp)
+           + coarsen_plane(v_fine,fine-ip,jp,kp))/4;
+                                   
+      if(!is_residual)
+        {
+          SAMRAI::pdat::CellIndex cell(fine);
+          result+=coarsen_plane_correction(dv_mixed,fine,jp,kp)
+            + (dv_diagonal(cell-ip,axis) - dv_diagonal(cell,axis)
+               + dv_diagonal(cell-ip+jp,axis) - dv_diagonal(cell+jp,axis)
+               + dv_diagonal(cell-ip+kp,axis) - dv_diagonal(cell+kp,axis)
+               + dv_diagonal(cell-ip+jp+kp,axis)
+               - dv_diagonal(cell+jp+kp,axis))/16;
+        }
+      return result;
+    }
+
+
     void
     fix_boundary_elements_3D
     (SAMRAI::pdat::SideData<double>& v,
