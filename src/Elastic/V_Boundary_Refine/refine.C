@@ -151,9 +151,9 @@ void Elastic::V_Boundary_Refine::refine
 
                  if(!is_residual)
                    Correction_2D(axis,boundary_direction,boundary_positive,
-                                 fine_index,jp,ip,j,i,p_min[1],p_max[1],*dv_diagonal,
-                                 *dv_diagonal_fine,*dv_mixed,*dv_mixed_fine,
-                                 *v_fine);
+                                 fine_index,jp,ip,j,i,p_min[1],p_max[1],
+                                 *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
+                                 *dv_mixed_fine,*v_fine);
                  break;
                default:
                  abort();
@@ -177,7 +177,9 @@ void Elastic::V_Boundary_Refine::refine
                SAMRAI::pdat::SideIndex
                  fine(ijk,axis,SAMRAI::pdat::SideIndex::Lower);
                Update_V_3D(axis,boundary_direction,boundary_positive,fine,
-                           unit,ijk,coarse_box,*geom,*v,*v_fine);
+                           unit,ijk,coarse_box,*geom,dv_diagonal,
+                           dv_diagonal_fine,dv_mixed,
+                           dv_mixed_fine,*v,*v_fine);
              }
      }
 }

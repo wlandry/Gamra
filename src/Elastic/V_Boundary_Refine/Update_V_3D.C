@@ -13,7 +13,11 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  const SAMRAI::hier::Index &ijk,
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::geom::CartesianPatchGeometry &geom,
- SAMRAI::pdat::SideData<double> &v,
+ const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal,
+ const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal_fine,
+ const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed,
+ const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_fine,
+ const SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
   /* Quadratic interpolation involving both coarse and fine grids for
@@ -61,9 +65,9 @@ void Elastic::V_Boundary_Refine::Update_V_3D
      -------------------
 
 
-     So need to do two interpolations of coarse values on the face and
-     then an interpolation using coarse and fine values to get inside
-     the cube.
+     So need to do a diagonal interpolation of coarse values on the
+     face and then an interpolation using coarse and fine values to
+     get inside the cube.
 
   */
 
@@ -103,11 +107,41 @@ void Elastic::V_Boundary_Refine::Update_V_3D
           kp=-kp;
         }
 
+      int plus,minus;
+      if(ijk_mod_y==0)
+        {
+          if(ijk_mod_z==0)
+            {
+              plus=4;
+              minus=6;
+            }
+          else
+            {
+              plus=5;
+              minus=7;
+            }
+        }
+      else
+        {
+          if(ijk_mod_z==0)
+            {
+              plus=7;
+              minus=5;
+            }
+          else
+            {
+              plus=6;
+              minus=4;
+            }
+        }
+          
       double v_coarse;
       if(ijk[iy]==lower_y && geom.getTouchesRegularBoundary(iy,ijk_mod_y)
          && ijk[iz]==lower_z && geom.getTouchesRegularBoundary(iz,ijk_mod_z))
         {
           v_coarse=(5*v(coarse) - v(coarse+jp+kp))/4;
+          if(!is_residual)
+            v_coarse-=((*dv_mixed)(coarse+jp+kp,minus) - (*dv_mixed)(coarse,plus))/4;
         }
       else if(ijk[iy]==upper_y
               && geom.getTouchesRegularBoundary(iy,(ijk_mod_y+1)%2)
@@ -115,14 +149,42 @@ void Elastic::V_Boundary_Refine::Update_V_3D
               && geom.getTouchesRegularBoundary(iz,(ijk_mod_z+1)%2))
         {
           v_coarse=(3*v(coarse) + v(coarse-jp-kp))/4;
+          if(!is_residual)
+            v_coarse+=((*dv_mixed)(coarse-jp-kp,plus) - (*dv_mixed)(coarse,minus))/4;
         }
       else
         {
           v_coarse=
             quad_offset_interpolate(v(coarse-jp-kp),v(coarse),v(coarse+jp+kp));
+          if(!is_residual)
+            v_coarse+=quad_offset_correction((*dv_mixed)(coarse-jp-kp,plus),
+                                             (*dv_mixed)(coarse,minus),
+                                             (*dv_mixed)(coarse,plus),
+                                             (*dv_mixed)(coarse+jp+kp,minus));
+        }
+      if(!is_residual)
+        {
+          SAMRAI::pdat::CellIndex cell(coarse);
+          v_coarse-=(*dv_mixed_fine)(fine-ip_s,plus)
+            - (boundary_positive ? -(*dv_diagonal)(cell-ip_s,ix) :
+               (*dv_diagonal)(cell,ix));
         }
 
       v_fine(fine)=v_fine(fine-ip_s) + (v_coarse - v_fine(fine-ip_s-ip_s))/3;
+      if(!is_residual)
+        {
+          SAMRAI::pdat::CellIndex cell(fine);
+          if(boundary_positive)
+            {
+              v_fine(fine)+=(*dv_diagonal_fine)(cell-ip_s,ix)
+                - (*dv_diagonal_fine)(cell-ip_s-ip_s,ix)/3;
+            }
+          else
+            {
+              v_fine(fine)-=(*dv_diagonal_fine)(cell,ix)
+                - (*dv_diagonal_fine)(cell-ip_s,ix)/3;
+            }
+        }
     }
   /* Set the value for the tangential direction.
 

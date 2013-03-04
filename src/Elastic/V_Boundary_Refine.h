@@ -169,7 +169,7 @@ namespace Elastic {
      SAMRAI::pdat::SideData<double> &v_fine) const;
 
     void Update_V_3D
-    (const int &axis,
+    (const int &ix,
      const int &boundary_direction,
      const bool &boundary_positive,
      const SAMRAI::pdat::SideIndex &fine,
@@ -177,7 +177,11 @@ namespace Elastic {
      const SAMRAI::hier::Index &ijk,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::geom::CartesianPatchGeometry &geom,
-     SAMRAI::pdat::SideData<double> &v,
+     const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal,
+     const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal_fine,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_fine,
+     const SAMRAI::pdat::SideData<double> &v,
      SAMRAI::pdat::SideData<double> &v_fine) const;
 
     void quad_offset_correction(const double &dv_pm, const double &dv_p,
