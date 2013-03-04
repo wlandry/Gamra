@@ -216,16 +216,16 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  */
   else
     {
-      const int axis3((ix+1)%3 != boundary_direction ? (ix+1)%3 : (ix+2)%3);
+      const int iz((ix+1)%3 != boundary_direction ? (ix+1)%3 : (ix+2)%3);
       const SAMRAI::hier::Index ip(unit[ix]),
         jp(boundary_positive ? unit[boundary_direction] : -unit[boundary_direction]),
-        kp(unit[axis3]);
+        kp(unit[iz]);
 
-      SAMRAI::pdat::SideIndex center(fine);
-      center.coarsen(SAMRAI::hier::Index(2,2,2));
+      SAMRAI::pdat::SideIndex coarse(fine);
+      coarse.coarsen(SAMRAI::hier::Index(2,2,2));
 
-      double v_m, v_p;
-      quad_offset_interpolate(v(center+kp),v(center),v(center-kp),v_p,v_m);
+      double v_pm[2];
+      quad_offset_interpolate(v(coarse+kp),v(coarse),v(coarse-kp),v_pm[1],v_pm[0]);
 
       /* Be careful about using the right interpolation if the fine
        * points are not aligned with the coarse points.  There is some
@@ -234,32 +234,16 @@ void Elastic::V_Boundary_Refine::Update_V_3D
        * annoying way. */
       if(ijk[ix]%2==0)
         {
-          if(ijk[axis3]%2==0)
-            {
-              v_fine(fine)=(8*v_m + 10*v_fine(fine-jp)
-                            - 3*v_fine(fine-jp-jp))/15;
-            }
-          else
-            {
-              v_fine(fine)=(8*v_p + 10*v_fine(fine-jp)
-                            - 3*v_fine(fine-jp-jp))/15;
-            }
+          v_fine(fine)=(8*v_pm[ijk[iz]%2] + 10*v_fine(fine-jp)
+                        - 3*v_fine(fine-jp-jp))/15;
         }
       else
         {
-          double vv_m, vv_p;
-          quad_offset_interpolate(v(center+kp+ip),v(center+ip),
-                                  v(center-kp+ip),vv_p,vv_m);
-          if(ijk[axis3]%2==0)
-            {
-              v_fine(fine)=(4*(v_m+vv_m) + 10*v_fine(fine-jp)
-                            - 3*v_fine(fine-jp-jp))/15;
-            }
-          else
-            {
-              v_fine(fine)=(4*(v_p+vv_p) + 10*v_fine(fine-jp)
-                            - 3*v_fine(fine-jp-jp))/15;
-            }
+          double vv_pm[2];
+          quad_offset_interpolate(v(coarse+kp+ip),v(coarse+ip),
+                                  v(coarse-kp+ip),vv_pm[1],vv_pm[0]);
+          v_fine(fine)=(4*(v_pm[ijk[iz]%2]+vv_pm[ijk[iz]%2]) + 10*v_fine(fine-jp)
+                        - 3*v_fine(fine-jp-jp))/15;
         }
     }
 }
