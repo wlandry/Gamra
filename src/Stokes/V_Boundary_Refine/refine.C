@@ -45,11 +45,10 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::refine
  const int dst_component,
  const int src_component,
  const hier::Box& overlap_box,
- const hier::IntVector& ratio,
+ const hier::IntVector&,
  const int &axis) const
 {
    const tbox::Dimension& dimension(getDim());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, overlap_box, ratio);
    const int dim(dimension.getValue());
 
    boost::shared_ptr<pdat::SideData<double> > v =

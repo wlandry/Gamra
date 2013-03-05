@@ -12,8 +12,8 @@ void SAMRAI::geom::Stokes::Resid_Coarsen::coarsen(hier::Patch& coarse,
                                                   const hier::Patch& fine,
                                                   const int dst_component,
                                                   const int src_component,
-                                                  const hier::Box& coarse_box,
-                                                  const hier::IntVector& ratio) const
+                                                  const hier::Box&,
+                                                  const hier::IntVector&) const
 {
   const tbox::Dimension& dimension(getDim());
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, coarse, fine, coarse_box, ratio);

@@ -45,11 +45,9 @@ void SAMRAI::geom::Stokes::P_Refine::refine(
    const int dst_component,
    const int src_component,
    const hier::Box& fine_box,
-   const hier::IntVector& ratio) const
+   const hier::IntVector&) const
 {
    const tbox::Dimension& dim(getDim());
-   TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, fine_patch, coarse_patch,
-                                   fine_box, ratio);
 
    boost::shared_ptr<pdat::CellData<double> > p =
      boost::dynamic_pointer_cast<pdat::CellData<double> >

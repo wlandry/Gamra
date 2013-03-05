@@ -49,12 +49,11 @@ void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
                                             const int dst_component,
                                             const int src_component,
                                             const hier::Box& fine_box,
-                                            const hier::IntVector& ratio,
+                                            const hier::IntVector&,
                                             const int &axis) const
 {
   const tbox::Dimension& dimension(getDim());
   const int dim(dimension.getValue());
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, fine, coarse, fine_box, ratio);
 
   boost::shared_ptr<pdat::SideData<double> > v_ptr =
     boost::dynamic_pointer_cast<pdat::SideData<double> >
