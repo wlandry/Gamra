@@ -8,7 +8,7 @@ void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
  const int dst_component,
  const int src_component,
  const hier::BoxOverlap& overlap,
- const hier::IntVector& ratio) const
+ const hier::IntVector&) const
 {
   const pdat::CellOverlap* t_overlap =
     dynamic_cast<const pdat::CellOverlap *>(&overlap);
@@ -21,7 +21,6 @@ void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
   for (hier::BoxContainer::const_iterator b(boxes.begin()); b!=boxes.end(); b++)
     {
       const hier::Box &overlap_box=*b;
-      TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension,fine,coarse,overlap_box,ratio);
 
       boost::shared_ptr<pdat::CellData<double> > p =
         boost::dynamic_pointer_cast<pdat::CellData<double> >

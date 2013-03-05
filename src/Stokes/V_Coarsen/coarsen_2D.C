@@ -40,12 +40,8 @@ void SAMRAI::geom::Stokes::V_Coarsen::coarsen_2D
  const int dst_component,
  const int src_component,
  const hier::Box& coarse_box,
- const hier::IntVector& ratio) const
+ const hier::IntVector&) const
 {
-  const tbox::Dimension& dim(getDim());
-
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dim, coarse, fine, coarse_box, ratio);
-
   boost::shared_ptr<pdat::SideData<double> > v_fine =
     boost::dynamic_pointer_cast<pdat::SideData<double> >
     (fine.getPatchData(src_component));
