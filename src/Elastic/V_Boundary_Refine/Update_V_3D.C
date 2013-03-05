@@ -11,7 +11,9 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::hier::Index unit[],
  const SAMRAI::hier::Index &ijk,
- const SAMRAI::hier::Box &pbox,
+ const SAMRAI::hier::Box &coarse_box,
+ const SAMRAI::hier::Index &fine_min,
+ const SAMRAI::hier::Index &fine_max,
  const SAMRAI::geom::CartesianPatchGeometry &geom,
  const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal,
  const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal_fine,
@@ -85,25 +87,25 @@ void Elastic::V_Boundary_Refine::Update_V_3D
       int lower_y, upper_y, lower_z, upper_z;
       if(ijk_mod_y==0)
         {
-          lower_y=pbox.lower(iy);
-          upper_y=pbox.upper(iy);
+          lower_y=coarse_box.lower(iy);
+          upper_y=coarse_box.upper(iy);
         }
       else
         {
-          lower_y=pbox.upper(iy);
-          upper_y=pbox.lower(iy);
+          lower_y=coarse_box.upper(iy);
+          upper_y=coarse_box.lower(iy);
           jp=-jp;
         }
 
       if(ijk_mod_z==0)
         {
-          lower_z=pbox.lower(iz);
-          upper_z=pbox.upper(iz);
+          lower_z=coarse_box.lower(iz);
+          upper_z=coarse_box.upper(iz);
         }
       else
         {
-          lower_z=pbox.upper(iz);
-          upper_z=pbox.lower(iz);
+          lower_z=coarse_box.upper(iz);
+          upper_z=coarse_box.lower(iz);
           kp=-kp;
         }
 
@@ -141,7 +143,8 @@ void Elastic::V_Boundary_Refine::Update_V_3D
         {
           v_coarse=(5*v(coarse) - v(coarse+jp+kp))/4;
           if(!is_residual)
-            v_coarse-=((*dv_mixed)(coarse+jp+kp,minus) - (*dv_mixed)(coarse,plus))/4;
+            v_coarse-=
+              ((*dv_mixed)(coarse+jp+kp,minus) - (*dv_mixed)(coarse,plus))/4;
         }
       else if(ijk[iy]==upper_y
               && geom.getTouchesRegularBoundary(iy,(ijk_mod_y+1)%2)
@@ -150,7 +153,8 @@ void Elastic::V_Boundary_Refine::Update_V_3D
         {
           v_coarse=(3*v(coarse) + v(coarse-jp-kp))/4;
           if(!is_residual)
-            v_coarse+=((*dv_mixed)(coarse-jp-kp,plus) - (*dv_mixed)(coarse,minus))/4;
+            v_coarse+=
+              ((*dv_mixed)(coarse-jp-kp,plus) - (*dv_mixed)(coarse,minus))/4;
         }
       else
         {
@@ -218,30 +222,100 @@ void Elastic::V_Boundary_Refine::Update_V_3D
     {
       const int iz((ix+1)%3 != boundary_direction ? (ix+1)%3 : (ix+2)%3);
       const SAMRAI::hier::Index ip(unit[ix]),
-        jp(boundary_positive ? unit[boundary_direction] : -unit[boundary_direction]),
+        jp(boundary_positive ? unit[boundary_direction]
+           : -unit[boundary_direction]),
         kp(ijk[iz]%2==0 ? -unit[iz] : unit[iz]);
 
       SAMRAI::pdat::SideIndex coarse(fine);
       coarse.coarsen(SAMRAI::hier::Index(2,2,2));
 
-      double v_pm(quad_offset_interpolate(v(coarse+kp),v(coarse),v(coarse-kp)));
+      double v_coarse(quad_offset_interpolate(v(coarse+kp),v(coarse),
+                                              v(coarse-kp)));
+
+      const int dim(3);
+      int ix_iz(index_map(ix,iz,dim));
+      if(!is_residual)
+        v_coarse+=quad_offset_correction((*dv_mixed)(coarse+kp,ix_iz+1),
+                                     (*dv_mixed)(coarse,ix_iz),
+                                     (*dv_mixed)(coarse,ix_iz+1),
+                                     (*dv_mixed)(coarse-kp,ix_iz));
+
+      double v_m(v_fine(fine-jp)), v_mm(v_fine(fine-jp-jp));
+
+      if(!is_residual)
+        {
+          int ix_iy_in(index_map(ix,boundary_direction,dim)
+                       + (boundary_positive ? 1 : 0));
+          int ix_iy_out(index_map(ix,boundary_direction,dim)
+                        + (boundary_positive ? 0 : 1));
+
+          double v_m_correction(-(*dv_mixed_fine)(fine,ix_iy_in)
+                                + (*dv_mixed_fine)(fine-jp,ix_iy_out));
+          v_m+= v_m_correction;
+          v_mm+= -(*dv_mixed_fine)(fine-jp,ix_iy_in)
+            + (*dv_mixed_fine)(fine-jp-jp,ix_iy_out)
+            + v_m_correction;
+        }
+
+      /* Numbering determined by Elastic::FAC::compute_intersections_3D */
+
+      int directions[2][2][2]={{{4,5},{7,6}},{{4,7},{5,6}}};
+      int direction=directions[boundary_direction==(ix+1)%dim ? 0 : 1]
+        [boundary_positive ? 0 : 1][ijk[iz]%2];
 
       /* Be careful about using the right interpolation if the fine
        * points are not aligned with the coarse points.  There is some
        * double calls to quad_offset_interpolate going on, but fixing
        * that would require mucking with the iteration order in an
        * annoying way. */
+
       if(ijk[ix]%2==0)
         {
-          v_fine(fine)=(8*v_pm + 10*v_fine(fine-jp)
-                        - 3*v_fine(fine-jp-jp))/15;
+          if(!is_residual)
+            v_coarse+= -(*dv_mixed_fine)(fine,direction);
+
+          v_fine(fine)=(8*v_coarse + 10*v_m - 3*v_mm)/15;
         }
       else
         {
-          double vv_pm(quad_offset_interpolate(v(coarse+kp+ip),v(coarse+ip),
-                                               v(coarse-kp+ip)));
-          v_fine(fine)=(4*(v_pm + vv_pm) + 10*v_fine(fine-jp)
-                        - 3*v_fine(fine-jp-jp))/15;
+          double v_coarse_p(quad_offset_interpolate
+                            (v(coarse+kp+ip),v(coarse+ip),v(coarse-kp+ip)));
+                             
+          if(!is_residual)
+            {
+              SAMRAI::pdat::CellIndex cell(fine), coarse_cell(coarse);
+
+              double coarse_to_fine[]={0,0};
+              if(fine_min(ix)!=fine(ix))
+                {
+                  coarse_to_fine[0]=-(*dv_mixed_fine)(fine-ip,direction)
+                    + (*dv_diagonal_fine)(cell-ip,ix);
+                }
+
+              if(fine_max(ix)!=fine(ix))
+                {
+                  coarse_to_fine[1]=-(*dv_mixed_fine)(fine+ip,direction)
+                    - (*dv_diagonal_fine)(cell,ix);
+                }
+
+              if(fine_min(ix)==fine(ix))
+                coarse_to_fine[0]=coarse_to_fine[1]
+                  + (*dv_diagonal)(coarse_cell,ix);
+
+              if(fine_max(ix)==fine(ix))
+                coarse_to_fine[1]=coarse_to_fine[0]
+                  - (*dv_diagonal)(coarse_cell,ix);
+
+              v_coarse+=coarse_to_fine[0];
+                
+              v_coarse_p+=
+                quad_offset_correction((*dv_mixed)(coarse+kp+ip,ix_iz+1),
+                                       (*dv_mixed)(coarse+ip,ix_iz),
+                                       (*dv_mixed)(coarse+ip,ix_iz+1),
+                                       (*dv_mixed)(coarse-kp+ip,ix_iz))
+                + coarse_to_fine[1];
+            }
+          v_fine(fine)=(4*(v_coarse + v_coarse_p) + 10*v_m - 3*v_mm)/15;
         }
     }
 }

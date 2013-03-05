@@ -106,17 +106,18 @@ void Elastic::V_Boundary_Refine::refine
          }
      }
 
-   SAMRAI::hier::Index p_min(overlap_box.lower()), p_max(overlap_box.upper());
+   SAMRAI::hier::Index fine_min(overlap_box.lower()),
+     fine_max(overlap_box.upper());
 
    if(boundary_direction==axis)
      {
        if(boundary_positive)
          {
-           p_min[axis]=p_max[axis];
+           fine_min[axis]=fine_max[axis];
          }
        else
          {
-           p_max[axis]=p_min[axis];
+           fine_max[axis]=fine_min[axis];
          }
      }
 
@@ -129,8 +130,8 @@ void Elastic::V_Boundary_Refine::refine
 
    if(dim==2)
      {
-       for(int j=p_min[1]; j<=p_max[1]; ++j)
-         for(int i=p_min[0]; i<=p_max[0]; ++i)
+       for(int j=fine_min[1]; j<=fine_max[1]; ++j)
+         for(int i=fine_min[0]; i<=fine_max[0]; ++i)
            {
              SAMRAI::pdat::SideIndex fine_index(SAMRAI::hier::Index(i,j),axis,
                                                 SAMRAI::pdat::SideIndex::Lower);
@@ -141,9 +142,9 @@ void Elastic::V_Boundary_Refine::refine
                              fine_index,ip,jp,i,j,*v,*v_fine);
                  if(!is_residual)
                    Correction_2D(axis,boundary_direction,boundary_positive,
-                                 fine_index,ip,jp,i,j,p_min[0],p_max[0],*dv_diagonal,
-                                 *dv_diagonal_fine,*dv_mixed,*dv_mixed_fine,
-                                 *v_fine);
+                                 fine_index,ip,jp,i,j,fine_min[0],fine_max[0],
+                                 *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
+                                 *dv_mixed_fine,*v_fine);
                  break;
                case 1:
                  Update_V_2D(axis,boundary_direction,boundary_positive,
@@ -151,7 +152,7 @@ void Elastic::V_Boundary_Refine::refine
 
                  if(!is_residual)
                    Correction_2D(axis,boundary_direction,boundary_positive,
-                                 fine_index,jp,ip,j,i,p_min[1],p_max[1],
+                                 fine_index,jp,ip,j,i,fine_min[1],fine_max[1],
                                  *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
                                  *dv_mixed_fine,*v_fine);
                  break;
@@ -170,15 +171,15 @@ void Elastic::V_Boundary_Refine::refine
          boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
          (coarse_patch.getPatchGeometry());
 
-       for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]+=1)
-         for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]+=1)
-           for(ijk[0]=p_min[0]; ijk[0]<=p_max[0]; ijk[0]+=1)
+       for(ijk[2]=fine_min[2]; ijk[2]<=fine_max[2]; ijk[2]+=1)
+         for(ijk[1]=fine_min[1]; ijk[1]<=fine_max[1]; ijk[1]+=1)
+           for(ijk[0]=fine_min[0]; ijk[0]<=fine_max[0]; ijk[0]+=1)
              {
                SAMRAI::pdat::SideIndex
                  fine(ijk,axis,SAMRAI::pdat::SideIndex::Lower);
                Update_V_3D(axis,boundary_direction,boundary_positive,fine,
-                           unit,ijk,coarse_box,*geom,dv_diagonal,
-                           dv_diagonal_fine,dv_mixed,
+                           unit,ijk,coarse_box,fine_min,fine_max,*geom,
+                           dv_diagonal,dv_diagonal_fine,dv_mixed,
                            dv_mixed_fine,*v,*v_fine);
              }
      }
