@@ -43,6 +43,7 @@ Elastic::FAC::FAC(const std::string& object_name,
   v_rhs_id(invalid_id),
   dv_diagonal_id(invalid_id),
   dv_mixed_id(invalid_id),
+  level_set_id(invalid_id),
   lambda("lambda",database,dimension),
   mu("mu",database,dimension),
   v_rhs("v_rhs",database,dimension,dimension.getValue())
@@ -98,6 +99,15 @@ Elastic::FAC::FAC(const std::string& object_name,
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1));
 
+      if(database->keyExists("level_set"))
+        {
+          boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
+            level_set_ptr(new SAMRAI::pdat::NodeVariable<double>
+                          (d_dim,object_name + ":level_set",depth));
+          level_set_id =
+            vdb->registerVariableAndContext(level_set_ptr,d_context,
+                                            SAMRAI::hier::IntVector(d_dim,1));
+        }
     }
   else if(dim==3)
     {
@@ -107,6 +117,15 @@ Elastic::FAC::FAC(const std::string& object_name,
       edge_moduli_id =
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1));
+      if(database->keyExists("level_set"))
+        {
+          boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
+            level_set_ptr(new SAMRAI::pdat::EdgeVariable<double>
+                          (d_dim,object_name+ ":level_set",depth));
+          level_set_id =
+            vdb->registerVariableAndContext(level_set_ptr,d_context,
+                                            SAMRAI::hier::IntVector(d_dim,1));
+        }
     }
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >

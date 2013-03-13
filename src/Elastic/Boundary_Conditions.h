@@ -27,22 +27,28 @@ namespace Elastic {
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
                        const int &v_id, const bool &rhs);
     void set_extra_ids(const int &Edge_moduli_id, const int &Dv_diagonal_id,
-                       const int &Dv_mixed_id)
+                       const int &Dv_mixed_id, const int &Level_set_id)
     {
       edge_moduli_id=Edge_moduli_id;
       dv_diagonal_id=Dv_diagonal_id;
       dv_mixed_id=Dv_mixed_id;
+      level_set_id=Level_set_id;
     }
 
     Input_Expression expression[3][3][2];
     bool is_dirichlet[3][3][2];
     double coord[3];
     std::string d_object_name;
-    int edge_moduli_id, dv_diagonal_id, dv_mixed_id;
+    int edge_moduli_id, dv_diagonal_id, dv_mixed_id, level_set_id;
 
     bool have_faults() const
     {
       return dv_diagonal_id!=invalid_id;
+    }
+
+    bool have_embedded_boundary() const
+    {
+      return level_set_id!=invalid_id;
     }
 
     void set_dirichlet

@@ -33,6 +33,7 @@ void Elastic::FACSolver::initializeSolverState
  const int edge_moduli_id,
  const int dv_diagonal_id,
  const int dv_mixed_id, 
+ const int level_set_id,
  const int v_id,
  const int v_rhs_id,
  boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
@@ -83,7 +84,7 @@ void Elastic::FACSolver::initializeSolverState
                                  d_ln_max);
 
   d_fac_ops.set_extra_ids(cell_moduli_id,edge_moduli_id,dv_diagonal_id,
-                          dv_mixed_id);
+                          dv_mixed_id,level_set_id);
 
   createVectorWrappers(v_id, v_rhs_id);
 

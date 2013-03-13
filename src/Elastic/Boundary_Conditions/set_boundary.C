@@ -111,11 +111,16 @@ void Elastic::Boundary_Conditions::set_boundary
             }
         }
 
-      set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-      set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-
       if(dim==2)
         {
+          boost::shared_ptr<SAMRAI::pdat::NodeData<double> > level_set_ptr;
+          if(have_embedded_boundary())
+            level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+              (patch.getPatchData(level_set_id));
+
+          set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+          set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+
           boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
             (patch.getPatchData(edge_moduli_id));
@@ -124,6 +129,14 @@ void Elastic::Boundary_Conditions::set_boundary
         }
       else
         {
+          boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > level_set_ptr;
+          if(have_embedded_boundary())
+            level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
+              (patch.getPatchData(level_set_id));
+
+          set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+          set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+
           boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
             (patch.getPatchData(edge_moduli_id));

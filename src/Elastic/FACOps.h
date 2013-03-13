@@ -250,23 +250,33 @@ namespace Elastic {
      * flux and you would like that to be used, set flux id to the
      * patch data index of that space.
      */
-    void set_extra_ids(const int &cell_moduli, const int &edge_moduli,
-                       const int &dv_diagonal, const int &dv_mixed)
+    void set_extra_ids(const int &Cell_moduli_id, const int &Edge_moduli_id,
+                       const int &Dv_diagonal_id, const int &Dv_mixed_id,
+                       const int &Level_set_id)
     {
-      cell_moduli_id=cell_moduli;
-      edge_moduli_id=edge_moduli;
-      dv_diagonal_id=dv_diagonal;
-      dv_mixed_id=dv_mixed;
+      cell_moduli_id=Cell_moduli_id;
+      edge_moduli_id=Edge_moduli_id;
+      dv_diagonal_id=Dv_diagonal_id;
+      dv_mixed_id=Dv_mixed_id;
+      level_set_id=Level_set_id;
 
       Elastic::V_Boundary_Refine::dv_diagonal_id=dv_diagonal_id;
       Elastic::V_Boundary_Refine::dv_mixed_id=dv_mixed_id;
-      v_coarsen_patch_strategy.set_extra_ids(dv_diagonal_id,dv_mixed_id);
+      Elastic::V_Boundary_Refine::level_set_id=level_set_id;
+      v_coarsen_patch_strategy.set_extra_ids(dv_diagonal_id,dv_mixed_id,
+                                             level_set_id);
     }
 
     bool have_faults() const
     {
       return dv_diagonal_id!=invalid_id;
     }
+
+    bool have_embedded_boundary() const
+    {
+      return level_set_id!=invalid_id;
+    }
+
     //@}
 
     /*!
@@ -864,7 +874,8 @@ namespace Elastic {
      *
      * @see set_extra_ids.
      */
-    int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id;
+    int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id,
+      level_set_id;
 
     /*!
      * @brief Externally provided physical boundary condition object.

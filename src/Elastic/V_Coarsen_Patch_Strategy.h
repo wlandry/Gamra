@@ -48,6 +48,7 @@ namespace Elastic {
       d_object_name(object_name),
       dv_diagonal_id(invalid_id),
       dv_mixed_id(invalid_id),
+      level_set_id(invalid_id),
       d_boundary_conditions(bc){}
 
     /*!
@@ -184,15 +185,22 @@ namespace Elastic {
     int data_id;
     bool is_residual;
 
-    void set_extra_ids(const int& dv_diagonal, const int& dv_mixed)
+    void set_extra_ids(const int& Dv_diagonal_id, const int& Dv_mixed_id,
+                       const int& Level_set_id)
     {
-      dv_diagonal_id=dv_diagonal;
-      dv_mixed_id=dv_mixed;
+      dv_diagonal_id=Dv_diagonal_id;
+      dv_mixed_id=Dv_mixed_id;
+      level_set_id=Level_set_id;
     }
 
     bool have_faults() const
     {
       return dv_diagonal_id!=invalid_id;
+    }
+
+    bool have_embedded_boundary() const
+    {
+      return level_set_id!=invalid_id;
     }
 
     SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
@@ -205,7 +213,7 @@ namespace Elastic {
     /*!
      * @brief SAMRAI::hier::Index of target patch data when filling ghosts.
      */
-    int dv_diagonal_id, dv_mixed_id;
+    int dv_diagonal_id, dv_mixed_id, level_set_id;
 
     Boundary_Conditions& d_boundary_conditions;
 

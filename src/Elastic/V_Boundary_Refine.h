@@ -44,7 +44,7 @@ namespace Elastic {
   public:
 
     static bool is_residual;
-    static int dv_diagonal_id, dv_mixed_id;
+    static int dv_diagonal_id, dv_mixed_id, level_set_id;
     /**
      * Uninteresting default constructor.
      */
@@ -59,6 +59,10 @@ namespace Elastic {
       return dv_diagonal_id!=invalid_id;
     }
 
+    bool have_embedded_boundary() const
+    {
+      return level_set_id!=invalid_id;
+    }
     /**
      * Uninteresting virtual destructor.
      */

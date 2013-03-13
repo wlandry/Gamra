@@ -45,6 +45,10 @@ void Elastic::FAC::initializeLevelData
           level->allocatePatchData(dv_diagonal_id);
           level->allocatePatchData(dv_mixed_id);
         }
+      if(have_embedded_boundary())
+        {
+          level->allocatePatchData(level_set_id);
+        }
     }
   /*
    * Initialize data in all patches in the level.

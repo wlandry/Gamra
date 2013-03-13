@@ -24,6 +24,24 @@ Elastic::FAC::pack_strain(double* buffer,
     }
 
   const int dim=d_dim.getValue();
+  if(have_embedded_boundary())
+    {
+      if(dim==2)
+        {
+          boost::shared_ptr<SAMRAI::pdat::NodeData<double> > level_set_ptr;
+          if(have_embedded_boundary())
+            level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+              (patch.getPatchData(level_set_id));
+        }
+      else
+        {
+          boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > level_set_ptr;
+          if(have_embedded_boundary())
+            level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
+              (patch.getPatchData(level_set_id));
+        }
+    }
+
   int ix(depth/dim), iy(depth%dim);
   const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(d_dim));
   SAMRAI::hier::Index ip(zero), jp(zero);

@@ -48,6 +48,7 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   edge_moduli_id(invalid_id),
   dv_diagonal_id(invalid_id),
   dv_mixed_id(invalid_id),
+  level_set_id(invalid_id),
   d_context(SAMRAI::hier::VariableDatabase::getDatabase()
             ->getContext(object_name + "::PRIVATE_CONTEXT")),
   d_side_scratch_id(invalid_id),

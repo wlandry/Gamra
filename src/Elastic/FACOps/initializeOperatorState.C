@@ -236,6 +236,13 @@ void Elastic::FACOps::initializeOperatorState
                        boost::shared_ptr<SAMRAI::hier::RefineOperator>());
     }
 
+  if(have_embedded_boundary())
+    {
+      v_ghostfill_refine_algorithm.
+        registerRefine(level_set_id,level_set_id,level_set_id,
+                       boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+    }
+
   v_ghostfill_refine_algorithm.
     registerRefine(edge_moduli_id,edge_moduli_id,edge_moduli_id,
                    boost::shared_ptr<SAMRAI::hier::RefineOperator>());
