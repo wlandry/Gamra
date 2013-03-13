@@ -119,24 +119,16 @@ void Elastic::Boundary_Conditions::set_boundary
           boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
             (patch.getPatchData(edge_moduli_id));
-          if(edge_moduli_ptr)
-            {
-              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_stress(v,dv_diagonal_ptr,edge_moduli,unit,dim,pbox,gbox,
-                                geom,dx,homogeneous);
-            }
+          set_normal_stress(v,dv_diagonal_ptr,*edge_moduli_ptr,unit,dim,
+                            pbox,gbox,geom,dx,homogeneous);
         }
       else
         {
           boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
             (patch.getPatchData(edge_moduli_id));
-          if(edge_moduli_ptr)
-            {
-              SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
-              set_normal_stress(v,dv_diagonal_ptr,edge_moduli,unit,dim,pbox,gbox,
-                                geom,dx,homogeneous);
-            }
+          set_normal_stress(v,dv_diagonal_ptr,*edge_moduli_ptr,unit,dim,pbox,
+                            gbox,geom,dx,homogeneous);
         }
     }
   catch(mu::Parser::exception_type &e)

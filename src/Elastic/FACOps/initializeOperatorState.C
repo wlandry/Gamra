@@ -236,6 +236,10 @@ void Elastic::FACOps::initializeOperatorState
                        boost::shared_ptr<SAMRAI::hier::RefineOperator>());
     }
 
+  v_ghostfill_refine_algorithm.
+    registerRefine(edge_moduli_id,edge_moduli_id,edge_moduli_id,
+                   boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+
   v_nocoarse_refine_algorithm.
     registerRefine(v_id,v_id,v_id,
                    boost::shared_ptr<SAMRAI::hier::RefineOperator>());

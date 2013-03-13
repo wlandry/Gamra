@@ -25,6 +25,8 @@ void Elastic::FACOps::xeqScheduleGhostFill(int v_id, int dest_ln)
       refiner.registerRefine(dv_mixed_id,dv_mixed_id,dv_mixed_id,
                              boost::shared_ptr<SAMRAI::hier::RefineOperator>());
     }
+  refiner.registerRefine(edge_moduli_id,edge_moduli_id,edge_moduli_id,
+                         boost::shared_ptr<SAMRAI::hier::RefineOperator>());
   refiner.resetSchedule(v_ghostfill_refine_schedules[dest_ln]);
   v_ghostfill_refine_schedules[dest_ln]->fillData(0.0,false);
 }
