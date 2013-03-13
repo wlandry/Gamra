@@ -169,7 +169,8 @@ namespace Elastic {
                           double mu=
                             edge_node_average(edge_moduli,x-unit[ix],ix,unit,1);
 
-                          v(x)=v(x-unit[ix]*2) - lambda*duyy*2*dx[ix]/(lambda+2*mu);
+                          v(x)=v(x-unit[ix]*2)
+                            - lambda*duyy*2*dx[ix]/(lambda+2*mu);
                         
                           if(!homogeneous)
                             {
