@@ -113,7 +113,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
                          && coarse_geom.getTouchesRegularBoundary(ix,1)))
                     {
                       v(coarse)=coarsen_plane(v_fine,fine,unit[iy],unit[iz]);
-                      if(have_faults && !is_residual)
+                      if(have_faults() && !is_residual)
                         v(coarse)+=coarsen_plane_correction(*dv_mixed,fine,
                                                             unit[iy],
                                                             unit[iz]);

@@ -123,7 +123,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                   {
                     v(coarse)=
                       (v_fine(fine) + v_fine(fine+unit[off_axis]))/2;
-                    if(have_faults && !is_residual)
+                    if(have_faults() && !is_residual)
                       v(coarse)+=((*dv_mixed)(fine,0)
                                   + (*dv_mixed)(fine+unit[off_axis],1))/2;
                   }
@@ -131,7 +131,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                   {
                     coarsen_point_2D(coarse,fine,unit[axis],unit[off_axis],
                                      v,v_fine);
-                    if(have_faults && !is_residual)
+                    if(have_faults() && !is_residual)
                       {
                         v(coarse)+=
                           coarsen_correction_2D(fine,axis,unit[axis],

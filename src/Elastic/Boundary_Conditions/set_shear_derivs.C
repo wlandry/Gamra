@@ -53,7 +53,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                             {
                               double coord_save(geom->getXLower()[iy]);
                               std::swap(coord[iy],coord_save);
-                              if(have_faults)
+                              if(have_faults())
                                 v(x)+=((*dv_mixed_ptr)(y,iy_ix+1)
                                        - (*dv_mixed_ptr)(y-unit[ix],iy_ix))
                                   *dx[iy]/dx[ix]
@@ -77,7 +77,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                             {
                               double coord_save(geom->getXUpper()[iy]);
                               std::swap(coord[iy],coord_save);
-                              if(have_faults)
+                              if(have_faults())
                                 v(x)-=((*dv_mixed_ptr)(y,iy_ix+1)
                                        - (*dv_mixed_ptr)(y-unit[ix],iy_ix))
                                   *dx[iy]/dx[ix]

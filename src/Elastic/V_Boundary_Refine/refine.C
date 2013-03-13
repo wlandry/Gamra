@@ -65,7 +65,7 @@ void Elastic::V_Boundary_Refine::refine
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_fine;
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_fine;
 
-  if(have_faults && !is_residual)
+  if(have_faults() && !is_residual)
     {
       dv_mixed=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (coarse_patch.getPatchData(dv_mixed_id));
@@ -140,7 +140,7 @@ void Elastic::V_Boundary_Refine::refine
                case 0:
                  Update_V_2D(axis,boundary_direction,boundary_positive,
                              fine_index,ip,jp,i,j,*v,*v_fine);
-                 if(have_faults && !is_residual)
+                 if(have_faults() && !is_residual)
                    Correction_2D(axis,boundary_direction,boundary_positive,
                                  fine_index,ip,jp,i,j,fine_min[0],fine_max[0],
                                  *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
@@ -150,7 +150,7 @@ void Elastic::V_Boundary_Refine::refine
                  Update_V_2D(axis,boundary_direction,boundary_positive,
                              fine_index,jp,ip,j,i,*v,*v_fine);
 
-                 if(have_faults && !is_residual)
+                 if(have_faults() && !is_residual)
                    Correction_2D(axis,boundary_direction,boundary_positive,
                                  fine_index,jp,ip,j,i,fine_min[1],fine_max[1],
                                  *dv_diagonal,*dv_diagonal_fine,*dv_mixed,

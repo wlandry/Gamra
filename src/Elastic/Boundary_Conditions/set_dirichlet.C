@@ -84,7 +84,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
                             {
                               double coord_save(geom->getXLower()[iy]);
                               std::swap(coord[iy],coord_save);
-                              if(have_faults)
+                              if(have_faults())
                                 v(x)+= -(*dv_mixed_ptr)(x+unit[iy],ix_iy+1);
                               v(x)+=2*expression[ix][iy][0].eval(coord);
                               std::swap(coord[iy],coord_save);
@@ -101,7 +101,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
                             {
                               double coord_save(geom->getXUpper()[iy]);
                               std::swap(coord[iy],coord_save);
-                              if(have_faults)
+                              if(have_faults())
                                 v(x)+= -(*dv_mixed_ptr)(x-unit[iy],ix_iy);
                               v(x)+=2*expression[ix][iy][1].eval(coord);
                               std::swap(coord[iy],coord_save);

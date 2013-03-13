@@ -73,7 +73,6 @@ bool Elastic::FACSolver::solveSystem
  const int edge_moduli_id,
  const int dv_diagonal_id,
  const int dv_mixed_id, 
- const bool &have_faults,
  const int v_id,
  const int v_rhs_id,
  boost::shared_ptr<SAMRAI::hier::PatchHierarchy>
@@ -105,7 +104,7 @@ bool Elastic::FACSolver::solveSystem
   }
 #endif
   initializeSolverState(cell_moduli_id, edge_moduli_id, dv_diagonal_id,
-                        dv_mixed_id, have_faults, v_id, v_rhs_id,
+                        dv_mixed_id, v_id, v_rhs_id,
                         hierarchy, coarse_ln, fine_ln);
 
   bool solver_rval;

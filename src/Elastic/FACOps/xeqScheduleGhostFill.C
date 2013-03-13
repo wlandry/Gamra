@@ -18,7 +18,7 @@ void Elastic::FACOps::xeqScheduleGhostFill(int v_id, int dest_ln)
   SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
 
   refiner.registerRefine(v_id,v_id,v_id,v_ghostfill_refine_operator);
-  if(have_faults)
+  if(have_faults())
     {
       refiner.registerRefine(dv_diagonal_id,dv_diagonal_id,dv_diagonal_id,
                              boost::shared_ptr<SAMRAI::hier::RefineOperator>());

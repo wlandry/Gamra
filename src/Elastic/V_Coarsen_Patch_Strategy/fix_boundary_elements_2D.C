@@ -43,7 +43,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 if(x[1]>=gbox.lower(1) && x[1]<gbox.upper(1))
                   {
                     v(coarse)=(v_fine(x) + v_fine(x+jp))/2;
-                    if(have_faults && !is_residual)
+                    if(have_faults() && !is_residual)
                       v(coarse)+=((*dv_mixed)(x,0) + (*dv_mixed)(x+jp,1))/2;
                   }
               }
@@ -55,7 +55,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 if(x[1]>=gbox.lower(1) && x[1]<gbox.upper(1))
                   {
                     v(coarse)=(v_fine(x) + v_fine(x+jp))/2;
-                    if(have_faults && !is_residual)
+                    if(have_faults() && !is_residual)
                       v(coarse)+=((*dv_mixed)(x,0) + (*dv_mixed)(x+jp,1))/2;
                   }
               }
@@ -68,7 +68,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 if(y[0]>=gbox.lower(0) && y[0]<gbox.upper(0))
                   {
                     v(coarse)=(v_fine(y) + v_fine(y+ip))/2;
-                    if(have_faults && !is_residual)
+                    if(have_faults() && !is_residual)
                       v(coarse)+=((*dv_mixed)(y,0) + (*dv_mixed)(y+ip,1))/2;
                   }
               }
@@ -80,7 +80,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 if(y[0]>=gbox.lower(0) && y[0]<gbox.upper(0))
                   {
                     v(coarse)=(v_fine(y) + v_fine(y+ip))/2;
-                    if(have_faults && !is_residual)
+                    if(have_faults() && !is_residual)
                       v(coarse)+=((*dv_mixed)(y,0) + (*dv_mixed)(y+ip,1))/2;
                   }
               }

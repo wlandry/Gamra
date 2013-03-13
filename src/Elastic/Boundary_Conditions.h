@@ -13,6 +13,7 @@
 #include <vector>
 #include "Input_Expression.h"
 #include "edge_node_eval.h"
+#include "Constants.h"
 
 namespace Elastic {
   class Boundary_Conditions
@@ -25,21 +26,24 @@ namespace Elastic {
                       const int &v_id, const bool &rhs);
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
                        const int &v_id, const bool &rhs);
-    void set_extra_ids(const int &e_id, const int &dv_d, const int &dv_m,
-                       const bool &Have_faults)
+    void set_extra_ids(const int &Edge_moduli_id, const int &Dv_diagonal_id,
+                       const int &Dv_mixed_id)
     {
-      edge_moduli_id=e_id;
-      dv_diagonal_id=dv_d;
-      dv_mixed_id=dv_m;
-      have_faults=Have_faults;
+      edge_moduli_id=Edge_moduli_id;
+      dv_diagonal_id=Dv_diagonal_id;
+      dv_mixed_id=Dv_mixed_id;
     }
 
     Input_Expression expression[3][3][2];
     bool is_dirichlet[3][3][2];
     double coord[3];
     std::string d_object_name;
-    int edge_moduli_id,dv_diagonal_id,dv_mixed_id;
-    bool have_faults;
+    int edge_moduli_id, dv_diagonal_id, dv_mixed_id;
+
+    bool have_faults() const
+    {
+      return dv_diagonal_id!=invalid_id;
+    }
 
     void set_dirichlet
     (SAMRAI::pdat::SideData<double> &v,
@@ -111,7 +115,7 @@ namespace Elastic {
                               duyy+=(v(y+unit[iy]) + v(y+unit[ix]+unit[iy])
                                      - v(y+unit[ix]) - v(y))
                                 /(2*dx[iy]);
-                              if(have_faults && !homogeneous)
+                              if(have_faults() && !homogeneous)
                                 {
                                   /* We only have to correct for one
                                      of the derivatives because the
@@ -133,7 +137,7 @@ namespace Elastic {
                               SAMRAI::pdat::CellIndex c(x+unit[ix]);
                               double coord_save(geom->getXLower()[ix]);
                               std::swap(coord[ix],coord_save);
-                              if(have_faults)
+                              if(have_faults())
                                 v(x)-=(*dv_diagonal_ptr)(c,ix);
                               v(x)-=expression[ix][ix][0].eval(coord)*2*dx[ix]
                                 /(lambda+2*mu);
@@ -154,7 +158,7 @@ namespace Elastic {
                               duyy+=(v(y+unit[iy]) + v(y-unit[ix]+unit[iy])
                                      -v(y) - v(y-unit[ix]))
                                 /(2*dx[iy]);
-                              if(have_faults && !homogeneous)
+                              if(have_faults() && !homogeneous)
                                 {
                                   /* We only have to correct for one
                                      of the derivatives because the
@@ -177,7 +181,7 @@ namespace Elastic {
                               SAMRAI::pdat::CellIndex c(x-unit[ix]*2);
                               double coord_save(geom->getXUpper()[ix]);
                               std::swap(coord[ix],coord_save);
-                              if(have_faults)
+                              if(have_faults())
                                 v(x)+=(*dv_diagonal_ptr)(c,ix);
                               v(x)+=expression[ix][ix][1].eval(coord)*2*dx[ix]
                                 /(lambda+2*mu);

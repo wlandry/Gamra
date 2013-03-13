@@ -20,7 +20,7 @@ void Elastic::Boundary_Conditions::set_boundary
 
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr;
       boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr;
-      if(have_faults && !homogeneous)
+      if(have_faults() && !homogeneous)
         {
           dv_mixed_ptr=boost::dynamic_pointer_cast
             <SAMRAI::pdat::SideData<double> >(patch.getPatchData(dv_mixed_id));
@@ -52,7 +52,7 @@ void Elastic::Boundary_Conditions::set_boundary
 
       /* FIXME: This looping seems really excessive.  It seems like
          there should be a better way using getBoundaryBoxes. */
-      if(have_faults && !homogeneous)
+      if(have_faults() && !homogeneous)
         {
           SAMRAI::pdat::SideData<double> &dv_mixed(*dv_mixed_ptr);
           for(int ix=0; ix<dim; ++ix)

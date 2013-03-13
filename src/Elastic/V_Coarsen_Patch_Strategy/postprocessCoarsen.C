@@ -17,7 +17,7 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr;
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr;
 
-  if(have_faults)
+  if(have_faults())
     {
       dv_mixed_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (fine.getPatchData(dv_mixed_id));

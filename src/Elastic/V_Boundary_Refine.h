@@ -43,7 +43,7 @@ namespace Elastic {
   {
   public:
 
-    static bool is_residual, have_faults;
+    static bool is_residual;
     static int dv_diagonal_id, dv_mixed_id;
     /**
      * Uninteresting default constructor.
@@ -54,6 +54,10 @@ namespace Elastic {
       d_name_id = "V_BOUNDARY_REFINE";
     }
 
+    bool have_faults() const
+    {
+      return dv_diagonal_id!=invalid_id;
+    }
 
     /**
      * Uninteresting virtual destructor.

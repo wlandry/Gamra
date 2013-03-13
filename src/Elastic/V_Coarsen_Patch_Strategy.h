@@ -46,7 +46,9 @@ namespace Elastic {
                              Boundary_Conditions &bc):
       SAMRAI::xfer::CoarsenPatchStrategy(dim),
       d_object_name(object_name),
-      d_boundary_conditions(bc) {}
+      dv_diagonal_id(invalid_id),
+      dv_mixed_id(invalid_id),
+      d_boundary_conditions(bc){}
 
     /*!
      * @brief Destructor.
@@ -133,7 +135,7 @@ namespace Elastic {
     {
       /* The numbering here (4,7,5,6) is determined by
          the numbering used in FAC::add_faults */
-      if(have_faults && !is_residual)
+      if(have_faults() && !is_residual)
         return (dv_mixed(fine,4) + dv_mixed(fine+jp,7)
                 + dv_mixed(fine+kp,5) + dv_mixed(fine+jp+kp,6))/4;
       return 0;
@@ -152,7 +154,7 @@ namespace Elastic {
         + (coarsen_plane(v_fine,fine+ip,jp,kp)
            + coarsen_plane(v_fine,fine-ip,jp,kp))/4;
                                    
-      if(have_faults && !is_residual)
+      if(have_faults() && !is_residual)
         {
           SAMRAI::pdat::CellIndex cell(fine);
           result+=coarsen_plane_correction(*dv_mixed,fine,jp,kp)
@@ -180,14 +182,17 @@ namespace Elastic {
      */
 
     int data_id;
-    bool is_residual, have_faults;
+    bool is_residual;
 
-    void set_extra_ids(const int& dv_diagonal, const int& dv_mixed,
-                       const bool &Have_faults)
+    void set_extra_ids(const int& dv_diagonal, const int& dv_mixed)
     {
       dv_diagonal_id=dv_diagonal;
       dv_mixed_id=dv_mixed;
-      have_faults=Have_faults;
+    }
+
+    bool have_faults() const
+    {
+      return dv_diagonal_id!=invalid_id;
     }
 
     SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >

@@ -226,7 +226,7 @@ void Elastic::FACOps::initializeOperatorState
     registerRefine(v_id,v_id,v_id,
                    v_ghostfill_refine_operator);
 
-  if(have_faults)
+  if(have_faults())
     {
       v_ghostfill_refine_algorithm.
         registerRefine(dv_diagonal_id,dv_diagonal_id,dv_diagonal_id,

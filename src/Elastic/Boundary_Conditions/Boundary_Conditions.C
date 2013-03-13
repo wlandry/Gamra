@@ -10,7 +10,8 @@ Elastic::Boundary_Conditions::Boundary_Conditions
 (const SAMRAI::tbox::Dimension& dimension,
  const std::string& object_name,
  boost::shared_ptr<SAMRAI::tbox::Database> database):
-  d_object_name(object_name), edge_moduli_id(invalid_id)
+  d_object_name(object_name), edge_moduli_id(invalid_id),
+  dv_diagonal_id(invalid_id), dv_mixed_id(invalid_id)
 {
   const int dim(dimension.getValue());
   std::string v("v");
