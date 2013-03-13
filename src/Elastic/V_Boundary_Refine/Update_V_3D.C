@@ -142,7 +142,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
          && ijk[iz]==lower_z && geom.getTouchesRegularBoundary(iz,ijk_mod_z))
         {
           v_coarse=(5*v(coarse) - v(coarse+jp+kp))/4;
-          if(!is_residual)
+          if(have_faults && !is_residual)
             v_coarse-=
               ((*dv_mixed)(coarse+jp+kp,minus) - (*dv_mixed)(coarse,plus))/4;
         }
@@ -152,7 +152,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
               && geom.getTouchesRegularBoundary(iz,(ijk_mod_z+1)%2))
         {
           v_coarse=(3*v(coarse) + v(coarse-jp-kp))/4;
-          if(!is_residual)
+          if(have_faults && !is_residual)
             v_coarse+=
               ((*dv_mixed)(coarse-jp-kp,plus) - (*dv_mixed)(coarse,minus))/4;
         }
@@ -160,13 +160,13 @@ void Elastic::V_Boundary_Refine::Update_V_3D
         {
           v_coarse=
             quad_offset_interpolate(v(coarse-jp-kp),v(coarse),v(coarse+jp+kp));
-          if(!is_residual)
+          if(have_faults && !is_residual)
             v_coarse+=quad_offset_correction((*dv_mixed)(coarse-jp-kp,plus),
                                              (*dv_mixed)(coarse,minus),
                                              (*dv_mixed)(coarse,plus),
                                              (*dv_mixed)(coarse+jp+kp,minus));
         }
-      if(!is_residual)
+      if(have_faults && !is_residual)
         {
           SAMRAI::pdat::CellIndex cell(coarse);
           v_coarse-=(*dv_mixed_fine)(fine-ip_s,plus)
@@ -175,7 +175,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
         }
 
       v_fine(fine)=v_fine(fine-ip_s) + (v_coarse - v_fine(fine-ip_s-ip_s))/3;
-      if(!is_residual)
+      if(have_faults && !is_residual)
         {
           SAMRAI::pdat::CellIndex cell(fine);
           if(boundary_positive)
@@ -234,7 +234,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
 
       const int dim(3);
       int ix_iz(index_map(ix,iz,dim));
-      if(!is_residual)
+      if(have_faults && !is_residual)
         v_coarse+=quad_offset_correction((*dv_mixed)(coarse+kp,ix_iz+1),
                                      (*dv_mixed)(coarse,ix_iz),
                                      (*dv_mixed)(coarse,ix_iz+1),
@@ -242,7 +242,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
 
       double v_m(v_fine(fine-jp)), v_mm(v_fine(fine-jp-jp));
 
-      if(!is_residual)
+      if(have_faults && !is_residual)
         {
           int ix_iy_in(index_map(ix,boundary_direction,dim)
                        + (boundary_positive ? 1 : 0));
@@ -271,7 +271,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
 
       if(ijk[ix]%2==0)
         {
-          if(!is_residual)
+          if(have_faults && !is_residual)
             v_coarse+= -(*dv_mixed_fine)(fine,direction);
 
           v_fine(fine)=(8*v_coarse + 10*v_m - 3*v_mm)/15;
@@ -281,7 +281,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
           double v_coarse_p(quad_offset_interpolate
                             (v(coarse+kp+ip),v(coarse+ip),v(coarse-kp+ip)));
                              
-          if(!is_residual)
+          if(have_faults && !is_residual)
             {
               SAMRAI::pdat::CellIndex cell(fine), coarse_cell(coarse);
 

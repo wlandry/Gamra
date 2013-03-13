@@ -4,7 +4,7 @@ void
 Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
 (SAMRAI::pdat::SideData<double>& v,
  const SAMRAI::pdat::SideData<double>& v_fine,
- const SAMRAI::pdat::SideData<double>& dv_mixed,
+ const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
  const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries) const
 {
   /* FIXME: Why is this required?  Shouldn't the boundary points be
@@ -43,8 +43,8 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 if(x[1]>=gbox.lower(1) && x[1]<gbox.upper(1))
                   {
                     v(coarse)=(v_fine(x) + v_fine(x+jp))/2;
-                    if(!is_residual)
-                      v(coarse)+=(dv_mixed(x,0) + dv_mixed(x+jp,1))/2;
+                    if(have_faults && !is_residual)
+                      v(coarse)+=((*dv_mixed)(x,0) + (*dv_mixed)(x+jp,1))/2;
                   }
               }
             else if(location_index==1)
@@ -55,8 +55,8 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 if(x[1]>=gbox.lower(1) && x[1]<gbox.upper(1))
                   {
                     v(coarse)=(v_fine(x) + v_fine(x+jp))/2;
-                    if(!is_residual)
-                      v(coarse)+=(dv_mixed(x,0) + dv_mixed(x+jp,1))/2;
+                    if(have_faults && !is_residual)
+                      v(coarse)+=((*dv_mixed)(x,0) + (*dv_mixed)(x+jp,1))/2;
                   }
               }
             /* Fix vy */
@@ -68,8 +68,8 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 if(y[0]>=gbox.lower(0) && y[0]<gbox.upper(0))
                   {
                     v(coarse)=(v_fine(y) + v_fine(y+ip))/2;
-                    if(!is_residual)
-                      v(coarse)+=(dv_mixed(y,0) + dv_mixed(y+ip,1))/2;
+                    if(have_faults && !is_residual)
+                      v(coarse)+=((*dv_mixed)(y,0) + (*dv_mixed)(y+ip,1))/2;
                   }
               }
             else if(location_index==3)
@@ -80,8 +80,8 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
                 if(y[0]>=gbox.lower(0) && y[0]<gbox.upper(0))
                   {
                     v(coarse)=(v_fine(y) + v_fine(y+ip))/2;
-                    if(!is_residual)
-                      v(coarse)+=(dv_mixed(y,0) + dv_mixed(y+ip,1))/2;
+                    if(have_faults && !is_residual)
+                      v(coarse)+=((*dv_mixed)(y,0) + (*dv_mixed)(y+ip,1))/2;
                   }
               }
             else

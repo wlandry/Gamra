@@ -18,7 +18,7 @@ void Elastic::FAC::applyGradientDetector
     (SAMRAI::hier::PatchLevel &) * hierarchy.getPatchLevel(ln);
   
   int ntag = 0, ntotal = 0;
-  double maxestimate = 0;
+  double max_curvature(0);
   for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
       pi!=level.end(); pi++)
     {
@@ -54,16 +54,13 @@ void Elastic::FAC::applyGradientDetector
       SAMRAI::pdat::SideData<double>& v = *soln_side_data_;
       SAMRAI::pdat::CellData<int>& tag_cell_data = *tag_cell_data_;
                               
-      boost::shared_ptr<SAMRAI::hier::PatchData>
-        dv_diagonal_data = patch.getPatchData(dv_diagonal_id);
-      boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr =
-        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-        (dv_diagonal_data);
-      if (!dv_diagonal_ptr)
+      boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr;
+      if(!faults.empty())
         {
-          TBOX_ERROR("Can not find dv_diagonal in applyGradientDetector.\n");
+          dv_diagonal_ptr =
+            boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+            (patch.getPatchData(dv_diagonal_id));
         }
-      SAMRAI::pdat::CellData<double>& dv_diagonal = *dv_diagonal_ptr;
 
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
@@ -75,7 +72,7 @@ void Elastic::FAC::applyGradientDetector
         {
           const SAMRAI::pdat::CellIndex cell_index(*ci);
 
-	  double curve(0.);
+          double curvature(0);
 	  for (int ix=0; ix<d_dim.getValue(); ++ix)
 	  {
             const SAMRAI::pdat::SideIndex x(cell_index,ix,
@@ -98,36 +95,38 @@ void Elastic::FAC::applyGradientDetector
               if(cell_index[ix]==patch.getBox().lower(ix)
                  && geom->getTouchesRegularBoundary(ix,0))
                 {
-                  curve=std::max(curve,
-                                 std::abs(v(x+pp[ix]+pp[ix])
-                                          - 2*v(x+pp[ix]) + v(x)
-                                          - dv_diagonal(cell_index+pp[ix],ix)
-                                          + dv_diagonal(cell_index,ix)));
+                  double curve(v(x+pp[ix]+pp[ix]) - 2*v(x+pp[ix]) + v(x));
+                  if(!faults.empty())
+                    curve+=-(*dv_diagonal_ptr)(cell_index+pp[ix],ix)
+                      + (*dv_diagonal_ptr)(cell_index,ix);
+                  curvature=std::max(curvature,std::abs(curve));
                     
                 }
               else if(cell_index[ix]==patch.getBox().upper(ix)
                       && geom->getTouchesRegularBoundary(ix,1))
                 {
-                  curve=std::max(curve,
-                                 std::abs(v(x+pp[ix])
-                                          - 2*v(x) + v(x-pp[ix])
-                                          - dv_diagonal(cell_index,ix)
-                                          + dv_diagonal(cell_index-pp[ix],ix)));
+                  double curve(v(x+pp[ix]) - 2*v(x) + v(x-pp[ix]));
+                  if(!faults.empty())
+                    curve+=-(*dv_diagonal_ptr)(cell_index,ix)
+                      + (*dv_diagonal_ptr)(cell_index-pp[ix],ix);
+                  curvature=std::max(curvature,std::abs(curve));
                 }
 	      else
                 {
-                  curve=std::max(curve,
-                                 std::abs(v(x+pp[ix]+pp[ix]) - v(x+pp[ix])
-                                          - v(x) + v(x-pp[ix])
-                                          - dv_diagonal(cell_index+pp[ix],ix)
-                                          + dv_diagonal(cell_index-pp[ix],ix)));
+                  double curve(v(x+pp[ix]+pp[ix]) - v(x+pp[ix])
+                              - v(x) + v(x-pp[ix]));
+                  if(!faults.empty())
+                    curve+=-(*dv_diagonal_ptr)(cell_index+pp[ix],ix)
+                      + (*dv_diagonal_ptr)(cell_index-pp[ix],ix);
+                  curvature=std::max(curvature,std::abs(curve));
                 }
 	    }
 	  }
 
-          if (maxestimate < curve)
-               maxestimate=curve;
-          if (curve > d_adaption_threshold || ln<min_full_refinement_level)
+          if (max_curvature < curvature)
+               max_curvature=curvature;
+
+          if (curvature > d_adaption_threshold || ln<min_full_refinement_level)
             {
               tag_cell_data(cell_index) = 1;
               ++ntag;
@@ -137,6 +136,5 @@ void Elastic::FAC::applyGradientDetector
   SAMRAI::tbox::plog << "Adaption threshold is " << d_adaption_threshold << "\n";
   SAMRAI::tbox::plog << "Number of cells tagged on level " << ln << " is "
              << ntag << "/" << ntotal << "\n";
-  SAMRAI::tbox::plog << "Max estimate is " << maxestimate << "\n";
+  SAMRAI::tbox::plog << "Max estimate is " << max_curvature << "\n";
 }
-

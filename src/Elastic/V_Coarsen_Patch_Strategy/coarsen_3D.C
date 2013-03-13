@@ -26,8 +26,8 @@
 void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
 (SAMRAI::pdat::SideData<double>& v,
  const SAMRAI::pdat::SideData<double>& v_fine,
- const SAMRAI::pdat::SideData<double>& dv_mixed,
- const SAMRAI::pdat::CellData<double>& dv_diagonal,
+ const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
+ const boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal,
  const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
  const SAMRAI::hier::Box& coarse_box) const
 {
@@ -113,12 +113,12 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
                          && coarse_geom.getTouchesRegularBoundary(ix,1)))
                     {
                       v(coarse)=coarsen_plane(v_fine,fine,unit[iy],unit[iz])
-                        + coarsen_plane_correction(dv_mixed,fine,unit[iy],
+                        + coarsen_plane_correction(*dv_mixed,fine,unit[iy],
                                                    unit[iz]);
                     }
                   else
                     {
-                      v(coarse)=coarsen_point_3D(v_fine,dv_diagonal,dv_mixed,
+                      v(coarse)=coarsen_point_3D(v_fine,dv_mixed,dv_diagonal,
                                                  fine,ix,unit[ix],unit[iy],
                                                  unit[iz]);
                     }

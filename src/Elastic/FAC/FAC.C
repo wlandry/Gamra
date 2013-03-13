@@ -63,20 +63,26 @@ Elastic::FAC::FAC(const std::string& object_name,
     vdb->registerVariableAndContext(cell_moduli_ptr, d_context,
                                     SAMRAI::hier::IntVector(d_dim, 1));
 
-  boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    dv_diagonal_ptr(new SAMRAI::pdat::CellVariable<double>
-                    (d_dim,object_name + ":dv_diagonal",dim));
-  dv_diagonal_id =
-    vdb->registerVariableAndContext(dv_diagonal_ptr, d_context,
-                                    SAMRAI::hier::IntVector(d_dim, 1));
+  if(database->keyExists("faults"))
+    {
+      faults=database->getDoubleArray("faults");
+    }
+  if(!faults.empty())
+    {
+      boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
+        dv_diagonal_ptr(new SAMRAI::pdat::CellVariable<double>
+                        (d_dim,object_name + ":dv_diagonal",dim));
+      dv_diagonal_id =
+        vdb->registerVariableAndContext(dv_diagonal_ptr, d_context,
+                                        SAMRAI::hier::IntVector(d_dim, 1));
 
-  boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-    dv_mixed_ptr(new SAMRAI::pdat::SideVariable<double>
-                 (d_dim,object_name + ":dv_mixed",dim==2 ? 2 : 8));
-  dv_mixed_id =
-    vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
-                                    SAMRAI::hier::IntVector(d_dim,1));
-
+      boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
+        dv_mixed_ptr(new SAMRAI::pdat::SideVariable<double>
+                     (d_dim,object_name + ":dv_mixed",dim==2 ? 2 : 8));
+      dv_mixed_id =
+        vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
+                                        SAMRAI::hier::IntVector(d_dim,1));
+    }
   if(dim==2)
     {
       boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
@@ -112,9 +118,4 @@ Elastic::FAC::FAC(const std::string& object_name,
                                                       1.0e-15);
   min_full_refinement_level
     =database->getIntegerWithDefault("min_full_refinement_level",0);
-
-  if(database->keyExists("faults"))
-    {
-      faults=database->getDoubleArray("faults");
-    }
 }

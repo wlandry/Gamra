@@ -82,12 +82,11 @@ void Elastic::Boundary_Conditions::set_dirichlet
                           v(x)=-v(x+unit[iy]);
                           if(!homogeneous)
                             {
-                              SAMRAI::pdat::SideData<double>
-                                &dv_mixed(*dv_mixed_ptr);
                               double coord_save(geom->getXLower()[iy]);
                               std::swap(coord[iy],coord_save);
-                              v(x)+= -dv_mixed(x+unit[iy],ix_iy+1)
-                                + 2*expression[ix][iy][0].eval(coord);
+                              if(have_faults)
+                                v(x)+= -(*dv_mixed_ptr)(x+unit[iy],ix_iy+1);
+                              v(x)+=2*expression[ix][iy][0].eval(coord);
                               std::swap(coord[iy],coord_save);
                             }
                         }
@@ -100,12 +99,11 @@ void Elastic::Boundary_Conditions::set_dirichlet
                           v(x)=-v(x-unit[iy]);
                           if(!homogeneous)
                             {
-                              SAMRAI::pdat::SideData<double>
-                                &dv_mixed(*dv_mixed_ptr);
                               double coord_save(geom->getXUpper()[iy]);
                               std::swap(coord[iy],coord_save);
-                              v(x)+= -dv_mixed(x-unit[iy],ix_iy)
-                                + 2*expression[ix][iy][1].eval(coord);
+                              if(have_faults)
+                                v(x)+= -(*dv_mixed_ptr)(x-unit[iy],ix_iy);
+                              v(x)+=2*expression[ix][iy][1].eval(coord);
                               std::swap(coord[iy],coord_save);
                             }
                         }

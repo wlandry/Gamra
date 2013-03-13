@@ -34,15 +34,18 @@ void Elastic::FAC::initializeLevelData
     hierarchy->getPatchLevel(level_number);
   const int dim=d_dim.getValue();
 
-  if (allocate_data) {
-    level->allocatePatchData(cell_moduli_id);
-    level->allocatePatchData(edge_moduli_id);
-    level->allocatePatchData(v_id);
-    level->allocatePatchData(v_rhs_id);
-    level->allocatePatchData(dv_diagonal_id);
-    level->allocatePatchData(dv_mixed_id);
-  }
-
+  if(allocate_data)
+    {
+      level->allocatePatchData(cell_moduli_id);
+      level->allocatePatchData(edge_moduli_id);
+      level->allocatePatchData(v_id);
+      level->allocatePatchData(v_rhs_id);
+      if(!faults.empty())
+        {
+          level->allocatePatchData(dv_diagonal_id);
+          level->allocatePatchData(dv_mixed_id);
+        }
+    }
   /*
    * Initialize data in all patches in the level.
    */

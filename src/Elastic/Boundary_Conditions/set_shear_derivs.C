@@ -51,14 +51,14 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                           v(x)=v(x+unit[iy]) + duyx*dx[iy];
                           if(!homogeneous)
                             {
-                              SAMRAI::pdat::SideData<double>
-                                &dv_mixed(*dv_mixed_ptr);
                               double coord_save(geom->getXLower()[iy]);
                               std::swap(coord[iy],coord_save);
-                              v(x)+=((dv_mixed(y,iy_ix+1)
-                                     - dv_mixed(y-unit[ix],iy_ix))/dx[ix]
-                                     - expression[ix][iy][0].eval(coord))*dx[iy]
-                                + dv_mixed(x+unit[iy],ix_iy+1);
+                              if(have_faults)
+                                v(x)+=((*dv_mixed_ptr)(y,iy_ix+1)
+                                       - (*dv_mixed_ptr)(y-unit[ix],iy_ix))
+                                  *dx[iy]/dx[ix]
+                                  + (*dv_mixed_ptr)(x+unit[iy],ix_iy+1);
+                              v(x)-=expression[ix][iy][0].eval(coord)*dx[iy];
                               std::swap(coord[iy],coord_save);
                             }
                         }
@@ -75,14 +75,14 @@ void Elastic::Boundary_Conditions::set_shear_derivs
 
                           if(!homogeneous)
                             {
-                              SAMRAI::pdat::SideData<double>
-                                &dv_mixed(*dv_mixed_ptr);
                               double coord_save(geom->getXUpper()[iy]);
                               std::swap(coord[iy],coord_save);
-                              v(x)-=((dv_mixed(y,iy_ix+1)
-                                     - dv_mixed(y-unit[ix],iy_ix))/dx[ix]
-                                     - expression[ix][iy][1].eval(coord))*dx[iy]
-                                - dv_mixed(x-unit[iy],ix_iy);
+                              if(have_faults)
+                                v(x)-=((*dv_mixed_ptr)(y,iy_ix+1)
+                                       - (*dv_mixed_ptr)(y-unit[ix],iy_ix))
+                                  *dx[iy]/dx[ix]
+                                  - (*dv_mixed_ptr)(x-unit[iy],ix_iy);
+                              v(x)+=expression[ix][iy][1].eval(coord)*dx[iy];
                               std::swap(coord[iy],coord_save);
                             }
                         }

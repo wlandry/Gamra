@@ -251,16 +251,20 @@ namespace Elastic {
      * patch data index of that space.
      */
     void set_extra_ids(const int &cell_moduli, const int &edge_moduli,
-                       const int &dv_diagonal, const int &dv_mixed)
+                       const int &dv_diagonal, const int &dv_mixed,
+                       const bool &Have_faults)
     {
       cell_moduli_id=cell_moduli;
       edge_moduli_id=edge_moduli;
       dv_diagonal_id=dv_diagonal;
       dv_mixed_id=dv_mixed;
+      have_faults=Have_faults;
 
       Elastic::V_Boundary_Refine::dv_diagonal_id=dv_diagonal_id;
       Elastic::V_Boundary_Refine::dv_mixed_id=dv_mixed_id;
-      v_coarsen_patch_strategy.set_extra_ids(dv_diagonal_id,dv_mixed_id);
+      Elastic::V_Boundary_Refine::have_faults=have_faults;
+      v_coarsen_patch_strategy.set_extra_ids(dv_diagonal_id,dv_mixed_id,
+                                             have_faults);
     }
     //@}
 
@@ -860,6 +864,7 @@ namespace Elastic {
      * @see set_extra_ids.
      */
     int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id;
+    bool have_faults;
 
     /*!
      * @brief Externally provided physical boundary condition object.

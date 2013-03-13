@@ -52,8 +52,8 @@ coarsen_correction_2D(const SAMRAI::pdat::SideIndex& fine,
 void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
 (SAMRAI::pdat::SideData<double>& v,
  const SAMRAI::pdat::SideData<double>& v_fine,
- const SAMRAI::pdat::SideData<double>& dv_mixed,
- const SAMRAI::pdat::CellData<double>& dv_diagonal,
+ const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
+ const boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal,
  const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
  const SAMRAI::hier::Box& coarse_box) const
 {
@@ -123,20 +123,20 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                   {
                     v(coarse)=
                       (v_fine(fine) + v_fine(fine+unit[off_axis]))/2;
-                    if(!is_residual)
-                      v(coarse)+=(dv_mixed(fine,0)
-                                  + dv_mixed(fine+unit[off_axis],1))/2;
+                    if(have_faults && !is_residual)
+                      v(coarse)+=((*dv_mixed)(fine,0)
+                                  + (*dv_mixed)(fine+unit[off_axis],1))/2;
                   }
                 else
                   {
                     coarsen_point_2D(coarse,fine,unit[axis],unit[off_axis],
                                      v,v_fine);
-                    if(!is_residual)
+                    if(have_faults && !is_residual)
                       {
                         v(coarse)+=
                           coarsen_correction_2D(fine,axis,unit[axis],
-                                                unit[off_axis],dv_diagonal,
-                                                dv_mixed);
+                                                unit[off_axis],*dv_diagonal,
+                                                *dv_mixed);
                       }
                   }
               }

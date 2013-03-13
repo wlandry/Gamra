@@ -87,8 +87,8 @@ namespace Elastic {
     coarsen_2D
     (SAMRAI::pdat::SideData<double>& v,
      const SAMRAI::pdat::SideData<double>& v_fine,
-     const SAMRAI::pdat::SideData<double>& dv_mixed,
-     const SAMRAI::pdat::CellData<double>& dv_diagonal,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
+     const boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal,
      const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
      const SAMRAI::hier::Box& coarse_box) const;
 
@@ -96,17 +96,25 @@ namespace Elastic {
     fix_boundary_elements_2D
     (SAMRAI::pdat::SideData<double>& v,
      const SAMRAI::pdat::SideData<double>& v_fine,
-     const SAMRAI::pdat::SideData<double>& dv_mixed,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
      const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
 
     void
     coarsen_3D
     (SAMRAI::pdat::SideData<double>& v,
      const SAMRAI::pdat::SideData<double>& v_fine,
-     const SAMRAI::pdat::SideData<double>& dv_mixed,
-     const SAMRAI::pdat::CellData<double>& dv_diagonal,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
+     const boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal,
      const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
      const SAMRAI::hier::Box& coarse_box) const;
+
+    void
+    fix_boundary_elements_3D
+    (SAMRAI::pdat::SideData<double>& v,
+     const SAMRAI::pdat::SideData<double>& v_fine,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
+     const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
+
 
     double coarsen_plane(const SAMRAI::pdat::SideData<double>& v_fine,
                          const SAMRAI::pdat::SideIndex &fine,
@@ -125,15 +133,15 @@ namespace Elastic {
     {
       /* The numbering here (4,7,5,6) is determined by
          the numbering used in FAC::add_faults */
-      if(!is_residual)
+      if(have_faults && !is_residual)
         return (dv_mixed(fine,4) + dv_mixed(fine+jp,7)
                 + dv_mixed(fine+kp,5) + dv_mixed(fine+jp+kp,6))/4;
       return 0;
     }
 
     double coarsen_point_3D(const SAMRAI::pdat::SideData<double>& v_fine,
-                            const SAMRAI::pdat::CellData<double>& dv_diagonal,
-                            const SAMRAI::pdat::SideData<double>& dv_mixed,
+                            const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
+                            const boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal,
                             const SAMRAI::pdat::SideIndex& fine,
                             const int& axis,
                             const SAMRAI::hier::Index& ip,
@@ -144,26 +152,19 @@ namespace Elastic {
         + (coarsen_plane(v_fine,fine+ip,jp,kp)
            + coarsen_plane(v_fine,fine-ip,jp,kp))/4;
                                    
-      if(!is_residual)
+      if(have_faults && !is_residual)
         {
           SAMRAI::pdat::CellIndex cell(fine);
-          result+=coarsen_plane_correction(dv_mixed,fine,jp,kp)
-            + (dv_diagonal(cell-ip,axis) - dv_diagonal(cell,axis)
-               + dv_diagonal(cell-ip+jp,axis) - dv_diagonal(cell+jp,axis)
-               + dv_diagonal(cell-ip+kp,axis) - dv_diagonal(cell+kp,axis)
-               + dv_diagonal(cell-ip+jp+kp,axis)
-               - dv_diagonal(cell+jp+kp,axis))/16;
+          result+=coarsen_plane_correction(*dv_mixed,fine,jp,kp)
+            + ((*dv_diagonal)(cell-ip,axis) - (*dv_diagonal)(cell,axis)
+               + (*dv_diagonal)(cell-ip+jp,axis) - (*dv_diagonal)(cell+jp,axis)
+               + (*dv_diagonal)(cell-ip+kp,axis) - (*dv_diagonal)(cell+kp,axis)
+               + (*dv_diagonal)(cell-ip+jp+kp,axis)
+               - (*dv_diagonal)(cell+jp+kp,axis))/16;
         }
       return result;
     }
 
-
-    void
-    fix_boundary_elements_3D
-    (SAMRAI::pdat::SideData<double>& v,
-     const SAMRAI::pdat::SideData<double>& v_fine,
-     const SAMRAI::pdat::SideData<double>& dv_mixed,
-     const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
 
     //@}
 
@@ -179,12 +180,14 @@ namespace Elastic {
      */
 
     int data_id;
-    bool is_residual;
+    bool is_residual, have_faults;
 
-    void set_extra_ids(const int& dv_diagonal, const int& dv_mixed)
+    void set_extra_ids(const int& dv_diagonal, const int& dv_mixed,
+                       const bool &Have_faults)
     {
       dv_diagonal_id=dv_diagonal;
       dv_mixed_id=dv_mixed;
+      have_faults=Have_faults;
     }
 
     SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >

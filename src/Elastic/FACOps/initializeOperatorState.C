@@ -226,12 +226,15 @@ void Elastic::FACOps::initializeOperatorState
     registerRefine(v_id,v_id,v_id,
                    v_ghostfill_refine_operator);
 
-  v_ghostfill_refine_algorithm.
-    registerRefine(dv_diagonal_id,dv_diagonal_id,dv_diagonal_id,
-                   boost::shared_ptr<SAMRAI::hier::RefineOperator>());
-  v_ghostfill_refine_algorithm.
-    registerRefine(dv_mixed_id,dv_mixed_id,dv_mixed_id,
-                   boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+  if(have_faults)
+    {
+      v_ghostfill_refine_algorithm.
+        registerRefine(dv_diagonal_id,dv_diagonal_id,dv_diagonal_id,
+                       boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+      v_ghostfill_refine_algorithm.
+        registerRefine(dv_mixed_id,dv_mixed_id,dv_mixed_id,
+                       boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+    }
 
   v_nocoarse_refine_algorithm.
     registerRefine(v_id,v_id,v_id,

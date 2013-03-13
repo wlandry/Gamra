@@ -4,7 +4,7 @@ void
 Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
 (SAMRAI::pdat::SideData<double>& v,
  const SAMRAI::pdat::SideData<double>& v_fine,
- const SAMRAI::pdat::SideData<double>& dv_mixed,
+ const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
  const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries) const
 {
   /* Fix up the boundary elements by iterating through the boundary
@@ -58,9 +58,10 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
               if(fine[iy]>=gbox.lower(iy) && fine[iy]<gbox.upper(iy)
                  && fine[iz]>=gbox.lower(iz) && fine[iz]<gbox.upper(iz))
                 {
-                  v(coarse)=coarsen_plane(v_fine,fine,unit[iy],unit[iz])
-                    + coarsen_plane_correction(dv_mixed,fine,unit[iy],
-                                               unit[iz]);
+                  v(coarse)=coarsen_plane(v_fine,fine,unit[iy],unit[iz]);
+                  if(have_faults)
+                    v(coarse)+=coarsen_plane_correction(*dv_mixed,fine,unit[iy],
+                                                        unit[iz]);
                 }
             }
     }

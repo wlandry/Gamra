@@ -43,7 +43,7 @@ namespace Elastic {
   {
   public:
 
-    static bool is_residual;
+    static bool is_residual, have_faults;
     static int dv_diagonal_id, dv_mixed_id;
     /**
      * Uninteresting default constructor.
