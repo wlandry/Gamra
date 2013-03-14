@@ -122,8 +122,10 @@ void Elastic::FAC::fix_moduli()
                 {
                   const int axis2((axis+1)%3), axis3((axis+2)%3);
                   SAMRAI::hier::Box pbox=patch->getBox();
-                  pbox.grow(axis2,edge_moduli.getGhostCellWidth()[axis2]);
-                  pbox.grow(axis3,edge_moduli.getGhostCellWidth()[axis3]);
+                  /* Grow in axis direction only, because the
+                     cell_moduli neighbors are not available on the
+                     corners */
+                  pbox.grow(axis,edge_moduli.getGhostCellWidth()[axis]);
 
                   SAMRAI::pdat::EdgeIterator nend(pbox,axis,false);
                   for(SAMRAI::pdat::EdgeIterator ni(pbox,axis,true);
