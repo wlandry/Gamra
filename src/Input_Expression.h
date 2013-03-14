@@ -16,7 +16,7 @@ public:
 
   int dim, slice;
   double coord[3];
-  bool use_equation;
+  bool use_equation, is_valid;
 
   static double* variable_factory(const char *, void *)
   {
@@ -25,14 +25,33 @@ public:
     return &variables.back();
   }
 
-  Input_Expression() {}
+  Input_Expression(): is_valid(false) {}
+
+  Input_Expression(const std::string &name,
+                   boost::shared_ptr<SAMRAI::tbox::Database> database,
+                   const SAMRAI::tbox::Dimension& dimension,
+                   const bool &error_if_missing,
+                   const int num_components=1,
+                   const int Slice=-1):
+    dim(dimension.getValue()), slice(Slice), is_valid(true)
+  {
+    Init(name,database,num_components,error_if_missing);
+  }
 
   Input_Expression(const std::string &name,
                    boost::shared_ptr<SAMRAI::tbox::Database> database,
                    const SAMRAI::tbox::Dimension& dimension,
                    const int num_components=1,
                    const int Slice=-1):
-    dim(dimension.getValue()), slice(Slice)
+    dim(dimension.getValue()), slice(Slice), is_valid(true)
+  {
+    Init(name,database,num_components,false);
+  }
+
+  void Init(const std::string &name,
+            boost::shared_ptr<SAMRAI::tbox::Database> database,
+            const int num_components,
+            const bool &error_if_missing)
   {
     if(database->keyExists(name))
       {
@@ -54,7 +73,9 @@ public:
       }
     else
       {
-        TBOX_ERROR("Could not find an entry for " + name);
+        is_valid=false;
+        if(error_if_missing)
+          TBOX_ERROR("Could not find an entry for " + name);
       }
   }
 

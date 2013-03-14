@@ -208,14 +208,14 @@ namespace Elastic {
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id, dv_diagonal_id,
       dv_mixed_id, level_set_id;
 
-    Input_Expression lambda, mu, v_rhs;
+    Input_Expression lambda, mu, v_rhs, level_set;
 
     SAMRAI::tbox::Array<double> faults;
     //@}
 
     bool have_embedded_boundary() const
     {
-      return level_set_id!=invalid_id;
+      return level_set.is_valid;
     }
 
     template<class T> void add_faults();

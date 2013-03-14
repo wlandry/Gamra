@@ -94,5 +94,55 @@ void Elastic::FAC::initializeLevelData
 
     v_rhs_data->fillAll(0);
     /* FIXME: need to add in the v_rhs from the input file */
+
+    if(have_embedded_boundary())
+      {
+        if(dim==2)
+          {
+            boost::shared_ptr<SAMRAI::pdat::NodeData<double> > level_set_ptr =
+              boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+              (patch->getPatchData(level_set_id));
+            SAMRAI::hier::Box level_set_box = level_set_ptr->getBox();
+            SAMRAI::pdat::NodeIterator end(level_set_ptr->getGhostBox(),false);
+            for(SAMRAI::pdat::NodeIterator ni(level_set_ptr->getGhostBox(),true);
+                ni!=end; ni++)
+              {
+                SAMRAI::pdat::NodeIndex n(*ni);
+                double xyz[3];
+                for(int d=0;d<dim;++d)
+                  xyz[d]=geom->getXLower()[d]
+                    + dx[d]*(n[d]-level_set_box.lower()[d]);
+
+                (*level_set_ptr)(n)=level_set.eval(xyz);
+              }
+          }
+        else
+          {
+            boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > level_set_ptr =
+              boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
+              (patch->getPatchData(level_set_id));
+            for(int ix=0;ix<3;++ix)
+              {
+                const int iy((ix+1)%dim), iz((ix+2)%dim);
+                double offset[]={0,0,0};
+                offset[ix]=0.5;
+                SAMRAI::hier::Box gbox = level_set_ptr->getGhostBox();
+                SAMRAI::hier::Box pbox = level_set_ptr->getBox();
+                gbox.grow(iy,level_set_ptr->getGhostCellWidth()[iy]);
+                gbox.grow(iz,level_set_ptr->getGhostCellWidth()[iz]);
+                SAMRAI::pdat::EdgeIterator end(gbox,ix,false);
+                for(SAMRAI::pdat::EdgeIterator ni(gbox,ix,true); ni!=end; ni++)
+                  {
+                    SAMRAI::pdat::EdgeIndex n(*ni);
+                    double xyz[3];
+                    for(int d=0;d<dim;++d)
+                      xyz[d]=geom->getXLower()[d]
+                        + dx[d]*(n[d]-pbox.lower()[d] + offset[d]);
+
+                    (*level_set_ptr)(n)=level_set.eval(xyz);
+                  }
+              }
+          }
+      }
   }
 }

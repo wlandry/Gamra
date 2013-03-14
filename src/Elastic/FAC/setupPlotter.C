@@ -51,6 +51,12 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   plotter.registerDerivedPlotQuantity("Strain","TENSOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
+
+  if(have_embedded_boundary())
+    {
+      if(d_dim.getValue()==2)
+        plotter.registerPlotQuantity("Level set","SCALAR",level_set_id);
+    }
   return 0;
 }
 #endif

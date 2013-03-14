@@ -46,7 +46,8 @@ Elastic::FAC::FAC(const std::string& object_name,
   level_set_id(invalid_id),
   lambda("lambda",database,dimension),
   mu("mu",database,dimension),
-  v_rhs("v_rhs",database,dimension,dimension.getValue())
+  v_rhs("v_rhs",database,dimension,dimension.getValue()),
+  level_set("level_set",database,dimension)
 {
   const int dim(d_dim.getValue());
   SAMRAI::hier::VariableDatabase* vdb =
@@ -99,7 +100,7 @@ Elastic::FAC::FAC(const std::string& object_name,
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1));
 
-      if(database->keyExists("level_set"))
+      if(have_embedded_boundary())
         {
           boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
             level_set_ptr(new SAMRAI::pdat::NodeVariable<double>
@@ -117,7 +118,7 @@ Elastic::FAC::FAC(const std::string& object_name,
       edge_moduli_id =
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1));
-      if(database->keyExists("level_set"))
+      if(have_embedded_boundary())
         {
           boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
             level_set_ptr(new SAMRAI::pdat::EdgeVariable<double>
