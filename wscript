@@ -234,7 +234,7 @@ def build(bld):
         target       = 'gamra',
         cxxflags = variant_flags[bld.variant] + default_flags,
         lib          = ['dl','gfortranbegin', 'gfortran', 'm'],
-        libpath      = ['/usr/lib/petsc/linux-gnu-c-opt/lib'],
+        libpath      = ['/sw/lib/gcc4.7/lib','/sw/lib/gcc4.7/lib/gcc/x86_64-apple-darwin11.4.0/4.7.2'],
         includes = ['src','../FTensor'],
         use=['samrai','muparser','hdf5']
         )
