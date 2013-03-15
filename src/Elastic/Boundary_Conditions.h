@@ -23,7 +23,13 @@ namespace Elastic {
                         const std::string& object_name,
                         boost::shared_ptr<SAMRAI::tbox::Database> database);
     void set_boundary(const SAMRAI::hier::Patch& patch,
-                      const int &v_id, const bool &rhs);
+                      const int &v_id, const bool &homogeneous)
+    {
+      set_boundary(patch,v_id,homogeneous,true);
+    }
+    void set_boundary(const SAMRAI::hier::Patch& patch,
+                      const int &v_id, const bool &homogeneous,
+                      const bool &apply_normal_stress);
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
                        const int &v_id, const bool &rhs);
     void set_extra_ids(const int &Edge_moduli_id, const int &Dv_diagonal_id,

@@ -5,7 +5,8 @@
 #include "Elastic/Boundary_Conditions.h"
 
 void Elastic::Boundary_Conditions::set_boundary
-(const SAMRAI::hier::Patch& patch, const int &v_id, const bool &homogeneous)
+(const SAMRAI::hier::Patch& patch, const int &v_id, const bool &homogeneous,
+ const bool &apply_normal_stress)
 {
   try
     {
@@ -121,11 +122,14 @@ void Elastic::Boundary_Conditions::set_boundary
           set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
           set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
 
-          boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-            (patch.getPatchData(edge_moduli_id));
-          set_normal_stress(v,dv_diagonal_ptr,*edge_moduli_ptr,unit,dim,
-                            pbox,gbox,geom,dx,homogeneous);
+          if(apply_normal_stress)
+            {
+              boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+                (patch.getPatchData(edge_moduli_id));
+              set_normal_stress(v,dv_diagonal_ptr,*edge_moduli_ptr,unit,dim,
+                                pbox,gbox,geom,dx,homogeneous);
+            }
         }
       else
         {
@@ -137,11 +141,14 @@ void Elastic::Boundary_Conditions::set_boundary
           set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
           set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
 
-          boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-            (patch.getPatchData(edge_moduli_id));
-          set_normal_stress(v,dv_diagonal_ptr,*edge_moduli_ptr,unit,dim,pbox,
-                            gbox,geom,dx,homogeneous);
+          if(apply_normal_stress)
+            {
+              boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
+                (patch.getPatchData(edge_moduli_id));
+              set_normal_stress(v,dv_diagonal_ptr,*edge_moduli_ptr,unit,dim,pbox,
+                                gbox,geom,dx,homogeneous);
+            }
         }
     }
   catch(mu::Parser::exception_type &e)
