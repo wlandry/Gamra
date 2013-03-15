@@ -114,6 +114,7 @@ def build(bld):
                         'src/Elastic/FAC/applyGradientDetector.C',
                         'src/Elastic/FAC/initializeLevelData.C',
                         'src/Elastic/FAC/pack_strain.C',
+                        'src/Elastic/FAC/pack_level_set.C',
                         'src/Elastic/FAC/pack_v_v_rhs.C',
                         'src/Elastic/FAC/resetHierarchyConfiguration.C',
                         'src/Elastic/FAC/setupPlotter.C',

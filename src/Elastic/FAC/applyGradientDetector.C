@@ -64,20 +64,10 @@ void Elastic::FAC::applyGradientDetector
 
       if(have_embedded_boundary())
         {
-          if(d_dim.getValue()==2)
-            {
-              boost::shared_ptr<SAMRAI::pdat::NodeData<double> > level_set_ptr;
-              if(have_embedded_boundary())
-                level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-                  (patch.getPatchData(level_set_id));
-            }
-          else
-            {
-              boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > level_set_ptr;
-              if(have_embedded_boundary())
-                level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-                  (patch.getPatchData(level_set_id));
-            }
+          boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
+          if(have_embedded_boundary())
+            level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+              (patch.getPatchData(level_set_id));
         }
 
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =

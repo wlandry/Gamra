@@ -112,17 +112,17 @@ void Elastic::Boundary_Conditions::set_boundary
             }
         }
 
-      if(dim==2)
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
+      if(have_embedded_boundary())
+        level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+          (patch.getPatchData(level_set_id));
+
+      set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+      set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+
+      if(apply_normal_stress)
         {
-          boost::shared_ptr<SAMRAI::pdat::NodeData<double> > level_set_ptr;
-          if(have_embedded_boundary())
-            level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-              (patch.getPatchData(level_set_id));
-
-          set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-          set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-
-          if(apply_normal_stress)
+          if(dim==2)
             {
               boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
@@ -130,18 +130,7 @@ void Elastic::Boundary_Conditions::set_boundary
               set_normal_stress(v,dv_diagonal_ptr,*edge_moduli_ptr,unit,dim,
                                 pbox,gbox,geom,dx,homogeneous);
             }
-        }
-      else
-        {
-          boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > level_set_ptr;
-          if(have_embedded_boundary())
-            level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-              (patch.getPatchData(level_set_id));
-
-          set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-          set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-
-          if(apply_normal_stress)
+          else
             {
               boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >

@@ -128,13 +128,13 @@ void Elastic::V_Boundary_Refine::refine
    if(dim>2)
      kp[2]=1;
 
+   boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
+   if(have_embedded_boundary())
+     level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+       (fine_patch.getPatchData(level_set_id));
+
    if(dim==2)
      {
-       boost::shared_ptr<SAMRAI::pdat::NodeData<double> > level_set_ptr;
-       if(have_embedded_boundary())
-         level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-           (fine_patch.getPatchData(level_set_id));
-
        for(int j=fine_min[1]; j<=fine_max[1]; ++j)
          for(int i=fine_min[0]; i<=fine_max[0]; ++i)
            {
@@ -169,11 +169,6 @@ void Elastic::V_Boundary_Refine::refine
      }
    else
      {
-       boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > level_set_ptr;
-       if(have_embedded_boundary())
-         level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-           (fine_patch.getPatchData(level_set_id));
-
        SAMRAI::hier::Index unit[]={ip,jp,kp};
        SAMRAI::hier::Index ijk(dimension);
        SAMRAI::hier::Box coarse_box(coarse_patch.getBox());

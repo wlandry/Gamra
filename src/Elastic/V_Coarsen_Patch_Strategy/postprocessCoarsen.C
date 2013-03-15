@@ -29,13 +29,13 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
     (coarse.getPatchGeometry());
 
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
+  if(have_embedded_boundary())
+    level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+      (fine.getPatchData(level_set_id));
+
   if(getDim().getValue()==2)
     {
-       boost::shared_ptr<SAMRAI::pdat::NodeData<double> > level_set_ptr;
-       if(have_embedded_boundary())
-         level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-           (fine.getPatchData(level_set_id));
-
       coarsen_2D(*v,*v_fine,dv_mixed_ptr,dv_diagonal_ptr,*coarse_geom,coarse_box);
 
       const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
@@ -46,11 +46,6 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
     }
   else
     {
-       boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > level_set_ptr;
-       if(have_embedded_boundary())
-         level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-           (fine.getPatchData(level_set_id));
-
       coarsen_3D(*v,*v_fine,dv_mixed_ptr,dv_diagonal_ptr,*coarse_geom,coarse_box);
 
       const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>

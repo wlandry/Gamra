@@ -107,26 +107,33 @@ namespace Elastic {
                                     const SAMRAI::hier::Patch& patch,
                                     const SAMRAI::hier::Box& region,
                                     const std::string& variable_name,
-                                    int depth_id) const
+                                    int depth) const
     {
       if(variable_name=="Strain")
-        return pack_strain(buffer,patch,region,depth_id);
+        return pack_strain(buffer,patch,region,depth);
+      else if(variable_name=="Level Set")
+        return pack_level_set(buffer,patch,region);
       else
-        return pack_v_v_rhs(buffer,patch,region,variable_name,depth_id);
+        return pack_v_v_rhs(buffer,patch,region,variable_name,depth);
     }
 
     bool
     pack_strain(double* buffer,
                 const SAMRAI::hier::Patch& patch,
                 const SAMRAI::hier::Box& region,
-                const int &depth_id) const;
+                const int &depth) const;
+
+    bool
+    pack_level_set(double* buffer,
+                   const SAMRAI::hier::Patch& patch,
+                   const SAMRAI::hier::Box& region) const;
 
     bool
     pack_v_v_rhs(double* buffer,
                  const SAMRAI::hier::Patch& patch,
                  const SAMRAI::hier::Box& region,
                  const std::string& variable_name,
-                 const int &depth_id) const;
+                 const int &depth) const;
     //@}
 
     /*!

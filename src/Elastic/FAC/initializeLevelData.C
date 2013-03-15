@@ -78,13 +78,13 @@ void Elastic::FAC::initializeLevelData
         ci!=cend; ci++)
       {
         SAMRAI::pdat::CellIndex c=*ci;
-        double xyz[3];
+        double coord[3];
         for(int d=0;d<dim;++d)
-          xyz[d]=geom->getXLower()[d]
+          coord[d]=geom->getXLower()[d]
             + dx[d]*(c[d]-cell_moduli_box.lower()[d] + 0.5);
 
-        (*cell_moduli)(c,0)=lambda.eval(xyz);
-        (*cell_moduli)(c,1)=mu.eval(xyz);
+        (*cell_moduli)(c,0)=lambda.eval(coord);
+        (*cell_moduli)(c,1)=mu.eval(coord);
       }
 
     /* v_rhs */
@@ -97,50 +97,25 @@ void Elastic::FAC::initializeLevelData
 
     if(have_embedded_boundary())
       {
-        if(dim==2)
+        boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr =
+          boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+          (patch->getPatchData(level_set_id));
+        SAMRAI::hier::Box level_set_box = level_set_ptr->getBox();
+        for(int ix=0;ix<dim;++ix)
           {
-            boost::shared_ptr<SAMRAI::pdat::NodeData<double> > level_set_ptr =
-              boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-              (patch->getPatchData(level_set_id));
-            SAMRAI::hier::Box level_set_box = level_set_ptr->getBox();
-            SAMRAI::pdat::NodeIterator end(level_set_ptr->getGhostBox(),false);
-            for(SAMRAI::pdat::NodeIterator ni(level_set_ptr->getGhostBox(),true);
-                ni!=end; ni++)
+            double offset[]={0.5,0.5,0.5};
+            offset[ix]=0;
+            SAMRAI::pdat::SideIterator end(level_set_ptr->getGhostBox(),ix,false);
+            for(SAMRAI::pdat::SideIterator si(level_set_ptr->getGhostBox(),ix,true);
+                si!=end; si++)
               {
-                SAMRAI::pdat::NodeIndex n(*ni);
-                double xyz[3];
+                SAMRAI::pdat::SideIndex x(*si);
+                double coord[3];
                 for(int d=0;d<dim;++d)
-                  xyz[d]=geom->getXLower()[d]
-                    + dx[d]*(n[d]-level_set_box.lower()[d]);
+                  coord[d]=geom->getXLower()[d]
+                    + dx[d]*(x[d]-level_set_box.lower()[d]+offset[d]);
 
-                (*level_set_ptr)(n)=level_set.eval(xyz);
-              }
-          }
-        else
-          {
-            boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > level_set_ptr =
-              boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-              (patch->getPatchData(level_set_id));
-            for(int ix=0;ix<3;++ix)
-              {
-                const int iy((ix+1)%dim), iz((ix+2)%dim);
-                double offset[]={0,0,0};
-                offset[ix]=0.5;
-                SAMRAI::hier::Box gbox = level_set_ptr->getGhostBox();
-                SAMRAI::hier::Box pbox = level_set_ptr->getBox();
-                gbox.grow(iy,level_set_ptr->getGhostCellWidth()[iy]);
-                gbox.grow(iz,level_set_ptr->getGhostCellWidth()[iz]);
-                SAMRAI::pdat::EdgeIterator end(gbox,ix,false);
-                for(SAMRAI::pdat::EdgeIterator ni(gbox,ix,true); ni!=end; ni++)
-                  {
-                    SAMRAI::pdat::EdgeIndex n(*ni);
-                    double xyz[3];
-                    for(int d=0;d<dim;++d)
-                      xyz[d]=geom->getXLower()[d]
-                        + dx[d]*(n[d]-pbox.lower()[d] + offset[d]);
-
-                    (*level_set_ptr)(n)=level_set.eval(xyz);
-                  }
+                (*level_set_ptr)(x)=level_set.eval(coord);
               }
           }
       }

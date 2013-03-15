@@ -54,8 +54,10 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
 
   if(have_embedded_boundary())
     {
-      if(d_dim.getValue()==2)
-        plotter.registerPlotQuantity("Level set","SCALAR",level_set_id);
+      plotter.registerDerivedPlotQuantity("Level Set",
+                                          "SCALAR",
+                                          (SAMRAI::appu::VisDerivedDataStrategy *)
+                                          this);
     }
   return 0;
 }
