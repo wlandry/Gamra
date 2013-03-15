@@ -1,5 +1,7 @@
 #!pvpython
 
+# export three .xyz files for displacement on a horizontal slice out of gamra HDF5 output
+
 import getopt
 import glob
 import os
@@ -9,7 +11,7 @@ from paraview.simple import *
 def usage():
     print 'sam2xyz.py exports a slice of samrai hdf5 export file to .xyz format'
     print ''
-    print 'usage: sam2xyz.py --depth=0'
+    print 'usage: sam2xyz.py --depth=0 summary.samrai'
     print ''
     print 'options:'
     print '  -d --depth:  the depth of the horizontal slice'
@@ -17,12 +19,16 @@ def usage():
     print 'example:'
     print './sam2xyz.py --depth=0 ./Landers.visit/visit_dump.00000/summary.samrai'
     print ''
+    print 'or'
+    print ''
+    print './sam2xyz.py --depth=0 */*/summary.samrai'
+    print ''
 
 
 def main():
 
     # default parameters
-    depth=0
+    depth = 0
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hd:", ["help","depth="])
@@ -33,7 +39,7 @@ def main():
         usage()
         sys.exit(2)
 
-    if 0==len(args):
+    if 0 == len(args):
 	usage()
 	sys.exit(2)
 
@@ -42,36 +48,31 @@ def main():
             usage()
             sys.exit()
         elif o in ("-d", "--depth"):
-            depth=float(a)
+            depth = float(a)
         else:
-            print >> sys.stderr, 'obsres.py: unhandled option:', o, a
+            print >> sys.stderr, 'sam2xyz.py: unhandled option:', o, a
             assert False, "unhandled option"
 
-    print '# obsres.py '+" ".join(sys.argv[1:])
+    print '# sam2xyz.py '+" ".join(sys.argv[1:])
 
     # loop over the models
     for i in xrange(len(args)):
-        ifile=os.path.abspath(args[i])
-        ofile=os.path.abspath(args[i]+'.csv')
+        ifile = os.path.abspath(args[i])
+        ofile = os.path.abspath(os.path.dirname(args[i])+'/.'+os.path.basename(args[i])+'.csv')
 
-        print 'Processing '+ifile
-        print 'Processing '+os.path.basename(ifile)
-
-        #summary_samrai = VisItSAMRAIReader( FileName='/Users/sbarbot/Documents/src/gamra/Landers.visit/visit_dump.00000/summary.samrai' )
-        summary_samrai = VisItSAMRAIReader( FileName=ifile )
-
+        summary_samrai = VisItSAMRAIReader( FileName = ifile )
         summary_samrai.CellArrays = []
         summary_samrai.Materials = []
         summary_samrai.Meshes = ['amr_mesh']
         summary_samrai.PointArrays = []
-
         summary_samrai.CellArrays = ['Displacement']
+
         CellDatatoPointData2 = CellDatatoPointData()
 
         Slice2 = Slice( SliceType="Plane" )
         Slice2.SliceType.Origin = [-20.0, -20.0, -depth-0.011]
         Slice2.SliceType = "Plane"
-        Slice2.SliceType.Normal=[0,0,1]
+        Slice2.SliceType.Normal = [0,0,1]
         SetActiveSource(Slice2)
         UpdatePipeline()
         writer = CreateWriter(ofile, Slice2)
@@ -79,11 +80,11 @@ def main():
         writer.UpdatePipeline()
         del writer
 
-        ofiles=glob.glob(os.path.dirname(ifile)+'/'+os.path.basename(ifile)+'*.csv')
+        ofiles = glob.glob(os.path.dirname(ifile)+'/.'+os.path.basename(ifile)+'*.csv')
 
-        fname_north=os.path.abspath(args[i]+'-north.xyz')
-        fname_east =os.path.abspath(args[i]+'-east.xyz')
-        fname_up   =os.path.abspath(args[i]+'-up.xyz')
+        fname_north = os.path.abspath(args[i]+'-north.xyz')
+        fname_east  = os.path.abspath(args[i]+'-east.xyz')
+        fname_up    = os.path.abspath(args[i]+'-up.xyz')
 
         of_north = open(fname_north, 'wb')
         of_east  = open(fname_east , 'wb')
@@ -93,15 +94,14 @@ def main():
         #of_up.write(   '> x y u3(down)\n')
 
         for fname in ofiles:
-            #print fname
-            f=open(fname,'r')
+            f = open(fname,'r')
 
             # "Displacement:0","Displacement:1","Displacement:2","Points:0","Points:1","Points:2"
-            header=f.readline()
+            header = f.readline()
 
             for line in f:
-                line=line.strip()
-                cols=map(float,line.split(','))
+                line = line.strip()
+                cols = map(float,line.split(','))
 
                 if len(cols)>3:
                     of_north.write("%+05.3e %+05.3e %+05.3e\n" % (cols[3],cols[4],cols[1]))
@@ -109,7 +109,6 @@ def main():
                     of_up.write("%+05.3e %+05.3e %+05.3e\n" % (cols[3],cols[4],-cols[2]))
             f.close()
 
-            #print 'Removing '+os.path.basename(fname)
             os.remove(fname)
 
         of_north.close()
