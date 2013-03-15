@@ -115,7 +115,12 @@ void Elastic::FAC::initializeLevelData
                   coord[d]=geom->getXLower()[d]
                     + dx[d]*(x[d]-level_set_box.lower()[d]+offset[d]);
 
-                (*level_set_ptr)(x)=level_set.eval(coord);
+                double distance(level_set.eval(coord));
+                for(int d=0;d<dim;++d)
+                  distance=std::min(distance,
+                                    std::min(coord[d]-grid_geom->getXLower()[d],
+                                             grid_geom->getXUpper()[d]-coord[d]));
+                (*level_set_ptr)(x)=distance;
               }
           }
       }
