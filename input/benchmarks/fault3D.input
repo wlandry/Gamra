@@ -38,9 +38,9 @@ Elastic {
         vy_y_lower_is_dirichlet=TRUE
 
         vz_z_upper="0"
-        vz_z_upper_is_dirichlet=FALSE
+        vz_z_upper_is_dirichlet=TRUE
         vz_z_lower="0"
-        vz_z_lower_is_dirichlet=TRUE
+        vz_z_lower_is_dirichlet=FALSE
 
         vx_y_upper="0"
         vx_y_upper_is_dirichlet=FALSE
@@ -71,8 +71,8 @@ Elastic {
 
 CartesianGridGeometry {
     domain_boxes = [(0,0,0), (3,3,3)]
-    x_lo         = -.5, -.5, -.5
-    x_up         = .5, .5, .5
+    x_lo         = -.5, -.5, 0.
+    x_up         = .5, .5, 1.
 }
 
 StandardTagAndInitialize {
@@ -80,7 +80,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 7
+    max_levels = 5
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2
