@@ -113,9 +113,7 @@ void Elastic::FACOps::smooth_2D
                       for(int i=i_min; i<=pbox.upper(0)+unit[ix][0]; i+=2)
                         {
                           SAMRAI::pdat::CellIndex
-                            center(SAMRAI::tbox::Dimension(2));
-                          center[0]=i;
-                          center[1]=j;
+                            center(SAMRAI::hier::Index(i,j));
                           /* Update v */
                           smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
                                       v,v_rhs,maxres,dx,dy,cell_moduli,
