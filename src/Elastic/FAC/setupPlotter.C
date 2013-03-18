@@ -38,7 +38,7 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
                                       "VECTOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
-  plotter.registerDerivedPlotQuantity("Equivalent body force",
+  plotter.registerDerivedPlotQuantity("Fault Correction",
                                       "VECTOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
