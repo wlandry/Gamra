@@ -53,21 +53,12 @@ int Elastic::FACOps::solveCoarsestLevel
 
   int return_value = 0;
 
-  if (d_coarse_solver_choice == "Tackley"
-      || d_coarse_solver_choice == "Gerya") {
-    d_residual_tolerance_during_smoothing = d_coarse_solver_tolerance;
-    smoothError(data,
-                residual,
-                coarsest_ln,
-                d_coarse_solver_max_iterations);
-    d_residual_tolerance_during_smoothing = -1.0;
-  } else {
-    TBOX_ERROR(
-               d_object_name << ": Bad coarse level solver choice '"
-               << d_coarse_solver_choice
-               <<
-               "' in Elastic::FACOps::solveCoarsestLevel.");
-  }
+  d_residual_tolerance_during_smoothing = d_coarse_solver_tolerance;
+  smoothError(data,
+              residual,
+              coarsest_ln,
+              d_coarse_solver_max_iterations);
+  d_residual_tolerance_during_smoothing = -1.0;
 
   xeqScheduleGhostFillNoCoarse(data.getComponentDescriptorIndex(0),
                                coarsest_ln);

@@ -62,10 +62,6 @@ void Elastic::FACSolver::getFromInput
       std::string s = database->getString("v_prolongation_method");
       set_V_ProlongationMethod(s);
     }
-    if (database->isString("coarse_solver_choice")) {
-      std::string s = database->getString("coarse_solver_choice");
-      setCoarsestLevelSolverChoice(s);
-    }
     if (database->isDouble("coarse_solver_tolerance")) {
       double tol = database->getDouble("coarse_solver_tolerance");
       setCoarsestLevelSolverTolerance(tol);

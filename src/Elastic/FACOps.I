@@ -16,20 +16,6 @@ void Elastic::FACOps::setPreconditioner(
 
 /*
  ********************************************************************
- * Set the physical boundary condition object.                      *
- ********************************************************************
- */
-
-// inline
-// void Elastic::FACOps::setPhysicalBcCoefObject(
-//    const RobinBcCoefStrategy* physical_bc_coef)
-// {
-//    d_physical_bc_coef = physical_bc_coef;
-//    // d_bc_helper.setCoefImplementation(physical_bc_coef);
-// }
-
-/*
- ********************************************************************
  ********************************************************************
  */
 
@@ -38,46 +24,6 @@ void Elastic::FACOps::enableLogging(
    bool enable_logging)
 {
    d_enable_logging = enable_logging;
-}
-
-/*
- ********************************************************************
- * Set the choice for smoothing algorithm.                          *
- ********************************************************************
- */
-
-inline
-void Elastic::FACOps::setSmoothingChoice(
-   const std::string& smoothing_choice)
-{
-#ifdef DEBUG_CHECK_ASSERTIONS
-   if (smoothing_choice != "Tackley" && smoothing_choice != "Gerya") {
-      TBOX_ERROR(d_object_name << ": Bad smoothing choice '"
-                               << smoothing_choice
-                               << "' in Elastic::FACOps::setSmoothingChoice.");
-   }
-#endif
-   d_smoothing_choice = smoothing_choice;
-}
-
-/*
- ********************************************************************
- * Set the choice for the coarse level solver.                      *
- ********************************************************************
- */
-
-inline
-void Elastic::FACOps::setCoarsestLevelSolverChoice(
-   const std::string& choice) {
-   if (choice == "Tackley") {
-      d_coarse_solver_choice = choice;
-   } else {
-      TBOX_ERROR(
-         d_object_name << ": Bad coarse level solver choice '"
-         << choice
-         <<
-         "' in Elastic::FACOps::setCoarseLevelSolver.");
-   }
 }
 
 /*

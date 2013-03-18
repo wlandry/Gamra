@@ -102,7 +102,6 @@ namespace Elastic {
    * coarse_solver_choice = "hypre"    // see setCoarsestLevelSolverChoice()
    * coarse_solver_tolerance = 1e-14   // see setCoarsestLevelSolverTolerance()
    * coarse_solver_max_iterations = 10 // see setCoarsestLevelSolverMaxIterations()
-   * smoothing_choice = "Tackley"     // see setSmoothingChoice()
    * cf_discretization = "Ewing"       // see setCoarseFineDiscretization()
    * prolongation_method = "P_REFINE" // see setProlongationMethod()
    * hypre_solver = { ... }            // tbox::Database for initializing Hypre solver
@@ -146,27 +145,6 @@ namespace Elastic {
     /*!
      * @name Functions for setting solver mathematic algorithm controls
      */
-
-    /*!
-     * @brief Set the choice of smoothing algorithms.
-     *
-     * Current smoothing choices are:
-     * - "Tackley"
-     * - "Gerya"
-     */
-    void
-    setSmoothingChoice(const std::string& smoothing_choice);
-
-    /*!
-     * @brief Set coarse level solver.
-     *
-     * Select from these:
-     * - @c "Tackley" (red-black smoothing until convergence--very slow!)
-     * - @c "Gerya" (red-black smoothing until convergence--very slow!)
-     * - @c "hypre" (only if the HYPRE library is available).
-     */
-    void
-    setCoarsestLevelSolverChoice(const std::string& choice);
 
     /*!
      * @brief Set tolerance for coarse level solve.
@@ -452,13 +430,13 @@ namespace Elastic {
      * @param residual_tolerance the maximum residual considered to be
      *        converged
      */
-    void smooth_Tackley_2D(SAMRAI::solv::SAMRAIVectorReal<double>& error,
-                           const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                           int ln,
-                           int num_sweeps,
-                           double residual_tolerance = -1.0);
+    void smooth_2D(SAMRAI::solv::SAMRAIVectorReal<double>& error,
+                   const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+                   int ln,
+                   int num_sweeps,
+                   double residual_tolerance = -1.0);
 
-    void smooth_Tackley_3D
+    void smooth_3D
     (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
      int ln,
@@ -813,18 +791,6 @@ namespace Elastic {
     /*!
      * @name Private state variables for solution process.
      */
-
-    /*!
-     * @brief Smoothing choice.
-     * @see setSmoothingChoice.
-     */
-    std::string d_smoothing_choice;
-
-    /*!
-     * @brief Coarse level solver.
-     * @see setCoarsestLevelSolverChoice
-     */
-    std::string d_coarse_solver_choice;
 
     /*!
      * @brief Coarse-fine discretization method.

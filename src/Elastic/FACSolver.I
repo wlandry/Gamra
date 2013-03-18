@@ -16,13 +16,6 @@ void Elastic::FACSolver::set_V_ProlongationMethod(
 }
 
 inline
-void Elastic::FACSolver::setCoarsestLevelSolverChoice(
-   const std::string& choice)
-{
-   d_fac_ops.setCoarsestLevelSolverChoice(choice);
-}
-
-inline
 void Elastic::FACSolver::setCoarsestLevelSolverTolerance(
    double tol)
 {

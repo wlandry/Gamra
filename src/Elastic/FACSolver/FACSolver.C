@@ -74,7 +74,6 @@ Elastic::FACSolver::FACSolver
   setPresmoothingSweeps(1);
   setPostsmoothingSweeps(1);
   setCoarseFineDiscretization("Ewing");
-  setCoarsestLevelSolverChoice("Tackley");
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);
 

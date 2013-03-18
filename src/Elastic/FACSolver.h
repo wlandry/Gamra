@@ -192,17 +192,6 @@ namespace Elastic {
     //@{ @name Functions for setting solver mathematic algorithm controls
 
     /*!
-     * @brief Set coarse level solver.
-     *
-     * Select from these:
-     * - @c "Tackley"
-     * - @c "Gerya"
-     * - @c "hypre" (only if the HYPRE library is available).
-     */
-    void
-    setCoarsestLevelSolverChoice(const std::string& choice);
-
-    /*!
      * @brief Set tolerance for coarse level solve.
      *
      * If the coarse level solver requires a tolerance

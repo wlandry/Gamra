@@ -8,7 +8,7 @@
 ********************************************************************
 */
 
-void Elastic::FACOps::smooth_Tackley_2D
+void Elastic::FACOps::smooth_2D
 (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int ln,
