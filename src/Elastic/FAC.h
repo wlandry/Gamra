@@ -385,16 +385,10 @@ void Elastic::FAC::add_faults()
               fault_index+=params_per_fault)
             {
               const double pi=4*atan(1);
-              /* The conventions for faults are different from the regular
-               * xyz coordinates, so we have to convert.  Depth is a
-               * coordinate, giving a left-handed coordinate system.  So we
-               * invert the depth and width to convert to a right-handed
-               * coordinate system.  Strike is opposite in direction, and
-               * dip is measured from a plane lying flat. */
-              double scale(faults[fault_index+0]), x(faults[fault_index+2]),
-                y(faults[fault_index+1]), z(-faults[fault_index+3]),
-                L(faults[fault_index+4]), W(-faults[fault_index+5]),
-                strike(faults[fault_index+6]*pi/180),
+              double scale(-faults[fault_index+0]), x(faults[fault_index+1]),
+                y(faults[fault_index+2]), z(faults[fault_index+3]),
+                L(faults[fault_index+4]), W(faults[fault_index+5]),
+                strike(pi/2-faults[fault_index+6]*pi/180),
                 dip(faults[fault_index+7]*pi/180),
                 rake(faults[fault_index+8]*pi/180);
 

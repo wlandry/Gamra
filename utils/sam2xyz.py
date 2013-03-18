@@ -70,7 +70,7 @@ def main():
         CellDatatoPointData2 = CellDatatoPointData()
 
         Slice2 = Slice( SliceType="Plane" )
-        Slice2.SliceType.Origin = [-20.0, -20.0, -depth-0.011]
+        Slice2.SliceType.Origin = [-20.0, -20.0, depth+0.011]
         Slice2.SliceType = "Plane"
         Slice2.SliceType.Normal = [0,0,1]
         SetActiveSource(Slice2)
@@ -104,9 +104,9 @@ def main():
                 cols = map(float,line.split(','))
 
                 if len(cols)>3:
-                    of_north.write("%+05.3e %+05.3e %+05.3e\n" % (cols[3],cols[4],cols[1]))
-                    of_east.write("%+05.3e %+05.3e %+05.3e\n" % (cols[3],cols[4],cols[0]))
-                    of_up.write("%+05.3e %+05.3e %+05.3e\n" % (cols[3],cols[4],-cols[2]))
+                    of_north.write("%+05.3e %+05.3e %+05.3e\n" % (cols[4],cols[3],cols[0]))
+                    of_east.write("%+05.3e %+05.3e %+05.3e\n" % (cols[4],cols[3],cols[1]))
+                    of_up.write("%+05.3e %+05.3e %+05.3e\n" % (cols[4],cols[3],-cols[2]))
             f.close()
 
             os.remove(fname)
