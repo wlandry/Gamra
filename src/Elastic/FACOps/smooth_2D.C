@@ -57,124 +57,70 @@ void Elastic::FACOps::smooth_2D
    */
 
   const SAMRAI::hier::Index ip(1,0), jp(0,1);
+  const SAMRAI::hier::Index unit[]={ip,jp};
   bool converged = false;
   for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
        ++sweep)
     {
       maxres=0;
 
-      /* vx sweep */
-      for(int rb=0;rb<2;++rb)
+      const int dim(2);
+      for(int ix=0; ix<dim; ++ix)
         {
-          xeqScheduleGhostFillNoCoarse(v_id,ln);
-          if (ln > d_ln_min)
+          const int iy((ix+1)%dim);
+          for(int rb=0;rb<2;++rb)
             {
-              xeqScheduleGhostFill(v_id, ln);
-            }
-          set_boundaries(v_id,level,true);
-          for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-               pi!=level->end(); pi++)
-            {
-              boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
-
-              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
-                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                (patch->getPatchData(v_id));
-              SAMRAI::pdat::SideData<double> &v(*v_ptr);
-              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
-                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                (patch->getPatchData(v_rhs_id));
-              SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
-                
-              boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr=
-                boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-                (patch->getPatchData(cell_moduli_id));
-              SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
-              boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr=
-                boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-                (patch->getPatchData(edge_moduli_id));
-              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
-
-              SAMRAI::hier::Box pbox=patch->getBox();
-              boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
-                boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-                (patch->getPatchGeometry());
-              double dx = geom->getDx()[0];
-              double dy = geom->getDx()[1];
-
-              for(int j=pbox.lower(1); j<=pbox.upper(1); ++j)
+              xeqScheduleGhostFillNoCoarse(v_id,ln);
+              if (ln > d_ln_min)
                 {
-                  /* Do the red-black skip */
-                  int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
-                  for(int i=i_min; i<=pbox.upper(0)+1; i+=2)
-                    {
-                      SAMRAI::pdat::CellIndex
-                        center(SAMRAI::tbox::Dimension(2));
-                      center[0]=i;
-                      center[1]=j;
-                      /* Update v */
-                      smooth_V_2D(0,pbox,center,ip,jp,
-                                  v,v_rhs,maxres,dx,dy,cell_moduli,
-                                  edge_moduli,theta_momentum);
-                    }
+                  xeqScheduleGhostFill(v_id, ln);
                 }
-            }
-        }
-
-
-      /* vy sweep */
-
-      for(int rb=0;rb<2;++rb)
-        {
-          xeqScheduleGhostFillNoCoarse(v_id,ln);
-          if (ln > d_ln_min)
-            {
-              xeqScheduleGhostFill(v_id, ln);
-            }
-          set_boundaries(v_id,level,true);
-          for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-               pi!=level->end(); pi++)
-            {
-              boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
-
-              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
-                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                (patch->getPatchData(v_id));
-              SAMRAI::pdat::SideData<double> &v(*v_ptr);
-              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
-                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                (patch->getPatchData(v_rhs_id));
-              SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
-                
-              boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr=
-                boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-                (patch->getPatchData(cell_moduli_id));
-              SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
-              boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr=
-                boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-                (patch->getPatchData(edge_moduli_id));
-              SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
-
-              SAMRAI::hier::Box pbox=patch->getBox();
-              boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
-                boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-                (patch->getPatchGeometry());
-              double dx = geom->getDx()[0];
-              double dy = geom->getDx()[1];
-
-              for(int j=pbox.lower(1); j<=pbox.upper(1)+1; ++j)
+              set_boundaries(v_id,level,true);
+              for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
+                   pi!=level->end(); pi++)
                 {
-                  /* Do the red-black skip */
-                  int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
-                  for(int i=i_min; i<=pbox.upper(0); i+=2)
+                  boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+
+                  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+                    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+                    (patch->getPatchData(v_id));
+                  SAMRAI::pdat::SideData<double> &v(*v_ptr);
+                  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
+                    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+                    (patch->getPatchData(v_rhs_id));
+                  SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
+                
+                  boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr=
+                    boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+                    (patch->getPatchData(cell_moduli_id));
+                  SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
+                  boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr=
+                    boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+                    (patch->getPatchData(edge_moduli_id));
+                  SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
+
+                  SAMRAI::hier::Box pbox=patch->getBox();
+                  boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+                    boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+                    (patch->getPatchGeometry());
+                  double dx = geom->getDx()[ix];
+                  double dy = geom->getDx()[iy];
+
+                  for(int j=pbox.lower(1); j<=pbox.upper(1)+unit[ix][1]; ++j)
                     {
-                      SAMRAI::pdat::CellIndex center(SAMRAI::tbox::Dimension(2));
-                      center[0]=i;
-                      center[1]=j;
-                      /* Update v */
-                      smooth_V_2D(1,pbox,center,jp,ip,
-                                  v,v_rhs,maxres,dy,dx,cell_moduli,
-                                  edge_moduli,theta_momentum);
+                      /* Do the red-black skip */
+                      int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
+                      for(int i=i_min; i<=pbox.upper(0)+unit[ix][0]; i+=2)
+                        {
+                          SAMRAI::pdat::CellIndex
+                            center(SAMRAI::tbox::Dimension(2));
+                          center[0]=i;
+                          center[1]=j;
+                          /* Update v */
+                          smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
+                                      v,v_rhs,maxres,dx,dy,cell_moduli,
+                                      edge_moduli,theta_momentum);
+                        }
                     }
                 }
             }
