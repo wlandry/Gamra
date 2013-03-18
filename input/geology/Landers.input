@@ -7,11 +7,8 @@
  * Description:   Input file for example FAC Stokes solver 
  *
  ************************************************************************/
-// This is the input file for the 2D FAC example
-// demonstrating changes in boundary conditions.
+// Input file for the 1992 Mw 7.3 Landers earthquake
 //
-// Note that using constant refine prolongation
-// lead to slower convergence.
 
 Main {
     dim = 3
@@ -22,13 +19,14 @@ Main {
 
 Elastic {
     adaption_threshold = 1.0e-2
-    min_full_refinement_level = 0
+    min_full_refinement_level = 1
 
     lambda="1"
     mu="1"
     v_rhs="0"
 
-    faults= 1.3475, 14.246, -45.439, 10.056, 5.6, 4.94, 132.7, 91.0, -114.7,
+    faults= 
+    1.3475, 14.246, -45.439, 10.056, 5.6, 4.94, 132.7, 91.0, -114.7,
     1.8921, 10.446, -41.319, 10.056, 5.6, 4.94, 132.7, 91.0, -151.8,
     0.46688, 14.201, -45.481, 6.5269, 3.74, 3.53, 132.7, 91.0, -150.6,
     0.38986, 11.668, -42.734, 6.5269, 3.74, 3.53, 132.7, 91.0, -175.6,
@@ -478,9 +476,12 @@ Elastic {
         vy_y_lower="0"
         vy_y_lower_is_dirichlet=TRUE
         vz_z_upper="0"
-        vz_z_upper_is_dirichlet=FALSE
+        vz_z_upper_is_dirichlet=TRUE
+
+        // Free surface
         vz_z_lower="0"
-        vz_z_lower_is_dirichlet=TRUE
+        vz_z_lower_is_dirichlet=FALSE
+
         vx_y_upper="0"
         vx_y_upper_is_dirichlet=FALSE
         vx_y_lower="0"
@@ -523,8 +524,8 @@ CartesianGridGeometry {
     //                        [0]
     // domain_boxes = [(0,0), (15,15)]
     domain_boxes = [(0,0,0), (7,7,1)]
-    x_lo         = -120, -120, -50
-    x_up         = 80, 80, -0.01
+    x_lo         = -130, -130, 0.01
+    x_up         =   90,   90,  90
 }
 
 StandardTagAndInitialize {
