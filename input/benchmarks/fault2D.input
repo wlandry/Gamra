@@ -1,6 +1,6 @@
 Main {
     dim = 2
-    base_name = "fault"
+    base_name = "fault2D"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
