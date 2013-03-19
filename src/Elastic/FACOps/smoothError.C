@@ -50,20 +50,13 @@ void Elastic::FACOps::smoothError
 {
   t_smooth_error->start();
 
-  if(!have_embedded_boundary())
-    {
-      if(d_dim.getValue()==2)
-        smooth_2D(data,residual,ln,num_sweeps,
-                  d_residual_tolerance_during_smoothing);
-      else if(d_dim.getValue()==3)
-        smooth_3D(data,residual,ln,num_sweeps,
-                  d_residual_tolerance_during_smoothing);
-      else
-        TBOX_ERROR(d_object_name << ": Invalid dimension in Elastic::FACOps.");
-    }
+  if(d_dim.getValue()==2)
+    smooth_2D(data,residual,ln,num_sweeps,
+              d_residual_tolerance_during_smoothing);
+  else if(d_dim.getValue()==3)
+    smooth_3D(data,residual,ln,num_sweeps,
+              d_residual_tolerance_during_smoothing);
   else
-    {
-      abort();
-    }
+    TBOX_ERROR(d_object_name << ": Invalid dimension in Elastic::FACOps.");
   t_smooth_error->stop();
 }
