@@ -105,6 +105,7 @@ void Elastic::FAC::initializeLevelData
         double dx_max(0);
         for(int d=0;d<dim;++d)
           dx_max=std::max(dx_max,dx[d]);
+        double epsilon((grid_geom->getXUpper()[0]-grid_geom->getXLower()[0])/1e10);
         for(int ix=0;ix<dim;++ix)
           {
             double offset[]={0.5,0.5,0.5};
@@ -121,9 +122,10 @@ void Elastic::FAC::initializeLevelData
 
                 double distance(level_set.eval(coord));
                 for(int d=0;d<dim;++d)
-                  distance=std::min(distance,
-                                    std::min(coord[d]-grid_geom->getXLower()[d],
-                                             grid_geom->getXUpper()[d]-coord[d]));
+                  distance=
+                    std::min(distance,
+                             std::min(coord[d]-grid_geom->getXLower()[d]-epsilon,
+                                      grid_geom->getXUpper()[d]-coord[d]-epsilon));
                 (*level_set_ptr)(x)=distance/dx_max;
               }
           }
