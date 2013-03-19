@@ -415,8 +415,8 @@ void Elastic::FAC::add_faults()
               FTensor::Tensor1<double,3> slip(0,scale,0);
               const FTensor::Tensor2<double,3,3>
                 rot_rake(1,0,0,
-                         0,std::cos(rake),-std::sin(rake),
-                         0,std::sin(rake),std::cos(rake));
+                         0,std::cos(rake),std::sin(rake),
+                         0,-std::sin(rake),std::cos(rake));
               FTensor::Tensor1<double,3> jump;
               jump(c)=rot(b,c)*rot_rake(b,a)*slip(a);
 
