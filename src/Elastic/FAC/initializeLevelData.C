@@ -101,6 +101,10 @@ void Elastic::FAC::initializeLevelData
           boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
           (patch->getPatchData(level_set_id));
         SAMRAI::hier::Box level_set_box = level_set_ptr->getBox();
+
+        double dx_max(0);
+        for(int d=0;d<dim;++d)
+          dx_max=std::max(dx_max,dx[d]);
         for(int ix=0;ix<dim;++ix)
           {
             double offset[]={0.5,0.5,0.5};
@@ -120,7 +124,7 @@ void Elastic::FAC::initializeLevelData
                   distance=std::min(distance,
                                     std::min(coord[d]-grid_geom->getXLower()[d],
                                              grid_geom->getXUpper()[d]-coord[d]));
-                (*level_set_ptr)(x)=distance;
+                (*level_set_ptr)(x)=distance/dx_max;
               }
           }
       }
