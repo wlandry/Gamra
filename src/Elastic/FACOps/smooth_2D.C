@@ -144,6 +144,7 @@ void Elastic::FACOps::smooth_2D
                                                               edge_moduli,cell,
                                                               edge,x,y,ip,jp,
                                                               dx,dy);
+                                  maxres=std::max(maxres,std::fabs(delta_Rx));
                                   double C_vx(dRm_dv_2D(cell_moduli,edge_moduli,
                                                         cell,cell-ip,
                                                         edge+jp,edge,dx,dy));
