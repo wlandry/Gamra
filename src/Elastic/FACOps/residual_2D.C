@@ -10,7 +10,8 @@ void Elastic::FACOps::residual_2D
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::geom::CartesianPatchGeometry &geom)
 {
-  const SAMRAI::hier::Index ip(1,0), jp(0,1);
+  const SAMRAI::hier::Index unit[]={SAMRAI::hier::Index(1,0),
+                                    SAMRAI::hier::Index(0,1)};
 
   boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
     boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
@@ -25,43 +26,32 @@ void Elastic::FACOps::residual_2D
     {
       SAMRAI::pdat::CellIndex center(*ci);
 
-      const SAMRAI::pdat::SideIndex
-        x(center,0,SAMRAI::pdat::SideIndex::Lower),
-        y(center,1,SAMRAI::pdat::SideIndex::Lower);
       const SAMRAI::pdat::NodeIndex
         edge(center,SAMRAI::pdat::NodeIndex::LowerLeft);
 
-      /* vx */
-      if(center[1]!=pbox.upper(1))
+      const int dim(2);
+      for(int ix=0;ix<dim;++ix)
         {
-          /* If x==0 */
-          if((center[0]==pbox.lower(0) && v(x-ip)==boundary_value)
-             || (center[0]==pbox.upper(0) && v(x+ip)==boundary_value))
-            {
-              v_resid(x)=0;
-            }
-          else
-            {
-              v_resid(x)=v_rhs(x)
-                - v_operator_2D(v,cell_moduli,edge_moduli,center,
-                                edge,x,y,ip,jp,dx,dy);
-            }
-        }
+          const int iy((ix+1)%dim);
+          const SAMRAI::pdat::SideIndex
+            x(center,ix,SAMRAI::pdat::SideIndex::Lower),
+            y(center,iy,SAMRAI::pdat::SideIndex::Lower);
+          const SAMRAI::hier::Index ip(unit[ix]), jp(unit[iy]);
 
-      /* vy */
-      if(center[0]!=pbox.upper(0))
-        {
-          /* If y==0 */
-          if((center[1]==pbox.lower(1) && v(y-jp)==boundary_value)
-             || (center[1]==pbox.upper(1) && v(y+jp)==boundary_value))
+          if(center[iy]!=pbox.upper(iy))
             {
-              v_resid(y)=0;
-            }
-          else
-            {
-              v_resid(y)=v_rhs(y)
-                - v_operator_2D(v,cell_moduli,edge_moduli,center,
-                                edge,y,x,jp,ip,dy,dx);
+              /* If x==0 */
+              if((center[ix]==pbox.lower(ix) && v(x-ip)==boundary_value)
+                 || (center[ix]==pbox.upper(ix) && v(x+ip)==boundary_value))
+                {
+                  v_resid(x)=0;
+                }
+              else
+                {
+                  v_resid(x)=v_rhs(x)
+                    - v_operator_2D(v,cell_moduli,edge_moduli,center,
+                                    edge,x,y,ip,jp,dx,dy);
+                }
             }
         }
     }
