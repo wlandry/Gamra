@@ -10,11 +10,11 @@ void Elastic::Boundary_Conditions::set_boundary
 {
   try
     {
-      // if(have_embedded_boundary())
-      //   {
-      //     set_embedded_boundary(patch,v_id,homogeneous,apply_normal_stress);
-      //   }
-      // else
+      if(have_embedded_boundary())
+        {
+          set_embedded_boundary(patch,homogeneous);
+        }
+      else
         {
           set_regular_boundary(patch,v_id,homogeneous,apply_normal_stress);
         }

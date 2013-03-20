@@ -138,6 +138,7 @@ def build(bld):
                         'src/Elastic/Boundary_Conditions/set_regular_boundary/set_dirichlet.C',
                         'src/Elastic/Boundary_Conditions/set_regular_boundary/set_shear_derivs.C',
                         'src/Elastic/FACOps/FACOps.C',
+                        'src/Elastic/FACOps/v_level_set_operator_2D.C',
                         'src/Elastic/FACOps/computeCompositeResidualOnLevel.C',
                         'src/Elastic/FACOps/residual_2D.C',
                         'src/Elastic/FACOps/residual_3D.C',
