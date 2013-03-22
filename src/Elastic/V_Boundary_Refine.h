@@ -147,6 +147,20 @@ namespace Elastic {
   private:
     std::string d_name_id;
 
+    void Update_V_embedded_2D
+    (const int &axis,
+     const int &boundary_direction,
+     const bool &boundary_positive,
+     const SAMRAI::pdat::SideIndex &fine,
+     const SAMRAI::hier::Index &ip,
+     const SAMRAI::hier::Index &jp,
+     const int &i,
+     const int &j,
+     const SAMRAI::pdat::SideData<double> &level_set,
+     const SAMRAI::pdat::SideData<double> &level_set_fine,
+     const SAMRAI::pdat::SideData<double> &v,
+     SAMRAI::pdat::SideData<double> &v_fine) const;
+
     void Update_V_2D
     (const int &axis,
      const int &boundary_direction,

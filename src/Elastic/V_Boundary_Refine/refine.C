@@ -53,12 +53,25 @@ void Elastic::V_Boundary_Refine::refine
   const SAMRAI::tbox::Dimension &dimension(getDim());
   const int dim(dimension.getValue());
 
-  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (coarse_patch.getPatchData(src_component));
-  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
+  SAMRAI::pdat::SideData<double> &v(*v_ptr);
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine_ptr =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (fine_patch.getPatchData(dst_component));
+  SAMRAI::pdat::SideData<double> &v_fine(*v_fine_ptr);
+
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_fine_ptr;
+
+  if(have_embedded_boundary())
+    {
+      level_set_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (coarse_patch.getPatchData(level_set_id));
+      level_set_fine_ptr =boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (fine_patch.getPatchData(level_set_id));
+    }
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed;
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal;
@@ -77,13 +90,6 @@ void Elastic::V_Boundary_Refine::refine
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
         (fine_patch.getPatchData(dv_diagonal_id));
     }
-
-#ifdef DEBUG_CHECK_ASSERTIONS
-   TBOX_ASSERT(v);
-   TBOX_ASSERT(v_fine);
-   TBOX_ASSERT(v->getDepth() == v_fine->getDepth());
-   TBOX_ASSERT(v->getDepth() == 1);
-#endif
 
    SAMRAI::hier::Box fine_box=fine_patch.getBox();
 
@@ -128,29 +134,75 @@ void Elastic::V_Boundary_Refine::refine
      unit[d][d]=1;
    SAMRAI::hier::Index ijk(dimension);
 
-   boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
-   if(have_embedded_boundary())
-     level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-       (fine_patch.getPatchData(level_set_id));
-
    if(dim==2)
      {
        const int iy((ix+1)%dim);
-       for(ijk[1]=fine_min[1]; ijk[1]<=fine_max[1]; ijk[1]+=1)
-         for(ijk[0]=fine_min[0]; ijk[0]<=fine_max[0]; ijk[0]+=1)
-           {
-             SAMRAI::pdat::SideIndex
-               fine_index(ijk,ix,SAMRAI::pdat::SideIndex::Lower);
+       if(!have_embedded_boundary())
+         {
+           for(ijk[1]=fine_min[1]; ijk[1]<=fine_max[1]; ijk[1]+=1)
+             for(ijk[0]=fine_min[0]; ijk[0]<=fine_max[0]; ijk[0]+=1)
+               {
+                 SAMRAI::pdat::SideIndex
+                   fine_index(ijk,ix,SAMRAI::pdat::SideIndex::Lower);
 
-             Update_V_2D(ix,boundary_direction,boundary_positive,fine_index,
-                         unit[ix],unit[iy],ijk[ix],ijk[iy],*v,*v_fine);
-             if(have_faults() && !is_residual)
-               Correction_2D(ix,boundary_direction,boundary_positive,
-                             fine_index,unit[ix],unit[iy],ijk[ix],ijk[iy],
-                             fine_min[ix],fine_max[ix],
-                             *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
-                             *dv_mixed_fine,*v_fine);
-           }
+                 Update_V_2D(ix,boundary_direction,boundary_positive,fine_index,
+                             unit[ix],unit[iy],ijk[ix],ijk[iy],v,v_fine);
+                 if(have_faults() && !is_residual)
+                   Correction_2D(ix,boundary_direction,boundary_positive,
+                                 fine_index,unit[ix],unit[iy],ijk[ix],ijk[iy],
+                                 fine_min[ix],fine_max[ix],
+                                 *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
+                                 *dv_mixed_fine,v_fine);
+               }
+         }
+       else
+         {
+           SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
+           SAMRAI::pdat::SideData<double> &level_set_fine(*level_set_fine_ptr);
+
+           int accum(0);
+           for(ijk[1]=fine_min[1]; ijk[1]<=fine_max[1]; ijk[1]+=1)
+             for(ijk[0]=fine_min[0]; ijk[0]<=fine_max[0]; ijk[0]+=1)
+               {
+                 SAMRAI::pdat::SideIndex
+                   fine_index(ijk,ix,SAMRAI::pdat::SideIndex::Lower);
+
+  // if(fine_index[0]==0 && fine_index[1]==1 && ix==1)
+  //   std::cout << "fine "
+  //             << fine_index << " "
+  //             << level_set_fine(fine_index) << " "
+  //             << "\n";
+
+                 if(level_set_fine(fine_index)>=0)
+                   {
+                     Update_V_embedded_2D(ix,boundary_direction,
+                                          boundary_positive,
+                                          fine_index,unit[ix],unit[iy],ijk[ix],
+                                          ijk[iy],level_set,level_set_fine,v,v_fine);
+                     if(have_faults() && !is_residual)
+                       Correction_2D(ix,boundary_direction,boundary_positive,
+                                     fine_index,unit[ix],unit[iy],ijk[ix],ijk[iy],
+                                     fine_min[ix],fine_max[ix],
+                                     *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
+                                     *dv_mixed_fine,v_fine);
+                   }
+
+
+                 int xx(fine_index[0]), yy(fine_index[1]);
+                 if(v_fine(fine_index)>1e101)
+                   {
+                     ++accum;
+                   }
+
+  // if(fine_index[0]==0 && fine_index[1]==1 && ix==1)
+  //   std::cout << "fine "
+  //             << fine_index << " "
+  //             << v_fine(fine_index) << " "
+  //             << level_set_fine(fine_index) << " "
+  //             << "\n";
+
+               }
+         }
      }
    else
      {
@@ -168,7 +220,7 @@ void Elastic::V_Boundary_Refine::refine
                Update_V_3D(ix,boundary_direction,boundary_positive,fine,
                            unit,ijk,coarse_box,fine_min,fine_max,*geom,
                            dv_diagonal,dv_diagonal_fine,dv_mixed,
-                           dv_mixed_fine,*v,*v_fine);
+                           dv_mixed_fine,v,v_fine);
              }
      }
 }

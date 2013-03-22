@@ -28,6 +28,7 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
   const int dim(Dim.getValue());
 
   const SAMRAI::hier::Box gbox=level_set.getGhostBox();
+  const SAMRAI::hier::Box box=level_set.getBox();
 
   /* FIXME: Why is this even required?  Shouldn't the boundaries
      be set once and then forgotten?  On coarse levels, the
@@ -37,29 +38,61 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
   /* FIXME: This looping seems really excessive.  It seems like
      there should be a better way using getBoundaryBoxes. */
 
+  /* Corners are not synced, so we set the level set to a generic
+   * negative value */
   for(int ix=0; ix<dim; ++ix)
     {
+      const int iy((ix+1)%dim), iz((ix+2)%dim);
       SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
       for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; si++)
         {
           SAMRAI::pdat::SideIndex s(*si);
 
-          if(level_set(s)<0)
-            for(int d=0;d<(dim==2 ? 2 : 8);++d)
-              dv_mixed(s,d)=0;
+          if(dim==2)
+            {
+              if((s[ix]==box.lower(ix) || s[ix]==box.upper(ix)+1)
+                 && (s[iy]==gbox.lower(iy) || s[iy]==gbox.upper(iy)))
+                {
+                  std::cout << "Set embedded "
+                            << ix << " "
+                            << s << " "
+                            << "\n";
+                  level_set(s)=-boundary_value;
+                }
+            }
+          else
+            {
+              if((s[ix]==box.lower(ix) || s[ix]==box.upper(ix)+1)
+                 && ((s[iy]==gbox.lower(iy) || s[iy]==gbox.upper(iy))
+                     || (s[iz]==gbox.lower(iz) || s[iz]==gbox.upper(iz))))
+                level_set(s)=-boundary_value;
+            }
         }
     }
 
-  SAMRAI::pdat::CellIterator c_end(gbox,false);
-  for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=c_end; ci++)
-    {
-      SAMRAI::pdat::CellIndex c(*ci);
-      for(int ix=0;ix<dim;++ix)
-        {
-          SAMRAI::pdat::SideIndex x_m(c,ix,SAMRAI::pdat::SideIndex::Lower),
-            x_p(c,ix,SAMRAI::pdat::SideIndex::Upper);
-          if(level_set(x_m) + level_set(x_p)<0)
-            dv_diagonal(c,ix)=0;
-        }
-    }
+  // for(int ix=0; ix<dim; ++ix)
+  //   {
+  //     SAMRAI::pdat::SideIterator s_end(box,ix,false);
+  //     for(SAMRAI::pdat::SideIterator si(box,ix,true); si!=s_end; si++)
+  //       {
+  //         SAMRAI::pdat::SideIndex s(*si);
+
+  //         if(level_set(s)<0)
+  //           for(int d=0;d<(dim==2 ? 2 : 8);++d)
+  //             dv_mixed(s,d)=0;
+  //       }
+  //   }
+
+  // SAMRAI::pdat::CellIterator c_end(box,false);
+  // for(SAMRAI::pdat::CellIterator ci(box,true); ci!=c_end; ci++)
+  //   {
+  //     SAMRAI::pdat::CellIndex c(*ci);
+  //     for(int ix=0;ix<dim;++ix)
+  //       {
+  //         SAMRAI::pdat::SideIndex x_m(c,ix,SAMRAI::pdat::SideIndex::Lower),
+  //           x_p(c,ix,SAMRAI::pdat::SideIndex::Upper);
+  //         if(level_set(x_m) + level_set(x_p)<0)
+  //           dv_diagonal(c,ix)=0;
+  //       }
+  //   }
 }
