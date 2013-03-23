@@ -30,6 +30,11 @@ namespace Elastic {
     void set_boundary(const SAMRAI::hier::Patch& patch,
                       const int &v_id, const bool &homogeneous,
                       const bool &apply_normal_stress);
+    void set_regular_boundary(const SAMRAI::hier::Patch& patch,
+                              const int &v_id, const bool &homogeneous,
+                              const bool &apply_normal_stress);
+    void set_embedded_boundary(const SAMRAI::hier::Patch& patch,
+                               const bool &homogeneous);
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
                        const int &v_id, const bool &rhs);
     void set_extra_ids(const int &Edge_moduli_id, const int &Dv_diagonal_id,

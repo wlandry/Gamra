@@ -10,7 +10,8 @@ void Elastic::FACOps::residual_2D
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::geom::CartesianPatchGeometry &geom)
 {
-  const SAMRAI::hier::Index ip(1,0), jp(0,1);
+  const SAMRAI::hier::Index unit[]={SAMRAI::hier::Index(1,0),
+                                    SAMRAI::hier::Index(0,1)};
 
   boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
     boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
@@ -21,49 +22,87 @@ void Elastic::FACOps::residual_2D
   double dy = geom.getDx()[1];
 
   SAMRAI::pdat::CellIterator cend(pbox,false);
-  for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
+
+  if(have_embedded_boundary())
     {
-      SAMRAI::pdat::CellIndex center(*ci);
-
-      const SAMRAI::pdat::SideIndex
-        x(center,0,SAMRAI::pdat::SideIndex::Lower),
-        y(center,1,SAMRAI::pdat::SideIndex::Lower);
-      const SAMRAI::pdat::NodeIndex
-        edge(center,SAMRAI::pdat::NodeIndex::LowerLeft);
-
-      /* vx */
-      if(center[1]!=pbox.upper(1))
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (patch.getPatchData(level_set_id));
+      SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
+      for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
         {
-          /* If x==0 */
-          if((center[0]==pbox.lower(0) && v(x-ip)==boundary_value)
-             || (center[0]==pbox.upper(0) && v(x+ip)==boundary_value))
+          SAMRAI::pdat::CellIndex cell(*ci);
+
+          const SAMRAI::pdat::NodeIndex
+            edge(cell,SAMRAI::pdat::NodeIndex::LowerLeft);
+
+          const int dim(2);
+          for(int ix=0;ix<dim;++ix)
             {
-              v_resid(x)=0;
-            }
-          else
-            {
-              v_resid(x)=v_rhs(x)
-                - v_operator_2D(v,cell_moduli,edge_moduli,center,
-                                edge,x,y,ip,jp,dx,dy);
+              const int iy((ix+1)%dim);
+              const SAMRAI::pdat::SideIndex
+                x(cell,ix,SAMRAI::pdat::SideIndex::Lower),
+                y(cell,iy,SAMRAI::pdat::SideIndex::Lower);
+              const SAMRAI::hier::Index ip(unit[ix]), jp(unit[iy]);
+
+              if(cell[iy]!=pbox.upper(iy))
+                {
+                  /* If x==0 */
+                  if(level_set(x)<0)
+                    {
+                      v_resid(x)=0;
+                    }
+                  else if(level_set(x)>1)
+                    {
+                      v_resid(x)=v_rhs(x)
+                        - v_operator_2D(v,cell_moduli,edge_moduli,cell,
+                                        edge,x,y,ip,jp,dx,dy);
+                    }
+                  else
+                    {
+                      v_resid(x)=v_rhs(x)
+                        - v_level_set_operator_2D(level_set,v,cell_moduli,
+                                                  edge_moduli,cell,
+                                                  edge,x,y,ip,jp,dx,dy);
+                    }
+                }
             }
         }
-
-      /* vy */
-      if(center[0]!=pbox.upper(0))
+    }
+  else
+    {
+      for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
         {
-          /* If y==0 */
-          if((center[1]==pbox.lower(1) && v(y-jp)==boundary_value)
-             || (center[1]==pbox.upper(1) && v(y+jp)==boundary_value))
+          SAMRAI::pdat::CellIndex cell(*ci);
+
+          const SAMRAI::pdat::NodeIndex
+            edge(cell,SAMRAI::pdat::NodeIndex::LowerLeft);
+
+          const int dim(2);
+          for(int ix=0;ix<dim;++ix)
             {
-              v_resid(y)=0;
-            }
-          else
-            {
-              v_resid(y)=v_rhs(y)
-                - v_operator_2D(v,cell_moduli,edge_moduli,center,
-                                edge,y,x,jp,ip,dy,dx);
+              const int iy((ix+1)%dim);
+              const SAMRAI::pdat::SideIndex
+                x(cell,ix,SAMRAI::pdat::SideIndex::Lower),
+                y(cell,iy,SAMRAI::pdat::SideIndex::Lower);
+              const SAMRAI::hier::Index ip(unit[ix]), jp(unit[iy]);
+
+              if(cell[iy]!=pbox.upper(iy))
+                {
+                  /* If x==0 */
+                  if((cell[ix]==pbox.lower(ix) && v(x-ip)==boundary_value)
+                     || (cell[ix]==pbox.upper(ix) && v(x+ip)==boundary_value))
+                    {
+                      v_resid(x)=0;
+                    }
+                  else
+                    {
+                      v_resid(x)=v_rhs(x)
+                        - v_operator_2D(v,cell_moduli,edge_moduli,cell,
+                                        edge,x,y,ip,jp,dx,dy);
+                    }
+                }
             }
         }
     }
 }
-

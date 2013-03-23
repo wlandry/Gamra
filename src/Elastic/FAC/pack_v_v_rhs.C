@@ -37,7 +37,7 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
     v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
       (patch.getPatchData(v_id));
   }
-  else if ("Equivalent body force" == variable_name)
+  else if ("Fault Correction" == variable_name)
     {
       v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (patch.getPatchData(v_rhs_id));
