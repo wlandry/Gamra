@@ -1,6 +1,8 @@
 #include "Elastic/FACOps.h"
 #include "Elastic/V_Boundary_Refine.h"
 #include "Constants.h"
+#include "Elastic/dRm_dv.h"
+
 /*
 ********************************************************************
 * Workhorse function to smooth error using red-black               *
@@ -56,8 +58,7 @@ void Elastic::FACOps::smooth_2D
    * whether to continue smoothing.
    */
 
-  const SAMRAI::hier::Index ip(1,0), jp(0,1);
-  const SAMRAI::hier::Index unit[]={ip,jp};
+  const SAMRAI::hier::Index unit[]={SAMRAI::hier::Index(1,0),SAMRAI::hier::Index(0,1)};
   bool converged = false;
   for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
        ++sweep)
@@ -68,6 +69,7 @@ void Elastic::FACOps::smooth_2D
       for(int ix=0; ix<dim; ++ix)
         {
           const int iy((ix+1)%dim);
+          const SAMRAI::hier::Index ip(unit[ix]), jp(unit[iy]);
           for(int rb=0;rb<2;++rb)
             {
               xeqScheduleGhostFillNoCoarse(v_id,ln);
@@ -106,18 +108,67 @@ void Elastic::FACOps::smooth_2D
                   double dx = geom->getDx()[ix];
                   double dy = geom->getDx()[iy];
 
-                  for(int j=pbox.lower(1); j<=pbox.upper(1)+unit[ix][1]; ++j)
+                  if(have_embedded_boundary())
                     {
-                      /* Do the red-black skip */
-                      int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
-                      for(int i=i_min; i<=pbox.upper(0)+unit[ix][0]; i+=2)
+                      boost::shared_ptr<SAMRAI::pdat::SideData<double> >
+                        level_set_ptr =boost::dynamic_pointer_cast
+                        <SAMRAI::pdat::SideData<double> >
+                        (patch->getPatchData(level_set_id));
+                      SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
+                      for(int j=pbox.lower(1); j<=pbox.upper(1)+unit[ix][1]; ++j)
                         {
-                          SAMRAI::pdat::CellIndex
-                            center(SAMRAI::hier::Index(i,j));
-                          /* Update v */
-                          smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
-                                      v,v_rhs,maxres,dx,dy,cell_moduli,
-                                      edge_moduli,theta_momentum);
+                          /* Do the red-black skip */
+                          int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
+                          for(int i=i_min; i<=pbox.upper(0)+unit[ix][0]; i+=2)
+                            {
+                              SAMRAI::pdat::CellIndex
+                                center(SAMRAI::hier::Index(i,j));
+                              const SAMRAI::pdat::SideIndex
+                                x(center,ix,SAMRAI::pdat::SideIndex::Lower),
+                                y(center,iy,SAMRAI::pdat::SideIndex::Lower);
+                              if(level_set(x)>1)
+                                {
+                                  smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
+                                              v,v_rhs,maxres,dx,dy,cell_moduli,
+                                              edge_moduli,theta_momentum);
+                                }
+                              else if(level_set(x)>0)
+                                {
+                                  const SAMRAI::pdat::CellIndex cell(x);
+                                  const SAMRAI::pdat::NodeIndex
+                                    edge(x,SAMRAI::pdat::NodeIndex::LowerLeft);
+
+                                  double delta_Rx=v_rhs(x)
+                                    - v_level_set_operator_2D(level_set,v,
+                                                              cell_moduli,
+                                                              edge_moduli,cell,
+                                                              edge,x,y,ip,jp,
+                                                              dx,dy);
+                                  maxres=std::max(maxres,std::fabs(delta_Rx));
+                                  double C_vx(dRm_dv_2D(cell_moduli,edge_moduli,
+                                                        cell,cell-ip,
+                                                        edge+jp,edge,dx,dy));
+
+                                  v(x)+=delta_Rx*theta_momentum/C_vx;
+                                }
+                            }
+                        }
+                    }
+                  else
+                    {
+                      for(int j=pbox.lower(1); j<=pbox.upper(1)+unit[ix][1]; ++j)
+                        {
+                          /* Do the red-black skip */
+                          int i_min=pbox.lower(0)
+                            + (abs(pbox.lower(0) + j + rb))%2;
+                          for(int i=i_min; i<=pbox.upper(0)+unit[ix][0]; i+=2)
+                            {
+                              SAMRAI::pdat::CellIndex
+                                center(SAMRAI::hier::Index(i,j));
+                              smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
+                                          v,v_rhs,maxres,dx,dy,cell_moduli,
+                                          edge_moduli,theta_momentum);
+                            }
                         }
                     }
                 }

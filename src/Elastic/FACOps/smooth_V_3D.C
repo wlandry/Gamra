@@ -14,30 +14,30 @@ void Elastic::FACOps::smooth_V_3D
  SAMRAI::pdat::SideData<double> &v_rhs,
  SAMRAI::pdat::CellData<double> &cell_moduli,
  SAMRAI::pdat::EdgeData<double> &edge_moduli,
- const SAMRAI::pdat::CellIndex &center,
+ const SAMRAI::pdat::CellIndex &cell,
  const double Dx[3],
  const double &theta_momentum,
  const SAMRAI::hier::Index pp[3],
  double &maxres)
 {
   const int iy((ix+1)%3), iz((ix+2)%3);
-  const SAMRAI::pdat::SideIndex x(center,ix,SAMRAI::pdat::SideIndex::Lower),
-    y(center,iy,SAMRAI::pdat::SideIndex::Lower),
-    z(center,iz,SAMRAI::pdat::SideIndex::Lower);
+  const SAMRAI::pdat::SideIndex x(cell,ix,SAMRAI::pdat::SideIndex::Lower),
+    y(cell,iy,SAMRAI::pdat::SideIndex::Lower),
+    z(cell,iz,SAMRAI::pdat::SideIndex::Lower);
   const SAMRAI::pdat::EdgeIndex
-    edge_y(center,iy,SAMRAI::pdat::EdgeIndex::LowerLeft),
-    edge_z(center,iz,SAMRAI::pdat::EdgeIndex::LowerLeft);
+    edge_y(cell,iy,SAMRAI::pdat::EdgeIndex::LowerLeft),
+    edge_z(cell,iz,SAMRAI::pdat::EdgeIndex::LowerLeft);
     
   /* If at a Dirichlet 'x' boundary, leave vx as is */
-  if(!((center[ix]==pbox.lower(ix) && v(x-pp[ix])==boundary_value)
-       || (center[ix]==pbox.upper(ix)+1 && v(x+pp[ix])==boundary_value)))
+  if(!((cell[ix]==pbox.lower(ix) && v(x-pp[ix])==boundary_value)
+       || (cell[ix]==pbox.upper(ix)+1 && v(x+pp[ix])==boundary_value)))
     {
-      double C_vx=dRm_dv_3D(cell_moduli,edge_moduli,center,center-pp[ix],
+      double C_vx=dRm_dv_3D(cell_moduli,edge_moduli,cell,cell-pp[ix],
                             edge_y+pp[iz],edge_y,edge_z+pp[iy],edge_z,
                             Dx[ix],Dx[iy],Dx[iz]);
 
       double delta_Rx=v_rhs(x)
-        - v_operator_3D(v,cell_moduli,edge_moduli,center,edge_y,edge_z,
+        - v_operator_3D(v,cell_moduli,edge_moduli,cell,edge_y,edge_z,
                         x,y,z,pp[ix],pp[iy],pp[iz],Dx[ix],Dx[iy],Dx[iz]);
 
       /* No scaling here, though there should be. */
