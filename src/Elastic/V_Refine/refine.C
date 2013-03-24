@@ -88,24 +88,56 @@ void Elastic::V_Refine::refine
    SAMRAI::hier::Index pp[]={ip,jp,kp};
 
    SAMRAI::pdat::CellIterator cend(fine_box,false);
-   for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
+
+   // if(have_embedded_boundary())
+   //   {
+   //     boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr =
+   //       boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+   //       (coarse_patch.getPatchData(src_component));
+   //     SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
+       
+   //     for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
+   //       {
+   //         SAMRAI::pdat::SideIndex fine(*ci,axis,SAMRAI::pdat::SideIndex::Lower);
+
+   //         SAMRAI::pdat::SideIndex coarse(fine);
+   //         coarse.coarsen(SAMRAI::hier::Index::getOneIndex(dimension)*2);
+
+   //         if(fine[axis]%2==0)
+   //           {
+   //             v_fine(fine)=refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
+   //                                            *coarse_geom);
+   //           }
+   //         else
+   //           {
+   //             v_fine(fine)=(refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
+   //                                             *coarse_geom)
+   //                           + refine_along_line(v,axis,dim,pp,fine,coarse+pp[axis],
+   //                                               coarse_box,*coarse_geom))/2;
+   //           }
+   //       }
+   //   }
+   // else
      {
-       SAMRAI::pdat::SideIndex fine(*ci,axis,SAMRAI::pdat::SideIndex::Lower);
-
-       SAMRAI::pdat::SideIndex coarse(fine);
-       coarse.coarsen(SAMRAI::hier::Index::getOneIndex(dimension)*2);
-
-       if(fine[axis]%2==0)
+       for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
          {
-           v_fine(fine)=refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
-                                          *coarse_geom);
-         }
-       else
-         {
-           v_fine(fine)=(refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
-                                           *coarse_geom)
-                         + refine_along_line(v,axis,dim,pp,fine,coarse+pp[axis],
-                                             coarse_box,*coarse_geom))/2;
+           SAMRAI::pdat::SideIndex fine(*ci,axis,SAMRAI::pdat::SideIndex::Lower);
+
+           SAMRAI::pdat::SideIndex coarse(fine);
+           coarse.coarsen(SAMRAI::hier::Index::getOneIndex(dimension)*2);
+
+           if(fine[axis]%2==0)
+             {
+               v_fine(fine)=refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
+                                              *coarse_geom);
+             }
+           else
+             {
+               v_fine(fine)=(refine_along_line(v,axis,dim,pp,fine,coarse,coarse_box,
+                                               *coarse_geom)
+                             + refine_along_line(v,axis,dim,pp,fine,coarse+pp[axis],
+                                                 coarse_box,*coarse_geom))/2;
+             }
          }
      }
 }
