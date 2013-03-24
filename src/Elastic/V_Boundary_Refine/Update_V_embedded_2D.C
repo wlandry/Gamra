@@ -74,8 +74,6 @@ void Elastic::V_Boundary_Refine::Update_V_embedded_2D
           v_coarse_p=v_coarse_center;
         }
 
-      int xx((coarse+ip_s-jp)[0]), yy((coarse+ip_s-jp)[1]);
-
       double v_coarse_m;
       if(level_set(coarse+ip_s-jp)>=0)
         {
@@ -92,21 +90,6 @@ void Elastic::V_Boundary_Refine::Update_V_embedded_2D
       double v_coarse(j%2==0 ? v_m : v_p);
       /* FIXME: Need to do something about the fine points */
       v_fine(fine)=v_fine(fine-ip_s) + (v_coarse - v_fine(fine-ip_s-ip_s))/3;
-
-
-  if(fine[0]==0 && fine[1]==1 && axis==1)
-    std::cout << "Update "
-              << fine << " "
-              << v_coarse_m << " "
-              << v_coarse_p << " "
-              << v_coarse_center << " "
-              << v_fine(fine-ip_s) << " "
-              << v_fine(fine-ip_s-ip_s) << " "
-              << v_fine(fine) << " "
-              << "\n";
-
-
-
     }
   /* Quadratic interpolation involving both coarse and fine grids for
      the tangential direction
@@ -171,6 +154,5 @@ void Elastic::V_Boundary_Refine::Update_V_embedded_2D
       /* FIXME: Need to do something about the fine points */
       v_fine(fine)=(8*v_coarse + 10*v_fine(fine-jp_s)
                     - 3*v_fine(fine-jp_s-jp_s))/15;
-
     }
 }

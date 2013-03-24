@@ -160,18 +160,11 @@ void Elastic::V_Boundary_Refine::refine
            SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
            SAMRAI::pdat::SideData<double> &level_set_fine(*level_set_fine_ptr);
 
-           int accum(0);
            for(ijk[1]=fine_min[1]; ijk[1]<=fine_max[1]; ijk[1]+=1)
              for(ijk[0]=fine_min[0]; ijk[0]<=fine_max[0]; ijk[0]+=1)
                {
                  SAMRAI::pdat::SideIndex
                    fine_index(ijk,ix,SAMRAI::pdat::SideIndex::Lower);
-
-  // if(fine_index[0]==0 && fine_index[1]==1 && ix==1)
-  //   std::cout << "fine "
-  //             << fine_index << " "
-  //             << level_set_fine(fine_index) << " "
-  //             << "\n";
 
                  if(level_set_fine(fine_index)>=0)
                    {
@@ -186,21 +179,6 @@ void Elastic::V_Boundary_Refine::refine
                                      *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
                                      *dv_mixed_fine,v_fine);
                    }
-
-
-                 int xx(fine_index[0]), yy(fine_index[1]);
-                 if(v_fine(fine_index)>1e101)
-                   {
-                     ++accum;
-                   }
-
-  // if(fine_index[0]==0 && fine_index[1]==1 && ix==1)
-  //   std::cout << "fine "
-  //             << fine_index << " "
-  //             << v_fine(fine_index) << " "
-  //             << level_set_fine(fine_index) << " "
-  //             << "\n";
-
                }
          }
      }
