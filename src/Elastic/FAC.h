@@ -232,6 +232,8 @@ namespace Elastic {
                          const FTensor::Tensor1<double,3> &c1,
                          const double fault[])
     {
+      /* FIXME: Need to check whether the intersection happens within
+       * the boundary (level_set>=0) */
       bool result(true);
       for(int d=1;d<dim;++d)
         {
