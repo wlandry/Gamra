@@ -97,45 +97,24 @@ void solve_system(T &fac,
 
 
   bool done(false);
-  for (int lnum = 0;
-       patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++)
+  int lnum = 0;
+  for (;patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++)
     {
+      if (use_visit)
+        visit_writer->writePlotData(patch_hierarchy, lnum);
       SAMRAI::tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
-      for (int ln = 0; ln < tag_buffer.getSize(); ++ln) {
-        tag_buffer[ln] = 1;
-      }
-      gridding_algorithm->regridAllFinerLevels(
-                                               0,
-                                               0.0,
-                                               tag_buffer);
+      for (int ln = 0; ln < tag_buffer.getSize(); ++ln)
+        {
+          tag_buffer[ln] = 1;
+        }
+      gridding_algorithm->regridAllFinerLevels(0,0.0,tag_buffer);
       SAMRAI::tbox::plog << "Newly adapted hierarchy\n";
 
-
-      // SAMRAI::tbox::plog << "Adding finner levels with lnum = " << lnum << endl;
-      // gridding_algorithm->makeFinerLevel(0.0,true,0);
-      // SAMRAI::tbox::plog << "Just added finer levels with lnum = " << lnum << endl;
       done = !(patch_hierarchy->finerLevelExists(lnum));
       fac.solve();
     }
-
-  // {
-  //     SAMRAI::tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
-  //     for (int ln = 0; ln < tag_buffer.getSize(); ++ln) {
-  //       tag_buffer[ln] = 1;
-  //     }
-  //     gridding_algorithm->regridAllFinerLevels(
-  //                                              0,
-  //                                              0.0,
-  //                                              tag_buffer);
-  // }
-#ifdef HAVE_HDF5
-  /*
-   * Plot.
-   */
-  if (use_visit) {
-    visit_writer->writePlotData(patch_hierarchy, 0);
-  }
-#endif
+  if (use_visit)
+    visit_writer->writePlotData(patch_hierarchy, lnum);
 
   SAMRAI::tbox::TimerManager::getManager()->print(SAMRAI::tbox::plog);
 }
