@@ -101,6 +101,7 @@ void Elastic::FAC::applyGradientDetector
               /* Special treatment near the boundary.  For Dirichlet
                  boundaries, the ghost point may not be valid. */
 
+              int offset(std::numeric_limits<int>::max());
               if(have_embedded_boundary())
                 {
                   if(!((*level_set_ptr)(x)<0 || (*level_set_ptr)(x+unit[ix])<0))
@@ -108,32 +109,15 @@ void Elastic::FAC::applyGradientDetector
                       if((*level_set_ptr)(x+unit[ix]+unit[ix])<0)
                         {
                           if(!((*level_set_ptr)(x-unit[ix])<0))
-                            {
-                              double curve(v(x+unit[ix]) - 2*v(x)
-                                           + v(x-unit[ix]));
-                              if(!faults.empty())
-                                curve+=-(*dv_diagonal_ptr)(cell_index,ix)
-                                  + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
-                              curvature=std::max(curvature,std::abs(curve));
-                            }
+                            offset=-1;
                         }
                       else if((*level_set_ptr)(x-unit[ix])<0)
                         {
-                          double curve(v(x+unit[ix]+unit[ix])
-                                       - 2*v(x+unit[ix]) + v(x));
-                          if(!faults.empty())
-                            curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
-                              + (*dv_diagonal_ptr)(cell_index,ix);
-                          curvature=std::max(curvature,std::abs(curve));
+                          offset=1;
                         }
                       else
                         {
-                          double curve(v(x+unit[ix]+unit[ix]) - v(x+unit[ix])
-                                       - v(x) + v(x-unit[ix]));
-                          if(!faults.empty())
-                            curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
-                              + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
-                          curvature=std::max(curvature,std::abs(curve));
+                          offset=0;
                         }
                     }
                 }
@@ -142,34 +126,47 @@ void Elastic::FAC::applyGradientDetector
                   if(cell_index[ix]==patch.getBox().lower(ix)
                      && geom->getTouchesRegularBoundary(ix,0))
                     {
-                      double curve(v(x+unit[ix]+unit[ix]) - 2*v(x+unit[ix])
-                                   + v(x));
-                      if(!faults.empty())
-                        curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
-                          + (*dv_diagonal_ptr)(cell_index,ix);
-                      curvature=std::max(curvature,std::abs(curve));
-                    
+                      offset=1;
                     }
                   else if(cell_index[ix]==patch.getBox().upper(ix)
                           && geom->getTouchesRegularBoundary(ix,1))
                     {
-                      double curve(v(x+unit[ix]) - 2*v(x) + v(x-unit[ix]));
-                      if(!faults.empty())
-                        curve+=-(*dv_diagonal_ptr)(cell_index,ix)
-                          + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
-                      curvature=std::max(curvature,std::abs(curve));
+                      offset=-1;
                     }
                   else
                     {
-                      double curve(v(x+unit[ix]+unit[ix]) - v(x+unit[ix])
-                                   - v(x) + v(x-unit[ix]));
-                      if(!faults.empty())
-                        curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
-                          + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
-                      curvature=std::max(curvature,std::abs(curve));
+                      offset=0;
                     }
                 }
-	    }
+              double curve;
+              switch(offset)
+                {
+                case -1:
+                  curve=v(x+unit[ix]) - 2*v(x) + v(x-unit[ix]);
+                  if(!faults.empty())
+                    curve+=-(*dv_diagonal_ptr)(cell_index,ix)
+                      + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
+                  curvature=std::max(curvature,std::abs(curve));
+                  break;
+                case 0:
+                  curve=v(x+unit[ix]+unit[ix]) - v(x+unit[ix])
+                        - v(x) + v(x-unit[ix]);
+                  if(!faults.empty())
+                    curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
+                      + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
+                  curvature=std::max(curvature,std::abs(curve));
+                  break;
+                case 1:
+                  curve=v(x+unit[ix]+unit[ix]) - 2*v(x+unit[ix]) + v(x);
+                  if(!faults.empty())
+                    curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
+                      + (*dv_diagonal_ptr)(cell_index,ix);
+                  curvature=std::max(curvature,std::abs(curve));
+                  break;
+                default:
+                  break;
+                }
+              }
 	  }
 
           if (max_curvature < curvature)
