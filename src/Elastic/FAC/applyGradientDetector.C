@@ -62,12 +62,12 @@ void Elastic::FAC::applyGradientDetector
             (patch.getPatchData(dv_diagonal_id));
         }
 
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
       if(have_embedded_boundary())
         {
-          boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
-          if(have_embedded_boundary())
-            level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-              (patch.getPatchData(level_set_id));
+          level_set_ptr=
+            boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+            (patch.getPatchData(level_set_id));
         }
 
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
@@ -96,37 +96,78 @@ void Elastic::FAC::applyGradientDetector
                   {
                     kp(2)=1;
                   }
-              const SAMRAI::hier::Index pp[]={ip,jp,kp};
+              const SAMRAI::hier::Index unit[]={ip,jp,kp};
 
               /* Special treatment near the boundary.  For Dirichlet
                  boundaries, the ghost point may not be valid. */
-              if(cell_index[ix]==patch.getBox().lower(ix)
-                 && geom->getTouchesRegularBoundary(ix,0))
+
+              if(have_embedded_boundary())
                 {
-                  double curve(v(x+pp[ix]+pp[ix]) - 2*v(x+pp[ix]) + v(x));
-                  if(!faults.empty())
-                    curve+=-(*dv_diagonal_ptr)(cell_index+pp[ix],ix)
-                      + (*dv_diagonal_ptr)(cell_index,ix);
-                  curvature=std::max(curvature,std::abs(curve));
+                  if(!((*level_set_ptr)(x)<0 || (*level_set_ptr)(x+unit[ix])<0))
+                    {
+                      if((*level_set_ptr)(x+unit[ix]+unit[ix])<0)
+                        {
+                          if(!((*level_set_ptr)(x-unit[ix])<0))
+                            {
+                              double curve(v(x+unit[ix]) - 2*v(x)
+                                           + v(x-unit[ix]));
+                              if(!faults.empty())
+                                curve+=-(*dv_diagonal_ptr)(cell_index,ix)
+                                  + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
+                              curvature=std::max(curvature,std::abs(curve));
+                            }
+                        }
+                      else if((*level_set_ptr)(x-unit[ix])<0)
+                        {
+                          double curve(v(x+unit[ix]+unit[ix])
+                                       - 2*v(x+unit[ix]) + v(x));
+                          if(!faults.empty())
+                            curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
+                              + (*dv_diagonal_ptr)(cell_index,ix);
+                          curvature=std::max(curvature,std::abs(curve));
+                        }
+                      else
+                        {
+                          double curve(v(x+unit[ix]+unit[ix]) - v(x+unit[ix])
+                                       - v(x) + v(x-unit[ix]));
+                          if(!faults.empty())
+                            curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
+                              + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
+                          curvature=std::max(curvature,std::abs(curve));
+                        }
+                    }
+                }
+              else
+                {
+                  if(cell_index[ix]==patch.getBox().lower(ix)
+                     && geom->getTouchesRegularBoundary(ix,0))
+                    {
+                      double curve(v(x+unit[ix]+unit[ix]) - 2*v(x+unit[ix])
+                                   + v(x));
+                      if(!faults.empty())
+                        curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
+                          + (*dv_diagonal_ptr)(cell_index,ix);
+                      curvature=std::max(curvature,std::abs(curve));
                     
-                }
-              else if(cell_index[ix]==patch.getBox().upper(ix)
-                      && geom->getTouchesRegularBoundary(ix,1))
-                {
-                  double curve(v(x+pp[ix]) - 2*v(x) + v(x-pp[ix]));
-                  if(!faults.empty())
-                    curve+=-(*dv_diagonal_ptr)(cell_index,ix)
-                      + (*dv_diagonal_ptr)(cell_index-pp[ix],ix);
-                  curvature=std::max(curvature,std::abs(curve));
-                }
-	      else
-                {
-                  double curve(v(x+pp[ix]+pp[ix]) - v(x+pp[ix])
-                              - v(x) + v(x-pp[ix]));
-                  if(!faults.empty())
-                    curve+=-(*dv_diagonal_ptr)(cell_index+pp[ix],ix)
-                      + (*dv_diagonal_ptr)(cell_index-pp[ix],ix);
-                  curvature=std::max(curvature,std::abs(curve));
+                    }
+                  else if(cell_index[ix]==patch.getBox().upper(ix)
+                          && geom->getTouchesRegularBoundary(ix,1))
+                    {
+                      double curve(v(x+unit[ix]) - 2*v(x) + v(x-unit[ix]));
+                      if(!faults.empty())
+                        curve+=-(*dv_diagonal_ptr)(cell_index,ix)
+                          + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
+                      curvature=std::max(curvature,std::abs(curve));
+                    }
+                  else
+                    {
+                      double curve(v(x+unit[ix]+unit[ix]) - v(x+unit[ix])
+                                   - v(x) + v(x-unit[ix]));
+                      if(!faults.empty())
+                        curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
+                          + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
+                      curvature=std::max(curvature,std::abs(curve));
+                    }
                 }
 	    }
 	  }
