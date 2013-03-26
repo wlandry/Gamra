@@ -31,10 +31,6 @@ void Elastic::FACOps::smooth_2D
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
     level = d_hierarchy->getPatchLevel(ln);
 
-  /* Only need to sync the rhs once. This sync is needed because
-     calculating a new pressure update requires computing in the ghost
-     region so that the update for the velocity inside the box will be
-     correct. */
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=true;
   V_Boundary_Refine::is_residual=true;
@@ -47,15 +43,8 @@ void Elastic::FACOps::smooth_2D
   double theta_momentum=1.0;
 
   /*
-   * Smooth the number of sweeps specified or until
-   * the convergence is satisfactory.
-   */
-  double maxres;
-  /*
-   * Instead of checking residual convergence globally, we check the
-   * converged flag.  This avoids possible round-off errors affecting
-   * different processes differently, leading to disagreement on
-   * whether to continue smoothing.
+   * Smooth the number of sweeps specified or until the convergence is
+   * satisfactory.
    */
 
   const SAMRAI::hier::Index unit[]={SAMRAI::hier::Index(1,0),SAMRAI::hier::Index(0,1)};
@@ -63,7 +52,7 @@ void Elastic::FACOps::smooth_2D
   for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
        ++sweep)
     {
-      maxres=0;
+      double max_residual(0);
 
       const int dim(2);
       for(int ix=0; ix<dim; ++ix)
@@ -129,7 +118,7 @@ void Elastic::FACOps::smooth_2D
                               if(level_set(x)>1)
                                 {
                                   smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
-                                              v,v_rhs,maxres,dx,dy,cell_moduli,
+                                              v,v_rhs,max_residual,dx,dy,cell_moduli,
                                               edge_moduli,theta_momentum);
                                 }
                               else if(level_set(x)>0)
@@ -144,7 +133,8 @@ void Elastic::FACOps::smooth_2D
                                                               edge_moduli,cell,
                                                               edge,x,y,ip,jp,
                                                               dx,dy);
-                                  maxres=std::max(maxres,std::fabs(delta_Rx));
+
+                                  max_residual=std::max(max_residual,std::fabs(delta_Rx));
                                   double C_vx(dRm_dv_2D(cell_moduli,edge_moduli,
                                                         cell,cell-ip,
                                                         edge+jp,edge,dx,dy));
@@ -166,7 +156,7 @@ void Elastic::FACOps::smooth_2D
                               SAMRAI::pdat::CellIndex
                                 center(SAMRAI::hier::Index(i,j));
                               smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
-                                          v,v_rhs,maxres,dx,dy,cell_moduli,
+                                          v,v_rhs,max_residual,dx,dy,cell_moduli,
                                           edge_moduli,theta_momentum);
                             }
                         }
@@ -175,26 +165,32 @@ void Elastic::FACOps::smooth_2D
             }
         }
 
-      if (residual_tolerance >= 0.0) {
-        /*
-         * Check for early end of sweeps due to convergence
-         * only if it is numerically possible (user gave a
-         * non negative value for residual tolerance).
-         */
-        converged = maxres < residual_tolerance;
-        const SAMRAI::tbox::SAMRAI_MPI& mpi(d_hierarchy->getMPI());
-        int tmp= converged ? 1 : 0;
-        if (mpi.getSize() > 1)
-          {
-            mpi.AllReduce(&tmp, 1, MPI_MIN);
-          }
-        converged=(tmp==1);
+      if (residual_tolerance >= 0.0)
+        {
+          /*
+           * Check for early end of sweeps due to convergence
+           * only if it is numerically possible (user gave a
+           * non negative value for residual tolerance).
+           */
+          /*
+           * Instead of checking residual convergence globally, we check the
+           * converged flag.  This avoids possible round-off errors affecting
+           * different processes differently, leading to disagreement on
+           * whether to continue smoothing.
+           */
+          converged = max_residual < residual_tolerance;
+          const SAMRAI::tbox::SAMRAI_MPI& mpi(d_hierarchy->getMPI());
+          int tmp= converged ? 1 : 0;
+          if (mpi.getSize() > 1)
+            {
+              mpi.AllReduce(&tmp, 1, MPI_MIN);
+            }
+          converged=(tmp==1);
+        }
 
-        // if (d_enable_logging)
-        //   SAMRAI::tbox::plog
-        //     << d_object_name << " "
-        //     << "Tackley  " << ln << " " << sweep << " : " << maxres << "\n";
-      }
+      // SAMRAI::tbox::plog
+      //   << d_object_name << " "
+      //   << "Tackley  " << ln << " " << sweep << " : " << max_residual << "\n";
     }
 
   xeqScheduleGhostFillNoCoarse(v_id,ln);

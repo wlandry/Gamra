@@ -5,61 +5,87 @@
 #include "Elastic/Boundary_Conditions.h"
 
 void Elastic::Boundary_Conditions::set_embedded_boundary
-(const SAMRAI::hier::Patch& patch, const bool &homogeneous)
+(const SAMRAI::hier::Patch& patch)
 {
-  if(!have_faults() || homogeneous)
-    return;
-
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr=
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (patch.getPatchData(level_set_id));
   SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
 
-  boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr=
-    boost::dynamic_pointer_cast
-    <SAMRAI::pdat::SideData<double> >(patch.getPatchData(dv_mixed_id));
-  SAMRAI::pdat::SideData<double> &dv_mixed(*dv_mixed_ptr);
-  boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr=
-    boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-    (patch.getPatchData(dv_diagonal_id));
-  SAMRAI::pdat::CellData<double> &dv_diagonal(*dv_diagonal_ptr);
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr;
+  if(have_faults())
+    dv_mixed_ptr=boost::dynamic_pointer_cast
+      <SAMRAI::pdat::SideData<double> >(patch.getPatchData(dv_mixed_id));
 
-  const SAMRAI::tbox::Dimension Dim(patch.getDim());
-  const int dim(Dim.getValue());
+  const SAMRAI::tbox::Dimension dimension(patch.getDim());
+  const int dim(dimension.getValue());
 
   const SAMRAI::hier::Box gbox=level_set.getGhostBox();
+  const SAMRAI::hier::Box box=level_set.getBox();
 
-  /* FIXME: Why is this even required?  Shouldn't the boundaries
-     be set once and then forgotten?  On coarse levels, the
-     boundaries may not be copied over. Taking this part out
-     certainly breaks the code. */
+  boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+    boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+    (patch.getPatchGeometry());
 
-  /* FIXME: This looping seems really excessive.  It seems like
-     there should be a better way using getBoundaryBoxes. */
-
+  /* Corners are not synced, so we set the level set to a generic
+   * negative value and dv_mixed to zero.  Setting dv_mixed to zero
+   * implies that we do not care about faults that intersect that
+   * corner (nor should we). */
   for(int ix=0; ix<dim; ++ix)
     {
-      SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
-      for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; si++)
-        {
-          SAMRAI::pdat::SideIndex s(*si);
+      const int iy((ix+1)%dim), iz((ix+2)%dim);
 
-          if(level_set(s)<0)
-            for(int d=0;d<(dim==2 ? 2 : 8);++d)
-              dv_mixed(s,d)=0;
+      std::vector<int> corners[dim];
+      corners[ix].push_back(box.lower(ix));
+      corners[ix].push_back(box.upper(ix)+1);
+
+      if(geom->getTouchesRegularBoundary(iy,0))
+        corners[iy].push_back(gbox.lower(iy));
+      if(geom->getTouchesRegularBoundary(iy,1))
+        corners[iy].push_back(gbox.upper(iy));
+
+      if(dim==3)
+        {
+          if(geom->getTouchesRegularBoundary(iz,0))
+            corners[iz].push_back(gbox.lower(iz));
+          if(geom->getTouchesRegularBoundary(iz,1))
+            corners[iz].push_back(gbox.upper(iz));
         }
-    }
 
-  SAMRAI::pdat::CellIterator c_end(gbox,false);
-  for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=c_end; ci++)
-    {
-      SAMRAI::pdat::CellIndex c(*ci);
-      for(int ix=0;ix<dim;++ix)
+      SAMRAI::pdat::SideIndex x(SAMRAI::hier::Index(dimension),ix,
+                                SAMRAI::pdat::SideIndex::Lower);
+      for(std::vector<int>::iterator i=corners[ix].begin();i!=corners[ix].end();++i)
         {
-          SAMRAI::pdat::SideIndex x_m(c,ix,SAMRAI::pdat::SideIndex::Lower),
-            x_p(c,ix,SAMRAI::pdat::SideIndex::Upper);
-          if(level_set(x_m) + level_set(x_p)<0)
-            dv_diagonal(c,ix)=0;
+          x[ix]=*i;
+          if(dim==2)
+            {
+              for(std::vector<int>::iterator j=corners[iy].begin();j!=corners[iy].end();++j)
+                {
+                  x[iy]=*j;
+                  set_embedded_values(x,dim,level_set,dv_mixed_ptr);
+                }
+            }
+          else
+            {
+              for(std::vector<int>::iterator j=corners[iy].begin();
+                  j!=corners[iy].end();++j)
+                for(int kk=gbox.lower(iz); kk<=gbox.upper(iz); ++kk)
+                  {
+                    x[iy]=*j;
+                    x[iz]=kk;
+                    set_embedded_values(x,dim,level_set,dv_mixed_ptr);
+                  }
+              for(std::vector<int>::iterator k=corners[iz].begin();
+                  k!=corners[iz].end();++k)
+                {
+                  for(int jj=gbox.lower(iy); jj<=gbox.upper(iy); ++jj)
+                    {
+                      x[iy]=jj;
+                      x[iz]=*k;
+                      set_embedded_values(x,dim,level_set,dv_mixed_ptr);
+                    }
+                }
+            }
         }
     }
 }
