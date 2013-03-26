@@ -1,0 +1,312 @@
+.\" Manpage for Gamra 0.0.1.
+.\" Contact wlandry@caltech.edu for more information.
+.TH man 1 "23 March 2013" "0.0.1" "gamra man page"
+.SH NAME
+Gamra \- Gamra is a parallel, adaptive 2D and 3D finite difference C++ code for modeling processes in the Earth such as earthquakes, tides and volcanic processes.
+.SH SYNOPSIS
+
+gamra [-h] [--help] [--version]
+
+.SH DESCRIPTION
+
+Gamra (Geodynamique Avec Maille Rafinee Adaptivement) computes elasto-static deformation in heterogeneous media due to surface loads and moving faults using finite difference and adaptive mesh refinement.
+
+.SH OPTIONS
+
+.TP
+.B \-h
+Prints a short message and exits.
+.TP
+.B \-\-help
+Prints a short message and exits.
+.TP
+.B \-\-version
+Prints the version number and exits.
+
+.SH "INPUT PARAMETERS"
+
+.TP
+.B Main
+For example:
+
+Main {
+    dim = 3
+    base_name = "Landers_ml8"
+    log_all_nodes = FALSE
+    vis_writer = "Vizamrai", "VisIt" }
+
+.B dim 
+Integer. Define the number of dimensions of the calculation. Use dim = 2, for anti-plane and plane-strain problems. Use dim = 3 for three-dimensional problems.
+
+.B base_name 
+String. Defines the log file base_name.log.
+
+.B log_all_nodes
+Boolean. Set to TRUE to log all nodes, FALSE otherwise.
+
+.B vis_writer
+Strings. Defines the type of export files.
+
+.B vis_filename
+String. Defines the output directory vis_filename.visit. Default is same as
+.B base_name
+
+.B intermediate_output
+Boolean. Whether or not to output intermediate solution at coarse levels for debugging purposes. Default is FALSE.
+
+.TP
+.B Elastic
+For example:
+
+Elastic {
+    adaption_threshold = 5.0e-3
+    min_full_refinement_level = 3
+
+    lambda="1"
+    mu="1"
+    v_rhs="0"
+
+    faults= 
+    1.3475, 14.246, -45.439, 10.056, 5.6, 4.94, 132.7, 91.0, -114.7
+
+    fac_solver {
+    ...
+    }
+
+    boundary_conditions {
+    ...
+    }
+}
+
+.B adaption_threshold
+Float. Controls the maximum level of the gradient in one cell before it is flagged for mesh refinement.
+
+.B min_full_refinement_level
+Integer. Controls the minimum number of mesh levels.
+
+.B lambda
+Mathematical expression (string) that defines the Lame parameters, for example: 
+
+        lambda = "1" 
+
+or 
+
+        lambda = "z<20 ? 30 : 50"
+
+.B mu
+Mathematical expression (string) that defines the rigidity.
+
+.B  {lambda,mu}_ijk
+defines the dimension of the input elastic structure, for example:
+
+        lambda_ijk = 101,101,101
+
+.B {lambda,mu}_coord_min
+defines the bounds of the elastic structure, for example:
+
+        lambda_coord_min =  -200,-200,0
+
+.B {lambda,mu}_data
+array defining the value of the elastic structure, for example:
+
+        lambda_data =
+        7.0988,
+        7.0988,
+        ...
+        25.6
+
+The dimension x is the fast index. The number of points must be the product of the elements of 
+.B lambda_ijk
+.
+
+.B v_rhs
+mathematical expression (string) that defines the forcing terms, for example: 
+
+        v_rhs = "0"
+
+.B faults
+List of dislocations. For example,
+
+        faults = 1.0, 0.0, 0.0, 0.0, 10.0, 10.0, 0.0, 90.0, 0.0
+
+for a single fault, or
+
+        faults= 
+        1.3475, 14.246, -45.439, 10.056, 5.6, 4.94, 132.7, 91.0, -114.7,
+        1.8921, 10.446, -41.319, 10.056, 5.6, 4.94, 132.7, 91.0, -151.8
+
+for two fault segments. Static dislocation sources are discretized into a series of planar segments. Slip patches are defined in terms of position, orientation, and slip, as illustrated in the following figure. For positive slip, a zero rake corresponds to left-lateral strike-slip motion and a 90 degree rake corresponds to a thrust motion (when dip is smaller than 90 degrees).
+
+               N (x1)
+              /
+             /| strike
+ x1,x2,x3 ->@--------------------------    E (x2)
+            |\\        p .            \\ w
+            :-\\      i .              \\ i
+            |  \\    l .                \\ d
+            :90 \\  s .                  \\ t
+            |-dip\\  .                    \\ h
+            :     \\. | Rake               \\
+            |      --------------------------
+            :             l e n g t h
+            Z (x3)
+
+
+.TP
+.B
+fac_solver
+
+.B enable_logging 
+Boolean flag to switch logging on/off, for example:
+
+        enable_logging = TRUE
+
+.B max_cycles 
+Integer. Max number of FAC cycles to use, for example:
+
+        max_cycles = 100
+        
+.B residual_tol
+Float. Residual tolerance to solve for, for example:
+
+        residual_tol = 1e-3
+        
+.B num_pre_sweeps
+Integer. Number of presmoothing sweeps to use, for example:
+
+        num_pre_sweeps =  2
+        
+.B num_post_sweeps
+Integer. Number of postsmoothing sweeps to use, for example:
+
+        num_post_sweeps =  2
+        
+.B smoothing_choice
+smoothing_choice = "Tackley"
+        
+.B coarse_solver_choice
+coarse_solver_choice = "Tackley"
+        
+.B coarse_solver_max_iterations
+coarse_solver_max_iterations =  32
+        
+.B coarse_solver_tolerance
+coarse_solver_tolerance = 1e-12
+        
+.B v_prolongation
+v_prolongation_method = "V_REFINE"
+
+.TP
+.B boundary_conditions
+Defines the boundary conditions (defining stress or displacements) at the faces of the computational grid.
+
+        v{x,y,z}_{x,y,z}_{upper,lower}="0"
+        v{x,y,z}_{x,y,z}_upper_is_dirichlet
+
+For example, for a Dirichlet boundary condition:
+
+        vx_x_lower="0"
+        vx_x_lower_is_dirichlet=TRUE
+
+or for a (stress) free surface boundary condition:
+        vz_z_lower="0"
+        vz_z_lower_is_dirichlet=FALSE
+
+.TP
+.B CartesianGridGeometry
+Specify lower/upper corners of the computational domain and a set of non-overlapping boxes defining domain interior. If union of boxes is not a parallelpiped, lower/upper corner data corresponds to min/max corner indices over all boxes given.
+
+.B x_lo
+(Double array) required lower corner of computational domain, for example:
+
+        x_lo = -153.6, -153.6, 0.01
+
+.B x_up  
+(Double array) required upper corner of computational domain, for example:
+
+        x_up =  152.4,  152.4, 100
+
+.B domain_boxes
+(box array) required set of boxes that define interior of physical domain, for example:
+
+        domain_boxes = [(0,0,0), (7,7,3)]
+
+Domain_boxes describes the number of cells in the coarsest level. The finest cell size dx in the 0-direction is (x_up-x_lo(0)/[(domain_boxes(1,0)-domain_boxes(0,0))*2^(max_levels-1)].
+
+.B periodic_dimension 
+(int array) coordinate directions in which domain is periodic. Zero indicates not periodic, non-zero value indicates periodicity. default is [0].
+
+.TP
+.B PatchHierarchy
+Information used to create patches in AMR hierarchy.
+
+.B max_levels 
+Integer. Required max number of mesh levels in hierarchy, for example:
+
+        max_levels = 8
+
+The finest cell size dx in the 0-direction is (x_up-x_lo(0)/[(domain_boxes(1,0)-domain_boxes(0,0))*2^(max_levels-1)].
+
+For most of the following parameters, the number of precribed data values need not match the number of levels in the hierarchy (determined by max_levels).  If more values are given than number of levels, extraneous values will be ignored.  If less are give, then values that correspond to individual levels will apply to those levels.  Missing values will be taken from those for the finest level specified.
+
+.B ratio_to_coarser
+
+level_1 (int array) ratio between index spaces on level 1 to level 0 [REQD]
+
+level_2 (int array) ratio between index spaces on level 2 to level 1 [REQD]
+etc....
+for example:
+
+        ratio_to_coarser {
+           level_1            = 2, 2, 2
+           level_2            = 2, 2, 2
+           level_3            = 2, 2, 2
+           level_4            = 2, 2, 2
+        }
+
+.B largest_patch_size
+
+level_0 (int array) largest patch allowed on level 0. [REQD]    
+
+level_1 (int array)    "       "      "   "  level 1 
+etc..., for example:
+
+        largest_patch_size {
+           level_0 = -1, -1, -1
+           // all finer levels will use same values as level_0...
+        }
+
+or:
+
+        largest_patch_size {
+           level_0 = 8, 8
+        }
+
+.TP
+.B INCLUDE FILES
+Include files can be used to specify further input parameters, using, for example:
+
+#include "file.inc"
+
+.SH "CALLING SEQUENCE"
+
+gamra file.inp
+
+or, to run in parallel:
+
+mpirun -n 64 gamra file.inp
+
+.SH BUGS
+No known bugs.
+
+.SH AUTHOR
+Walter Landry (wlandry@caltech.edu)
+
+.SH COPYRIGHT
+
+GAMRA is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+GAMRA is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with GAMRA.  If not, see <http://www.gnu.org/licenses/>.
+
