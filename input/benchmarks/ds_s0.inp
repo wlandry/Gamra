@@ -7,18 +7,18 @@
  * Description:   Input file for example FAC Stokes solver 
  *
  ************************************************************************/
-// Input file for the 1992 Mw 7.3 Landers earthquake
+// Input file for dip-slip displacement on a vertical fault
 //
 
 Main {
     dim = 3
-    base_name = "ds_s0"
+    base_name = "ds_s0_ml8"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    adaption_threshold = 1.0e-2
+    adaption_threshold = 5e-3
     min_full_refinement_level = 3
 
     lambda="1"
@@ -132,7 +132,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 5
+    max_levels = 8
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2
