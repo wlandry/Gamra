@@ -12,7 +12,7 @@ void Elastic::Boundary_Conditions::set_boundary
     {
       if(have_embedded_boundary())
         {
-          set_embedded_boundary(patch,homogeneous);
+          set_embedded_boundary(patch);
         }
       else
         {

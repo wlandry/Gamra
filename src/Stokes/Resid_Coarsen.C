@@ -16,7 +16,6 @@ void SAMRAI::geom::Stokes::Resid_Coarsen::coarsen(hier::Patch& coarse,
                                                   const hier::IntVector&) const
 {
   const tbox::Dimension& dimension(getDim());
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(dimension, coarse, fine, coarse_box, ratio);
   
   boost::shared_ptr<pdat::CellData<double> > r_fine_ptr =
     boost::dynamic_pointer_cast<pdat::CellData<double> >

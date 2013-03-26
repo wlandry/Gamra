@@ -164,11 +164,11 @@ public:
               }
             else
               {
-                dx[d]=(Coord[dd]-xyz_min[d]-ix[d]*delta)/delta;
+                dx[d]=std::min(1.,std::max(0.,(Coord[dd]-xyz_min[d]-ix[d]*delta)
+                                           /delta));
               }
             ++d;
           }
-
         switch (d)
           {
           case 1:

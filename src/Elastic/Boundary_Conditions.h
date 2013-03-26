@@ -33,8 +33,20 @@ namespace Elastic {
     void set_regular_boundary(const SAMRAI::hier::Patch& patch,
                               const int &v_id, const bool &homogeneous,
                               const bool &apply_normal_stress);
-    void set_embedded_boundary(const SAMRAI::hier::Patch& patch,
-                               const bool &homogeneous);
+    void set_embedded_boundary(const SAMRAI::hier::Patch& patch);
+
+    void set_embedded_values
+    (const SAMRAI::pdat::SideIndex &x,
+     const int &dim,
+     SAMRAI::pdat::SideData<double> &level_set,
+     boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr)
+    {
+      level_set(x)=-boundary_value;
+      if(have_faults())
+        for(int d=0;d<(dim==2 ? 2 : 8);++d)
+          (*dv_mixed_ptr)(x,d)=0;
+    }
+
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
                        const int &v_id, const bool &rhs);
     void set_extra_ids(const int &Edge_moduli_id, const int &Dv_diagonal_id,
