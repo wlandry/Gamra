@@ -70,7 +70,7 @@ void Elastic::FAC::fix_moduli()
   jp[1]=1;
   if(d_dim.getValue()>2)
     kp[2]=1;
-  SAMRAI::hier::Index pp[]={ip,jp,kp};
+  SAMRAI::hier::Index unit[]={ip,jp,kp};
 
   for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln)
     {
@@ -101,10 +101,6 @@ void Elastic::FAC::fix_moduli()
                     {
                       SAMRAI::pdat::NodeIndex e=*ni;
                       SAMRAI::pdat::CellIndex c(e);
-                      cell_moduli(c,m);
-                      cell_moduli(c-ip,m);
-                      cell_moduli(c-jp,m);
-                      cell_moduli(c-ip-jp,m);
                       edge_moduli(e,m)=
                         pow(cell_moduli(c,m)*cell_moduli(c-ip,m)
                             *cell_moduli(c-jp,m)*cell_moduli(c-ip-jp,m),0.25);
@@ -136,9 +132,9 @@ void Elastic::FAC::fix_moduli()
 		      for (int m=0;m<2;++m)
                         {
                           edge_moduli(e,m)=
-                            pow(cell_moduli(c,m)*cell_moduli(c-pp[axis2],m)
-                                *cell_moduli(c-pp[axis3],m)
-                                *cell_moduli(c-pp[axis2]-pp[axis3],m),0.25);
+                            pow(cell_moduli(c,m)*cell_moduli(c-unit[axis2],m)
+                                *cell_moduli(c-unit[axis3],m)
+                                *cell_moduli(c-unit[axis2]-unit[axis3],m),0.25);
                         }
                     }
                 }
