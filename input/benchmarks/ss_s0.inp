@@ -7,12 +7,12 @@
  * Description:   Input file for example FAC Stokes solver 
  *
  ************************************************************************/
-// Input file for the 1992 Mw 7.3 Landers earthquake
+// Input file for strike-slip displacement on a vertical fault
 //
 
 Main {
     dim = 3
-    base_name = "ss_s0"
+    base_name = "ss_s0_ml4"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }

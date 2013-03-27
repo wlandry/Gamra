@@ -53,10 +53,10 @@ def main():
             print >> sys.stderr, 'sam2xyz.py: unhandled option:', o, a
             assert False, "unhandled option"
 
-    print '# sam2xyz.py '+" ".join(sys.argv[1:])
-
     # loop over the models
     for i in xrange(len(args)):
+        print '# sam2xyz.py '+sys.argv[1+i]
+
         ifile = os.path.abspath(args[i])
         ofile = os.path.abspath(os.path.dirname(args[i])+'/.'+os.path.basename(args[i])+'.csv')
 
