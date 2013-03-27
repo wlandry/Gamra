@@ -85,5 +85,5 @@ int Elastic::FAC::solve()
 
   d_elastic_fac_solver.deallocateSolverState();
 
-  return 0;
+  return solver_ret;
 }
