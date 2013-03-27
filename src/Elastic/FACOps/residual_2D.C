@@ -47,7 +47,6 @@ void Elastic::FACOps::residual_2D
 
               if(cell[iy]!=pbox.upper(iy))
                 {
-                  /* If x==0 */
                   if(level_set(x)<0)
                     {
                       v_resid(x)=0;

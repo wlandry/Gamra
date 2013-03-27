@@ -93,7 +93,6 @@ void Elastic::V_Refine::refine
        boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
          boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
          (coarse_patch.getPatchGeometry());
-       const int iy((ix+1)%dim), iz((ix+2)%dim);
 
        const SAMRAI::hier::Box coarse_box=level_set_coarse.getBox();
        const SAMRAI::hier::Box coarse_ghost_box=level_set_coarse.getGhostBox();
@@ -133,9 +132,8 @@ void Elastic::V_Refine::refine
            coarse.coarsen(SAMRAI::hier::Index::getOneIndex(dimension)*2);
 
            double temp(refine_along_line(v,ix,dim,unit,fine,coarse,
-                                         level_set_coarse,level_set_fine));
+                                         level_set_coarse));
 
-           int xxx(fine[0]), yyy(fine[1]);
            if(fine[ix]%2==0)
              {
                v_fine(fine)=temp;
@@ -149,8 +147,7 @@ void Elastic::V_Refine::refine
              {
                double temp2(refine_along_line(v,ix,dim,unit,fine,
                                               coarse+unit[ix],
-                                              level_set_coarse,
-                                              level_set_fine));
+                                              level_set_coarse));
 
                v_fine(fine)=(temp+temp2)/2;
                if(temp==std::numeric_limits<double>::max())

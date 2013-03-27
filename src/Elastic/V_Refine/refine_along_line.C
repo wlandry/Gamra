@@ -56,8 +56,7 @@ double Elastic::V_Refine::refine_along_line
  const SAMRAI::hier::Index unit[],
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::pdat::SideIndex &coarse,
- const SAMRAI::pdat::SideData<double> &level_set_coarse,
- const SAMRAI::pdat::SideData<double> &level_set_fine) const
+ const SAMRAI::pdat::SideData<double> &level_set_coarse) const
 {
   if(level_set_coarse(coarse)<0)
     {

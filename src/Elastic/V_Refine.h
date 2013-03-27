@@ -149,8 +149,7 @@ namespace Elastic {
      const SAMRAI::hier::Index unit[],
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::pdat::SideIndex &coarse,
-     const SAMRAI::pdat::SideData<double> &level_set_coarse,
-     const SAMRAI::pdat::SideData<double> &level_set_fine) const;
+     const SAMRAI::pdat::SideData<double> &level_set_coarse) const;
 
     static int level_set_id;
   private:
