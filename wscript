@@ -119,6 +119,7 @@ def build(bld):
                         'src/Elastic/FAC/resetHierarchyConfiguration.C',
                         'src/Elastic/FAC/setupPlotter.C',
                         'src/Elastic/FAC/solve.C',
+                        'src/Elastic/V_Refine/V_Refine.C',
                         'src/Elastic/V_Refine/refine.C',
                         'src/Elastic/V_Refine/refine_along_line.C',
                         'src/Elastic/V_Boundary_Refine/V_Boundary_Refine.C',

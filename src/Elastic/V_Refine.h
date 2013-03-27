@@ -20,6 +20,7 @@
 #include "SAMRAI/hier/RefineOperator.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
+#include "Constants.h"
 
 #include "FTensor.hpp"
 #include <string>
@@ -44,19 +45,12 @@ namespace Elastic {
     public SAMRAI::hier::RefineOperator
   {
   public:
-    /**
-     * Uninteresting default constructor.
-     */
     explicit V_Refine(const SAMRAI::tbox::Dimension& dim):
       SAMRAI::hier::RefineOperator(dim, "V_REFINE")
     {
       d_name_id = "V_REFINE";
     }
 
-
-    /**
-     * Uninteresting virtual destructor.
-     */
     virtual ~V_Refine(){}
 
     /**
@@ -77,9 +71,7 @@ namespace Elastic {
         return false;
       }
     }
-    /**
-     * Return name std::string identifier of this refinement operator.
-     */
+
     const std::string& getOperatorName() const
     {
       return d_name_id;
@@ -101,6 +93,11 @@ namespace Elastic {
     SAMRAI::hier::IntVector getStencilWidth() const
     {
       return SAMRAI::hier::IntVector::getOne(getDim());
+    }
+
+    bool have_embedded_boundary() const
+    {
+      return level_set_id!=invalid_id;
     }
 
     /**
@@ -145,6 +142,17 @@ namespace Elastic {
      const SAMRAI::hier::Box &coarse_box,
      const SAMRAI::geom::CartesianPatchGeometry &coarse_geom) const;
 
+    double refine_along_line
+    (SAMRAI::pdat::SideData<double> &v,
+     const int &ix,
+     const int &dim,
+     const SAMRAI::hier::Index unit[],
+     const SAMRAI::pdat::SideIndex &fine,
+     const SAMRAI::pdat::SideIndex &coarse,
+     const SAMRAI::pdat::SideData<double> &level_set_coarse,
+     const SAMRAI::pdat::SideData<double> &level_set_fine) const;
+
+    static int level_set_id;
   private:
     std::string d_name_id;
 

@@ -241,6 +241,9 @@ void Elastic::FACOps::initializeOperatorState
       v_ghostfill_refine_algorithm.
         registerRefine(level_set_id,level_set_id,level_set_id,
                        boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+      v_prolongation_refine_algorithm.
+        registerRefine(level_set_id,level_set_id,level_set_id,
+                       boost::shared_ptr<SAMRAI::hier::RefineOperator>());
     }
 
   v_nocoarse_refine_algorithm.

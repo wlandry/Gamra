@@ -58,21 +58,17 @@ double Elastic::FACOps::v_level_set_operator_2D
     (edge_moduli(edge+jp,1)*dvy_xp
      - edge_moduli(edge,1)*dvy_x)/(dx*dy);
 
-  double dvy_y(v(y+jp)-v(y)),
-    dvy_ym(v(y+jp-ip)-v(y-ip));
   /* FIXME: This needs to be
    * interpolated to the dirichlet
    * conditions */
-  // if(level_set(y+jp)<0 || level_set(y)<0)
-  //   {
-  //     dvy_y=0;
-  //   }
-  // if(level_set(y+jp-ip)<0 || level_set(y-ip)<0)
-  //   {
-  //     dvy_ym=0;
-  //   }
+  double vy_pp(level_set(y+jp)<0 ? 0 : v(y+jp)),
+    vy_pm(level_set(y)<0 ? 0 : v(y)),
+    vy_mp(level_set(y+jp-ip)<0 ? 0 : v(y+jp-ip)),
+    vy_mm(level_set(y-ip)<0 ? 0 : v(y-ip));
+
+  double dvy_yp(vy_pp-vy_pm), dvy_ym(vy_mp-vy_mm);
   double dy_yx=
-    (cell_moduli(cell,0)*dvy_y
+    (cell_moduli(cell,0)*dvy_yp
      - cell_moduli(cell-ip,0)*dvy_ym)/(dx*dy);
 
   return dx_xx + dx_yy + dy_xy + dy_yx;

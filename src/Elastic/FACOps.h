@@ -40,6 +40,7 @@
 #include "Elastic/V_Refine_Patch_Strategy.h"
 #include "Elastic/V_Coarsen_Patch_Strategy.h"
 #include "Elastic/V_Boundary_Refine.h"
+#include "Elastic/V_Refine.h"
 
 #include <string>
 
@@ -241,6 +242,7 @@ namespace Elastic {
       Elastic::V_Boundary_Refine::dv_diagonal_id=dv_diagonal_id;
       Elastic::V_Boundary_Refine::dv_mixed_id=dv_mixed_id;
       Elastic::V_Boundary_Refine::level_set_id=level_set_id;
+      Elastic::V_Refine::level_set_id=level_set_id;
       v_coarsen_patch_strategy.set_extra_ids(dv_diagonal_id,dv_mixed_id,
                                              level_set_id);
     }

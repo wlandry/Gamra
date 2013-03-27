@@ -3,6 +3,7 @@ Main {
     base_name = "embedded_boundary_fault2D"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
+    intermediate_output=TRUE
 }
 
 Elastic {
@@ -13,13 +14,16 @@ Elastic {
     mu="1"
     v_rhs="0"
 
-    level_set="10-((x-0.5)^2 + y^2)"
+    // level_set="min(y-0.4999,y+0.4999,x-0.0.4999,x+0.0.4999)"
+    level_set="min(0.4999-y,0.4999+y,0.4999-x,0.4999+x)"
 
     // Put a fault just outside of the domain to ensure that we are
     // computing jump terms near the boundary correctly.
 
-    faults= -10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,
-        -10, .50001, -.25, 0.0, 0.2, 0.25, 90, 90, 0
+    faults= -10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0
+
+    // faults= -10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,
+    //     -10, .50001, -.25, 0.0, 0.2, 0.25, 90, 90, 0
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
@@ -54,9 +58,9 @@ Elastic {
 }
 
 CartesianGridGeometry {
-    domain_boxes = [(0,0), (3,3)]
-    x_lo         = -.5, -.5
-    x_up         = .5, .5
+    domain_boxes = [(0,0), (7,7)]
+    x_lo         = -1.0, -1.0
+    x_up         = 1.0, 1.0
 }
 
 StandardTagAndInitialize {

@@ -13,9 +13,9 @@
 
 double Elastic::V_Refine::refine_along_line
 (SAMRAI::pdat::SideData<double> &v,
- const int &axis,
+ const int &ix,
  const int &dim,
- const SAMRAI::hier::Index pp[],
+ const SAMRAI::hier::Index unit[],
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::pdat::SideIndex &coarse,
  const SAMRAI::hier::Box &coarse_box,
@@ -23,7 +23,7 @@ double Elastic::V_Refine::refine_along_line
 {
   double result=v(coarse);
 
-  for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
+  for(int d=(ix+1)%dim;d!=ix;d=(d+1)%dim)
     {
       const int sgn(fine[d]%2==0 ? -1 : 1);
 
@@ -31,18 +31,79 @@ double Elastic::V_Refine::refine_along_line
       if(coarse[d]==coarse_box.lower(d)
          && coarse_geom.getTouchesRegularBoundary(d,0))
         {
-          dvx_dy=sgn*(v(coarse+pp[d])-v(coarse))/4;
+          dvx_dy=sgn*(v(coarse+unit[d])-v(coarse))/4;
         }
       else if(coarse[d]==coarse_box.upper(d)
               && coarse_geom.getTouchesRegularBoundary(d,1))
         {
-          dvx_dy=sgn*(v(coarse)-v(coarse-pp[d]))/4;
+          dvx_dy=sgn*(v(coarse)-v(coarse-unit[d]))/4;
         }
       else
         {
-          dvx_dy=sgn*(v(coarse+pp[d])-v(coarse-pp[d]))/8;
+          dvx_dy=sgn*(v(coarse+unit[d])-v(coarse-unit[d]))/8;
         }
       result+=dvx_dy;
+    }
+  return result;
+}
+
+/* Version for embedded boundaries */
+
+double Elastic::V_Refine::refine_along_line
+(SAMRAI::pdat::SideData<double> &v,
+ const int &ix,
+ const int &dim,
+ const SAMRAI::hier::Index unit[],
+ const SAMRAI::pdat::SideIndex &fine,
+ const SAMRAI::pdat::SideIndex &coarse,
+ const SAMRAI::pdat::SideData<double> &level_set_coarse,
+ const SAMRAI::pdat::SideData<double> &level_set_fine) const
+{
+  if(level_set_coarse(coarse)<0)
+    {
+      /* FIXME: This should calculate the Dirichlet or Neumann
+       * conditions properly as well as the proper weights.  For now,
+       * hard code v=0 bc's. */
+      double result(0);
+      // double result(std::numeric_limits<double>::max());
+      for(int d=(ix+1)%dim;d!=ix;d=(d+1)%dim)
+        {
+          if(level_set_coarse(coarse+unit[d])>=0)
+            {
+              result=v(coarse+unit[d]);
+            }
+          else if(level_set_coarse(coarse-unit[d])>=0)
+            {
+              result=v(coarse-unit[d]);
+            }
+        }
+      return result;
+    }
+
+  double result=v(coarse);
+
+  for(int d=(ix+1)%dim;d!=ix;d=(d+1)%dim)
+    {
+      const int sgn(fine[d]%2==0 ? -1 : 1);
+
+      /* FIXME: This should calculate the Dirichlet or Neumann
+       * conditions properly as well as the proper weights.  For now,
+       * hard code d/dx=0 bc's. */
+      // double v_plus(v(coarse)), v_minus(v(coarse));
+      double dvx_dy;
+      if(level_set_coarse(coarse+unit[d])<0)
+        {
+          dvx_dy=(v(coarse)-v(coarse-unit[d]))/4;
+        }
+      else if(level_set_coarse(coarse-unit[d])<0)
+        {
+          dvx_dy=(v(coarse+unit[d])-v(coarse))/4;
+        }
+      else
+        {
+          dvx_dy=(v(coarse+unit[d])-v(coarse-unit[d]))/8;
+        }
+      result+=sgn*dvx_dy;
     }
   return result;
 }

@@ -4,8 +4,23 @@
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
 #include "Elastic/Boundary_Conditions.h"
 
+namespace {
+  void set_embedded_values
+  (const SAMRAI::pdat::SideIndex &x,
+   const int &dim,
+   SAMRAI::pdat::SideData<double> &level_set,
+   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr)
+  {
+    level_set(x)=-boundary_value;
+    if(dv_mixed_ptr)
+      for(int d=0;d<(dim==2 ? 2 : 8);++d)
+        (*dv_mixed_ptr)(x,d)=0;
+  }
+}
+
 void Elastic::Boundary_Conditions::set_embedded_boundary
-(const SAMRAI::hier::Patch& patch)
+(const SAMRAI::hier::Patch& patch, const int &level_set_id,
+ const int &dv_mixed_id)
 {
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr=
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
@@ -13,7 +28,7 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
   SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr;
-  if(have_faults())
+  if(dv_mixed_id!=invalid_id)
     dv_mixed_ptr=boost::dynamic_pointer_cast
       <SAMRAI::pdat::SideData<double> >(patch.getPatchData(dv_mixed_id));
 

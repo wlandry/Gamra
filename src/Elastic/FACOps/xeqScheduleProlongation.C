@@ -18,6 +18,11 @@ void Elastic::FACOps::xeqScheduleProlongation
   }
   SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
   refiner.registerRefine(v_dst, v_src, v_scr, v_prolongation_refine_operator);
+  if(have_embedded_boundary())
+    {
+      refiner.registerRefine(level_set_id,level_set_id,level_set_id,
+                             boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+    }
   refiner.resetSchedule(v_prolongation_refine_schedules[dest_ln]);
   v_prolongation_refine_schedules[dest_ln]->fillData(0.0,false);
 }
