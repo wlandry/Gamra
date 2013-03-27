@@ -30,29 +30,8 @@
 
 bool Elastic::FACSolver::solveSystem(const int v_id, const int v_rhs_id)
 {
-#ifdef DEBUG_CHECK_ASSERTIONS
-  if (!d_solver_is_initialized) {
-    TBOX_ERROR(
-               d_object_name << ".solveSystem(int,int): uninitialized\n"
-               <<
-               "solver state.  You must call initializeSolverState()\n"
-               <<
-               "before using this function.  Or you can use\n"
-               <<
-               "solveSystem(int,int,...) to initialize the solver,\n"
-               << "solve and deallocate the solver.\n");
-  }
-  if (v_id < 0 || v_rhs_id < 0) {
-    TBOX_ERROR(d_object_name << ": Bad patch data id.\n");
-  }
-#endif
-
   createVectorWrappers(v_id, v_rhs_id);
-  bool solver_rval;
-
-  solver_rval = d_fac_precond.solveSystem(*d_uv, *d_fv);
-
-  return solver_rval;
+  return d_fac_precond.solveSystem(*d_uv, *d_fv);
 }
 
 /*

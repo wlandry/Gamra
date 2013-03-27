@@ -38,15 +38,6 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-/*
-***********************************************************************
-* FACOperatorStrategy virtual prolongErrorAndCorrect function.  *
-* After the prolongation, we set the physical boundary condition      *
-* for the correction, which is zero.  Other ghost cell values,        *
-* which are preset to zero, need not be set.                          *
-***********************************************************************
-*/
-
 void Elastic::FACOps::prolongErrorAndCorrect
 (const SAMRAI::solv::SAMRAIVectorReal<double>& s,
  SAMRAI::solv::SAMRAIVectorReal<double>& d,
@@ -54,34 +45,13 @@ void Elastic::FACOps::prolongErrorAndCorrect
 {
   t_prolong->start();
 
-#ifdef DEBUG_CHECK_ASSERTIONS
-  if (s.getPatchHierarchy() != d_hierarchy
-      || d.getPatchHierarchy() != d_hierarchy) {
-    TBOX_ERROR(d_object_name << ": Vector hierarchy does not match\n"
-               "internal state hierarchy.");
-  }
-#endif
-
   boost::shared_ptr<SAMRAI::hier::PatchLevel> coarse_level =
     d_hierarchy->getPatchLevel(dest_ln - 1);
   boost::shared_ptr<SAMRAI::hier::PatchLevel> fine_level =
     d_hierarchy->getPatchLevel(dest_ln);
 
-  /*
-   * Data is prolonged into the scratch space corresponding
-   * to index d_cell_scratch_id and allocated here.
-   */
   fine_level->allocatePatchData(d_side_scratch_id);
 
-  // int v_src(s.getComponentDescriptorIndex(0)),
-  //   v_dst(d.getComponentDescriptorIndex(0));
-  // xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_ln+1);
-
-  /*
-   * Refine solution into scratch space to fill the fine level
-   * interior in the scratch space, then use that refined data
-   * to correct the fine level error.
-   */
   v_refine_patch_strategy.data_id=d_side_scratch_id;
   v_refine_patch_strategy.is_residual=true;
   V_Boundary_Refine::is_residual=true;
@@ -90,23 +60,6 @@ void Elastic::FACOps::prolongErrorAndCorrect
                           d_side_scratch_id,
                           dest_ln);
 
-  // set_boundaries(s.getComponentDescriptorIndex(0),fine_level,true);
-
-  // if (fine_level > d_ln_min) {
-  //   /* Fill from current, next coarser level and physical boundary */
-  //   xeqScheduleGhostFill(s.getComponentDescriptorIndex(0),
-  //                        s.getComponentDescriptorIndex(0), fine_level);
-  // } else {
-  //   /* Fill from current and physical boundary */
-  //   xeqScheduleGhostFillNoCoarse(s.getComponentDescriptorIndex(0),
-  //                                s.getComponentDescriptorIndex(0), fine_level);
-  // }
-
-
-  /*
-   * Add the refined error in the scratch space to the error currently
-   * residing in the destination level.
-   */
   {
     SAMRAI::math::HierarchySideDataOpsReal<double>
       hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
