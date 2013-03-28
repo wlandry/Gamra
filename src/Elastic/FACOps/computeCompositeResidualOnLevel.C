@@ -68,41 +68,42 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
    */
 
   for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-       pi!=level->end(); pi++) {
-    boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
-    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-      (solution.getComponentPatchData(0,(*patch)));
-    boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-      (patch->getPatchData(cell_moduli_id));
-    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-      (rhs.getComponentPatchData(0,*patch));
-    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_resid_ptr =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-      (residual.getComponentPatchData(0,*patch));
+       pi!=level->end(); pi++)
+    {
+      boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (solution.getComponentPatchData(0,(*patch)));
+      boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+        (patch->getPatchData(cell_moduli_id));
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (rhs.getComponentPatchData(0,*patch));
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_resid_ptr =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (residual.getComponentPatchData(0,*patch));
 
-    SAMRAI::hier::Box pbox=patch->getBox();
-    pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
-    boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
-      boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-      (patch->getPatchGeometry());
+      SAMRAI::hier::Box pbox=patch->getBox();
+      pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
+      boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+        boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+        (patch->getPatchGeometry());
 
-    switch(d_dim.getValue())
-      {
-      case 2:
-        residual_2D(*v_ptr,*cell_moduli_ptr,*v_rhs_ptr,
-                    *v_resid_ptr,*patch,pbox,*geom);
-        break;
-      case 3:
-        residual_3D(*v_ptr,*cell_moduli_ptr,*v_rhs_ptr,
-                    *v_resid_ptr,*patch,pbox,*geom);
-        break;
-      default:
-        abort();
-      }
-  }
+      switch(d_dim.getValue())
+        {
+        case 2:
+          residual_2D(*v_ptr,*cell_moduli_ptr,*v_rhs_ptr,
+                      *v_resid_ptr,*patch,pbox,*geom);
+          break;
+        case 3:
+          residual_3D(*v_ptr,*cell_moduli_ptr,*v_rhs_ptr,
+                      *v_resid_ptr,*patch,pbox,*geom);
+          break;
+        default:
+          abort();
+        }
+    }
 
   t_compute_composite_residual->stop();
 }

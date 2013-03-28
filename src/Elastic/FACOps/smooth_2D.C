@@ -107,7 +107,8 @@ void Elastic::FACOps::smooth_2D
                       for(int j=pbox.lower(1); j<=pbox.upper(1)+unit[ix][1]; ++j)
                         {
                           /* Do the red-black skip */
-                          int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
+                          int i_min=pbox.lower(0)
+                            + (abs(pbox.lower(0) + j + rb))%2;
                           for(int i=i_min; i<=pbox.upper(0)+unit[ix][0]; i+=2)
                             {
                               SAMRAI::pdat::CellIndex
@@ -118,8 +119,9 @@ void Elastic::FACOps::smooth_2D
                               if(level_set(x)>1)
                                 {
                                   smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
-                                              v,v_rhs,max_residual,dx,dy,cell_moduli,
-                                              edge_moduli,theta_momentum);
+                                              v,v_rhs,max_residual,dx,dy,
+                                              cell_moduli,edge_moduli,
+                                              theta_momentum);
                                 }
                               else if(level_set(x)>0)
                                 {
@@ -134,7 +136,8 @@ void Elastic::FACOps::smooth_2D
                                                               edge,x,y,ip,jp,
                                                               dx,dy);
 
-                                  max_residual=std::max(max_residual,std::fabs(delta_Rx));
+                                  max_residual=std::max(max_residual,
+                                                        std::fabs(delta_Rx));
                                   double C_vx(dRm_dv_2D(cell_moduli,edge_moduli,
                                                         cell,cell-ip,
                                                         edge+jp,edge,dx,dy));
@@ -189,8 +192,7 @@ void Elastic::FACOps::smooth_2D
         }
 
       // SAMRAI::tbox::plog
-      //   << d_object_name << " "
-      //   << "Tackley  " << ln << " " << sweep << " : " << max_residual << "\n";
+      //   << "smooth_2D  " << ln << " " << sweep << " : " << max_residual << "\n";
     }
 
   xeqScheduleGhostFillNoCoarse(v_id,ln);
