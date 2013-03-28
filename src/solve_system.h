@@ -74,7 +74,7 @@ void solve_system(T &fac,
       SAMRAI::tbox::plog << "Newly adapted hierarchy\n";
 
       done = !(patch_hierarchy->finerLevelExists(lnum));
-      done=(!fac.solve() && done);
+      done=(!fac.solve() || done);
     }
   if (use_visit)
     visit_writer->writePlotData(patch_hierarchy, lnum);
