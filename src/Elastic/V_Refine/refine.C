@@ -124,7 +124,7 @@ void Elastic::V_Refine::refine
 
            if(level_set_fine(fine)<0)
              {
-               v_fine(fine)=2*boundary_value;
+               v_fine(fine)=invalid_value;
                continue;
              }
 

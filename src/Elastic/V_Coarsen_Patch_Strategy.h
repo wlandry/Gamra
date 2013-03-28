@@ -92,7 +92,8 @@ namespace Elastic {
      const SAMRAI::pdat::SideData<double>& v_fine,
      const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
      const boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal,
-     const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
+     SAMRAI::hier::Patch &coarse_patch,
+     const SAMRAI::hier::Patch &fine_patch,
      const SAMRAI::hier::Box& coarse_box) const;
 
     void

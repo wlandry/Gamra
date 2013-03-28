@@ -32,10 +32,14 @@ void Elastic::FAC::fix_moduli()
 
   cell_moduli_coarsen_schedules.resizeArray(ln_max + 1);
   cell_moduli_coarsen_algorithm =
-    boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(d_dim);
+    boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(d_dim,true);
   cell_moduli_coarsen_algorithm->
     registerCoarsen(cell_moduli_id,cell_moduli_id,
                     cell_moduli_coarsen_operator);
+  if(have_embedded_boundary())
+    cell_moduli_coarsen_algorithm->
+      registerCoarsen(level_set_id,level_set_id,
+                      boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
 
   for (int dest_ln = 0; dest_ln < ln_max; ++dest_ln) {
     cell_moduli_coarsen_schedules[dest_ln] =
@@ -50,13 +54,9 @@ void Elastic::FAC::fix_moduli()
 
   for(int dest_ln=ln_max-1; dest_ln>=0; --dest_ln)
     {
-      SAMRAI::xfer::CoarsenAlgorithm coarsener(d_dim);
-      coarsener.registerCoarsen(cell_moduli_id, cell_moduli_id,
-                                cell_moduli_coarsen_operator);
-      coarsener.resetSchedule(cell_moduli_coarsen_schedules[dest_ln]);
-      cell_moduli_coarsen_schedules[dest_ln]->coarsenData();
       cell_moduli_coarsen_algorithm->
         resetSchedule(cell_moduli_coarsen_schedules[dest_ln]);
+      cell_moduli_coarsen_schedules[dest_ln]->coarsenData();
     }
 
   cell_moduli_coarsen_algorithm.reset();

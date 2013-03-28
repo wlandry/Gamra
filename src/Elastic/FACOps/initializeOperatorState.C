@@ -205,8 +205,8 @@ void Elastic::FACOps::initializeOperatorState
   SAMRAI::xfer::RefineAlgorithm v_prolongation_refine_algorithm(d_dim),
     v_ghostfill_refine_algorithm(d_dim), v_nocoarse_refine_algorithm(d_dim);
     
-  SAMRAI::xfer::CoarsenAlgorithm v_urestriction_coarsen_algorithm(d_dim),
-    v_rrestriction_coarsen_algorithm(d_dim);
+  SAMRAI::xfer::CoarsenAlgorithm v_urestriction_coarsen_algorithm(d_dim,true),
+    v_rrestriction_coarsen_algorithm(d_dim,true);
 
   /* This is a little confusing.  The only real purpose here is to
      create a communication schedule.  That communication schedule is
@@ -244,6 +244,12 @@ void Elastic::FACOps::initializeOperatorState
       v_prolongation_refine_algorithm.
         registerRefine(level_set_id,level_set_id,level_set_id,
                        boost::shared_ptr<SAMRAI::hier::RefineOperator>());
+      v_urestriction_coarsen_algorithm.
+        registerCoarsen(level_set_id,level_set_id,
+                        boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
+      v_rrestriction_coarsen_algorithm.
+        registerCoarsen(level_set_id,level_set_id,
+                        boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
     }
 
   v_nocoarse_refine_algorithm.

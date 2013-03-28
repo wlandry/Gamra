@@ -2,7 +2,8 @@
 #define GAMRA_CONSTANTS_H
 
 #include <limits>
-const double boundary_value=1e100;
+const double boundary_value=1.1111e100;
+const double invalid_value=3.1415926*boundary_value;
 const int invalid_id=-1;
 inline int index_map(const int &ix, const int &iy, const int &dim)
 {

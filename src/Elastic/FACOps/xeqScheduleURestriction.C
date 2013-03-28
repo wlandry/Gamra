@@ -19,6 +19,12 @@ void Elastic::FACOps::xeqScheduleURestriction(int v_dst, int v_src,
 
   SAMRAI::xfer::CoarsenAlgorithm coarsener(d_dim);
   coarsener.registerCoarsen(v_dst, v_src, v_urestriction_coarsen_operator);
+  if(have_embedded_boundary())
+    {
+      coarsener.registerCoarsen
+        (level_set_id,level_set_id,
+         boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
+    }
   coarsener.resetSchedule(v_urestriction_coarsen_schedules[dest_ln]);
   v_urestriction_coarsen_schedules[dest_ln]->coarsenData();
 }
