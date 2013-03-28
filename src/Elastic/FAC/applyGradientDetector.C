@@ -76,105 +76,116 @@ void Elastic::FAC::applyGradientDetector
 
       tag_cell_data.fill(0);
       SAMRAI::pdat::CellIterator cend(patch.getBox(),false);
-      for (SAMRAI::pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ci++)
+      for(SAMRAI::pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ci++)
         {
-          const SAMRAI::pdat::CellIndex cell_index(*ci);
+          const SAMRAI::pdat::CellIndex cell(*ci);
 
           double curvature(0);
 	  for (int ix=0; ix<d_dim.getValue(); ++ix)
-	  {
-            const SAMRAI::pdat::SideIndex x(cell_index,ix,
-                                            SAMRAI::pdat::SideIndex::Lower);
-	    for (int d=0; d<d_dim.getValue(); ++d)
-              {
-                SAMRAI::hier::Index ip(d_dim,0),
-                  jp(d_dim,0),
-                  kp(d_dim,0);
-                ip(0)=1;
-                jp(1)=1;
-                if (3==d_dim.getValue())
-                  {
-                    kp(2)=1;
-                  }
-              const SAMRAI::hier::Index unit[]={ip,jp,kp};
-
-              /* Special treatment near the boundary.  For Dirichlet
-                 boundaries, the ghost point may not be valid. */
-
-              int offset(std::numeric_limits<int>::max());
-              if(have_embedded_boundary())
+            {
+              const SAMRAI::pdat::SideIndex x(cell,ix,
+                                              SAMRAI::pdat::SideIndex::Lower);
+              for (int d=0; d<d_dim.getValue(); ++d)
                 {
-                  if(!((*level_set_ptr)(x)<0 || (*level_set_ptr)(x+unit[ix])<0))
+                  SAMRAI::hier::Index ip(d_dim,0),
+                    jp(d_dim,0),
+                    kp(d_dim,0);
+                  ip(0)=1;
+                  jp(1)=1;
+                  if (3==d_dim.getValue())
                     {
-                      if((*level_set_ptr)(x+unit[ix]+unit[ix])<0)
+                      kp(2)=1;
+                    }
+                  const SAMRAI::hier::Index unit[]={ip,jp,kp};
+
+                  /* Special treatment near the boundary.  For Dirichlet
+                     boundaries, the ghost point may not be valid. */
+
+                  double curve(0);
+                  if(have_embedded_boundary())
+                    {
+                      SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
+                      /* FIXME: Need to do the correct interpolation
+                         at the boundary.  For now assume v=0. */
+                      const double boundary(0);
+                      double dv_plus, dv_minus;
+                      if(level_set(x)<0)
                         {
-                          if(!((*level_set_ptr)(x-unit[ix])<0))
-                            offset=-1;
-                        }
-                      else if((*level_set_ptr)(x-unit[ix])<0)
-                        {
-                          offset=1;
+                          if(!(level_set(x+unit[ix])<0))
+                            {
+                              dv_minus=v(x+unit[ix]) - boundary;
+                              dv_plus=v(x+unit[ix]*2) - v(x+unit[ix]);
+                              if(!faults.empty())
+                                {
+                                  dv_minus-=(*dv_diagonal_ptr)(cell,ix);
+                                  dv_plus-=(*dv_diagonal_ptr)(cell+unit[ix],ix);
+                                }
+                            }
+                          else
+                            {
+                              dv_minus=dv_plus=0;
+                            }
                         }
                       else
                         {
-                          offset=0;
+                          dv_minus=v(x) - (level_set(x-unit[ix])<0 ? boundary
+                                           : v(x-unit[ix]));
+                          if(!faults.empty())
+                            dv_minus-=(*dv_diagonal_ptr)(cell-unit[ix],ix);
+                          if(level_set(x+unit[ix])<0)
+                            {
+                              dv_plus=boundary-v(x);
+                              if(!faults.empty())
+                                dv_plus-=(*dv_diagonal_ptr)(cell,ix);
+                            }
+                          else
+                            {
+                              dv_plus=(level_set(x+unit[ix]*2)<0 ? boundary
+                                       : v(x+unit[ix]*2))
+                                - v(x+unit[ix]);
+                              if(!faults.empty())
+                                dv_plus-=(*dv_diagonal_ptr)(cell+unit[ix],ix);
+                            }
                         }
-                    }
-                }
-              else
-                {
-                  if(cell_index[ix]==patch.getBox().lower(ix)
-                     && geom->getTouchesRegularBoundary(ix,0))
-                    {
-                      offset=1;
-                    }
-                  else if(cell_index[ix]==patch.getBox().upper(ix)
-                          && geom->getTouchesRegularBoundary(ix,1))
-                    {
-                      offset=-1;
+                      curve=dv_plus-dv_minus;
                     }
                   else
                     {
-                      offset=0;
+                      if(cell[ix]==patch.getBox().lower(ix)
+                         && geom->getTouchesRegularBoundary(ix,0))
+                        {
+                          curve=v(x+unit[ix]*2) - 2*v(x+unit[ix]) + v(x);
+                          if(!faults.empty())
+                            curve+=-(*dv_diagonal_ptr)(cell+unit[ix],ix)
+                              + (*dv_diagonal_ptr)(cell,ix);
+                        }
+                      else if(cell[ix]==patch.getBox().upper(ix)
+                              && geom->getTouchesRegularBoundary(ix,1))
+                        {
+                          curve=v(x+unit[ix]) - 2*v(x) + v(x-unit[ix]);
+                          if(!faults.empty())
+                            curve+=-(*dv_diagonal_ptr)(cell,ix)
+                              + (*dv_diagonal_ptr)(cell-unit[ix],ix);
+                        }
+                      else
+                        {
+                          curve=v(x+unit[ix]*2) - v(x+unit[ix])
+                            - v(x) + v(x-unit[ix]);
+                          if(!faults.empty())
+                            curve+=-(*dv_diagonal_ptr)(cell+unit[ix],ix)
+                              + (*dv_diagonal_ptr)(cell-unit[ix],ix);
+                        }
                     }
+                  curvature=std::max(curvature,std::abs(curve));
                 }
-              double curve;
-              switch(offset)
-                {
-                case -1:
-                  curve=v(x+unit[ix]) - 2*v(x) + v(x-unit[ix]);
-                  if(!faults.empty())
-                    curve+=-(*dv_diagonal_ptr)(cell_index,ix)
-                      + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
-                  curvature=std::max(curvature,std::abs(curve));
-                  break;
-                case 0:
-                  curve=v(x+unit[ix]+unit[ix]) - v(x+unit[ix])
-                        - v(x) + v(x-unit[ix]);
-                  if(!faults.empty())
-                    curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
-                      + (*dv_diagonal_ptr)(cell_index-unit[ix],ix);
-                  curvature=std::max(curvature,std::abs(curve));
-                  break;
-                case 1:
-                  curve=v(x+unit[ix]+unit[ix]) - 2*v(x+unit[ix]) + v(x);
-                  if(!faults.empty())
-                    curve+=-(*dv_diagonal_ptr)(cell_index+unit[ix],ix)
-                      + (*dv_diagonal_ptr)(cell_index,ix);
-                  curvature=std::max(curvature,std::abs(curve));
-                  break;
-                default:
-                  break;
-                }
-              }
-	  }
+            }
 
-          if (max_curvature < curvature)
-               max_curvature=curvature;
+          if(max_curvature < curvature)
+            max_curvature=curvature;
 
           if (curvature > d_adaption_threshold || ln<min_full_refinement_level)
             {
-              tag_cell_data(cell_index) = 1;
+              tag_cell_data(cell) = 1;
               ++ntag;
             }
         }
