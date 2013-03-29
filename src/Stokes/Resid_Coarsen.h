@@ -5,74 +5,71 @@
 #include "SAMRAI/hier/CoarsenOperator.h"
 #include <string>
 
-namespace SAMRAI {
-namespace geom {
 namespace Stokes {
-/**
- * Coarsens using the viscosities as weights.  So in 2D
+  /**
+   * Coarsens using the viscosities as weights.  So in 2D
    resid_coarse = (resid(i,j)*viscosity(i,j)
-                   + resid(i,j+1)*viscosity(i,j+1)
-                   + resid(i+1,j)*viscosity(i+1,j)
-                   + resid(i+1,j+1)*viscosity(i+1,j+1))/(4*viscosity_coarse)
- * @see hier::CoarsenOperator
- */
+   + resid(i,j+1)*viscosity(i,j+1)
+   + resid(i+1,j)*viscosity(i+1,j)
+   + resid(i+1,j+1)*viscosity(i+1,j+1))/(4*viscosity_coarse)
+   * @see SAMRAI::hier::CoarsenOperator
+   */
 
-class Resid_Coarsen:
-   public hier::CoarsenOperator
-{
-public:
-  explicit Resid_Coarsen(const tbox::Dimension& dim,
-                         const int &cell_viscosity):
-    hier::CoarsenOperator(dim, "RESID_COARSEN"),
-    cell_viscosity_id(cell_viscosity)
+  class Resid_Coarsen:
+    public SAMRAI::hier::CoarsenOperator
   {
-    d_name_id = "RESID_COARSEN";
-  }
-
-  virtual ~Resid_Coarsen(){}
-
-  bool findCoarsenOperator(const boost::shared_ptr<hier::Variable>& var,
-                           const std::string& op_name) const
-  {
-    TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
-
-    const boost::shared_ptr<pdat::CellVariable<double> >
-      cast_var(boost::dynamic_pointer_cast<pdat::CellVariable<double> >(var));
-    if (cast_var && (op_name == d_name_id)) {
-      return true;
-    } else {
-      return false;
+  public:
+    explicit Resid_Coarsen(const SAMRAI::tbox::Dimension& dim,
+                           const int &cell_viscosity):
+      SAMRAI::hier::CoarsenOperator(dim, "RESID_COARSEN"),
+      cell_viscosity_id(cell_viscosity)
+    {
+      d_name_id = "RESID_COARSEN";
     }
-  }
 
-  const std::string& getOperatorName() const
-  {
-    return d_name_id;
-  }
+    virtual ~Resid_Coarsen(){}
 
-  int getOperatorPriority() const
-  {
-    return 0;
-  }
+    bool findCoarsenOperator(const boost::shared_ptr<SAMRAI::hier::Variable>& var,
+                             const std::string& op_name) const
+    {
+      TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
 
-  hier::IntVector getStencilWidth() const
-  {
-    return hier::IntVector::getZero(getDim());
-  }
+      const boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
+        cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::CellVariable<double> >
+                 (var));
+      if (cast_var && (op_name == d_name_id)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
 
-  void coarsen(hier::Patch& coarse,
-               const hier::Patch& fine,
-               const int dst_component,
-               const int src_component,
-               const hier::Box& coarse_box,
-               const hier::IntVector& ratio) const;
+    const std::string& getOperatorName() const
+    {
+      return d_name_id;
+    }
 
-private:
-  std::string d_name_id;
-  const int cell_viscosity_id;
-};
+    int getOperatorPriority() const
+    {
+      return 0;
+    }
 
-}
-}
+    SAMRAI::hier::IntVector getStencilWidth() const
+    {
+      return SAMRAI::hier::IntVector::getZero(getDim());
+    }
+
+    void coarsen(SAMRAI::hier::Patch& coarse,
+                 const SAMRAI::hier::Patch& fine,
+                 const int dst_component,
+                 const int src_component,
+                 const SAMRAI::hier::Box& coarse_box,
+                 const SAMRAI::hier::IntVector& ratio) const;
+
+  private:
+    std::string d_name_id;
+    const int cell_viscosity_id;
+  };
+
 }
 #endif

@@ -20,51 +20,47 @@
 #include "SAMRAI/hier/Variable.h"
 #include "SAMRAI/hier/VariableDatabase.h"
 
-namespace SAMRAI {
-
-  /*
+/*
 *************************************************************************
 * Write derived data to the given stream.                               *
 *************************************************************************
 */
-  bool Stokes::FAC::packDerivedDataIntoDoubleBuffer(
+bool Stokes::FAC::packDerivedDataIntoDoubleBuffer(
                                                   double* buffer,
-                                                  const hier::Patch& patch,
-                                                  const hier::Box& region,
+                                                  const SAMRAI::hier::Patch& patch,
+                                                  const SAMRAI::hier::Box& region,
                                                   const std::string&
                                                   variable_name,
                                                   int depth_id) const
-  {
-    (void)depth_id;
+{
+  (void)depth_id;
 
-    pdat::CellData<double>::iterator icell(region,true);
-    pdat::CellData<double>::iterator iend(region,false);
+  SAMRAI::pdat::CellData<double>::iterator icell(region,true);
+  SAMRAI::pdat::CellData<double>::iterator iend(region,false);
 
-    if (variable_name == "Error") {
-      boost::shared_ptr<pdat::CellData<double> > current_solution_ =
-        boost::dynamic_pointer_cast<pdat::CellData<double> >
-        (patch.getPatchData(p_id));
-      boost::shared_ptr<pdat::CellData<double> > exact_solution_ =
-        boost::dynamic_pointer_cast<pdat::CellData<double> >
-        (patch.getPatchData(p_exact_id));
-      pdat::CellData<double>& current_solution = *current_solution_;
-      pdat::CellData<double>& exact_solution = *exact_solution_;
-      for ( ; icell!=iend; icell++) {
-        double diff = (current_solution(*icell) - exact_solution(*icell));
-        *buffer = diff;
-        buffer = buffer + 1;
-      }
-    } else {
-      // Did not register this name.
-      TBOX_ERROR(
-                 "Unregistered variable name '" << variable_name << "' in\n"
-                 <<
-                 "Stokes::FACX::packDerivedDataIntoDoubleBuffer");
-
+  if (variable_name == "Error") {
+    boost::shared_ptr<SAMRAI::pdat::CellData<double> > current_solution_ =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+      (patch.getPatchData(p_id));
+    boost::shared_ptr<SAMRAI::pdat::CellData<double> > exact_solution_ =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+      (patch.getPatchData(p_exact_id));
+    SAMRAI::pdat::CellData<double>& current_solution = *current_solution_;
+    SAMRAI::pdat::CellData<double>& exact_solution = *exact_solution_;
+    for ( ; icell!=iend; icell++) {
+      double diff = (current_solution(*icell) - exact_solution(*icell));
+      *buffer = diff;
+      buffer = buffer + 1;
     }
-    // Return true if this patch has derived data on it.
-    // False otherwise.
-    return true;
-  }
+  } else {
+    // Did not register this name.
+    TBOX_ERROR(
+               "Unregistered variable name '" << variable_name << "' in\n"
+               <<
+               "Stokes::FACX::packDerivedDataIntoDoubleBuffer");
 
+  }
+  // Return true if this patch has derived data on it.
+  // False otherwise.
+  return true;
 }

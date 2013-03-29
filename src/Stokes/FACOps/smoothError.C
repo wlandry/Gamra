@@ -43,9 +43,9 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::Stokes::FACOps::smoothError
-(SAMRAIVectorReal<double>& data,
- const SAMRAIVectorReal<double>& residual,
+void Stokes::FACOps::smoothError
+(SAMRAI::solv::SAMRAIVectorReal<double>& data,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int ln,
  int num_sweeps)
 {

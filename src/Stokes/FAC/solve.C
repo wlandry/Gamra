@@ -27,7 +27,7 @@
 * deallocate the solver state in this example.                          *
 *************************************************************************
 */
-int SAMRAI::Stokes::FAC::solve()
+int Stokes::FAC::solve()
 {
 
   if (!d_hierarchy) {
@@ -40,17 +40,17 @@ int SAMRAI::Stokes::FAC::solve()
    * Fill in the initial guess.
    */
   for (ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln) {
-    boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
-    hier::PatchLevel::Iterator ip(level->begin());
-    hier::PatchLevel::Iterator iend(level->end());
+    boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
+    SAMRAI::hier::PatchLevel::Iterator ip(level->begin());
+    SAMRAI::hier::PatchLevel::Iterator iend(level->end());
     for ( ; ip!=iend; ip++) {
-      boost::shared_ptr<hier::Patch> patch = *ip;
-      boost::shared_ptr<pdat::CellData<double> > p =
-        boost::dynamic_pointer_cast<pdat::CellData<double> >
+      boost::shared_ptr<SAMRAI::hier::Patch> patch = *ip;
+      boost::shared_ptr<SAMRAI::pdat::CellData<double> > p =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
         (patch->getPatchData(p_id));
 
-      boost::shared_ptr<geom::CartesianPatchGeometry> geom =
-        boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+      boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+        boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
         (patch->getPatchGeometry());
 
       if(p_initial.empty())
@@ -70,11 +70,11 @@ int SAMRAI::Stokes::FAC::solve()
           for(int d=1;d<dim;++d)
             di[d]=di[d-1]*p_initial_ijk[d-1];
 
-          hier::Box pbox = p->getBox();
-          pdat::CellIterator cend(p->getGhostBox(),false);
-          for(pdat::CellIterator ci(p->getGhostBox(),true); ci!=cend; ci++)
+          SAMRAI::hier::Box pbox = p->getBox();
+          SAMRAI::pdat::CellIterator cend(p->getGhostBox(),false);
+          for(SAMRAI::pdat::CellIterator ci(p->getGhostBox(),true); ci!=cend; ci++)
             {
-              pdat::CellIndex c=*ci;
+              SAMRAI::pdat::CellIndex c=*ci;
               double xyz[dim], weight[dim][2];
               for(int d=0;d<dim;++d)
                 xyz[d]=geom->getXLower()[d]
@@ -127,8 +127,8 @@ int SAMRAI::Stokes::FAC::solve()
             }
         }
 
-      boost::shared_ptr<pdat::SideData<double> > v =
-        boost::dynamic_pointer_cast<pdat::SideData<double> >
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (patch->getPatchData(v_id));
       v->fill(0.0);
     }
@@ -141,7 +141,7 @@ int SAMRAI::Stokes::FAC::solve()
     (p_id,cell_viscosity_id,edge_viscosity_id,dp_id,p_rhs_id,v_id,v_rhs_id,
      d_hierarchy,0,d_hierarchy->getFinestLevelNumber());
 
-  tbox::plog << "solving..." << std::endl;
+  SAMRAI::tbox::plog << "solving..." << std::endl;
   int solver_ret;
   solver_ret = d_stokes_fac_solver.solveSystem(p_id,p_rhs_id,v_id,v_rhs_id);
   /*
@@ -149,7 +149,7 @@ int SAMRAI::Stokes::FAC::solve()
    */
   double avg_factor, final_factor;
   d_stokes_fac_solver.getConvergenceFactors(avg_factor, final_factor);
-  tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
+  SAMRAI::tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
              << "	iterations: "
              << d_stokes_fac_solver.getNumberOfIterations() << "\n"
              << "	residual: "<< d_stokes_fac_solver.getResidualNorm()

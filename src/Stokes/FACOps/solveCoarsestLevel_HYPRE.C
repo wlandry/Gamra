@@ -38,57 +38,52 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
 #ifdef HAVE_HYPRE
-    /*
+/*
 ********************************************************************
 * Solve coarsest level using Hypre                                 *
 * We only solve for the error, so we always use homogeneous bc.    *
 ********************************************************************
 */
 
-    int Stokes::FACOps::solveCoarsestLevel_HYPRE(
-                                                 SAMRAIVectorReal<double>& data,
-                                                 const SAMRAIVectorReal<double>& residual,
-                                                 int coarsest_ln) {
+int Stokes::FACOps::solveCoarsestLevel_HYPRE(
+                                             SAMRAI::solv::SAMRAIVectorReal<double>& data,
+                                             const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+                                             int coarsest_ln) {
 
-      NULL_USE(coarsest_ln);
+  NULL_USE(coarsest_ln);
 
 #ifndef HAVE_HYPRE
-      TBOX_ERROR(d_object_name << ": Coarse level solver choice '"
-                 << d_coarse_solver_choice
-                 << "' unavailable in "
-                 << "Stokes::FACOps::solveCoarsestLevel.");
+  TBOX_ERROR(d_object_name << ": Coarse level solver choice '"
+             << d_coarse_solver_choice
+             << "' unavailable in "
+             << "Stokes::FACOps::solveCoarsestLevel.");
 
-      return 0;
+  return 0;
 
 #else
 
-      d_hypre_solver.setStoppingCriteria(d_coarse_solver_max_iterations,
-                                         d_coarse_solver_tolerance);
-      const int solver_ret =
-        d_hypre_solver.solveSystem(
-                                   data.getComponentDescriptorIndex(0),
-                                   residual.getComponentDescriptorIndex(0),
-                                   true);
-      /*
-       * Present data on the solve.
-       * The Hypre solver returns 0 if converged.
-       */
-      if (d_enable_logging) tbox::plog
-                              << d_object_name << " Hypre solve " << (solver_ret ? "" : "NOT ")
-                              << "converged\n"
-                              << "\titerations: " << d_hypre_solver.getNumberOfIterations() << "\n"
-                              << "\tresidual: " << d_hypre_solver.getRelativeResidualNorm() << "\n";
+  d_hypre_solver.setStoppingCriteria(d_coarse_solver_max_iterations,
+                                     d_coarse_solver_tolerance);
+  const int solver_ret =
+    d_hypre_solver.solveSystem(
+                               data.getComponentDescriptorIndex(0),
+                               residual.getComponentDescriptorIndex(0),
+                               true);
+  /*
+   * Present data on the solve.
+   * The Hypre solver returns 0 if converged.
+   */
+  if (d_enable_logging) SAMRAI::tbox::plog
+                          << d_object_name << " Hypre solve " << (solver_ret ? "" : "NOT ")
+                          << "converged\n"
+                          << "\titerations: " << d_hypre_solver.getNumberOfIterations() << "\n"
+                          << "\tresidual: " << d_hypre_solver.getRelativeResidualNorm() << "\n";
 
-      return !solver_ret;
+  return !solver_ret;
 
 #endif
 
-    }
-#endif
-
-  }
 }
+#endif
+

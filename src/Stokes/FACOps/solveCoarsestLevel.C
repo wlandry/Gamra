@@ -45,9 +45,9 @@
 ********************************************************************
 */
 
-int SAMRAI::solv::Stokes::FACOps::solveCoarsestLevel
-(SAMRAIVectorReal<double>& data,
- const SAMRAIVectorReal<double>& residual,
+int Stokes::FACOps::solveCoarsestLevel
+(SAMRAI::solv::SAMRAIVectorReal<double>& data,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int coarsest_ln)
 {
   t_solve_coarsest->start();

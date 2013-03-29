@@ -1,33 +1,33 @@
 #include "Stokes/FACOps.h"
 #include "Constants.h"
 
-void SAMRAI::solv::Stokes::FACOps::residual_2D
-(pdat::CellData<double> &p,
- pdat::SideData<double> &v,
- pdat::CellData<double> &cell_viscosity,
- pdat::CellData<double> &p_rhs,
- pdat::SideData<double> &v_rhs,
- pdat::CellData<double> &p_resid,
- pdat::SideData<double> &v_resid,
- hier::Patch &patch,
- const hier::Box &pbox,
- const geom::CartesianPatchGeometry &geom)
+void Stokes::FACOps::residual_2D
+(SAMRAI::pdat::CellData<double> &p,
+ SAMRAI::pdat::SideData<double> &v,
+ SAMRAI::pdat::CellData<double> &cell_viscosity,
+ SAMRAI::pdat::CellData<double> &p_rhs,
+ SAMRAI::pdat::SideData<double> &v_rhs,
+ SAMRAI::pdat::CellData<double> &p_resid,
+ SAMRAI::pdat::SideData<double> &v_resid,
+ SAMRAI::hier::Patch &patch,
+ const SAMRAI::hier::Box &pbox,
+ const SAMRAI::geom::CartesianPatchGeometry &geom)
 {
-  const hier::Index ip(1,0), jp(0,1);
+  const SAMRAI::hier::Index ip(1,0), jp(0,1);
 
-  boost::shared_ptr<pdat::NodeData<double> > edge_viscosity_ptr = 
-    boost::dynamic_pointer_cast<pdat::NodeData<double> >
+  boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_viscosity_ptr = 
+    boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
     (patch.getPatchData(edge_viscosity_id));
-  pdat::NodeData<double> &edge_viscosity(*edge_viscosity_ptr);
+  SAMRAI::pdat::NodeData<double> &edge_viscosity(*edge_viscosity_ptr);
 
   double dx = geom.getDx()[0];
   double dy = geom.getDx()[1];
 
-  pdat::CellIterator cend(pbox,false);
-  for(pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
+  SAMRAI::pdat::CellIterator cend(pbox,false);
+  for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
     {
-      pdat::CellIndex center(*ci);
-      pdat::CellIndex up(center), down(center), right(center),
+      SAMRAI::pdat::CellIndex center(*ci);
+      SAMRAI::pdat::CellIndex up(center), down(center), right(center),
         left(center);
 
       ++up[1];
@@ -35,11 +35,11 @@ void SAMRAI::solv::Stokes::FACOps::residual_2D
       ++right[0];
       --left[0];
 
-      const pdat::SideIndex
-        x(center,0,pdat::SideIndex::Lower),
-        y(center,1,pdat::SideIndex::Lower);
-      const pdat::NodeIndex
-        edge(center,pdat::NodeIndex::LowerLeft);
+      const SAMRAI::pdat::SideIndex
+        x(center,0,SAMRAI::pdat::SideIndex::Lower),
+        y(center,1,SAMRAI::pdat::SideIndex::Lower);
+      const SAMRAI::pdat::NodeIndex
+        edge(center,SAMRAI::pdat::NodeIndex::LowerLeft);
 
       /* p */
       if(center[0]!=pbox.upper(0) && center[1]!=pbox.upper(1))

@@ -39,15 +39,15 @@
 */
      
 
-void SAMRAI::geom::Stokes::P_Boundary_Refine::Update_P_2D
-(const pdat::CellIndex &fine,
- const hier::Index &ip, const hier::Index &jp,
+void Stokes::P_Boundary_Refine::Update_P_2D
+(const SAMRAI::pdat::CellIndex &fine,
+ const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
  const int &j, const int &j_max,
  SAMRAI::pdat::CellData<double> &p,
  SAMRAI::pdat::CellData<double> &p_fine) const
 {
-  pdat::CellIndex center(fine);
-  center.coarsen(hier::Index(2,2));
+  SAMRAI::pdat::CellIndex center(fine);
+  center.coarsen(SAMRAI::hier::Index(2,2));
 
     
   /* If we are at an even index, update both of the elements in the cell */

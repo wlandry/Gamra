@@ -43,14 +43,14 @@
 
 /* Set the physical boundaries for the velocity. */
 
-void SAMRAI::solv::Stokes::FACOps::set_boundaries
+void Stokes::FACOps::set_boundaries
 (const int &p_id, const int &v_id,
- boost::shared_ptr<hier::PatchLevel> &level, const bool &rhs)
+ boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
 {
-  for (hier::PatchLevel::Iterator pi(level->begin());
+  for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
        pi!=level->end(); pi++)
     {
-      boost::shared_ptr<hier::Patch> patch = *pi;
+      boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
       Stokes_set_boundary(*patch,p_id,v_id,rhs);
     }
 }

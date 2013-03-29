@@ -15,21 +15,15 @@
 
 #include IOMANIP_HEADER_FILE
 
-namespace SAMRAI {
-  namespace solv {
-
-
-    void Stokes::FACSolver::setBcObject(const RobinBcCoefStrategy* bc_object)
-    {
+void Stokes::FACSolver::setBcObject(const SAMRAI::solv::RobinBcCoefStrategy*
+                                    bc_object)
+{
 #ifdef DEBUG_CHECK_ASSERTIONS
-      if (!bc_object) {
-        TBOX_ERROR(d_object_name << ": NULL pointer for boundary condition\n"
-                   << "object.\n");
-      }
-#endif
-      d_bc_object = bc_object;
-      // d_fac_ops.setPhysicalBcCoefObject(d_bc_object);
-    }
-
+  if (!bc_object) {
+    TBOX_ERROR(d_object_name << ": NULL pointer for boundary condition\n"
+               << "object.\n");
   }
+#endif
+  d_bc_object = bc_object;
+  // d_fac_ops.setPhysicalBcCoefObject(d_bc_object);
 }

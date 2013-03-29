@@ -15,19 +15,13 @@
 
 #include IOMANIP_HEADER_FILE
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ***********************************************************************
 * Delete the vector wrappers.  Do not freeVectorComponents because    *
 * we do not control their data allocation.  The user does that.       *
 ***********************************************************************
 */
-    void Stokes::FACSolver::destroyVectorWrappers() {
-      d_uv.reset();
-      d_fv.reset();
-    }
-
-  }
+void Stokes::FACSolver::destroyVectorWrappers() {
+  d_uv.reset();
+  d_fv.reset();
 }

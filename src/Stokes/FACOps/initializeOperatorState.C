@@ -20,20 +20,20 @@
 ************************************************************************
 */
 
-void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
-(const SAMRAIVectorReal<double>& solution,
- const SAMRAIVectorReal<double>& rhs)
+void Stokes::FACOps::initializeOperatorState
+(const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& rhs)
 {
   deallocateOperatorState();
   int ln;
-  hier::VariableDatabase* vdb = hier::VariableDatabase::getDatabase();
+  SAMRAI::hier::VariableDatabase* vdb = SAMRAI::hier::VariableDatabase::getDatabase();
 
   d_hierarchy = solution.getPatchHierarchy();
   d_ln_min = solution.getCoarsestLevelNumber();
   d_ln_max = solution.getFinestLevelNumber();
-  d_hopscell = boost::make_shared<math::HierarchyCellDataOpsReal<double> >
+  d_hopscell = boost::make_shared<SAMRAI::math::HierarchyCellDataOpsReal<double> >
     (d_hierarchy,d_ln_min,d_ln_max);
-  d_hopsside = boost::make_shared<math::HierarchySideDataOpsReal<double> >
+  d_hopsside = boost::make_shared<SAMRAI::math::HierarchySideDataOpsReal<double> >
     (d_hierarchy,d_ln_min,d_ln_max);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -72,7 +72,7 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
    *   are allocated
    *   has sufficient ghost width
    */
-  boost::shared_ptr<hier::Variable> var;
+  boost::shared_ptr<SAMRAI::hier::Variable> var;
   {
     vdb->mapIndexToVariable(rhs.getComponentDescriptorIndex(0),
                             var);
@@ -80,8 +80,8 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name << ": RHS component does not\n"
                  << "correspond to a variable.\n");
     }
-    boost::shared_ptr<pdat::CellVariable<double> > cell_var =
-      boost::dynamic_pointer_cast<pdat::CellVariable<double> >
+    boost::shared_ptr<SAMRAI::pdat::CellVariable<double> > cell_var =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellVariable<double> >
       (var);
     if (!cell_var) {
       TBOX_ERROR(d_object_name
@@ -95,8 +95,8 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
       TBOX_ERROR(d_object_name << ": Solution component does not\n"
                  << "correspond to a variable.\n");
     }
-    boost::shared_ptr<pdat::CellVariable<double> > cell_var =
-      boost::dynamic_pointer_cast<pdat::CellVariable<double> >
+    boost::shared_ptr<SAMRAI::pdat::CellVariable<double> > cell_var =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellVariable<double> >
       (var);
     if (!cell_var) {
       TBOX_ERROR(d_object_name
@@ -104,19 +104,19 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
     }
   }
   for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-    boost::shared_ptr<hier::PatchLevel> level_ptr =
+    boost::shared_ptr<SAMRAI::hier::PatchLevel> level_ptr =
       d_hierarchy->getPatchLevel(ln);
-    hier::PatchLevel& level = *level_ptr;
-    for (hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); pi++) {
-      hier::Patch& patch = **pi;
-      boost::shared_ptr<hier::PatchData> fd =
+    SAMRAI::hier::PatchLevel& level = *level_ptr;
+    for (SAMRAI::hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); pi++) {
+      SAMRAI::hier::Patch& patch = **pi;
+      boost::shared_ptr<SAMRAI::hier::PatchData> fd =
         patch.getPatchData(rhs.getComponentDescriptorIndex(0));
       if (fd) {
         /*
          * Some data checks can only be done if the data already exists.
          */
-        boost::shared_ptr<pdat::CellData<double> > cd =
-          boost::dynamic_pointer_cast<pdat::CellData<double> >
+        boost::shared_ptr<SAMRAI::pdat::CellData<double> > cd =
+          boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
           (fd);
         if (!cd) {
           TBOX_ERROR(d_object_name
@@ -128,14 +128,14 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
                        << "Solver is for depth 0 only.\n");
         }
       }
-      boost::shared_ptr<hier::PatchData> ud =
+      boost::shared_ptr<SAMRAI::hier::PatchData> ud =
         patch.getPatchData(solution.getComponentDescriptorIndex(0));
       if (ud) {
         /*
          * Some data checks can only be done if the data already exists.
          */
-        boost::shared_ptr<pdat::CellData<double> > cd =
-          boost::dynamic_pointer_cast<pdat::CellData<double> >
+        boost::shared_ptr<SAMRAI::pdat::CellData<double> > cd =
+          boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
           (ud);
         if (!cd) {
           TBOX_ERROR(d_object_name
@@ -146,7 +146,7 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
                        << ": Solution data has multiple depths.\n"
                        << "Solver is for depth 0 only.\n");
         }
-        if (cd->getGhostCellWidth() < hier::IntVector::getOne(d_dim)) {
+        if (cd->getGhostCellWidth() < SAMRAI::hier::IntVector::getOne(d_dim)) {
           TBOX_ERROR(d_object_name
                      << ": Solution data has insufficient ghost width\n");
         }
@@ -172,9 +172,9 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
    */
   d_cf_boundary.resizeArray(d_hierarchy->getNumberOfLevels());
 
-  hier::IntVector max_gcw(d_dim, 1);
+  SAMRAI::hier::IntVector max_gcw(d_dim, 1);
   for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-    d_cf_boundary[ln] = boost::make_shared<hier::CoarseFineBoundary>
+    d_cf_boundary[ln] = boost::make_shared<SAMRAI::hier::CoarseFineBoundary>
       (*d_hierarchy,ln,max_gcw);
   }
 
@@ -196,10 +196,10 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
    * Get the transfer operators.
    * Cell (solution, error, etc) coarsening is conservative.
    */
-  boost::shared_ptr<geom::CartesianGridGeometry> geometry =
-    boost::dynamic_pointer_cast<geom::CartesianGridGeometry>
+  boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry> geometry =
+    boost::dynamic_pointer_cast<SAMRAI::geom::CartesianGridGeometry>
     (d_hierarchy->getGridGeometry());
-  boost::shared_ptr<hier::Variable> variable;
+  boost::shared_ptr<SAMRAI::hier::Variable> variable;
 
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_prolongation_refine_operator =
@@ -286,13 +286,13 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
   v_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   v_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
 
-  xfer::RefineAlgorithm p_prolongation_refine_algorithm(d_dim),
+  SAMRAI::xfer::RefineAlgorithm p_prolongation_refine_algorithm(d_dim),
     v_prolongation_refine_algorithm(d_dim),
     p_ghostfill_refine_algorithm(d_dim),
     v_ghostfill_refine_algorithm(d_dim),
     p_nocoarse_refine_algorithm(d_dim),
     v_nocoarse_refine_algorithm(d_dim);
-  xfer::CoarsenAlgorithm p_urestriction_coarsen_algorithm(d_dim),
+  SAMRAI::xfer::CoarsenAlgorithm p_urestriction_coarsen_algorithm(d_dim),
     p_rrestriction_coarsen_algorithm(d_dim),
     v_urestriction_coarsen_algorithm(d_dim),
     v_rrestriction_coarsen_algorithm(d_dim);
@@ -344,23 +344,23 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
     registerRefine(solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
                    solution.getComponentDescriptorIndex(0),
-                   boost::shared_ptr<hier::RefineOperator>());
+                   boost::shared_ptr<SAMRAI::hier::RefineOperator>());
   v_nocoarse_refine_algorithm.
     registerRefine(solution.getComponentDescriptorIndex(1),
                    solution.getComponentDescriptorIndex(1),
                    solution.getComponentDescriptorIndex(1),
-                   boost::shared_ptr<hier::RefineOperator>());
+                   boost::shared_ptr<SAMRAI::hier::RefineOperator>());
 
   /* Refinement and ghost fill operators */
   for (int dest_ln = d_ln_min + 1; dest_ln <= d_ln_max; ++dest_ln) {
 
-    boost::shared_ptr<xfer::PatchLevelFullFillPattern>
-      fill_pattern(new xfer::PatchLevelFullFillPattern());
+    boost::shared_ptr<SAMRAI::xfer::PatchLevelFullFillPattern>
+      fill_pattern(new SAMRAI::xfer::PatchLevelFullFillPattern());
     p_prolongation_refine_schedules[dest_ln] =
       p_prolongation_refine_algorithm.
       createSchedule(fill_pattern,
                      d_hierarchy->getPatchLevel(dest_ln),
-                     boost::shared_ptr<hier::PatchLevel>(),
+                     boost::shared_ptr<SAMRAI::hier::PatchLevel>(),
                      dest_ln - 1,
                      d_hierarchy);
     if (!p_prolongation_refine_schedules[dest_ln]) {
@@ -371,7 +371,7 @@ void SAMRAI::solv::Stokes::FACOps::initializeOperatorState
       v_prolongation_refine_algorithm.
       createSchedule(fill_pattern,
                      d_hierarchy->getPatchLevel(dest_ln),
-                     boost::shared_ptr<hier::PatchLevel>(),
+                     boost::shared_ptr<SAMRAI::hier::PatchLevel>(),
                      dest_ln - 1,
                      d_hierarchy);
     if (!v_prolongation_refine_schedules[dest_ln]) {

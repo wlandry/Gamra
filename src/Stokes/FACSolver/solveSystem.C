@@ -28,7 +28,7 @@
 *************************************************************************
 */
 
-bool SAMRAI::solv::Stokes::FACSolver::solveSystem(const int p,
+bool Stokes::FACSolver::solveSystem(const int p,
                                                   const int p_rhs,
                                                   const int v, const int v_rhs)
 {
@@ -80,7 +80,7 @@ bool SAMRAI::solv::Stokes::FACSolver::solveSystem(const int p,
 *************************************************************************
 */
 
-bool SAMRAI::solv::Stokes::FACSolver::solveSystem
+bool Stokes::FACSolver::solveSystem
 (const int p,
  const int cell_viscosity,
  const int edge_viscosity,
@@ -88,7 +88,7 @@ bool SAMRAI::solv::Stokes::FACSolver::solveSystem
  const int p_rhs,
  const int v,
  const int v_rhs,
- boost::shared_ptr<hier::PatchHierarchy>
+ boost::shared_ptr<SAMRAI::hier::PatchHierarchy>
  hierarchy,
  int coarse_ln,
  int fine_ln)
@@ -97,7 +97,7 @@ bool SAMRAI::solv::Stokes::FACSolver::solveSystem
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
 
   if (d_enable_logging) {
-    tbox::plog << "Stokes::FACSolver::solveSystem (" << d_object_name
+    SAMRAI::tbox::plog << "Stokes::FACSolver::solveSystem (" << d_object_name
                << ")\n";
   }
 #ifdef DEBUG_CHECK_ASSERTIONS

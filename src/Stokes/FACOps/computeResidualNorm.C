@@ -1,7 +1,7 @@
 #include "Stokes/FACOps.h"
 
-double SAMRAI::solv::Stokes::FACOps::computeResidualNorm
-(const SAMRAIVectorReal<double>& residual,
+double Stokes::FACOps::computeResidualNorm
+(const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int fine_ln,
  int coarse_ln)
 {

@@ -18,20 +18,20 @@
 * Fill the rhs and exact solution.                                      *
 *************************************************************************
 */
-void SAMRAI::Stokes::FAC::initializeLevelData
-(const boost::shared_ptr<hier::PatchHierarchy>& patch_hierarchy,
+void Stokes::FAC::initializeLevelData
+(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& patch_hierarchy,
  const int level_number,
  const double ,
  const bool ,
  const bool ,
- const boost::shared_ptr<hier::PatchLevel>& ,
+ const boost::shared_ptr<SAMRAI::hier::PatchLevel>& ,
  const bool allocate_data)
 {
-  boost::shared_ptr<hier::PatchHierarchy> hierarchy = patch_hierarchy;
-  boost::shared_ptr<geom::CartesianGridGeometry> grid_geom =
-    boost::dynamic_pointer_cast<geom::CartesianGridGeometry>(hierarchy->getGridGeometry());
+  boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy = patch_hierarchy;
+  boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry> grid_geom =
+    boost::dynamic_pointer_cast<SAMRAI::geom::CartesianGridGeometry>(hierarchy->getGridGeometry());
 
-  boost::shared_ptr<hier::PatchLevel> level =
+  boost::shared_ptr<SAMRAI::hier::PatchLevel> level =
     hierarchy->getPatchLevel(level_number);
   const int dim=d_dim.getValue();
 
@@ -49,27 +49,27 @@ void SAMRAI::Stokes::FAC::initializeLevelData
   /*
    * Initialize data in all patches in the level.
    */
-  hier::PatchLevel::Iterator pi(level->begin());
+  SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
   for (; pi!=level->end(); pi++) {
 
-    boost::shared_ptr<hier::Patch> patch = *pi;
+    boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
     if (!patch) {
       TBOX_ERROR(d_object_name
                  << ": Cannot find patch.  Null patch pointer.");
     }
-    boost::shared_ptr<geom::CartesianPatchGeometry> geom =
-      boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>(patch->getPatchGeometry());
+    boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+      boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>(patch->getPatchGeometry());
     const double *dx=geom->getDx();
 
     /* Initialize cell viscosity */
-    boost::shared_ptr<pdat::CellData<double> > cell_viscosity =
-      boost::dynamic_pointer_cast<pdat::CellData<double> >(patch->getPatchData(cell_viscosity_id));
+    boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_viscosity =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch->getPatchData(cell_viscosity_id));
 
-    hier::Box cell_visc_box = cell_viscosity->getBox();
-    pdat::CellIterator cend(cell_viscosity->getGhostBox(),false);
-    for(pdat::CellIterator ci(cell_viscosity->getGhostBox(),true); ci!=cend; ci++)
+    SAMRAI::hier::Box cell_visc_box = cell_viscosity->getBox();
+    SAMRAI::pdat::CellIterator cend(cell_viscosity->getGhostBox(),false);
+    for(SAMRAI::pdat::CellIterator ci(cell_viscosity->getGhostBox(),true); ci!=cend; ci++)
       {
-        pdat::CellIndex c=*ci;
+        SAMRAI::pdat::CellIndex c=*ci;
         double xyz[dim];
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
@@ -88,17 +88,17 @@ void SAMRAI::Stokes::FAC::initializeLevelData
       }
 
     /* I do not think this is actually necessary. */
-    boost::shared_ptr<pdat::CellData<double> > dp_data =
-      boost::dynamic_pointer_cast<pdat::CellData<double> >(patch->getPatchData(dp_id));
+    boost::shared_ptr<SAMRAI::pdat::CellData<double> > dp_data =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch->getPatchData(dp_id));
     dp_data->fill(0.0);
 
-    boost::shared_ptr<pdat::CellData<double> > p_rhs_data =
-      boost::dynamic_pointer_cast<pdat::CellData<double> >(patch->getPatchData(p_rhs_id));
+    boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_rhs_data =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch->getPatchData(p_rhs_id));
     p_rhs_data->fill(0.0);
 
     /* v_rhs */
-    boost::shared_ptr<pdat::SideData<double> > v_rhs_data =
-      boost::dynamic_pointer_cast<pdat::SideData<double> >(patch->getPatchData(v_rhs_id));
+    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_data =
+      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >(patch->getPatchData(v_rhs_id));
 
     if(v_rhs.empty())
       {
@@ -106,17 +106,17 @@ void SAMRAI::Stokes::FAC::initializeLevelData
       }
     else
       {
-        hier::Box pbox = v_rhs_data->getBox();
+        SAMRAI::hier::Box pbox = v_rhs_data->getBox();
         int ix_offset(0);
         for(int ix=0;ix<dim;++ix)
           {
             double offset[]={0.5,0.5,0.5};
             offset[ix]=0;
 
-            pdat::SideIterator send(pbox,ix,false);
-            for(pdat::SideIterator si(pbox,ix,true); si!=send; si++)
+            SAMRAI::pdat::SideIterator send(pbox,ix,false);
+            for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=send; si++)
               {
-                pdat::SideIndex s=*si;
+                SAMRAI::pdat::SideIndex s=*si;
                 double xyz[dim];
                 for(int d=0;d<dim;++d)
                   xyz[d]=geom->getXLower()[d]

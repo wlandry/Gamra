@@ -38,17 +38,11 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    void
-    Stokes::FACOps::finalizeCallback()
-    {
-      for (int d = 0; d < tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
-        s_cell_scratch_var[d].reset();
-        s_side_scratch_var[d].reset();
-      }
-    }
-
+void
+Stokes::FACOps::finalizeCallback()
+{
+  for (int d = 0; d < SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
+    s_cell_scratch_var[d].reset();
+    s_side_scratch_var[d].reset();
   }
 }

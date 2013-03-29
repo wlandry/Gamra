@@ -2,31 +2,31 @@
 #include "Stokes/set_boundary.h"
 #include "Constants.h"
 
-void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
-(hier::Patch& fine,
- const hier::Patch& coarse,
+void Stokes::P_Boundary_Refine::refine
+(SAMRAI::hier::Patch& fine,
+ const SAMRAI::hier::Patch& coarse,
  const int dst_component,
  const int src_component,
- const hier::BoxOverlap& overlap,
- const hier::IntVector&) const
+ const SAMRAI::hier::BoxOverlap& overlap,
+ const SAMRAI::hier::IntVector&) const
 {
-  const pdat::CellOverlap* t_overlap =
-    dynamic_cast<const pdat::CellOverlap *>(&overlap);
-  const hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
-  const tbox::Dimension& dimension(getDim());
+  const SAMRAI::pdat::CellOverlap* t_overlap =
+    dynamic_cast<const SAMRAI::pdat::CellOverlap *>(&overlap);
+  const SAMRAI::hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
+  const SAMRAI::tbox::Dimension& dimension(getDim());
   const int dim(dimension.getValue());
 
   Stokes_set_boundary(coarse,src_component,invalid_id,true);
 
-  for (hier::BoxContainer::const_iterator b(boxes.begin()); b!=boxes.end(); b++)
+  for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin()); b!=boxes.end(); b++)
     {
-      const hier::Box &overlap_box=*b;
+      const SAMRAI::hier::Box &overlap_box=*b;
 
-      boost::shared_ptr<pdat::CellData<double> > p =
-        boost::dynamic_pointer_cast<pdat::CellData<double> >
+      boost::shared_ptr<SAMRAI::pdat::CellData<double> > p =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
         (coarse.getPatchData(src_component));
-      boost::shared_ptr<pdat::CellData<double> > p_fine =
-        boost::dynamic_pointer_cast<pdat::CellData<double> >
+      boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_fine =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
         (fine.getPatchData(dst_component));
 #ifdef DEBUG_CHECK_ASSERTIONS
       TBOX_ASSERT(p);
@@ -35,8 +35,8 @@ void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
       TBOX_ASSERT(p->getDepth() == 1);
 #endif
 
-      hier::Box fine_box=fine.getBox();
-      hier::Box gbox=p_fine->getGhostBox();
+      SAMRAI::hier::Box fine_box=fine.getBox();
+      SAMRAI::hier::Box gbox=p_fine->getGhostBox();
 
       /* We have to infer where the boundary is from the boxes */
       int boundary_direction(-1);
@@ -57,14 +57,14 @@ void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
             }
         }
 
-      hier::Index p_min(dimension), p_max(dimension);
+      SAMRAI::hier::Index p_min(dimension), p_max(dimension);
       for(int d=0;d<dim;++d)
         {
           p_min[d]=std::max(overlap_box.lower(d),gbox.lower(d));
           p_max[d]=std::min(overlap_box.upper(d),gbox.upper(d));
         }
 
-      hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+      SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
       ip[0]=1;
       jp[1]=1;
       if(dim>2)
@@ -82,7 +82,7 @@ void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
           for(int j=p_min[1]; j<=p_max[1]; j=(j/2)*2+2)
             for(int i=p_min[0]; i<=p_max[0]; i=(i/2)*2+2)
               {
-                pdat::CellIndex fine(hier::Index(i,j));
+                SAMRAI::pdat::CellIndex fine(SAMRAI::hier::Index(i,j));
         
                 switch(boundary_direction)
                   {
@@ -103,7 +103,7 @@ void SAMRAI::geom::Stokes::P_Boundary_Refine::refine
             for(int j=p_min[1]; j<=p_max[1]; ++j)
               for(int i=p_min[0]; i<=p_max[0]; ++i)
                 {
-                  pdat::CellIndex fine(hier::Index(i,j,k));
+                  SAMRAI::pdat::CellIndex fine(SAMRAI::hier::Index(i,j,k));
         
                   switch(boundary_direction)
                     {

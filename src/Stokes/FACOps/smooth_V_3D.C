@@ -7,27 +7,28 @@
 * Gauss-Seidel iteration.  *
 ********************************************************************
 */
-void SAMRAI::solv::Stokes::FACOps::smooth_V_3D
+void Stokes::FACOps::smooth_V_3D
 (const int &ix,
- const hier::Box &pbox,
- boost::shared_ptr<geom::CartesianPatchGeometry> &geom,
- pdat::CellData<double> &p,
- pdat::SideData<double> &v,
- pdat::SideData<double> &v_rhs,
- pdat::CellData<double> &cell_viscosity,
- pdat::EdgeData<double> &edge_viscosity,
- const pdat::CellIndex &center,
+ const SAMRAI::hier::Box &pbox,
+ boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom,
+ SAMRAI::pdat::CellData<double> &p,
+ SAMRAI::pdat::SideData<double> &v,
+ SAMRAI::pdat::SideData<double> &v_rhs,
+ SAMRAI::pdat::CellData<double> &cell_viscosity,
+ SAMRAI::pdat::EdgeData<double> &edge_viscosity,
+ const SAMRAI::pdat::CellIndex &center,
  const double Dx[3],
  const double &theta_momentum,
- const hier::Index pp[3],
+ const SAMRAI::hier::Index pp[3],
  double &maxres)
 {
   const int iy((ix+1)%3), iz((ix+2)%3);
-  const pdat::SideIndex x(center,ix,pdat::SideIndex::Lower),
-    y(center,iy,pdat::SideIndex::Lower),
-    z(center,iz,pdat::SideIndex::Lower);
-  const pdat::EdgeIndex edge_y(center,iy,pdat::EdgeIndex::LowerLeft),
-    edge_z(center,iz,pdat::EdgeIndex::LowerLeft);
+  const SAMRAI::pdat::SideIndex x(center,ix,SAMRAI::pdat::SideIndex::Lower),
+    y(center,iy,SAMRAI::pdat::SideIndex::Lower),
+    z(center,iz,SAMRAI::pdat::SideIndex::Lower);
+  const SAMRAI::pdat::EdgeIndex
+    edge_y(center,iy,SAMRAI::pdat::EdgeIndex::LowerLeft),
+    edge_z(center,iz,SAMRAI::pdat::EdgeIndex::LowerLeft);
     
   /* If at a Dirichlet 'x' boundary, leave vx as is */
   if(!((center[ix]==pbox.lower(ix) && v(x-pp[ix])==boundary_value)
@@ -35,7 +36,7 @@ void SAMRAI::solv::Stokes::FACOps::smooth_V_3D
     {
       /* If at the boundary, set things up so that the derivative does
          not change. */
-      hier::Index offset(0,0,0);
+      SAMRAI::hier::Index offset(0,0,0);
       offset[ix]=2;
       bool set_lower_boundary(false), set_upper_boundary(false);
       double dv_lower(0), dv_upper(0);

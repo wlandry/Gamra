@@ -44,9 +44,9 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::Stokes::FACOps::restrictResidual
-(const SAMRAIVectorReal<double>& s,
- SAMRAIVectorReal<double>& d,
+void Stokes::FACOps::restrictResidual
+(const SAMRAI::solv::SAMRAIVectorReal<double>& s,
+ SAMRAI::solv::SAMRAIVectorReal<double>& d,
  int dest_ln)
 {
   t_restrict_residual->start();

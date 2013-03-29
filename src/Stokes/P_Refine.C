@@ -19,41 +19,41 @@
 #include "SAMRAI/pdat/CellVariable.h"
 #include "SAMRAI/tbox/Utilities.h"
 
-void SAMRAI::geom::Stokes::P_Refine::refine(
-   hier::Patch& fine,
-   const hier::Patch& coarse,
+void Stokes::P_Refine::refine(
+   SAMRAI::hier::Patch& fine,
+   const SAMRAI::hier::Patch& coarse,
    const int dst_component,
    const int src_component,
-   const hier::BoxOverlap& fine_overlap,
-   const hier::IntVector& ratio) const
+   const SAMRAI::hier::BoxOverlap& fine_overlap,
+   const SAMRAI::hier::IntVector& ratio) const
 {
-   const pdat::CellOverlap* t_overlap =
-      dynamic_cast<const pdat::CellOverlap *>(&fine_overlap);
+  const SAMRAI::pdat::CellOverlap* t_overlap =
+    dynamic_cast<const SAMRAI::pdat::CellOverlap *>(&fine_overlap);
 
    TBOX_ASSERT(t_overlap);
 
-   const hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
-   for (hier::BoxContainer::const_iterator b(boxes.begin());
+   const SAMRAI::hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
+   for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
         b!=boxes.end(); b++) {
       refine(fine,coarse,dst_component,src_component,*b,ratio);
    }
 }
 
-void SAMRAI::geom::Stokes::P_Refine::refine(
-   hier::Patch& fine_patch,
-   const hier::Patch& coarse_patch,
+void Stokes::P_Refine::refine(
+   SAMRAI::hier::Patch& fine_patch,
+   const SAMRAI::hier::Patch& coarse_patch,
    const int dst_component,
    const int src_component,
-   const hier::Box& fine_box,
-   const hier::IntVector&) const
+   const SAMRAI::hier::Box& fine_box,
+   const SAMRAI::hier::IntVector&) const
 {
-   const tbox::Dimension& dim(getDim());
+  const SAMRAI::tbox::Dimension& dim(getDim());
 
-   boost::shared_ptr<pdat::CellData<double> > p =
-     boost::dynamic_pointer_cast<pdat::CellData<double> >
+  boost::shared_ptr<SAMRAI::pdat::CellData<double> > p =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
      (coarse_patch.getPatchData(src_component));
-   boost::shared_ptr<pdat::CellData<double> > p_fine = 
-     boost::dynamic_pointer_cast<pdat::CellData<double> >
+  boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_fine = 
+    boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
      (fine_patch.getPatchData(dst_component));
 #ifdef DEBUG_CHECK_ASSERTIONS
    TBOX_ASSERT(p);
@@ -61,18 +61,18 @@ void SAMRAI::geom::Stokes::P_Refine::refine(
    TBOX_ASSERT(p->getDepth() == p_fine->getDepth());
 #endif
 
-   hier::Box coarse_box=coarse_patch.getBox();
-   boost::shared_ptr<geom::CartesianPatchGeometry> geom =
-     boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+   SAMRAI::hier::Box coarse_box=coarse_patch.getBox();
+   boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
      (coarse_patch.getPatchGeometry());
 
-   pdat::CellIterator cend(fine_box,false);
-   for(pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
+   SAMRAI::pdat::CellIterator cend(fine_box,false);
+   for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
      {
-       pdat::CellIndex fine(*ci);
+       SAMRAI::pdat::CellIndex fine(*ci);
 
-       pdat::CellIndex
-         center(hier::Index::coarsen(fine,hier::Index::getOneIndex(dim)*2));
+       SAMRAI::pdat::CellIndex
+         center(SAMRAI::hier::Index::coarsen(fine,SAMRAI::hier::Index::getOneIndex(dim)*2));
 
        /* Pressure is cell-centered, so prolongation is a
           linear interpolation from nearby cells. */
@@ -90,7 +90,7 @@ void SAMRAI::geom::Stokes::P_Refine::refine(
        (*p_fine)(fine)=(*p)(center);
        for(int d=0; d<dim.getValue(); ++d)
          {
-           hier::Index ip(hier::Index::getZeroIndex(dim));
+           SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dim));
            ip[d]=1;
            double dp;
            if(center[d]==coarse_box.lower(d)

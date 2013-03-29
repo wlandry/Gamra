@@ -46,9 +46,9 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::Stokes::FACOps::restrictSolution
-(const SAMRAIVectorReal<double>& s,
- SAMRAIVectorReal<double>& d,
+void Stokes::FACOps::restrictSolution
+(const SAMRAI::solv::SAMRAIVectorReal<double>& s,
+ SAMRAI::solv::SAMRAIVectorReal<double>& d,
  int dest_ln)
 {
   t_restrict_solution->start();
@@ -64,7 +64,7 @@ void SAMRAI::solv::Stokes::FACOps::restrictSolution
 
   xeqScheduleURestriction(p_dst,p_src,v_dst,v_src,dest_ln);
 
-  boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(dest_ln);
+  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(dest_ln);
   set_boundaries(p_dst,v_dst,level,false);
   // v_refine_patch_strategy.setHomogeneousBc(false);
   p_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));

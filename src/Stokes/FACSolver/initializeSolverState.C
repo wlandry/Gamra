@@ -28,7 +28,7 @@
 *************************************************************************
 */
 
-void SAMRAI::solv::Stokes::FACSolver::initializeSolverState
+void Stokes::FACSolver::initializeSolverState
 (const int p,
  const int cell_viscosity,
  const int edge_viscosity,
@@ -36,7 +36,7 @@ void SAMRAI::solv::Stokes::FACSolver::initializeSolverState
  const int p_rhs,
  const int v,
  const int v_rhs,
- boost::shared_ptr<hier::PatchHierarchy> hierarchy,
+ boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
  const int coarse_level,
  const int fine_level)
 {

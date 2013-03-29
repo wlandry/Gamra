@@ -7,197 +7,193 @@
  * Description:   Operator class for solving scalar Stokes using FAC 
  *
  ************************************************************************/
-namespace SAMRAI {
-namespace solv {
 namespace Stokes {
 
-inline
-void FACOps::setPreconditioner(
-   const FACPreconditioner* preconditioner) {
-   d_preconditioner = preconditioner;
-}
+  inline
+  void FACOps::setPreconditioner(
+                                 const SAMRAI::solv::FACPreconditioner* preconditioner) {
+    d_preconditioner = preconditioner;
+  }
 
 #ifdef HAVE_HYPRE
-inline
-void FACOps::setUseSMG(
-   bool use_smg)
-{
-   if (d_hierarchy) {
+  inline
+  void FACOps::setUseSMG(
+                         bool use_smg)
+  {
+    if (d_hierarchy) {
       TBOX_ERROR(
-         d_object_name << ": setUseSMG(bool) may NOT be called\n"
-         <<
-         "while the solver state is initialized, as that\n"
-         << "would lead to a corrupted solver state.\n");
-   }
-   d_hypre_solver.setUseSMG(use_smg);
-}
+                 d_object_name << ": setUseSMG(bool) may NOT be called\n"
+                 <<
+                 "while the solver state is initialized, as that\n"
+                 << "would lead to a corrupted solver state.\n");
+    }
+    d_hypre_solver.setUseSMG(use_smg);
+  }
 #endif
 
-/*
- ********************************************************************
- * Set the physical boundary condition object.                      *
- ********************************************************************
- */
+  /*
+********************************************************************
+* Set the physical boundary condition object.                      *
+********************************************************************
+*/
 
-// inline
-// void FACOps::setPhysicalBcCoefObject(
-//    const RobinBcCoefStrategy* physical_bc_coef)
-// {
-//    d_physical_bc_coef = physical_bc_coef;
-//    // d_bc_helper.setCoefImplementation(physical_bc_coef);
-// #ifdef HAVE_HYPRE
-//    d_hypre_solver.setPhysicalBcCoefObject(d_physical_bc_coef);
-// #endif
-// }
+  // inline
+  // void FACOps::setPhysicalBcCoefObject(
+  //    const RobinBcCoefStrategy* physical_bc_coef)
+  // {
+  //    d_physical_bc_coef = physical_bc_coef;
+  //    // d_bc_helper.setCoefImplementation(physical_bc_coef);
+  // #ifdef HAVE_HYPRE
+  //    d_hypre_solver.setPhysicalBcCoefObject(d_physical_bc_coef);
+  // #endif
+  // }
 
-/*
- ********************************************************************
- ********************************************************************
- */
+  /*
+********************************************************************
+********************************************************************
+*/
 
-inline
-void FACOps::enableLogging(
-   bool enable_logging)
-{
-   d_enable_logging = enable_logging;
-}
+  inline
+  void FACOps::enableLogging(
+                             bool enable_logging)
+  {
+    d_enable_logging = enable_logging;
+  }
 
-/*
- ********************************************************************
- * Set the choice for smoothing algorithm.                          *
- ********************************************************************
- */
+  /*
+********************************************************************
+* Set the choice for smoothing algorithm.                          *
+********************************************************************
+*/
 
-inline
-void FACOps::setSmoothingChoice(
-   const std::string& smoothing_choice)
-{
+  inline
+  void FACOps::setSmoothingChoice(
+                                  const std::string& smoothing_choice)
+  {
 #ifdef DEBUG_CHECK_ASSERTIONS
-   if (smoothing_choice != "Tackley" && smoothing_choice != "Gerya") {
+    if (smoothing_choice != "Tackley" && smoothing_choice != "Gerya") {
       TBOX_ERROR(d_object_name << ": Bad smoothing choice '"
-                               << smoothing_choice
-                               << "' in Stokes::FACOps::setSmoothingChoice.");
-   }
+                 << smoothing_choice
+                 << "' in Stokes::FACOps::setSmoothingChoice.");
+    }
 #endif
-   d_smoothing_choice = smoothing_choice;
-}
+    d_smoothing_choice = smoothing_choice;
+  }
 
-/*
- ********************************************************************
- * Set the choice for the coarse level solver.                      *
- ********************************************************************
- */
+  /*
+********************************************************************
+* Set the choice for the coarse level solver.                      *
+********************************************************************
+*/
 
-inline
-void FACOps::setCoarsestLevelSolverChoice(
-   const std::string& choice) {
+  inline
+  void FACOps::setCoarsestLevelSolverChoice(
+                                            const std::string& choice) {
 #ifdef DEBUG_CHECK_ASSERTIONS
 #ifndef HAVE_HYPRE
-   if (choice == "hypre") {
+    if (choice == "hypre") {
       TBOX_ERROR(d_object_name << ": HYPRe library is not available.\n");
-   }
+    }
 #endif
 #endif
-   if (choice == "Tackley"
-       || choice == "Gerya"
-       || choice == "hypre") {
+    if (choice == "Tackley"
+        || choice == "Gerya"
+        || choice == "hypre") {
       d_coarse_solver_choice = choice;
-   } else {
+    } else {
       TBOX_ERROR(
-         d_object_name << ": Bad coarse level solver choice '"
-         << choice
-         <<
-         "' in Stokes::FACOps::setCoarseLevelSolverChoice.");
-   }
-}
+                 d_object_name << ": Bad coarse level solver choice '"
+                 << choice
+                 <<
+                 "' in Stokes::FACOps::setCoarseLevelSolverChoice.");
+    }
+  }
 
-/*
- ********************************************************************
- * Set the tolerance for the coarse level solver.                   *
- ********************************************************************
- */
+  /*
+********************************************************************
+* Set the tolerance for the coarse level solver.                   *
+********************************************************************
+*/
 
-inline
-void FACOps::setCoarsestLevelSolverTolerance(
-   double tol) {
-   d_coarse_solver_tolerance = tol;
-}
+  inline
+  void FACOps::setCoarsestLevelSolverTolerance(
+                                               double tol) {
+    d_coarse_solver_tolerance = tol;
+  }
 
-/*
- ********************************************************************
- * Set the tolerance for the coarse level solver.                   *
- ********************************************************************
- */
+  /*
+********************************************************************
+* Set the tolerance for the coarse level solver.                   *
+********************************************************************
+*/
 
-inline
-void FACOps::setCoarsestLevelSolverMaxIterations(
-   int max_iterations) {
+  inline
+  void FACOps::setCoarsestLevelSolverMaxIterations(
+                                                   int max_iterations) {
 #ifdef DEBUG_CHECK_ASSERTIONS
-   if (max_iterations < 0) {
+    if (max_iterations < 0) {
       TBOX_ERROR(d_object_name << ": Invalid number of max iterations\n");
-   }
+    }
 #endif
-   d_coarse_solver_max_iterations = max_iterations;
-}
+    d_coarse_solver_max_iterations = max_iterations;
+  }
 
-/*
- ********************************************************************
- * Set the coarse-fine discretization method.                       *
- ********************************************************************
- */
+  /*
+********************************************************************
+* Set the coarse-fine discretization method.                       *
+********************************************************************
+*/
 
-inline
-void FACOps::setCoarseFineDiscretization(
-   const std::string& coarsefine_method) {
+  inline
+  void FACOps::setCoarseFineDiscretization(
+                                           const std::string& coarsefine_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
-   if (d_hierarchy) {
+    if (d_hierarchy) {
       TBOX_ERROR(
-         d_object_name << ": Cannot change coarse-fine\n"
-         <<
-         "discretization method while operator state\n"
-         << "is initialized because that causes a\n"
-         << "corruption in the state.\n");
-   }
+                 d_object_name << ": Cannot change coarse-fine\n"
+                 <<
+                 "discretization method while operator state\n"
+                 << "is initialized because that causes a\n"
+                 << "corruption in the state.\n");
+    }
 #endif
-   d_cf_discretization = coarsefine_method;
-}
+    d_cf_discretization = coarsefine_method;
+  }
 
-/*
- ********************************************************************
- * Set the prolongation method                                      *
- ********************************************************************
- */
+  /*
+********************************************************************
+* Set the prolongation method                                      *
+********************************************************************
+*/
 
-inline
-void FACOps::set_P_ProlongationMethod(
-   const std::string& prolongation_method) {
+  inline
+  void FACOps::set_P_ProlongationMethod(
+                                        const std::string& prolongation_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
-   if (d_hierarchy) {
+    if (d_hierarchy) {
       TBOX_ERROR(
-         d_object_name << ": Cannot change p prolongation method\n"
-         <<
-         "while operator state is initialized because that\n"
-         << "causes a corruption in the state.\n");
-   }
+                 d_object_name << ": Cannot change p prolongation method\n"
+                 <<
+                 "while operator state is initialized because that\n"
+                 << "causes a corruption in the state.\n");
+    }
 #endif
-   p_prolongation_method = prolongation_method;
-}
+    p_prolongation_method = prolongation_method;
+  }
 
-inline
-void FACOps::set_V_ProlongationMethod(
-   const std::string& prolongation_method) {
+  inline
+  void FACOps::set_V_ProlongationMethod(
+                                        const std::string& prolongation_method) {
 #ifdef DEBUG_CHECK_ASSERTIONS
-   if (d_hierarchy) {
+    if (d_hierarchy) {
       TBOX_ERROR(
-         d_object_name << ": Cannot change v prolongation method\n"
-         <<
-         "while operator state is initialized because that\n"
-         << "causes a corruption in the state.\n");
-   }
+                 d_object_name << ": Cannot change v prolongation method\n"
+                 <<
+                 "while operator state is initialized because that\n"
+                 << "causes a corruption in the state.\n");
+    }
 #endif
-   v_prolongation_method = prolongation_method;
-}
+    v_prolongation_method = prolongation_method;
+  }
 
-}
-}
 }

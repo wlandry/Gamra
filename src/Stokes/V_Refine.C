@@ -20,49 +20,49 @@
 #include "SAMRAI/tbox/Utilities.h"
 #include "SAMRAI/pdat/CellData.h"
 
-void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
-                                            const hier::Patch& coarse,
+void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
+                                            const SAMRAI::hier::Patch& coarse,
                                             const int dst_component,
                                             const int src_component,
-                                            const hier::BoxOverlap& fine_overlap,
-                                            const hier::IntVector& ratio) const
+                                            const SAMRAI::hier::BoxOverlap& fine_overlap,
+                                            const SAMRAI::hier::IntVector& ratio) const
 {
-  const pdat::SideOverlap* t_overlap =
-    dynamic_cast<const pdat::SideOverlap *>(&fine_overlap);
+  const SAMRAI::pdat::SideOverlap* t_overlap =
+    dynamic_cast<const SAMRAI::pdat::SideOverlap *>(&fine_overlap);
 
   TBOX_ASSERT(t_overlap);
 
   for(int axis=0; axis<getDim().getValue(); ++axis)
     {
-      const hier::BoxContainer&
+      const SAMRAI::hier::BoxContainer&
         boxes = t_overlap->getDestinationBoxContainer(axis);
-      hier::BoxContainer::const_iterator bend(boxes.end());
-      for (hier::BoxContainer::const_iterator b(boxes.begin()); b!=bend; b++)
+      SAMRAI::hier::BoxContainer::const_iterator bend(boxes.end());
+      for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin()); b!=bend; b++)
         {
           refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
         }
     }
 }
 
-void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
-                                            const hier::Patch& coarse,
+void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
+                                            const SAMRAI::hier::Patch& coarse,
                                             const int dst_component,
                                             const int src_component,
-                                            const hier::Box& fine_box,
-                                            const hier::IntVector&,
+                                            const SAMRAI::hier::Box& fine_box,
+                                            const SAMRAI::hier::IntVector&,
                                             const int &axis) const
 {
-  const tbox::Dimension& dimension(getDim());
+  const SAMRAI::tbox::Dimension& dimension(getDim());
   const int dim(dimension.getValue());
 
-  boost::shared_ptr<pdat::SideData<double> > v_ptr =
-    boost::dynamic_pointer_cast<pdat::SideData<double> >
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (coarse.getPatchData(src_component));
-  pdat::SideData<double> &v(*v_ptr);
-  boost::shared_ptr<pdat::SideData<double> > v_fine_ptr = 
-    boost::dynamic_pointer_cast<pdat::SideData<double> >
+  SAMRAI::pdat::SideData<double> &v(*v_ptr);
+  boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine_ptr = 
+    boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
     (fine.getPatchData(dst_component));
-  pdat::SideData<double> &v_fine(*v_fine_ptr);
+  SAMRAI::pdat::SideData<double> &v_fine(*v_fine_ptr);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
   TBOX_ASSERT(v_ptr);
@@ -71,25 +71,25 @@ void SAMRAI::geom::Stokes::V_Refine::refine(hier::Patch& fine,
   TBOX_ASSERT(v.getDepth() == 1);
 #endif
 
-  hier::Box coarse_box=coarse.getBox();
-  boost::shared_ptr<geom::CartesianPatchGeometry> geom =
-    boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+  SAMRAI::hier::Box coarse_box=coarse.getBox();
+  boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+    boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
     (coarse.getPatchGeometry());
 
-  hier::Index ip(hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+  SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
   ip[0]=1;
   jp[1]=1;
   if(dim>2)
     kp[2]=1;
-  hier::Index pp[]={ip,jp,kp};
+  SAMRAI::hier::Index pp[]={ip,jp,kp};
 
-  pdat::CellIterator cend(fine_box,false);
-  for(pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
+  SAMRAI::pdat::CellIterator cend(fine_box,false);
+  for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
     {
-      pdat::SideIndex fine(*ci,axis,pdat::SideIndex::Lower);
+      SAMRAI::pdat::SideIndex fine(*ci,axis,SAMRAI::pdat::SideIndex::Lower);
 
-      pdat::SideIndex center(fine);
-      center.coarsen(hier::Index::getOneIndex(dimension)*2);
+      SAMRAI::pdat::SideIndex center(fine);
+      center.coarsen(SAMRAI::hier::Index::getOneIndex(dimension)*2);
 
       /* This assumes that the levels are always properly nested, so
          that we always have an extra grid space for interpolation.

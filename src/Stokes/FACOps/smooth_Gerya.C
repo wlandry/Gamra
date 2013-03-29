@@ -9,9 +9,9 @@
    uses diagonal elements from vy and vice-versa.  So the red and
    black updates are not entirely separate.  */
 
-void SAMRAI::solv::Stokes::FACOps::smooth_Gerya
-(SAMRAIVectorReal<double>& solution,
- const SAMRAIVectorReal<double>& residual,
+void Stokes::FACOps::smooth_Gerya
+(SAMRAI::solv::SAMRAIVectorReal<double>& solution,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int ln,
  int num_sweeps,
  double residual_tolerance)
@@ -29,7 +29,7 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Gerya
                  "internal hierarchy.");
     }
 #endif
-  boost::shared_ptr<hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
+  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
 
   /* Only need to sync the rhs once. This sync is needed because
      calculating a new pressure update requires computing in the ghost
@@ -63,7 +63,7 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Gerya
    * different processes differently, leading to disagreement on
    * whether to continue smoothing.
    */
-  const hier::Index ip(1,0), jp(0,1);
+  const SAMRAI::hier::Index ip(1,0), jp(0,1);
   bool converged = false;
   for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
        ++sweep)
@@ -72,41 +72,41 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Gerya
       for(int rb=0;rb<2;++rb)
         {
           xeqScheduleGhostFillNoCoarse(p_id,v_id,ln);
-          for (hier::PatchLevel::Iterator pi(level->begin());
+          for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
                pi!=level->end(); pi++)
             {
-              boost::shared_ptr<hier::Patch> patch = *pi;
+              boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
-              boost::shared_ptr<pdat::CellData<double> > p_ptr =
-                boost::dynamic_pointer_cast<pdat::CellData<double> >
+              boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
                 (patch->getPatchData(p_id));
-              pdat::CellData<double> &p(*p_ptr);
-              boost::shared_ptr<pdat::CellData<double> > p_rhs_ptr =
-                boost::dynamic_pointer_cast<pdat::CellData<double> >
+              SAMRAI::pdat::CellData<double> &p(*p_ptr);
+              boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_rhs_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
                 (patch->getPatchData(p_rhs_id));
-              pdat::CellData<double> &p_rhs(*p_rhs_ptr);
+              SAMRAI::pdat::CellData<double> &p_rhs(*p_rhs_ptr);
                 
-              boost::shared_ptr<pdat::SideData<double> > v_ptr =
-                boost::dynamic_pointer_cast<pdat::SideData<double> >
+              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
                 (patch->getPatchData(v_id));
-              pdat::SideData<double> &v(*v_ptr);
-              boost::shared_ptr<pdat::SideData<double> > v_rhs_ptr =
-                boost::dynamic_pointer_cast<pdat::SideData<double> >
+              SAMRAI::pdat::SideData<double> &v(*v_ptr);
+              boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
                 (patch->getPatchData(v_rhs_id));
-              pdat::SideData<double> &v_rhs(*v_rhs_ptr);
+              SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
-              boost::shared_ptr<pdat::CellData<double> > cell_visc_ptr =
-                boost::dynamic_pointer_cast<pdat::CellData<double> >
+              boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_visc_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
                 (patch->getPatchData(cell_viscosity_id));
-              pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
-              boost::shared_ptr<pdat::NodeData<double> > edge_visc_ptr =
-                boost::dynamic_pointer_cast<pdat::NodeData<double> >
+              SAMRAI::pdat::CellData<double> &cell_viscosity(*cell_visc_ptr);
+              boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_visc_ptr =
+                boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
                 (patch->getPatchData(edge_viscosity_id));
-              pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
+              SAMRAI::pdat::NodeData<double> &edge_viscosity(*edge_visc_ptr);
 
-              hier::Box pbox=patch->getBox();
-              boost::shared_ptr<geom::CartesianPatchGeometry> geom =
-                boost::dynamic_pointer_cast<geom::CartesianPatchGeometry>
+              SAMRAI::hier::Box pbox=patch->getBox();
+              boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+                boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
                 (patch->getPatchGeometry());
               double dx = geom->getDx()[0];
               double dy = geom->getDx()[1];
@@ -117,11 +117,11 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Gerya
                   int i_min=pbox.lower(0) + (abs(pbox.lower(0) + j + rb))%2;
                   for(int i=i_min; i<=pbox.upper(0)+1; i+=2)
                     {
-                      pdat::CellIndex center(tbox::Dimension(2));
+                      SAMRAI::pdat::CellIndex center(SAMRAI::tbox::Dimension(2));
                       center[0]=i;
                       center[1]=j;
 
-                      pdat::CellIndex up(center), down(center), right(center),
+                      SAMRAI::pdat::CellIndex up(center), down(center), right(center),
                         left(center);
 
                       ++up[1];
@@ -129,11 +129,11 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Gerya
                       ++right[0];
                       --left[0];
 
-                      const pdat::SideIndex
-                        x(center,0,pdat::SideIndex::Lower),
-                        y(center,1,pdat::SideIndex::Lower);
-                      const pdat::NodeIndex
-                        edge(center,pdat::NodeIndex::LowerLeft);
+                      const SAMRAI::pdat::SideIndex
+                        x(center,0,SAMRAI::pdat::SideIndex::Lower),
+                        y(center,1,SAMRAI::pdat::SideIndex::Lower);
+                      const SAMRAI::pdat::NodeIndex
+                        edge(center,SAMRAI::pdat::NodeIndex::LowerLeft);
 
                       /* Update p */
                       if(j<pbox.upper(1)+1 && i<pbox.upper(0)+1)
@@ -174,7 +174,7 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Gerya
          * non negative value for residual tolerance).
          */
         converged = maxres < residual_tolerance;
-        const tbox::SAMRAI_MPI& mpi(d_hierarchy->getMPI());
+        const SAMRAI::tbox::SAMRAI_MPI& mpi(d_hierarchy->getMPI());
         int tmp= converged ? 1 : 0;
         if (mpi.getSize() > 1)
           {
@@ -182,7 +182,7 @@ void SAMRAI::solv::Stokes::FACOps::smooth_Gerya
           }
         converged=(tmp==1);
         if (d_enable_logging)
-          tbox::plog
+          SAMRAI::tbox::plog
             // << d_object_name << "\n"
             << "Gerya " << ln << " " << sweep << " : " << maxres << "\n";
       // }

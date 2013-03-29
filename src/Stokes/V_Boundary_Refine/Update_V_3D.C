@@ -3,14 +3,14 @@
 
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
-void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_3D
+void Stokes::V_Boundary_Refine::Update_V_3D
 (const int &axis,
  const int &boundary_direction,
  const bool &boundary_positive,
- const pdat::SideIndex &fine,
- const hier::Index pp[],
- const hier::Index &ijk,
- const hier::Index &p_min, const hier::Index &p_max,
+ const SAMRAI::pdat::SideIndex &fine,
+ const SAMRAI::hier::Index pp[],
+ const SAMRAI::hier::Index &ijk,
+ const SAMRAI::hier::Index &p_min, const SAMRAI::hier::Index &p_max,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
@@ -63,11 +63,11 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_3D
         return;
       /* Compute the derivative at all of the interpolation points.  */
 
-      const hier::Index ip(boundary_positive ? pp[axis] : -pp[axis]),
+      const SAMRAI::hier::Index ip(boundary_positive ? pp[axis] : -pp[axis]),
         jp(pp[(axis+1)%3]), kp(pp[(axis+2)%3]);
 
-      pdat::SideIndex center(fine-ip);
-      center.coarsen(hier::Index(2,2,2));
+      SAMRAI::pdat::SideIndex center(fine-ip);
+      center.coarsen(SAMRAI::hier::Index(2,2,2));
 
       const double dv_mm=v(center-jp-kp+ip) - v(center-jp-kp-ip);
       const double dv_m0=v(center-jp+ip) - v(center-jp-ip);
@@ -93,7 +93,7 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_3D
       const double dv_fine_pp=dv_pp/16 + (15.0/16)*dv_00
         + (3/32)*(-dv_m0 - dv_0m + dv_p0 + dv_0p);
 
-      hier::Index offset(ip*2);
+      SAMRAI::hier::Index offset(ip*2);
 
       /* Be careful about using the right interpolation if the fine
        * points are not aligned with the coarse points. */
@@ -165,12 +165,12 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_3D
   else
     {
       const int axis3((axis+1)%3 != boundary_direction ? (axis+1)%3 : (axis+2)%3);
-      const hier::Index ip(pp[axis]),
+      const SAMRAI::hier::Index ip(pp[axis]),
         jp(boundary_positive ? pp[boundary_direction] : -pp[boundary_direction]),
         kp(pp[axis3]);
 
-      pdat::SideIndex center(fine);
-      center.coarsen(hier::Index(2,2,2));
+      SAMRAI::pdat::SideIndex center(fine);
+      center.coarsen(SAMRAI::hier::Index(2,2,2));
 
       double v_minus=v(center-jp-kp)/16 + (15.0/16)*v(center)
         + (3.0/32)*(-v(center+jp) - v(center+kp) + v(center-jp) + v(center-kp));

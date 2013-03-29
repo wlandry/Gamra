@@ -4,12 +4,12 @@
 
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
-void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_2D
+void Stokes::V_Boundary_Refine::Update_V_2D
 (const int &axis,
  const int &boundary_direction,
  const bool &boundary_positive,
- const pdat::SideIndex &fine,
- const hier::Index &ip, const hier::Index &jp,
+ const SAMRAI::pdat::SideIndex &fine,
+ const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
  int &i, int &j,
  const int &i_max,
  const int &j_min,
@@ -58,10 +58,10 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_2D
       /* Compute the derivative at the nearest three coarse points and
          then interpolate */
 
-      hier::Index ip_s(boundary_positive ? ip : -ip);
+      SAMRAI::hier::Index ip_s(boundary_positive ? ip : -ip);
 
-      pdat::SideIndex center(fine-ip_s);
-      center.coarsen(hier::Index(2,2));
+      SAMRAI::pdat::SideIndex center(fine-ip_s);
+      center.coarsen(SAMRAI::hier::Index(2,2));
 
       const double dv_plus=v(center+jp+ip_s)-v(center+jp-ip_s);
       const double dv_minus=v(center-jp+ip_s)-v(center-jp-ip_s);
@@ -72,7 +72,7 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_2D
       quad_offset_interpolate(dv_plus,dv_center,dv_minus,
                               dv_fine_plus,dv_fine_minus);
 
-      hier::Index offset(ip_s*2);
+      SAMRAI::hier::Index offset(ip_s*2);
 
       if(j%2==0)
         {
@@ -116,11 +116,11 @@ void SAMRAI::geom::Stokes::V_Boundary_Refine::Update_V_2D
  */
   else
     {
-      pdat::SideIndex center(fine);
-      center.coarsen(hier::Index(2,2));
+      SAMRAI::pdat::SideIndex center(fine);
+      center.coarsen(SAMRAI::hier::Index(2,2));
 
       double v_center, v_plus;
-      hier::Index jp_s(boundary_positive ? jp : -jp);
+      SAMRAI::hier::Index jp_s(boundary_positive ? jp : -jp);
 
       v_center=
         quad_offset_interpolate(v(center-jp_s),v(center),v(center+jp_s));

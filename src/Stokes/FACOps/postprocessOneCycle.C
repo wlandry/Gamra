@@ -44,10 +44,10 @@
 ********************************************************************
 */
 
-void SAMRAI::solv::Stokes::FACOps::postprocessOneCycle
+void Stokes::FACOps::postprocessOneCycle
 (int fac_cycle_num,
- const SAMRAIVectorReal<double>& current_soln,
- const SAMRAIVectorReal<double>& residual)
+ const SAMRAI::solv::SAMRAIVectorReal<double>& current_soln,
+ const SAMRAI::solv::SAMRAIVectorReal<double>& residual)
 {
   NULL_USE(current_soln);
   NULL_USE(residual);
@@ -60,7 +60,7 @@ void SAMRAI::solv::Stokes::FACOps::postprocessOneCycle
        */
       double avg_factor, final_factor;
       d_preconditioner->getConvergenceFactors(avg_factor, final_factor);
-      tbox::plog
+      SAMRAI::tbox::plog
         << "iter=" << std::setw(4) << fac_cycle_num
         << " resid=" << d_preconditioner->getResidualNorm()
         << " net conv=" << d_preconditioner->getNetConvergenceFactor()

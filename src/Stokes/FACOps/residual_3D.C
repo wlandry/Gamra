@@ -1,32 +1,32 @@
 #include "Stokes/FACOps.h"
 #include "Constants.h"
 
-void SAMRAI::solv::Stokes::FACOps::residual_3D
-(pdat::CellData<double> &p,
- pdat::SideData<double> &v,
- pdat::CellData<double> &cell_viscosity,
- pdat::CellData<double> &p_rhs,
- pdat::SideData<double> &v_rhs,
- pdat::CellData<double> &p_resid,
- pdat::SideData<double> &v_resid,
- hier::Patch &patch,
- const hier::Box &pbox,
- const geom::CartesianPatchGeometry &geom)
+void Stokes::FACOps::residual_3D
+(SAMRAI::pdat::CellData<double> &p,
+ SAMRAI::pdat::SideData<double> &v,
+ SAMRAI::pdat::CellData<double> &cell_viscosity,
+ SAMRAI::pdat::CellData<double> &p_rhs,
+ SAMRAI::pdat::SideData<double> &v_rhs,
+ SAMRAI::pdat::CellData<double> &p_resid,
+ SAMRAI::pdat::SideData<double> &v_resid,
+ SAMRAI::hier::Patch &patch,
+ const SAMRAI::hier::Box &pbox,
+ const SAMRAI::geom::CartesianPatchGeometry &geom)
 {
-  boost::shared_ptr<pdat::EdgeData<double> > edge_viscosity_ptr = 
-    boost::dynamic_pointer_cast<pdat::EdgeData<double> >
+  boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_viscosity_ptr = 
+    boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
     (patch.getPatchData(edge_viscosity_id));
-  pdat::EdgeData<double> &edge_viscosity(*edge_viscosity_ptr);
+  SAMRAI::pdat::EdgeData<double> &edge_viscosity(*edge_viscosity_ptr);
 
   const double *Dx = geom.getDx();
-  const hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
-  const hier::Index pp[]={ip,jp,kp};
+  const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
+  const SAMRAI::hier::Index pp[]={ip,jp,kp};
 
-  pdat::CellIterator cend(pbox,false);
-  for(pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
+  SAMRAI::pdat::CellIterator cend(pbox,false);
+  for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
     {
-      pdat::CellIndex center(*ci);
-      pdat::CellIndex up(center), down(center), right(center),
+      SAMRAI::pdat::CellIndex center(*ci);
+      SAMRAI::pdat::CellIndex up(center), down(center), right(center),
         left(center), front(center), back(center);
 
       ++right[0];
@@ -40,10 +40,10 @@ void SAMRAI::solv::Stokes::FACOps::residual_3D
       if(center[0]!=pbox.upper(0) && center[1]!=pbox.upper(1)
          && center[2]!=pbox.upper(2))
         {
-          const pdat::SideIndex
-            x(center,0,pdat::SideIndex::Lower),
-            y(center,1,pdat::SideIndex::Lower),
-            z(center,2,pdat::SideIndex::Lower);
+          const SAMRAI::pdat::SideIndex
+            x(center,0,SAMRAI::pdat::SideIndex::Lower),
+            y(center,1,SAMRAI::pdat::SideIndex::Lower),
+            z(center,2,SAMRAI::pdat::SideIndex::Lower);
 
           double dvx_dx=(v(x+ip) - v(x))/Dx[0];
           double dvy_dy=(v(y+jp) - v(y))/Dx[1];
@@ -54,13 +54,13 @@ void SAMRAI::solv::Stokes::FACOps::residual_3D
       for(int ix=0;ix<3;++ix)
         {
           const int iy((ix+1)%3), iz((ix+2)%3);
-          const pdat::SideIndex
-            x(center,ix,pdat::SideIndex::Lower),
-            y(center,iy,pdat::SideIndex::Lower),
-            z(center,iz,pdat::SideIndex::Lower);
-          const pdat::EdgeIndex
-            edge_y(center,iy,pdat::EdgeIndex::LowerLeft),
-            edge_z(center,iz,pdat::EdgeIndex::LowerLeft);
+          const SAMRAI::pdat::SideIndex
+            x(center,ix,SAMRAI::pdat::SideIndex::Lower),
+            y(center,iy,SAMRAI::pdat::SideIndex::Lower),
+            z(center,iz,SAMRAI::pdat::SideIndex::Lower);
+          const SAMRAI::pdat::EdgeIndex
+            edge_y(center,iy,SAMRAI::pdat::EdgeIndex::LowerLeft),
+            edge_z(center,iz,SAMRAI::pdat::EdgeIndex::LowerLeft);
 
           if(center[iy]!=pbox.upper(iy) && center[iz]!=pbox.upper(iz))
             {

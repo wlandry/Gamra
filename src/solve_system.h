@@ -6,7 +6,7 @@ bool solve_system(T &fac,
                   boost::shared_ptr<SAMRAI::tbox::Database> &main_db,
                   boost::shared_ptr<SAMRAI::tbox::InputDatabase> &input_db,
                   boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &patch_hierarchy,
-                  const string &base_name,
+                  const std::string &base_name,
                   const SAMRAI::tbox::Dimension &dim)
 {
   boost::shared_ptr<SAMRAI::mesh::StandardTagAndInitialize>
@@ -33,7 +33,7 @@ bool solve_system(T &fac,
                                          load_balancer));
   gridding_algorithm->makeCoarsestLevel(0.0);
 
-  SAMRAI::tbox::Array<string> vis_writer(1);
+  SAMRAI::tbox::Array<std::string> vis_writer(1);
   vis_writer[0] = "Visit";
   if (main_db->keyExists("vis_writer")) {
     vis_writer = main_db->getStringArray("vis_writer");
@@ -46,17 +46,16 @@ bool solve_system(T &fac,
                                                        false));
 
   boost::shared_ptr<SAMRAI::appu::VisItDataWriter> visit_writer;
-  string vis_filename =
-    main_db->getStringWithDefault("vis_filename", base_name);
+  std::string vis_filename(main_db->getStringWithDefault("vis_filename",
+                                                         base_name));
   if (use_visit) {
     visit_writer = boost::make_shared<SAMRAI::appu::VisItDataWriter>
       (dim,"Visit Writer",vis_filename + ".visit");
     fac.setupPlotter(*visit_writer);
   }
 
-  SAMRAI::tbox::plog << "\nCheck input data and variables before simulation:"
-                     << endl;
-  SAMRAI::tbox::plog << "Input database..." << endl;
+  SAMRAI::tbox::plog << "\nCheck input data and variables before simulation:\n"
+                     << "Input database...\n";
   input_db->printClassData(SAMRAI::tbox::plog);
 
   bool done(!fac.solve());

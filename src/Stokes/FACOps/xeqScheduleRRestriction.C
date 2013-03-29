@@ -9,7 +9,7 @@
  ************************************************************************/
 #include "Stokes/FACOps.h"
 
-void SAMRAI::solv::Stokes::FACOps::xeqScheduleRRestriction(int p_dst, int p_src,
+void Stokes::FACOps::xeqScheduleRRestriction(int p_dst, int p_src,
                                                          int v_dst, int v_src,
                                                          int dest_ln)
 {
@@ -19,7 +19,7 @@ void SAMRAI::solv::Stokes::FACOps::xeqScheduleRRestriction(int p_dst, int p_src,
       TBOX_ERROR("Expected schedule not found.");
     }
 
-    xfer::CoarsenAlgorithm coarsener(d_dim);
+    SAMRAI::xfer::CoarsenAlgorithm coarsener(d_dim);
     coarsener.registerCoarsen(p_dst,p_src,p_rrestriction_coarsen_operator);
     coarsener.resetSchedule(p_rrestriction_coarsen_schedules[dest_ln]);
     p_rrestriction_coarsen_schedules[dest_ln]->coarsenData();
@@ -31,7 +31,7 @@ void SAMRAI::solv::Stokes::FACOps::xeqScheduleRRestriction(int p_dst, int p_src,
       TBOX_ERROR("Expected schedule not found.");
     }
 
-    xfer::CoarsenAlgorithm coarsener(d_dim);
+    SAMRAI::xfer::CoarsenAlgorithm coarsener(d_dim);
     coarsener.registerCoarsen(v_dst,v_src,v_rrestriction_coarsen_operator);
     coarsener.resetSchedule(v_rrestriction_coarsen_schedules[dest_ln]);
     v_rrestriction_coarsen_schedules[dest_ln]->coarsenData();

@@ -47,15 +47,16 @@
 */
      
 
-void SAMRAI::geom::Stokes::P_Boundary_Refine::Update_P_3D
-(const pdat::CellIndex &fine,
- const hier::Index &ip, const hier::Index &jp, const hier::Index &kp,
+void Stokes::P_Boundary_Refine::Update_P_3D
+(const SAMRAI::pdat::CellIndex &fine,
+ const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
+ const SAMRAI::hier::Index &kp,
  const int &j, const int &k, const int &j_max, const int &k_max,
  SAMRAI::pdat::CellData<double> &p,
  SAMRAI::pdat::CellData<double> &p_fine) const
 {
-  pdat::CellIndex center(fine);
-  center.coarsen(hier::Index(2,2,2));
+  SAMRAI::pdat::CellIndex center(fine);
+  center.coarsen(SAMRAI::hier::Index(2,2,2));
 
   const double p_mmm=p(center-ip-jp-kp)/64 + (63.0/64)*p(center)
     - (3.0/32) * (p(center+ip) + p(center+jp) + p(center+kp))

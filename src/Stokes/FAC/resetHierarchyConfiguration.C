@@ -20,22 +20,18 @@
 #include "SAMRAI/hier/Variable.h"
 #include "SAMRAI/hier/VariableDatabase.h"
 
-namespace SAMRAI {
-
-  /*
+/*
 *************************************************************************
 * Reset the hierarchy-dependent internal information.                   *
 *************************************************************************
 */
-  void Stokes::FAC::resetHierarchyConfiguration
-  (const boost::shared_ptr<hier::PatchHierarchy>& new_hierarchy,
-   const int coarsest_level,
-   const int finest_level)
-  {
-    (void)coarsest_level;
-    (void)finest_level;
+void Stokes::FAC::resetHierarchyConfiguration
+(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& new_hierarchy,
+ const int coarsest_level,
+ const int finest_level)
+{
+  (void)coarsest_level;
+  (void)finest_level;
 
-    d_hierarchy = new_hierarchy;
-  }
-
+  d_hierarchy = new_hierarchy;
 }

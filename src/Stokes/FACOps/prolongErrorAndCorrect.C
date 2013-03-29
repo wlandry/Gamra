@@ -47,9 +47,9 @@
 ***********************************************************************
 */
 
-void SAMRAI::solv::Stokes::FACOps::prolongErrorAndCorrect
-(const SAMRAIVectorReal<double>& s,
- SAMRAIVectorReal<double>& d,
+void Stokes::FACOps::prolongErrorAndCorrect
+(const SAMRAI::solv::SAMRAIVectorReal<double>& s,
+ SAMRAI::solv::SAMRAIVectorReal<double>& d,
  int dest_ln)
 {
   t_prolong->start();
@@ -62,9 +62,9 @@ void SAMRAI::solv::Stokes::FACOps::prolongErrorAndCorrect
   }
 #endif
 
-  boost::shared_ptr<hier::PatchLevel> coarse_level =
+  boost::shared_ptr<SAMRAI::hier::PatchLevel> coarse_level =
     d_hierarchy->getPatchLevel(dest_ln - 1);
-  boost::shared_ptr<hier::PatchLevel> fine_level =
+  boost::shared_ptr<SAMRAI::hier::PatchLevel> fine_level =
     d_hierarchy->getPatchLevel(dest_ln);
 
   /*
@@ -103,13 +103,13 @@ void SAMRAI::solv::Stokes::FACOps::prolongErrorAndCorrect
    * residing in the destination level.
    */
   {
-    math::HierarchyCellDataOpsReal<double>
+    SAMRAI::math::HierarchyCellDataOpsReal<double>
       hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
     const int p_dst = d.getComponentDescriptorIndex(0);
     hierarchy_math_ops.add(p_dst, p_dst, d_cell_scratch_id);
   }
   {
-    math::HierarchySideDataOpsReal<double>
+    SAMRAI::math::HierarchySideDataOpsReal<double>
       hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
     const int v_dst = d.getComponentDescriptorIndex(1);
     hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);

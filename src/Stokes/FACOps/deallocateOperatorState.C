@@ -38,10 +38,7 @@
 #include "SAMRAI/xfer/RefineSchedule.h"
 #include "SAMRAI/xfer/PatchLevelFullFillPattern.h"
 
-namespace SAMRAI {
-  namespace solv {
-
-    /*
+/*
 ********************************************************************
 * FACOperatorStrategy virtual deallocateOperatorState        *
 * function.  Deallocate internal hierarchy-dependent data.         *
@@ -49,29 +46,26 @@ namespace SAMRAI {
 ********************************************************************
 */
 
-    void Stokes::FACOps::deallocateOperatorState()
-    {
-      if (d_hierarchy) {
-        d_cf_boundary.resizeArray(0);
+void Stokes::FACOps::deallocateOperatorState()
+{
+  if (d_hierarchy) {
+    d_cf_boundary.resizeArray(0);
 #ifdef HAVE_HYPRE
-        d_hypre_solver.deallocateSolverState();
+    d_hypre_solver.deallocateSolverState();
 #endif
-        d_hierarchy.reset();
-        d_ln_min = -1;
-        d_ln_max = -1;
+    d_hierarchy.reset();
+    d_ln_min = -1;
+    d_ln_max = -1;
 
-        p_prolongation_refine_schedules.setNull();
-        v_prolongation_refine_schedules.setNull();
-        p_urestriction_coarsen_schedules.setNull();
-        v_urestriction_coarsen_schedules.setNull();
-        p_rrestriction_coarsen_schedules.setNull();
-        v_rrestriction_coarsen_schedules.setNull();
-        p_ghostfill_refine_schedules.setNull();
-        v_ghostfill_refine_schedules.setNull();
-        p_nocoarse_refine_schedules.setNull();
-        v_nocoarse_refine_schedules.setNull();
-      }
-    }
-
+    p_prolongation_refine_schedules.setNull();
+    v_prolongation_refine_schedules.setNull();
+    p_urestriction_coarsen_schedules.setNull();
+    v_urestriction_coarsen_schedules.setNull();
+    p_rrestriction_coarsen_schedules.setNull();
+    v_rrestriction_coarsen_schedules.setNull();
+    p_ghostfill_refine_schedules.setNull();
+    v_ghostfill_refine_schedules.setNull();
+    p_nocoarse_refine_schedules.setNull();
+    v_nocoarse_refine_schedules.setNull();
   }
 }
