@@ -23,36 +23,16 @@ void Elastic::FAC::applyGradientDetector
       pi!=level.end(); pi++)
     {
       SAMRAI::hier::Patch& patch = **pi;
-      boost::shared_ptr<SAMRAI::hier::PatchData>
-        tag_data = patch.getPatchData(tag_index);
       ntotal += patch.getBox().numberCells().getProduct();
-      if (!tag_data)
-        {
-          TBOX_ERROR("Data index "
-                     << tag_index << " does not exist for patch.\n");
-        }
-      boost::shared_ptr<SAMRAI::pdat::CellData<int> > tag_cell_data_ =
+      boost::shared_ptr<SAMRAI::pdat::CellData<int> > tag_cell_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<int> >
-        (tag_data);
-      if (!tag_cell_data_)
-        {
-          TBOX_ERROR("Data index " << tag_index << " is not cell int data.\n");
-        }
-      boost::shared_ptr<SAMRAI::hier::PatchData>
-        soln_data = patch.getPatchData(v_id);
-      if (!soln_data)
-        {
-          TBOX_ERROR("Data index " << v_id << " does not exist for patch.\n");
-        }
-      boost::shared_ptr<SAMRAI::pdat::SideData<double> > soln_side_data_ =
+        (patch.getPatchData(tag_index));
+      SAMRAI::pdat::CellData<int>& tag_cell(*tag_cell_ptr);
+
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (soln_data);
-      if (!soln_side_data_)
-        {
-          TBOX_ERROR("Data index " << v_id << " is not side data.\n");
-        }
-      SAMRAI::pdat::SideData<double>& v = *soln_side_data_;
-      SAMRAI::pdat::CellData<int>& tag_cell_data = *tag_cell_data_;
+        (patch.getPatchData(v_id));
+      SAMRAI::pdat::SideData<double>& v(*v_ptr);
                               
       boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr;
       if(!faults.empty())
@@ -74,7 +54,7 @@ void Elastic::FAC::applyGradientDetector
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
         (patch.getPatchGeometry());
 
-      tag_cell_data.fill(0);
+      tag_cell.fill(0);
       SAMRAI::pdat::CellIterator cend(patch.getBox(),false);
       for(SAMRAI::pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ci++)
         {
@@ -185,7 +165,7 @@ void Elastic::FAC::applyGradientDetector
 
           if (curvature > d_adaption_threshold || ln<min_full_refinement_level)
             {
-              tag_cell_data(cell) = 1;
+              tag_cell(cell) = 1;
               ++ntag;
             }
         }
