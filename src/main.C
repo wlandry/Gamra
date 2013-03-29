@@ -79,6 +79,7 @@ int main(
   tbox::SAMRAIManager::initialize();
   tbox::SAMRAIManager::startup();
 
+  bool converged;
   /*
    * Create block to force pointer deallocation.  If this is not done
    * then there will be memory leaks reported.
@@ -202,8 +203,8 @@ int main(
            boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
            (new SAMRAI::geom::Stokes::Resid_Coarsen(dim,fac_stokes.cell_viscosity_id)));
 
-        solve_system(fac_stokes,main_db,input_db,patch_hierarchy,
-                     base_name,dim);
+        converged=solve_system(fac_stokes,main_db,input_db,patch_hierarchy,
+                               base_name,dim);
       }
     else
       {
@@ -222,8 +223,8 @@ int main(
           (typeid(pdat::CellVariable<double>).name(),
            boost::make_shared<geom::CartesianCellDoubleWeightedAverage>(dim));
 
-        solve_system(fac_elastic,main_db,input_db,patch_hierarchy,
-                     base_name,dim);
+        converged=solve_system(fac_elastic,main_db,input_db,patch_hierarchy,
+                               base_name,dim);
       }
   }
   /*
@@ -237,5 +238,5 @@ int main(
   tbox::SAMRAIManager::finalize();
   tbox::SAMRAI_MPI::finalize();
 
-  return 0;
+  return (converged ? 0 : 1);
 }

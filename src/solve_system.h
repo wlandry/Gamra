@@ -2,7 +2,7 @@
 #define GAMRA_SOLVE_SYSTEM_H
 
 template<class T>
-void solve_system(T &fac,
+bool solve_system(T &fac,
                   boost::shared_ptr<SAMRAI::tbox::Database> &main_db,
                   boost::shared_ptr<SAMRAI::tbox::InputDatabase> &input_db,
                   boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &patch_hierarchy,
@@ -61,6 +61,7 @@ void solve_system(T &fac,
 
   bool done(!fac.solve());
   int lnum = 0;
+  bool converged(false);
   for (;patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++)
     {
       if (use_visit && intermediate_output)
@@ -74,12 +75,14 @@ void solve_system(T &fac,
       SAMRAI::tbox::plog << "Newly adapted hierarchy\n";
 
       done = !(patch_hierarchy->finerLevelExists(lnum));
-      done=(!fac.solve() || done);
+      converged=fac.solve();
+      done=(!converged || done);
     }
   if (use_visit)
     visit_writer->writePlotData(patch_hierarchy, lnum);
 
   SAMRAI::tbox::TimerManager::getManager()->print(SAMRAI::tbox::plog);
+  return converged;
 }
 
 #endif
