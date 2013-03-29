@@ -55,24 +55,26 @@ void Elastic::FAC::applyGradientDetector
         (patch.getPatchGeometry());
 
       tag_cell.fill(0);
-      SAMRAI::pdat::CellIterator cend(patch.getBox(),false);
-      for(SAMRAI::pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ci++)
+      const SAMRAI::hier::Box &box(patch.getBox());
+      SAMRAI::pdat::CellIterator cend(box,false);
+      const int dim(d_dim.getValue());
+      for(SAMRAI::pdat::CellIterator ci(box,true); ci!=cend; ci++)
         {
           const SAMRAI::pdat::CellIndex cell(*ci);
 
           double curvature(0);
-	  for (int ix=0; ix<d_dim.getValue(); ++ix)
+	  for (int ix=0; ix<dim; ++ix)
             {
               const SAMRAI::pdat::SideIndex x(cell,ix,
                                               SAMRAI::pdat::SideIndex::Lower);
-              for (int d=0; d<d_dim.getValue(); ++d)
+              for (int d=0; d<dim; ++d)
                 {
                   SAMRAI::hier::Index ip(d_dim,0),
                     jp(d_dim,0),
                     kp(d_dim,0);
                   ip(0)=1;
                   jp(1)=1;
-                  if (3==d_dim.getValue())
+                  if (3==dim)
                     {
                       kp(2)=1;
                     }
@@ -131,7 +133,7 @@ void Elastic::FAC::applyGradientDetector
                     }
                   else
                     {
-                      if(cell[ix]==patch.getBox().lower(ix)
+                      if(cell[ix]==box.lower(ix)
                          && geom->getTouchesRegularBoundary(ix,0))
                         {
                           curve=v(x+unit[ix]*2) - 2*v(x+unit[ix]) + v(x);
@@ -139,7 +141,7 @@ void Elastic::FAC::applyGradientDetector
                             curve+=-(*dv_diagonal_ptr)(cell+unit[ix],ix)
                               + (*dv_diagonal_ptr)(cell,ix);
                         }
-                      else if(cell[ix]==patch.getBox().upper(ix)
+                      else if(cell[ix]==box.upper(ix)
                               && geom->getTouchesRegularBoundary(ix,1))
                         {
                           curve=v(x+unit[ix]) - 2*v(x) + v(x-unit[ix]);
@@ -166,6 +168,20 @@ void Elastic::FAC::applyGradientDetector
           if (curvature > d_adaption_threshold || ln<min_full_refinement_level)
             {
               tag_cell(cell) = 1;
+              ++ntag;
+            }
+        }
+      for(int i=0;i<refinement_points.size();i+=3)
+        {
+          SAMRAI::pdat::CellIndex cell(d_dim);
+          for(int d=0;d<dim;++d)
+            cell[d]=static_cast<int>((refinement_points[i+d]
+                                      - geom->getXLower()[d])/geom->getDx()[d]
+                                     + 0.5);
+          cell+=box.lower();
+          if(box.contains(cell) && tag_cell(cell)!=1)
+            {
+              tag_cell(cell)=1;
               ++ntag;
             }
         }

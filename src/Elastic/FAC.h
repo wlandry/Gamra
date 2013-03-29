@@ -218,6 +218,7 @@ namespace Elastic {
     Input_Expression lambda, mu, v_rhs, level_set;
 
     SAMRAI::tbox::Array<double> faults;
+    SAMRAI::tbox::Array<double> refinement_points;
     //@}
 
     bool have_embedded_boundary() const

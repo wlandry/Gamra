@@ -75,6 +75,10 @@ Elastic::FAC::FAC(const std::string& object_name,
     {
       faults=database->getDoubleArray("faults");
     }
+  if(faults.size()%9!=0)
+    TBOX_ERROR("The number of points in refinement_points must be "
+               "divisible by 9.  Read "
+               << faults.size() << " points");
   if(!faults.empty())
     {
       boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
@@ -91,6 +95,12 @@ Elastic::FAC::FAC(const std::string& object_name,
         vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1));
     }
+  if(database->keyExists("refinement_points"))
+    refinement_points=database->getDoubleArray("refinement_points");
+  if(refinement_points.size()%3!=0)
+    TBOX_ERROR("The number of points in refinement_points must be "
+               "divisible by 3.  Read "
+               << refinement_points.size() << " points");
 
   if(have_embedded_boundary())
     {
