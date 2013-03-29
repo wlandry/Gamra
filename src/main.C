@@ -227,12 +227,11 @@ int main(
                                base_name,dim);
       }
   }
-  /*
-   * This print is for the SAMRAI testing framework.  Passing here
-   * means application ran.  A better test would actually test the
-   * results.
-   */
-  tbox::pout << "\nPASSED:  FAC" << endl;
+  if(converged)
+    tbox::pout << "PASSED\n";
+  else
+    tbox::pout << "FAILED\n";
+
 
   tbox::SAMRAIManager::shutdown();
   tbox::SAMRAIManager::finalize();
