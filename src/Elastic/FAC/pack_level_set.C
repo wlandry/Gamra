@@ -41,7 +41,7 @@ Elastic::FAC::pack_level_set(double* buffer,
 
       SAMRAI::pdat::CellData<double>::iterator iend(region,false);
       for (SAMRAI::pdat::CellData<double>::iterator icell(region,true);
-           icell!=iend; icell++) {
+           icell!=iend; ++icell) {
 
         SAMRAI::pdat::CellIndex center(*icell);
         const SAMRAI::pdat::SideIndex
@@ -60,7 +60,7 @@ Elastic::FAC::pack_level_set(double* buffer,
       const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
       SAMRAI::pdat::CellData<double>::iterator iend(region,false);
       for (SAMRAI::pdat::CellData<double>::iterator icell(region,true);
-           icell!=iend; icell++) {
+           icell!=iend; ++icell) {
 
         SAMRAI::pdat::CellIndex center(*icell);
         const SAMRAI::pdat::SideIndex

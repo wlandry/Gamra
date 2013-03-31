@@ -32,7 +32,7 @@ void Stokes::V_Boundary_Refine::refine
      {
        const SAMRAI::hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer(axis);
        for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
-            b!=boxes.end(); b++)
+            b!=boxes.end(); ++b)
          {
            refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
          }

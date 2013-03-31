@@ -39,7 +39,7 @@ bool solve_system
   if (main_db->keyExists("vis_writer"))
     vis_writer = main_db->getStringArray("vis_writer");
   bool use_visit = false;
-  for (int i = 0; i < vis_writer.getSize(); i++)
+  for (int i = 0; i < vis_writer.getSize(); ++i)
     {
       if (vis_writer[i] == "VisIt") use_visit = true;
     }
@@ -62,7 +62,7 @@ bool solve_system
   bool done(!fac.solve());
   int lnum = 0;
   bool converged(false);
-  for (;patch_hierarchy->levelCanBeRefined(lnum) && !done; lnum++)
+  for (;patch_hierarchy->levelCanBeRefined(lnum) && !done; ++lnum)
     {
       if (use_visit && intermediate_output)
         visit_writer->writePlotData(patch_hierarchy, lnum);

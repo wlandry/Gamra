@@ -70,7 +70,7 @@ void Elastic::FACOps::computeVectorWeights
     boost::shared_ptr<SAMRAI::hier::PatchLevel> level =
       hierarchy->getPatchLevel(ln);
     for (SAMRAI::hier::PatchLevel::Iterator p(level->begin());
-         p!=level->end(); p++) {
+         p!=level->end(); ++p) {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> patch_geometry =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
@@ -123,7 +123,7 @@ void Elastic::FACOps::computeVectorWeights
        */
 
       for (SAMRAI::hier::PatchLevel::Iterator p(level->begin());
-           p!=level->end(); p++) {
+           p!=level->end(); ++p) {
 
         boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
         for (SAMRAI::hier::BoxContainer::iterator i=coarsened_boxes.begin();

@@ -20,7 +20,7 @@ void Elastic::FAC::applyGradientDetector
   int ntag = 0, ntotal = 0;
   double max_curvature(0);
   for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
-      pi!=level.end(); pi++)
+      pi!=level.end(); ++pi)
     {
       SAMRAI::hier::Patch& patch = **pi;
       ntotal += patch.getBox().numberCells().getProduct();
@@ -58,7 +58,7 @@ void Elastic::FAC::applyGradientDetector
       const SAMRAI::hier::Box &box(patch.getBox());
       SAMRAI::pdat::CellIterator cend(box,false);
       const int dim(d_dim.getValue());
-      for(SAMRAI::pdat::CellIterator ci(box,true); ci!=cend; ci++)
+      for(SAMRAI::pdat::CellIterator ci(box,true); ci!=cend; ++ci)
         {
           const SAMRAI::pdat::CellIndex cell(*ci);
 

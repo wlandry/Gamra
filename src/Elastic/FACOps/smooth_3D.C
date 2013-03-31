@@ -70,7 +70,7 @@ void Elastic::FACOps::smooth_3D
             set_boundaries(v_id,level,true);
 
             for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-                 pi!=level->end(); pi++)
+                 pi!=level->end(); ++pi)
               {
                 boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 

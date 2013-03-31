@@ -40,7 +40,7 @@ void Elastic::V_Refine::refine(SAMRAI::hier::Patch& fine,
        const SAMRAI::hier::BoxContainer&
          boxes = t_overlap->getDestinationBoxContainer(ix);
        for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
-            b!=boxes.end(); b++)
+            b!=boxes.end(); ++b)
          {
            refine(fine,coarse,dst_component,src_component,*b,ratio,ix);
          }
@@ -101,7 +101,7 @@ void Elastic::V_Refine::refine
         * we have so manually set the level set on the edges */
        SAMRAI::pdat::CellIterator coarse_end(coarse_ghost_box,false);
        for(SAMRAI::pdat::CellIterator ci(coarse_ghost_box,true);
-           ci!=coarse_end; ci++)
+           ci!=coarse_end; ++ci)
          {
            SAMRAI::pdat::SideIndex
              coarse(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
@@ -117,7 +117,7 @@ void Elastic::V_Refine::refine
              }
          }
 
-       for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
+       for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ++ci)
          {
            SAMRAI::pdat::SideIndex
              fine(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
@@ -178,7 +178,7 @@ void Elastic::V_Refine::refine
          boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
          (coarse_patch.getPatchGeometry());
 
-       for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
+       for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ++ci)
          {
            SAMRAI::pdat::SideIndex fine(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
 

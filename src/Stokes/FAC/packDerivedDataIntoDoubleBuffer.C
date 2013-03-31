@@ -47,7 +47,7 @@ bool Stokes::FAC::packDerivedDataIntoDoubleBuffer(
       (patch.getPatchData(p_exact_id));
     SAMRAI::pdat::CellData<double>& current_solution = *current_solution_;
     SAMRAI::pdat::CellData<double>& exact_solution = *exact_solution_;
-    for ( ; icell!=iend; icell++) {
+    for ( ; icell!=iend; ++icell) {
       double diff = (current_solution(*icell) - exact_solution(*icell));
       *buffer = diff;
       buffer = buffer + 1;

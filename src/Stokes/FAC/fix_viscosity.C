@@ -70,7 +70,7 @@ void Stokes::FAC::fix_viscosity()
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
       SAMRAI::hier::PatchLevel::Iterator i_p(level->begin());
-      for ( ; i_p!=level->end(); i_p++)
+      for ( ; i_p!=level->end(); ++i_p)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *i_p;
           boost::shared_ptr<SAMRAI::pdat::CellData<double> >cell_viscosity_ptr =
@@ -84,7 +84,7 @@ void Stokes::FAC::fix_viscosity()
 
               SAMRAI::pdat::NodeIterator nend(edge_viscosity.getBox(),false);
               for(SAMRAI::pdat::NodeIterator ni(edge_viscosity.getBox(),true);
-                  ni!=nend; ni++)
+                  ni!=nend; ++ni)
                 {
                   SAMRAI::pdat::NodeIndex e=*ni;
                   SAMRAI::pdat::CellIndex c(e);
@@ -105,7 +105,7 @@ void Stokes::FAC::fix_viscosity()
                   pbox.grow(axis,edge_viscosity.getGhostCellWidth()[axis]);
                   
                   SAMRAI::pdat::EdgeIterator nend(pbox,axis,false);
-                  for(SAMRAI::pdat::EdgeIterator ni(pbox,axis,true); ni!=nend; ni++)
+                  for(SAMRAI::pdat::EdgeIterator ni(pbox,axis,true); ni!=nend; ++ni)
                     {
                       SAMRAI::pdat::EdgeIndex e=*ni;
                       SAMRAI::pdat::CellIndex c(e);

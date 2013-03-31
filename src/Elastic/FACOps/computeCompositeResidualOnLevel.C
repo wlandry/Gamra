@@ -68,7 +68,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
    */
 
   for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-       pi!=level->end(); pi++)
+       pi!=level->end(); ++pi)
     {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =

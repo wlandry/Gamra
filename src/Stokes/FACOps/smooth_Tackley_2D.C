@@ -75,7 +75,7 @@ void Stokes::FACOps::smooth_Tackley_2D
         {
           xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
           for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-               pi!=level->end(); pi++)
+               pi!=level->end(); ++pi)
             {
               boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
@@ -136,7 +136,7 @@ void Stokes::FACOps::smooth_Tackley_2D
         {
           xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
           for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-               pi!=level->end(); pi++)
+               pi!=level->end(); ++pi)
             {
               boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
@@ -197,7 +197,7 @@ void Stokes::FACOps::smooth_Tackley_2D
          the pressure. */
       xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
 
-      for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin()); pi!=level->end(); pi++)
+      for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin()); pi!=level->end(); ++pi)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
@@ -236,7 +236,7 @@ void Stokes::FACOps::smooth_Tackley_2D
           double dy = geom->getDx()[1];
 
           SAMRAI::pdat::CellIterator cend(pbox,false);
-          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
+          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
             {
               SAMRAI::pdat::CellIndex center(*ci);
               const SAMRAI::pdat::SideIndex
@@ -265,7 +265,7 @@ void Stokes::FACOps::smooth_Tackley_2D
       xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
 
       for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-           pi!=level->end(); pi++)
+           pi!=level->end(); ++pi)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
@@ -298,7 +298,7 @@ void Stokes::FACOps::smooth_Tackley_2D
           pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
 
           SAMRAI::pdat::CellIterator cend(pbox,false);
-          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
+          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
             {
               SAMRAI::pdat::CellIndex center(*ci);
 

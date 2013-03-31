@@ -17,7 +17,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
       double offset[]={0.5,0.5,0.5};
       offset[ix]=0;
       SAMRAI::pdat::SideIterator send(gbox,ix,false);
-      for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; si++)
+      for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
         {
           SAMRAI::pdat::SideIndex x(*si);
               

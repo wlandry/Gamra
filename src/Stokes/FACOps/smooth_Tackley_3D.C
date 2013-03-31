@@ -78,7 +78,7 @@ void Stokes::FACOps::smooth_Tackley_3D
           {
             xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
             for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-                 pi!=level->end(); pi++)
+                 pi!=level->end(); ++pi)
               {
                 boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
@@ -137,7 +137,7 @@ void Stokes::FACOps::smooth_Tackley_3D
       xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
 
       for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-           pi!=level->end(); pi++)
+           pi!=level->end(); ++pi)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
@@ -179,7 +179,7 @@ void Stokes::FACOps::smooth_Tackley_3D
           const double *Dx = geom->getDx();
 
           SAMRAI::pdat::CellIterator cend(pbox,false);
-          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
+          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
             {
               SAMRAI::pdat::CellIndex center(*ci);
 
@@ -205,7 +205,7 @@ void Stokes::FACOps::smooth_Tackley_3D
       xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
 
       for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-           pi!=level->end(); pi++)
+           pi!=level->end(); ++pi)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
@@ -237,7 +237,7 @@ void Stokes::FACOps::smooth_Tackley_3D
           pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
 
           SAMRAI::pdat::CellIterator cend(pbox,true);
-          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ci++)
+          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
             {
               SAMRAI::pdat::CellIndex center(*ci);
 

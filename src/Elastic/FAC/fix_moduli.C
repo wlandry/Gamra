@@ -78,7 +78,7 @@ void Elastic::FAC::fix_moduli()
         level = d_hierarchy->getPatchLevel(ln);
       
       for (SAMRAI::hier::PatchLevel::Iterator i_p(level->begin());
-           i_p!=level->end(); i_p++)
+           i_p!=level->end(); ++i_p)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *i_p;
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
@@ -125,7 +125,7 @@ void Elastic::FAC::fix_moduli()
 
                   SAMRAI::pdat::EdgeIterator nend(pbox,axis,false);
                   for(SAMRAI::pdat::EdgeIterator ni(pbox,axis,true);
-                      ni!=nend; ni++)
+                      ni!=nend; ++ni)
                     {
                       SAMRAI::pdat::EdgeIndex e=*ni;
                       SAMRAI::pdat::CellIndex c(e);

@@ -48,7 +48,7 @@ void Stokes::FACOps::set_boundaries
  boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
 {
   for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-       pi!=level->end(); pi++)
+       pi!=level->end(); ++pi)
     {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
       Stokes_set_boundary(*patch,p_id,v_id,rhs);

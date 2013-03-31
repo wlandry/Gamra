@@ -71,7 +71,7 @@ void Stokes::FACOps::computeVectorWeights(
     boost::shared_ptr<SAMRAI::hier::PatchLevel> level =
       hierarchy->getPatchLevel(ln);
     for (SAMRAI::hier::PatchLevel::Iterator p(level->begin());
-         p!=level->end(); p++) {
+         p!=level->end(); ++p) {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> patch_geometry =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
@@ -123,11 +123,11 @@ void Stokes::FACOps::computeVectorWeights(
        */
 
       for (SAMRAI::hier::PatchLevel::Iterator p(level->begin());
-           p!=level->end(); p++) {
+           p!=level->end(); ++p) {
 
         boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
         for (SAMRAI::hier::BoxContainer::iterator i = coarsened_boxes.begin();
-             i != coarsened_boxes.end(); i++) {
+             i != coarsened_boxes.end(); ++i) {
 
           SAMRAI::hier::Box coarse_box = *i;
           SAMRAI::hier::Box intersection = coarse_box * (patch->getBox());

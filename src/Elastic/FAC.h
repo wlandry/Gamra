@@ -336,7 +336,7 @@ void Elastic::FAC::add_faults()
         level(d_hierarchy->getPatchLevel(l));
       
       for(SAMRAI::hier::PatchLevel::Iterator p(level->begin());
-          p!=level->end(); p++)
+          p!=level->end(); ++p)
         {
           boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
             boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
@@ -432,7 +432,7 @@ void Elastic::FAC::add_faults()
 
                   SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
                   for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end;
-                      si++)
+                      ++si)
                     {
                       const SAMRAI::pdat::SideIndex s(*si);
 
@@ -493,7 +493,7 @@ void Elastic::FAC::add_faults()
             {
               SAMRAI::pdat::SideIterator s_end(pbox,ix,false);
               for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=s_end;
-                  si++)
+                  ++si)
                 {
                   const SAMRAI::pdat::SideIndex s(*si);
                   SAMRAI::pdat::CellIndex c(s);

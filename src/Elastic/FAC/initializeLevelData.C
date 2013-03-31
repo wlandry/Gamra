@@ -54,7 +54,7 @@ void Elastic::FAC::initializeLevelData
    * Initialize data in all patches in the level.
    */
   SAMRAI::hier::PatchLevel::Iterator p_i(level->begin());
-  for (; p_i!=level->end(); p_i++) {
+  for (; p_i!=level->end(); ++p_i) {
 
     boost::shared_ptr<SAMRAI::hier::Patch> patch = *p_i;
     if (!patch) {
@@ -75,7 +75,7 @@ void Elastic::FAC::initializeLevelData
 
     SAMRAI::pdat::CellIterator cend(cell_moduli->getGhostBox(),false);
     for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox(),true);
-        ci!=cend; ci++)
+        ci!=cend; ++ci)
       {
         SAMRAI::pdat::CellIndex c=*ci;
         double coord[3];
@@ -112,7 +112,7 @@ void Elastic::FAC::initializeLevelData
             offset[ix]=0;
             SAMRAI::pdat::SideIterator end(level_set_ptr->getGhostBox(),ix,false);
             for(SAMRAI::pdat::SideIterator si(level_set_ptr->getGhostBox(),ix,true);
-                si!=end; si++)
+                si!=end; ++si)
               {
                 SAMRAI::pdat::SideIndex x(*si);
                 double coord[3];

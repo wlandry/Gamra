@@ -458,7 +458,7 @@ void Stokes::HypreSolver::allocateHypreData()
 
   HYPRE_StructGridCreate(communicator, d_dim.getValue(), &d_grid);
   for (SAMRAI::hier::PatchLevel::Iterator p(level.begin());
-       p!=level.end(); p++) {
+       p!=level.end(); ++p) {
     const SAMRAI::hier::Box& box = (*p)->getBox();
     SAMRAI::hier::Index lower = box.lower();
     SAMRAI::hier::Index upper = box.upper();
@@ -519,7 +519,7 @@ void Stokes::HypreSolver::allocateHypreData()
         { -1 }, { 0 }
       };
       HYPRE_StructStencilCreate(d_dim.getValue(), stencil_size, &d_stencil);
-      for (int s = 0; s < stencil_size; s++) {
+      for (int s = 0; s < stencil_size; ++s) {
         HYPRE_StructStencilSetElement(d_stencil, s,
                                       stencil_offsets[s]);
       }
@@ -529,7 +529,7 @@ void Stokes::HypreSolver::allocateHypreData()
         { -1, 0 }, { 0, -1 }, { 0, 0 }
       };
       HYPRE_StructStencilCreate(d_dim.getValue(), stencil_size, &d_stencil);
-      for (int s = 0; s < stencil_size; s++) {
+      for (int s = 0; s < stencil_size; ++s) {
         HYPRE_StructStencilSetElement(d_stencil, s,
                                       stencil_offsets[s]);
       }
@@ -539,7 +539,7 @@ void Stokes::HypreSolver::allocateHypreData()
         { -1, 0, 0 }, { 0, -1, 0 }, { 0, 0, -1 }, { 0, 0, 0 }
       };
       HYPRE_StructStencilCreate(d_dim.getValue(), stencil_size, &d_stencil);
-      for (int s = 0; s < stencil_size; s++) {
+      for (int s = 0; s < stencil_size; ++s) {
         HYPRE_StructStencilSetElement(d_stencil, s,
                                       stencil_offsets[s]);
       }
@@ -672,7 +672,7 @@ void Stokes::HypreSolver::copyToHypre(
 {
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS2(d_dim, src, box);
 
-  for (SAMRAI::pdat::CellIterator c(box); c; c++) {
+  for (SAMRAI::pdat::CellIterator c(box); c; ++c) {
     SAMRAI::hier::IntVector ic = c();
     HYPRE_StructVectorSetValues(vector, &ic[0], src(c(), depth));
   }
@@ -694,7 +694,7 @@ void Stokes::HypreSolver::copyFromHypre(
 {
   TBOX_DIM_ASSERT_CHECK_DIM_ARGS2(d_dim, dst, box);
 
-  for (SAMRAI::pdat::CellIterator c(box); c; c++) {
+  for (SAMRAI::pdat::CellIterator c(box); c; ++c) {
     double value;
     SAMRAI::hier::IntVector ic = c();
     HYPRE_StructVectorGetValues(vector, &ic[0], &value);
@@ -758,7 +758,7 @@ void Stokes::HypreSolver::setMatrixCoefficients()
   boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
   const SAMRAI::hier::IntVector no_ghosts(d_dim, 0);
   for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-       pi!=level->end(); pi++) {
+       pi!=level->end(); ++pi) {
 
     SAMRAI::hier::Patch& patch = **pi;
 
@@ -953,7 +953,7 @@ void Stokes::HypreSolver::setMatrixCoefficients()
     int stencil_indices[stencil_size];
     double mat_entries[stencil_size];
 
-    for (i = 0; i < stencil_size; i++) stencil_indices[i] = i;
+    for (i = 0; i < stencil_size; ++i) stencil_indices[i] = i;
 
     SAMRAI::pdat::CellIterator ic(patch_box);
 
@@ -962,7 +962,7 @@ void Stokes::HypreSolver::setMatrixCoefficients()
      * See if it can be replaced by a Fortran loop or if we
      * can set matrix entries for an entire box at once.
      */
-    for ( ; ic; ic++) {
+    for ( ; ic; ++ic) {
 
       SAMRAI::hier::IntVector icell = ic();
       SAMRAI::pdat::SideIndex ixlower(ic(),
@@ -1241,7 +1241,7 @@ int Stokes::HypreSolver::solveSystem(
   d_cf_bc_coef.setGhostDataId(u, SAMRAI::hier::IntVector::getZero(d_dim));
 
   for (SAMRAI::hier::PatchLevel::Iterator p(level.begin());
-       p!=level.end(); p++) {
+       p!=level.end(); ++p) {
     boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
 
     const SAMRAI::hier::Box box = patch->getBox();
@@ -1341,7 +1341,7 @@ int Stokes::HypreSolver::solveSystem(
    * Pull the solution vector out of the HYPRE structures
    */
   for (SAMRAI::hier::PatchLevel::Iterator ip(level.begin());
-       ip!=level.end(); ip++) {
+       ip!=level.end(); ++ip) {
     boost::shared_ptr<SAMRAI::hier::Patch> patch = *ip;
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > u_data_ = patch->getPatchData(u);
     SAMRAI::pdat::CellData<double>& u_data = *u_data_;

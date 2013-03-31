@@ -21,7 +21,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
       double offset[]={0.5,0.5,0.5};
       offset[ix]=0;
       SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
-      for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; si++)
+      for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; ++si)
         {
           SAMRAI::pdat::SideIndex x(*si);
 

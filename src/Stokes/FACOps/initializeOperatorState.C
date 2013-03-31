@@ -107,7 +107,7 @@ void Stokes::FACOps::initializeOperatorState
     boost::shared_ptr<SAMRAI::hier::PatchLevel> level_ptr =
       d_hierarchy->getPatchLevel(ln);
     SAMRAI::hier::PatchLevel& level = *level_ptr;
-    for (SAMRAI::hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); pi++) {
+    for (SAMRAI::hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); ++pi) {
       SAMRAI::hier::Patch& patch = **pi;
       boost::shared_ptr<SAMRAI::hier::PatchData> fd =
         patch.getPatchData(rhs.getComponentDescriptorIndex(0));

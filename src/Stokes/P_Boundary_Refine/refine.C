@@ -18,7 +18,7 @@ void Stokes::P_Boundary_Refine::refine
 
   Stokes_set_boundary(coarse,src_component,invalid_id,true);
 
-  for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin()); b!=boxes.end(); b++)
+  for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin()); b!=boxes.end(); ++b)
     {
       const SAMRAI::hier::Box &overlap_box=*b;
 

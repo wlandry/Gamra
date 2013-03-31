@@ -92,7 +92,7 @@ void Elastic::FACOps::initializeOperatorState
           d_hierarchy->getPatchLevel(ln);
         SAMRAI::hier::PatchLevel& level = *level_ptr;
         for (SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
-             pi!=level.end(); pi++)
+             pi!=level.end(); ++pi)
           {
             SAMRAI::hier::Patch& patch = **pi;
             boost::shared_ptr<SAMRAI::hier::PatchData> fd=

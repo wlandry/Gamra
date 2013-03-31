@@ -44,7 +44,7 @@ Elastic::FAC::pack_strain(double* buffer,
 
   SAMRAI::pdat::CellData<double>::iterator iend(region,false);
   for(SAMRAI::pdat::CellData<double>::iterator icell(region,true);
-      icell!=iend; icell++)
+      icell!=iend; ++icell)
     {
       const SAMRAI::pdat::SideIndex
         s(*icell,ix,SAMRAI::pdat::SideIndex::Lower);

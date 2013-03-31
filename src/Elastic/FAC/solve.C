@@ -50,7 +50,7 @@ int Elastic::FAC::solve()
       level = d_hierarchy->getPatchLevel(ln);
     
     for (SAMRAI::hier::PatchLevel::Iterator ip(level->begin());
-         ip!=level->end(); ip++) {
+         ip!=level->end(); ++ip) {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *ip;
 
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =

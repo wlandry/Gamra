@@ -43,7 +43,7 @@ int Stokes::FAC::solve()
     boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
     SAMRAI::hier::PatchLevel::Iterator ip(level->begin());
     SAMRAI::hier::PatchLevel::Iterator iend(level->end());
-    for ( ; ip!=iend; ip++) {
+    for ( ; ip!=iend; ++ip) {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *ip;
       boost::shared_ptr<SAMRAI::pdat::CellData<double> > p =
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
@@ -72,7 +72,7 @@ int Stokes::FAC::solve()
 
           SAMRAI::hier::Box pbox = p->getBox();
           SAMRAI::pdat::CellIterator cend(p->getGhostBox(),false);
-          for(SAMRAI::pdat::CellIterator ci(p->getGhostBox(),true); ci!=cend; ci++)
+          for(SAMRAI::pdat::CellIterator ci(p->getGhostBox(),true); ci!=cend; ++ci)
             {
               SAMRAI::pdat::CellIndex c=*ci;
               double xyz[dim], weight[dim][2];

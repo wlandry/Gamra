@@ -57,7 +57,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
       for(int ix=0; ix<dim; ++ix)
         {
           SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
-          for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; si++)
+          for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; ++si)
             {
               SAMRAI::pdat::SideIndex s(*si);
               if((s[ix]<pbox.lower(ix)
@@ -91,7 +91,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
       SAMRAI::pdat::CellData<double>& dv_diagonal(*dv_diagonal_ptr);
 
       SAMRAI::pdat::CellIterator c_end(gbox,false);
-      for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=c_end; ci++)
+      for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=c_end; ++ci)
         {
           SAMRAI::pdat::CellIndex c(*ci);
           bool is_boundary(false);

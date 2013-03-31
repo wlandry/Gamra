@@ -50,7 +50,7 @@ void Stokes::FAC::initializeLevelData
    * Initialize data in all patches in the level.
    */
   SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-  for (; pi!=level->end(); pi++) {
+  for (; pi!=level->end(); ++pi) {
 
     boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
     if (!patch) {
@@ -67,7 +67,7 @@ void Stokes::FAC::initializeLevelData
 
     SAMRAI::hier::Box cell_visc_box = cell_viscosity->getBox();
     SAMRAI::pdat::CellIterator cend(cell_viscosity->getGhostBox(),false);
-    for(SAMRAI::pdat::CellIterator ci(cell_viscosity->getGhostBox(),true); ci!=cend; ci++)
+    for(SAMRAI::pdat::CellIterator ci(cell_viscosity->getGhostBox(),true); ci!=cend; ++ci)
       {
         SAMRAI::pdat::CellIndex c=*ci;
         double xyz[dim];
@@ -114,7 +114,7 @@ void Stokes::FAC::initializeLevelData
             offset[ix]=0;
 
             SAMRAI::pdat::SideIterator send(pbox,ix,false);
-            for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=send; si++)
+            for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=send; ++si)
               {
                 SAMRAI::pdat::SideIndex s=*si;
                 double xyz[dim];

@@ -37,7 +37,7 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
       const SAMRAI::hier::BoxContainer&
         boxes = t_overlap->getDestinationBoxContainer(axis);
       SAMRAI::hier::BoxContainer::const_iterator bend(boxes.end());
-      for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin()); b!=bend; b++)
+      for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin()); b!=bend; ++b)
         {
           refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
         }
@@ -84,7 +84,7 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
   SAMRAI::hier::Index pp[]={ip,jp,kp};
 
   SAMRAI::pdat::CellIterator cend(fine_box,false);
-  for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ci++)
+  for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ++ci)
     {
       SAMRAI::pdat::SideIndex fine(*ci,axis,SAMRAI::pdat::SideIndex::Lower);
 

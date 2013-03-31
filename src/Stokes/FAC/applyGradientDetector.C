@@ -18,7 +18,7 @@ void Stokes::FAC::applyGradientDetector
   
   int ntag = 0, ntotal = 0;
   double maxestimate = 0;
-  for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); pi++)
+  for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); ++pi)
     {
       SAMRAI::hier::Patch& patch = **pi;
       boost::shared_ptr<SAMRAI::hier::PatchData>
@@ -54,7 +54,7 @@ void Stokes::FAC::applyGradientDetector
                               
       tag_cell_data.fill(0);
       SAMRAI::pdat::CellIterator cend(patch.getBox(),false);
-      for (SAMRAI::pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ci++)
+      for (SAMRAI::pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ++ci)
         {
           const SAMRAI::pdat::CellIndex cell_index(*ci);
           if (maxestimate < estimate_data(cell_index))
