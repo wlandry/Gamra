@@ -23,7 +23,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
       SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
       for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; ++si)
         {
-          SAMRAI::pdat::SideIndex x(*si);
+          const SAMRAI::pdat::SideIndex &x(*si);
 
           for(int d=0;d<dim;++d)
             coord[d]=geom->getXLower()[d]

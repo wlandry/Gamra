@@ -59,7 +59,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
           SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
           for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; ++si)
             {
-              SAMRAI::pdat::SideIndex s(*si);
+              const SAMRAI::pdat::SideIndex &s(*si);
               if((s[ix]<pbox.lower(ix)
                   && geom->getTouchesRegularBoundary(ix,0))
                  || (s[ix]>pbox.upper(ix)+1
@@ -93,7 +93,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
       SAMRAI::pdat::CellIterator c_end(gbox,false);
       for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=c_end; ++ci)
         {
-          SAMRAI::pdat::CellIndex c(*ci);
+          const SAMRAI::pdat::CellIndex &c(*ci);
           bool is_boundary(false);
           for(int d=0;d<dim;++d)
             is_boundary= is_boundary

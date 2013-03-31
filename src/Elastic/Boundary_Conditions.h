@@ -106,7 +106,7 @@ namespace Elastic {
           SAMRAI::pdat::SideIterator send(gbox,ix,false);
           for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
             {
-              SAMRAI::pdat::SideIndex x(*si);
+              const SAMRAI::pdat::SideIndex &x(*si);
               
               bool on_corner(false);
               for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)

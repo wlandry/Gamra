@@ -38,7 +38,7 @@ void Stokes::Resid_Coarsen::coarsen(SAMRAI::hier::Patch& coarse,
   SAMRAI::pdat::CellIterator cend(coarse.getBox(),false);
   for(SAMRAI::pdat::CellIterator ci(coarse.getBox(),true); ci!=cend; ++ci)
     {
-      SAMRAI::pdat::CellIndex coarse(*ci);
+      const SAMRAI::pdat::CellIndex &coarse(*ci);
       SAMRAI::pdat::CellIndex fine(coarse*2);
       double temp(0), viscosity_sum(0);
 

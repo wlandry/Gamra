@@ -126,7 +126,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
 
       for(SAMRAI::pdat::CellIterator ci(big_box,true); ci!=end; ++ci)
         {
-          SAMRAI::pdat::CellIndex coarse_cell(*ci);
+          const SAMRAI::pdat::CellIndex &coarse_cell(*ci);
           for(int ix=0;ix<dim;++ix)
             {
               const int iy((ix+1)%dim);
@@ -221,7 +221,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
 
       for(SAMRAI::pdat::CellIterator ci(big_box,true); ci!=end; ++ci)
         {
-          SAMRAI::pdat::CellIndex cell(*ci);
+          const SAMRAI::pdat::CellIndex &cell(*ci);
           for(int ix=0;ix<2;++ix)
             {
               const int iy((ix+1)%dim);

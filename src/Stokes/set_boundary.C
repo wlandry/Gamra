@@ -47,7 +47,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
       SAMRAI::pdat::CellIterator cend(gbox,false);      
       for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=cend; ++ci)
         {
-          SAMRAI::pdat::CellIndex center(*ci);
+          const SAMRAI::pdat::CellIndex &center(*ci);
           SAMRAI::hier::Index ip(zero), jp(zero), kp(zero);
           SAMRAI::hier::Index pp[]={ip,jp,kp};
 
@@ -110,7 +110,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
           SAMRAI::pdat::SideIterator send(gbox,ix,false);
           for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
             {
-              SAMRAI::pdat::SideIndex x(*si);
+              const SAMRAI::pdat::SideIndex &x(*si);
 
               /* Set a sentinel value for normal components */
               if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0))
@@ -172,7 +172,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
 
           for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
             {
-              SAMRAI::pdat::SideIndex x(*si);
+              const SAMRAI::pdat::SideIndex &x(*si);
               if((x[ix]<pbox.lower(ix)
                   && geom->getTouchesRegularBoundary(ix,0)
                   && !lower_dirichlet[ix])
@@ -203,7 +203,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
               SAMRAI::pdat::SideIterator send(gbox,ix,false);
               for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
                 {
-                  SAMRAI::pdat::SideIndex x(*si);
+                  const SAMRAI::pdat::SideIndex &x(*si);
                   if(((x[ix]<pbox.lower(ix)
                        && geom->getTouchesRegularBoundary(ix,0)
                        && !lower_dirichlet[ix])

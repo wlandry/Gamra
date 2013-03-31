@@ -114,7 +114,7 @@ void Elastic::FAC::initializeLevelData
             for(SAMRAI::pdat::SideIterator si(level_set_ptr->getGhostBox(),ix,true);
                 si!=end; ++si)
               {
-                SAMRAI::pdat::SideIndex x(*si);
+                const SAMRAI::pdat::SideIndex &x(*si);
                 double coord[3];
                 for(int d=0;d<dim;++d)
                   coord[d]=geom->getXLower()[d]

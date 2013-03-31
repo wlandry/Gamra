@@ -60,7 +60,7 @@ void Elastic::FAC::applyGradientDetector
       const int dim(d_dim.getValue());
       for(SAMRAI::pdat::CellIterator ci(box,true); ci!=cend; ++ci)
         {
-          const SAMRAI::pdat::CellIndex cell(*ci);
+          const SAMRAI::pdat::CellIndex &cell(*ci);
 
           double curvature(0);
 	  for (int ix=0; ix<dim; ++ix)

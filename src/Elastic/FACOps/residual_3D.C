@@ -22,7 +22,7 @@ void Elastic::FACOps::residual_3D
   SAMRAI::pdat::CellIterator cend(pbox,false);
   for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
     {
-      SAMRAI::pdat::CellIndex center(*ci);
+      const SAMRAI::pdat::CellIndex &center(*ci);
       SAMRAI::pdat::CellIndex up(center), down(center), right(center),
         left(center), front(center), back(center);
 

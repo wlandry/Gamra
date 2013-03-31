@@ -19,7 +19,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
       SAMRAI::pdat::SideIterator send(gbox,ix,false);
       for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
         {
-          SAMRAI::pdat::SideIndex x(*si);
+          const SAMRAI::pdat::SideIndex &x(*si);
               
           /* Set the derivative.  Do not set a shear derivative at the
            * corner where a dirichlet condition is set. */

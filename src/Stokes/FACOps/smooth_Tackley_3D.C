@@ -181,7 +181,7 @@ void Stokes::FACOps::smooth_Tackley_3D
           SAMRAI::pdat::CellIterator cend(pbox,false);
           for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
             {
-              SAMRAI::pdat::CellIndex center(*ci);
+              const SAMRAI::pdat::CellIndex &center(*ci);
 
               double delta_R_continuity=p_rhs(center);
               for(int ix=0;ix<3;++ix)
@@ -239,7 +239,7 @@ void Stokes::FACOps::smooth_Tackley_3D
           SAMRAI::pdat::CellIterator cend(pbox,true);
           for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
             {
-              SAMRAI::pdat::CellIndex center(*ci);
+              const SAMRAI::pdat::CellIndex &center(*ci);
 
               /* Update v */
               for(int ix=0;ix<3;++ix)

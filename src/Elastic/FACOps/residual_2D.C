@@ -31,7 +31,7 @@ void Elastic::FACOps::residual_2D
       SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
       for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
         {
-          SAMRAI::pdat::CellIndex cell(*ci);
+          const SAMRAI::pdat::CellIndex &cell(*ci);
 
           const SAMRAI::pdat::NodeIndex
             edge(cell,SAMRAI::pdat::NodeIndex::LowerLeft);
@@ -72,7 +72,7 @@ void Elastic::FACOps::residual_2D
     {
       for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
         {
-          SAMRAI::pdat::CellIndex cell(*ci);
+          const SAMRAI::pdat::CellIndex &cell(*ci);
 
           const SAMRAI::pdat::NodeIndex
             edge(cell,SAMRAI::pdat::NodeIndex::LowerLeft);

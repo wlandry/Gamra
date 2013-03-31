@@ -69,7 +69,7 @@ void Stokes::P_Refine::refine(
    SAMRAI::pdat::CellIterator cend(fine_box,false);
    for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ++ci)
      {
-       SAMRAI::pdat::CellIndex fine(*ci);
+       const SAMRAI::pdat::CellIndex &fine(*ci);
 
        SAMRAI::pdat::CellIndex
          center(SAMRAI::hier::Index::coarsen(fine,SAMRAI::hier::Index::getOneIndex(dim)*2));

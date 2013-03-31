@@ -238,7 +238,7 @@ void Stokes::FACOps::smooth_Tackley_2D
           SAMRAI::pdat::CellIterator cend(pbox,false);
           for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
             {
-              SAMRAI::pdat::CellIndex center(*ci);
+              const SAMRAI::pdat::CellIndex &center(*ci);
               const SAMRAI::pdat::SideIndex
                 x(center,0,SAMRAI::pdat::SideIndex::Lower),
                 y(center,1,SAMRAI::pdat::SideIndex::Lower);
@@ -300,11 +300,13 @@ void Stokes::FACOps::smooth_Tackley_2D
           SAMRAI::pdat::CellIterator cend(pbox,false);
           for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
             {
-              SAMRAI::pdat::CellIndex center(*ci);
+              const SAMRAI::pdat::CellIndex &center(*ci);
 
-              const SAMRAI::pdat::SideIndex x(center,0,SAMRAI::pdat::SideIndex::Lower),
+              const SAMRAI::pdat::SideIndex
+                x(center,0,SAMRAI::pdat::SideIndex::Lower),
                 y(center,1,SAMRAI::pdat::SideIndex::Lower);
-              const SAMRAI::pdat::NodeIndex edge(center,SAMRAI::pdat::NodeIndex::LowerLeft);
+              const SAMRAI::pdat::NodeIndex
+                edge(center,SAMRAI::pdat::NodeIndex::LowerLeft);
 
               /* Update v */
               if(center[1]<pbox.upper(1))
