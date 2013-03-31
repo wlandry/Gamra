@@ -74,7 +74,7 @@ int Stokes::FAC::solve()
           SAMRAI::pdat::CellIterator cend(p->getGhostBox(),false);
           for(SAMRAI::pdat::CellIterator ci(p->getGhostBox(),true); ci!=cend; ++ci)
             {
-              SAMRAI::pdat::CellIndex c=*ci;
+              const SAMRAI::pdat::CellIndex &c(*ci);
               double xyz[dim], weight[dim][2];
               for(int d=0;d<dim;++d)
                 xyz[d]=geom->getXLower()[d]

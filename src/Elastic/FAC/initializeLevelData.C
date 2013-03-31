@@ -77,7 +77,7 @@ void Elastic::FAC::initializeLevelData
     for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox(),true);
         ci!=cend; ++ci)
       {
-        SAMRAI::pdat::CellIndex c=*ci;
+        const SAMRAI::pdat::CellIndex &c(*ci);
         double coord[3];
         for(int d=0;d<dim;++d)
           coord[d]=geom->getXLower()[d]

@@ -434,7 +434,7 @@ void Elastic::FAC::add_faults()
                   for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end;
                       ++si)
                     {
-                      const SAMRAI::pdat::SideIndex s(*si);
+                      const SAMRAI::pdat::SideIndex &s(*si);
 
                       FTensor::Tensor1<double,3> xyz(0,0,0);
                       for(int d=0;d<dim;++d)
@@ -495,7 +495,7 @@ void Elastic::FAC::add_faults()
               for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=s_end;
                   ++si)
                 {
-                  const SAMRAI::pdat::SideIndex s(*si);
+                  const SAMRAI::pdat::SideIndex &s(*si);
                   SAMRAI::pdat::CellIndex c(s);
 
                   /* d/dx^2, d/dy^2, d/dz^2 */

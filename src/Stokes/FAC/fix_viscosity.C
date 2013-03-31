@@ -86,7 +86,7 @@ void Stokes::FAC::fix_viscosity()
               for(SAMRAI::pdat::NodeIterator ni(edge_viscosity.getBox(),true);
                   ni!=nend; ++ni)
                 {
-                  SAMRAI::pdat::NodeIndex e=*ni;
+                  const SAMRAI::pdat::NodeIndex &e(*ni);
                   SAMRAI::pdat::CellIndex c(e);
                   edge_viscosity(e)=
                     pow(cell_viscosity(c)*cell_viscosity(c-ip)
@@ -107,7 +107,7 @@ void Stokes::FAC::fix_viscosity()
                   SAMRAI::pdat::EdgeIterator nend(pbox,axis,false);
                   for(SAMRAI::pdat::EdgeIterator ni(pbox,axis,true); ni!=nend; ++ni)
                     {
-                      SAMRAI::pdat::EdgeIndex e=*ni;
+                      const SAMRAI::pdat::EdgeIndex &e(*ni);
                       SAMRAI::pdat::CellIndex c(e);
                       edge_viscosity(e)=
                         pow(cell_viscosity(c)*cell_viscosity(c-pp[axis2])

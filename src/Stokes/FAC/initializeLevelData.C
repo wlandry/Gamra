@@ -69,7 +69,7 @@ void Stokes::FAC::initializeLevelData
     SAMRAI::pdat::CellIterator cend(cell_viscosity->getGhostBox(),false);
     for(SAMRAI::pdat::CellIterator ci(cell_viscosity->getGhostBox(),true); ci!=cend; ++ci)
       {
-        SAMRAI::pdat::CellIndex c=*ci;
+        const SAMRAI::pdat::CellIndex &c(*ci);
         double xyz[dim];
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
@@ -116,7 +116,7 @@ void Stokes::FAC::initializeLevelData
             SAMRAI::pdat::SideIterator send(pbox,ix,false);
             for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=send; ++si)
               {
-                SAMRAI::pdat::SideIndex s=*si;
+                const SAMRAI::pdat::SideIndex &s(*si);
                 double xyz[dim];
                 for(int d=0;d<dim;++d)
                   xyz[d]=geom->getXLower()[d]

@@ -99,7 +99,7 @@ void Elastic::FAC::fix_moduli()
                 {
                   for (int m=0;m<2;++m)
                     {
-                      SAMRAI::pdat::NodeIndex e=*ni;
+                      const SAMRAI::pdat::NodeIndex &e(*ni);
                       SAMRAI::pdat::CellIndex c(e);
                       edge_moduli(e,m)=
                         pow(cell_moduli(c,m)*cell_moduli(c-ip,m)
@@ -127,7 +127,7 @@ void Elastic::FAC::fix_moduli()
                   for(SAMRAI::pdat::EdgeIterator ni(pbox,axis,true);
                       ni!=nend; ++ni)
                     {
-                      SAMRAI::pdat::EdgeIndex e=*ni;
+                      const SAMRAI::pdat::EdgeIndex &e(*ni);
                       SAMRAI::pdat::CellIndex c(e);
 		      for (int m=0;m<2;++m)
                         {
