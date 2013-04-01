@@ -20,96 +20,124 @@ void Elastic::Boundary_Conditions::set_dirichlet
     {
       double offset[]={0.5,0.5,0.5};
       offset[ix]=0;
-      SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
-      for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; ++si)
+
+      for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
         {
-          const SAMRAI::pdat::SideIndex &x(*si);
+          const int ix_iy(index_map(ix,iy,dim));
 
-          for(int d=0;d<dim;++d)
-            coord[d]=geom->getXLower()[d]
-              + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+          SAMRAI::hier::Box x_box(gbox);
+          x_box.lower(ix)=(geom->getTouchesRegularBoundary(ix,0)
+                           && is_dirichlet[ix][ix][0]) ?
+            pbox.lower(ix)+1 : pbox.lower(ix);
+          x_box.upper(ix)=(geom->getTouchesRegularBoundary(ix,1)
+                   && is_dirichlet[ix][ix][1]) ?
+            pbox.upper(ix)-1 : pbox.upper(ix);
 
-          /* For normal BC's, for the point just outside the
-             boundary, set a sentinel value for normal dirichlet
-             BC or the derivative for normal traction BC. */
+          if(geom->getTouchesRegularBoundary(iy,0) && is_dirichlet[ix][iy][0])
+            {
+              SAMRAI::hier::Box y_box(x_box);
+              y_box.upper(iy)=y_box.lower(iy);
 
-          /* A point can be affected by multiple boundaries.  So we
-             have to fall through for every point in case a point is
-             on a corner but the normal direction is not dirichlet. */
-
-          if(x[ix]<pbox.lower(ix) && geom->getTouchesRegularBoundary(ix,0)
-             && is_dirichlet[ix][ix][0])
-            {
-              v(x)=boundary_value;
-            }
-          else if(x[ix]>pbox.upper(ix)+1
-                  && geom->getTouchesRegularBoundary(ix,1)
-                  && is_dirichlet[ix][ix][1])
-            {
-              v(x)=boundary_value;
-            }
-          /* If at the boundary line, set values for normal
-           * components. */
-          else if(x[ix]==pbox.lower(ix)
-                  && geom->getTouchesRegularBoundary(ix,0)
-                  && is_dirichlet[ix][ix][0])
-            {
-              if(!homogeneous)
-                v(x)=expression[ix][ix][0].eval(coord);
-              else
-                v(x)=0;
-            }
-          else if(x[ix]==pbox.upper(ix)+1
-                  && geom->getTouchesRegularBoundary(ix,1)
-                  && is_dirichlet[ix][ix][1])
-            {
-              if(!homogeneous)
-                v(x)=expression[ix][ix][1].eval(coord);
-              else
-                v(x)=0;
-            }
-          /* Set tangential components. */
-          else
-            {
-              for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+              SAMRAI::pdat::SideIterator end(gbox,ix,false);
+              for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=end; ++si)
                 {
-                  const int ix_iy(index_map(ix,iy,dim));
-                  if(x[iy]<pbox.lower(iy)
-                     && geom->getTouchesRegularBoundary(iy,0))
+                  const SAMRAI::pdat::SideIndex &x(*si);
+                  v(x)=-v(x+unit[iy]);
+                  if(!homogeneous)
                     {
-                      if(is_dirichlet[ix][iy][0])
-                        {
-                          v(x)=-v(x+unit[iy]);
-                          if(!homogeneous)
-                            {
-                              double coord_save(geom->getXLower()[iy]);
-                              std::swap(coord[iy],coord_save);
-                              if(have_faults())
-                                v(x)+= -(*dv_mixed_ptr)(x+unit[iy],ix_iy+1);
-                              v(x)+=2*expression[ix][iy][0].eval(coord);
-                              std::swap(coord[iy],coord_save);
-                            }
-                        }
+                      double coord[dim];
+                      coord[iy]=geom->getXLower()[iy];
+                      for(int d=(iy+1)%dim;d!=iy;d=(d+1)%dim)
+                        coord[d]=geom->getXLower()[d]
+                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                      if(have_faults())
+                        v(x)+= -(*dv_mixed_ptr)(x+unit[iy],ix_iy+1);
+                      v(x)+=2*expression[ix][iy][0].eval(coord);
                     }
-                  else if(x[iy]>pbox.upper(iy)
-                          && geom->getTouchesRegularBoundary(iy,1))
+                }
+            }
+          if(geom->getTouchesRegularBoundary(iy,1) && is_dirichlet[ix][iy][1])
+            {
+              SAMRAI::hier::Box y_box(x_box);
+              y_box.lower(iy)=y_box.upper(iy);
+
+              SAMRAI::pdat::SideIterator end(gbox,ix,false);
+              for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=end; ++si)
+                {
+                  const SAMRAI::pdat::SideIndex &x(*si);
+                  v(x)=-v(x-unit[iy]);
+                  if(!homogeneous)
                     {
-                      if(is_dirichlet[ix][iy][1])
-                        {
-                          v(x)=-v(x-unit[iy]);
-                          if(!homogeneous)
-                            {
-                              double coord_save(geom->getXUpper()[iy]);
-                              std::swap(coord[iy],coord_save);
-                              if(have_faults())
-                                v(x)+= -(*dv_mixed_ptr)(x-unit[iy],ix_iy);
-                              v(x)+=2*expression[ix][iy][1].eval(coord);
-                              std::swap(coord[iy],coord_save);
-                            }
-                        }
+                      double coord[dim];
+                      coord[iy]=geom->getXUpper()[iy];
+                      for(int d=(iy+1)%dim;d!=iy;d=(d+1)%dim)
+                        coord[d]=geom->getXLower()[d]
+                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                      if(have_faults())
+                        v(x)+= -(*dv_mixed_ptr)(x-unit[iy],ix_iy);
+                      v(x)+=2*expression[ix][iy][1].eval(coord);
                     }
                 }
             }
         }
-    }
+      
+      SAMRAI::hier::Box box(gbox);
+
+      if(geom->getTouchesRegularBoundary(ix,0) && is_dirichlet[ix][ix][0])
+        {
+          SAMRAI::hier::Box x_box(box);
+          x_box.upper(ix)=x_box.lower(ix);
+
+          SAMRAI::pdat::SideIterator end(x_box,ix,false);
+          for(SAMRAI::pdat::SideIterator si(x_box,ix,true); si!=end; ++si)
+            {
+              const SAMRAI::pdat::SideIndex &x(*si);
+              if(x[ix]<pbox.lower(ix))
+                v(x)=boundary_value;
+              else
+                {
+                  if(homogeneous)
+                    {
+                      v(x)=0;
+                    }
+                  else
+                    {
+                      double coord[dim];
+                      for(int d=0;d<dim;++d)
+                        coord[d]=geom->getXLower()[d]
+                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                      v(x)=expression[ix][ix][0].eval(coord);
+                    }
+                }
+            }
+        }
+      if(geom->getTouchesRegularBoundary(ix,1) && is_dirichlet[ix][ix][1])
+        {
+          SAMRAI::hier::Box x_box(box);
+          x_box.lower(ix)=x_box.upper(ix);
+
+          SAMRAI::pdat::SideIterator end(x_box,ix,false);
+          for(SAMRAI::pdat::SideIterator si(x_box,ix,true); si!=end; ++si)
+            {
+              const SAMRAI::pdat::SideIndex &x(*si);
+              if(x[ix]>pbox.upper(ix)+1)
+                v(x)=boundary_value;
+              else
+                {
+                  if(homogeneous)
+                    {
+                      v(x)=0;
+                    }
+                  else
+                    {
+                      double coord[dim];
+                      for(int d=0;d<dim;++d)
+                        coord[d]=geom->getXLower()[d]
+                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                      v(x)=expression[ix][ix][1].eval(coord);
+                    }
+                }
+            }
+        }
+    }    
 }
