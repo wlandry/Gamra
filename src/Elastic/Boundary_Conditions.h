@@ -103,109 +103,130 @@ namespace Elastic {
         {
           double offset[]={0.5,0.5,0.5};
           offset[ix]=0;
-          SAMRAI::pdat::SideIterator send(gbox,ix,false);
-          for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
+
+          if(geom->getTouchesRegularBoundary(ix,0) && !is_dirichlet[ix][ix][0])
             {
-              const SAMRAI::pdat::SideIndex &x(*si);
-              
-              bool on_corner(false);
-              for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
-                {
-                  on_corner=on_corner
-                    || !(x[iy]>=pbox.lower(iy) && x[iy]<=pbox.upper(iy));
-                }
+              SAMRAI::hier::Box box(gbox);
+              box.upper(ix)=pbox.lower(ix)-1;
 
-              if(!on_corner)
+              SAMRAI::pdat::CellIterator end(box,false);
+              for(SAMRAI::pdat::CellIterator ci(box,true); ci!=end; ++ci)
                 {
-                  for(int d=0;d<dim;++d)
-                    coord[d]=geom->getXLower()[d]
-                      + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                  const SAMRAI::pdat::SideIndex
+                    x(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
 
-                  if(x[ix]<pbox.lower(ix)
-                     && geom->getTouchesRegularBoundary(ix,0))
+                  bool on_corner(false);
+                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                     {
-                      if(!is_dirichlet[ix][ix][0])
+                      on_corner=on_corner
+                        || !(x[iy]>=pbox.lower(iy) && x[iy]<=pbox.upper(iy));
+                    }
+
+                  if(!on_corner)
+                    {
+                      for(int d=0;d<dim;++d)
+                        coord[d]=geom->getXLower()[d]
+                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                      double duyy=0;
+                      for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
                         {
-                          double duyy=0;
-                          for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                          SAMRAI::pdat::SideIndex
+                            y(x,iy,SAMRAI::pdat::SideIndex::Lower);
+                          duyy+=(v(y+unit[iy]) + v(y+unit[ix]+unit[iy])
+                                 - v(y+unit[ix]) - v(y))
+                            /(2*dx[iy]);
+                          if(have_faults() && !homogeneous)
                             {
-                              SAMRAI::pdat::SideIndex
-                                y(x,iy,SAMRAI::pdat::SideIndex::Lower);
-                              duyy+=(v(y+unit[iy]) + v(y+unit[ix]+unit[iy])
-                                     - v(y+unit[ix]) - v(y))
-                                /(2*dx[iy]);
-                              if(have_faults() && !homogeneous)
-                                {
-                                  /* We only have to correct for one
-                                     of the derivatives because the
-                                     other half is outside the domain
-                                     and defined to be regular. */
-                                  SAMRAI::pdat::CellIndex c(y+unit[ix]);
-                                  duyy-=(*dv_diagonal_ptr)(c,iy)/(2*dx[iy]);
-                                }
-                            }
-                          double lambda=
-                            edge_node_average(edge_moduli,x+unit[ix],ix,unit,0);
-                          double mu=
-                            edge_node_average(edge_moduli,x+unit[ix],ix,unit,1);
-                          v(x)=v(x+unit[ix]*2)
-                            + lambda*duyy*2*dx[ix]/(lambda+2*mu);
-                        
-                          if(!homogeneous)
-                            {
-                              SAMRAI::pdat::CellIndex c(x+unit[ix]);
-                              double coord_save(geom->getXLower()[ix]);
-                              std::swap(coord[ix],coord_save);
-                              if(have_faults())
-                                v(x)-=(*dv_diagonal_ptr)(c,ix);
-                              v(x)-=expression[ix][ix][0].eval(coord)*2*dx[ix]
-                                /(lambda+2*mu);
-                              std::swap(coord[ix],coord_save);
+                              /* We only have to correct for one
+                                 of the derivatives because the
+                                 other half is outside the domain
+                                 and defined to be regular. */
+                              SAMRAI::pdat::CellIndex c(y+unit[ix]);
+                              duyy-=(*dv_diagonal_ptr)(c,iy)/(2*dx[iy]);
                             }
                         }
-                    }
-                  else if(x[ix]>pbox.upper(ix)+1
-                          && geom->getTouchesRegularBoundary(ix,1))
-                    {
-                      if(!is_dirichlet[ix][ix][1])
-                        {
-                          double duyy=0;
-                          for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
-                            {
-                              SAMRAI::pdat::SideIndex
-                                y(x-unit[ix],iy,SAMRAI::pdat::SideIndex::Lower);
-                              duyy+=(v(y+unit[iy]) + v(y-unit[ix]+unit[iy])
-                                     -v(y) - v(y-unit[ix]))
-                                /(2*dx[iy]);
-                              if(have_faults() && !homogeneous)
-                                {
-                                  /* We only have to correct for one
-                                     of the derivatives because the
-                                     other half is outside the domain
-                                     and defined to regular. */
-                                  SAMRAI::pdat::CellIndex c(y-unit[ix]);
-                                  duyy-=(*dv_diagonal_ptr)(c,iy)/(2*dx[iy]);
-                                }
-                            }
-                          double lambda=
-                            edge_node_average(edge_moduli,x-unit[ix],ix,unit,0);
-                          double mu=
-                            edge_node_average(edge_moduli,x-unit[ix],ix,unit,1);
-
-                          v(x)=v(x-unit[ix]*2)
-                            - lambda*duyy*2*dx[ix]/(lambda+2*mu);
+                      double lambda=
+                        edge_node_average(edge_moduli,x+unit[ix],ix,unit,0);
+                      double mu=
+                        edge_node_average(edge_moduli,x+unit[ix],ix,unit,1);
+                      v(x)=v(x+unit[ix]*2)
+                        + lambda*duyy*2*dx[ix]/(lambda+2*mu);
                         
-                          if(!homogeneous)
+                      if(!homogeneous)
+                        {
+                          SAMRAI::pdat::CellIndex c(x+unit[ix]);
+                          double coord_save(geom->getXLower()[ix]);
+                          std::swap(coord[ix],coord_save);
+                          if(have_faults())
+                            v(x)-=(*dv_diagonal_ptr)(c,ix);
+                          v(x)-=expression[ix][ix][0].eval(coord)*2*dx[ix]
+                            /(lambda+2*mu);
+                          std::swap(coord[ix],coord_save);
+                        }
+                    }
+                }
+            }
+          if(geom->getTouchesRegularBoundary(ix,1) && !is_dirichlet[ix][ix][1])
+            {
+              SAMRAI::hier::Box box(gbox);
+              box.lower(ix)=pbox.upper(ix)+2;
+              box.upper(ix)=std::max(box.upper(ix),box.lower(ix));
+
+              SAMRAI::pdat::CellIterator end(box,false);
+              for(SAMRAI::pdat::CellIterator ci(box,true); ci!=end; ++ci)
+                {
+                  const SAMRAI::pdat::SideIndex
+                    x(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
+
+                  bool on_corner(false);
+                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                    {
+                      on_corner=on_corner
+                        || !(x[iy]>=pbox.lower(iy) && x[iy]<=pbox.upper(iy));
+                    }
+
+                  if(!on_corner)
+                    {
+                      for(int d=0;d<dim;++d)
+                        coord[d]=geom->getXLower()[d]
+                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+
+                      double duyy=0;
+                      for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                        {
+                          SAMRAI::pdat::SideIndex
+                            y(x-unit[ix],iy,SAMRAI::pdat::SideIndex::Lower);
+                          duyy+=(v(y+unit[iy]) + v(y-unit[ix]+unit[iy])
+                                 -v(y) - v(y-unit[ix]))
+                            /(2*dx[iy]);
+                          if(have_faults() && !homogeneous)
                             {
-                              SAMRAI::pdat::CellIndex c(x-unit[ix]*2);
-                              double coord_save(geom->getXUpper()[ix]);
-                              std::swap(coord[ix],coord_save);
-                              if(have_faults())
-                                v(x)+=(*dv_diagonal_ptr)(c,ix);
-                              v(x)+=expression[ix][ix][1].eval(coord)*2*dx[ix]
-                                /(lambda+2*mu);
-                              std::swap(coord[ix],coord_save);
+                              /* We only have to correct for one
+                                 of the derivatives because the
+                                 other half is outside the domain
+                                 and defined to regular. */
+                              SAMRAI::pdat::CellIndex c(y-unit[ix]);
+                              duyy-=(*dv_diagonal_ptr)(c,iy)/(2*dx[iy]);
                             }
+                        }
+                      double lambda=
+                        edge_node_average(edge_moduli,x-unit[ix],ix,unit,0);
+                      double mu=
+                        edge_node_average(edge_moduli,x-unit[ix],ix,unit,1);
+
+                      v(x)=v(x-unit[ix]*2)
+                        - lambda*duyy*2*dx[ix]/(lambda+2*mu);
+                        
+                      if(!homogeneous)
+                        {
+                          SAMRAI::pdat::CellIndex c(x-unit[ix]*2);
+                          double coord_save(geom->getXUpper()[ix]);
+                          std::swap(coord[ix],coord_save);
+                          if(have_faults())
+                            v(x)+=(*dv_diagonal_ptr)(c,ix);
+                          v(x)+=expression[ix][ix][1].eval(coord)*2*dx[ix]
+                            /(lambda+2*mu);
+                          std::swap(coord[ix],coord_save);
                         }
                     }
                 }
