@@ -17,15 +17,13 @@ void Elastic::Boundary_Conditions::set_shear_derivs
       double offset[]={0.5,0.5,0.5};
       offset[ix]=0;
 
-      int xmin((!is_dirichlet[ix][ix][0]
-                || !geom->getTouchesRegularBoundary(ix,0)) ? pbox.lower(ix)
-               : pbox.lower(ix)+1),
-        xmax((!is_dirichlet[ix][ix][1] 
-              || !geom->getTouchesRegularBoundary(ix,1)) ? pbox.upper(ix)
-             : pbox.upper(ix)-1);
       SAMRAI::hier::Box x_box(gbox);
-      x_box.lower(ix)=xmin;
-      x_box.upper(ix)=xmax;
+      x_box.lower(ix)=((!is_dirichlet[ix][ix][0]
+                        || !geom->getTouchesRegularBoundary(ix,0))
+                       ? pbox.lower(ix) : pbox.lower(ix)+1);
+      x_box.upper(ix)=((!is_dirichlet[ix][ix][1] 
+                        || !geom->getTouchesRegularBoundary(ix,1))
+                       ? pbox.upper(ix) : pbox.upper(ix)-1);
       for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
         {
           const int ix_iy(index_map(ix,iy,dim));
