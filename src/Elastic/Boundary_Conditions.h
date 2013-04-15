@@ -86,6 +86,23 @@ namespace Elastic {
      const double *dx,
      const bool &homogeneous);
 
+    bool at_corner
+    (const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom,
+     const SAMRAI::hier::Box &pbox,
+     const SAMRAI::pdat::SideIndex &x,
+     const int &ix,
+     const int &iz)
+    {
+      return (geom->getTouchesRegularBoundary(ix,0)
+              && (x[ix]<pbox.lower(ix)
+                  || (x[ix]<=pbox.lower(ix) && is_dirichlet[ix][ix][0])))
+        || (geom->getTouchesRegularBoundary(ix,1)
+            && (x[ix]>pbox.upper(ix)+1
+                || (x[ix]>pbox.upper(ix) && is_dirichlet[ix][ix][1])))
+        || (geom->getTouchesRegularBoundary(iz,0) && x[iz]<pbox.lower(iz))
+        || (geom->getTouchesRegularBoundary(iz,1) && x[iz]>pbox.upper(iz));
+    }
+
     template<class T>
     void set_normal_stress
     (SAMRAI::pdat::SideData<double> &v,

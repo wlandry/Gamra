@@ -18,18 +18,18 @@ void Elastic::Boundary_Conditions::set_shear_derivs
       offset[ix]=0;
 
       SAMRAI::hier::Box x_box(gbox);
-      x_box.lower(ix)=((!is_dirichlet[ix][ix][0]
-                        || !geom->getTouchesRegularBoundary(ix,0))
-                       ? pbox.lower(ix) : pbox.lower(ix)+1);
-      x_box.upper(ix)=((!is_dirichlet[ix][ix][1] 
-                        || !geom->getTouchesRegularBoundary(ix,1))
-                       ? pbox.upper(ix) : pbox.upper(ix)-1);
+      x_box.lower(ix)=pbox.lower(ix);
+      x_box.upper(ix)=pbox.upper(ix);
+
       for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
         {
           const int ix_iy(index_map(ix,iy,dim));
           const int iy_ix(index_map(iy,ix,dim));
-          if(geom->getTouchesRegularBoundary(iy,0) && !is_dirichlet[ix][iy][0]
-             && x_box.lower(iy)<pbox.lower(iy))
+
+
+          const int iz((iy+1)%dim!=ix ? (iy+1)%dim : (iy+2)%dim);
+
+          if(geom->getTouchesRegularBoundary(iy,0) && !is_dirichlet[ix][iy][0])
             {
               SAMRAI::hier::Box box(x_box);
               box.upper(iy)=pbox.lower(iy)-1;
@@ -37,6 +37,9 @@ void Elastic::Boundary_Conditions::set_shear_derivs
               for(SAMRAI::pdat::SideIterator si(box,ix,true); si!=end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
+                  if(at_corner(geom,pbox,x,ix,iz))
+                    continue;
+
                   for(int d=0;d<dim;++d)
                     coord[d]=geom->getXLower()[d]
                       + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
@@ -57,8 +60,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                     }
                 }
             }
-          if(geom->getTouchesRegularBoundary(iy,1) && !is_dirichlet[ix][iy][1]
-             && x_box.upper(iy)>pbox.upper(iy))
+          if(geom->getTouchesRegularBoundary(iy,1) && !is_dirichlet[ix][iy][1])
             {
               SAMRAI::hier::Box box(x_box);
               box.lower(iy)=pbox.upper(iy)+1;
@@ -66,6 +68,9 @@ void Elastic::Boundary_Conditions::set_shear_derivs
               for(SAMRAI::pdat::SideIterator si(box,ix,true); si!=end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
+                  if(at_corner(geom,pbox,x,ix,iz))
+                    continue;
+
                   for(int d=0;d<dim;++d)
                     coord[d]=geom->getXLower()[d]
                       + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);

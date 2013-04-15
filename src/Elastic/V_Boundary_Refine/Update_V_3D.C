@@ -14,7 +14,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  const SAMRAI::hier::Box &coarse_box,
  const SAMRAI::hier::Index &fine_min,
  const SAMRAI::hier::Index &fine_max,
- const SAMRAI::geom::CartesianPatchGeometry &geom,
+ const SAMRAI::geom::CartesianPatchGeometry &coarse_geom,
  const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal,
  const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal_fine,
  const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed,
@@ -137,19 +137,24 @@ void Elastic::V_Boundary_Refine::Update_V_3D
             }
         }
           
+      /* We need to check when interpolating whether the stencil goes
+         off to a corner.  Boundary values are not defined at the
+         outside corner, so we use a simpler interpolation there. */
       double v_coarse;
-      if(ijk[iy]==lower_y && geom.getTouchesRegularBoundary(iy,ijk_mod_y)
-         && ijk[iz]==lower_z && geom.getTouchesRegularBoundary(iz,ijk_mod_z))
+      if(coarse[iy]==lower_y
+         && coarse_geom.getTouchesRegularBoundary(iy,ijk_mod_y)
+         && coarse[iz]==lower_z
+         && coarse_geom.getTouchesRegularBoundary(iz,ijk_mod_z))
         {
           v_coarse=(5*v(coarse) - v(coarse+jp+kp))/4;
           if(have_faults() && !is_residual)
             v_coarse-=
               ((*dv_mixed)(coarse+jp+kp,minus) - (*dv_mixed)(coarse,plus))/4;
         }
-      else if(ijk[iy]==upper_y
-              && geom.getTouchesRegularBoundary(iy,(ijk_mod_y+1)%2)
-              && ijk[iz]==upper_z
-              && geom.getTouchesRegularBoundary(iz,(ijk_mod_z+1)%2))
+      else if(coarse[iy]==upper_y
+              && coarse_geom.getTouchesRegularBoundary(iy,(ijk_mod_y+1)%2)
+              && coarse[iz]==upper_z
+              && coarse_geom.getTouchesRegularBoundary(iz,(ijk_mod_z+1)%2))
         {
           v_coarse=(3*v(coarse) + v(coarse-jp-kp))/4;
           if(have_faults() && !is_residual)
@@ -173,8 +178,7 @@ void Elastic::V_Boundary_Refine::Update_V_3D
             - (boundary_positive ? -(*dv_diagonal)(cell-ip_s,ix) :
                (*dv_diagonal)(cell,ix));
         }
-
-      v_fine(fine)=v_fine(fine-ip_s) + (v_coarse - v_fine(fine-ip_s-ip_s))/3;
+      v_fine(fine)=v_fine(fine-ip_s) + (v_coarse - v_fine(fine-ip_s*2))/3;
       if(have_faults() && !is_residual)
         {
           SAMRAI::pdat::CellIndex cell(fine);
