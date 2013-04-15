@@ -67,9 +67,10 @@ void Elastic::V_Boundary_Refine::refine
 
   if(have_embedded_boundary())
     {
-      level_set_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+      level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (coarse_patch.getPatchData(level_set_id));
-      level_set_fine_ptr =boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+      level_set_fine_ptr=
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (fine_patch.getPatchData(level_set_id));
     }
 
@@ -185,7 +186,7 @@ void Elastic::V_Boundary_Refine::refine
    else
      {
        SAMRAI::hier::Box coarse_box(coarse_patch.getBox());
-       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> coarse_geom =
          boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
          (coarse_patch.getPatchGeometry());
 
@@ -196,7 +197,7 @@ void Elastic::V_Boundary_Refine::refine
                SAMRAI::pdat::SideIndex
                  fine(ijk,ix,SAMRAI::pdat::SideIndex::Lower);
                Update_V_3D(ix,boundary_direction,boundary_positive,fine,
-                           unit,ijk,coarse_box,fine_min,fine_max,*geom,
+                           unit,ijk,coarse_box,fine_min,fine_max,*coarse_geom,
                            dv_diagonal,dv_diagonal_fine,dv_mixed,
                            dv_mixed_fine,v,v_fine);
              }

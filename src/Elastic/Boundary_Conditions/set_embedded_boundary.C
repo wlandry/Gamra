@@ -69,12 +69,14 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
 
       SAMRAI::pdat::SideIndex x(SAMRAI::hier::Index(dimension),ix,
                                 SAMRAI::pdat::SideIndex::Lower);
-      for(std::vector<int>::iterator i=corners[ix].begin();i!=corners[ix].end();++i)
+      for(std::vector<int>::iterator i=corners[ix].begin();
+          i!=corners[ix].end(); ++i)
         {
           x[ix]=*i;
           if(dim==2)
             {
-              for(std::vector<int>::iterator j=corners[iy].begin();j!=corners[iy].end();++j)
+              for(std::vector<int>::iterator j=corners[iy].begin();
+                  j!=corners[iy].end();++j)
                 {
                   x[iy]=*j;
                   set_embedded_values(x,dim,level_set,dv_mixed_ptr);
