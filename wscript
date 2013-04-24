@@ -42,6 +42,8 @@ def configure(conf):
     configure_variant(conf);
     conf.setenv('release')
     configure_variant(conf);
+    conf.setenv('prof')
+    configure_variant(conf);
 
 def configure_variant(conf):
     conf.load('compiler_cxx')
@@ -103,8 +105,12 @@ def build(bld):
     if not bld.variant:
         bld.fatal('call "waf build_debug" or "waf build_release", and try "waf --help"')
     default_flags=['-Wall', '-Wextra', '-Wconversion', '-Drestrict=']
-    variant_flags= {'release' : ['-O3', '-DTESTING=0'],
+    cxxflags_variant= {'release' : ['-Ofast', '-DTESTING=0'],
+                    'prof' : ['-pg','-Ofast', '-DTESTING=0'],
                     'debug' : ['-g']}
+    linkflags_variant={'release' : [],
+                       'prof' : ['-pg'],
+                       'debug' : []}
     bld.program(
         features     = ['cxx','cprogram'],
         source       = ['src/main.C',
@@ -238,9 +244,10 @@ def build(bld):
                         'src/Stokes/FACSolver/solveSystem.C',
                         'src/Stokes/HypreSolver.C'],
         target       = 'gamra',
-        cxxflags = variant_flags[bld.variant] + default_flags,
+        cxxflags     = cxxflags_variant[bld.variant] + default_flags,
         lib          = ['dl','gfortranbegin', 'gfortran', 'm'],
         libpath      = ['/sw/lib/gcc4.7/lib','/sw/lib/gcc4.7/lib/gcc/x86_64-apple-darwin11.4.0/4.7.2'],
+        linkflags    = linkflags_variant[bld.variant],
         includes = ['src','../FTensor'],
         use=['samrai','muparser','hdf5']
         )
@@ -248,7 +255,7 @@ def build(bld):
 from waflib.Build import BuildContext, CleanContext, \
     InstallContext, UninstallContext
 
-for x in 'debug release'.split():
+for x in 'debug prof release'.split():
     for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
         name = y.__name__.replace('Context','').lower()
         class tmp(y):
