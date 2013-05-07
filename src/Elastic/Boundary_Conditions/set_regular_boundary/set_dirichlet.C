@@ -38,8 +38,8 @@ void Elastic::Boundary_Conditions::set_dirichlet
               SAMRAI::hier::Box y_box(x_box);
               y_box.upper(iy)=y_box.lower(iy);
 
-              SAMRAI::pdat::SideIterator end(gbox,ix,false);
-              for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=end; ++si)
+              SAMRAI::pdat::SideIterator end(y_box,ix,false);
+              for(SAMRAI::pdat::SideIterator si(y_box,ix,true); si!=end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   v(x)=-v(x+unit[iy]);
@@ -61,8 +61,8 @@ void Elastic::Boundary_Conditions::set_dirichlet
               SAMRAI::hier::Box y_box(x_box);
               y_box.lower(iy)=y_box.upper(iy);
 
-              SAMRAI::pdat::SideIterator end(gbox,ix,false);
-              for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=end; ++si)
+              SAMRAI::pdat::SideIterator end(y_box,ix,false);
+              for(SAMRAI::pdat::SideIterator si(y_box,ix,true); si!=end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   v(x)=-v(x-unit[iy]);
