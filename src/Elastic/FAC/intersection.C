@@ -1,3 +1,6 @@
+/* Returns whether the line between two grid points separated by dx
+   intersects the fault. */
+
 #include "Elastic/FAC.h"
 
 int Elastic::FAC::intersection(const FTensor::Tensor1<double,3> &ntt,
@@ -10,6 +13,10 @@ int Elastic::FAC::intersection(const FTensor::Tensor1<double,3> &ntt,
   FTensor::Tensor1<double,3> ntt_dp, ntt_dm;
   FTensor::Index<'a',3> a;
   FTensor::Index<'b',3> b;
+
+  /* ntt is already in the coordinate frame of the fault.  So we could
+     write this as ntt_dp(a)=ntt(a)+rot(a,b)*dx(b). Hmm. Maybe I
+     should. Then I would not have to pass xyz. */
 
   ntt_dp(a)=rot(a,b)*(xyz(b)+dx(b));
 

@@ -2,7 +2,8 @@
 #include "SAMRAI/geom/CartesianGridGeometry.h"
 
 /* Fix the moduli on the coarse grids by coarsening from the finer
-   grids. */
+   grids geometrically averaging the cell moduli to get the edge
+   moduli. */
 
 void Elastic::FAC::fix_moduli()
 {

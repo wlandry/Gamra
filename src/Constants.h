@@ -1,3 +1,6 @@
+/* Special values such as whether we are at a boundary, plus the
+   function index_map */
+
 #ifndef GAMRA_CONSTANTS_H
 #define GAMRA_CONSTANTS_H
 

@@ -1,0 +1,95 @@
+The top structure of Gamra is 
+
+src/   : C++ source code
+input/ : sample input files
+utils/ : utility programs
+
+
+Concepts
+========
+
+The Elastic(Stokes) code use a MAC grid, with displacements (velocity)
+being based on the sides of a grid cell, rather than at the center.
+
+The elastic moduli live on both the center of the cell and the edge.
+The cell moduli is canonical, and the edge moduli is interpolated to
+it (src/Elastic/FAC/fix_moduli.C).
+
+Most of the code is abstracted between 2D and 3D.  One notable
+exception is SAMRAI Edges.  SAMRAI Edges lives on an edge of a cube
+(as opposed to the face or corner).  In 2D, using a SAMRAI Edge is an
+error, so I have to use a SAMRAI Node.  So I end up using templates in
+places to allow 2D or 3D.
+
+The solver uses the FAC (Fast Adaptive Composite) method using the
+SAMRAI library.  This is similar to the MLAT (MultiLevel Adaptive
+Technique), used by Chombo.
+
+Source code
+===========
+
+The variable "v" is used everywhere as the velocity (Stokes) or
+displacement (Elastic).  "dv" is a derivative.
+
+Variables on the grid are often referred to by their id (e.g. v_id).
+These are an index for which data points where.  id's are somewhat
+persistent, so they are often stored in various objects (e.g. boundary
+conditions) to provide a way to access the correct variable.
+
+Generally, classes are defined in a file Class.h, and its methods are
+defined in the files Class/method1.C, Class/method2.C, ...
+
+An outline of the main flow of the code for a 2D elastic run:
+
+* main
+** solve_system
+*** Elastic::FAC::FAC
+**** Elastic::FACSolver::FACSolver
+*** Elastic::FAC::solve
+**** Elastic::FAC::fix_moduli
+**** Elastic::FAC::add_faults
+***** Elastic::FAC::compute_intersections_2D
+****** Elastic::FAC::intersection
+**** Elastic::FACSolver::set_boundaries
+***** Elastic::FACOps::set_boundaries
+****** Elastic::Boundary_Conditions::set_boundary
+******* Elastic::Boundary_Conditions::set_regular_boundary
+******** Elastic::Boundary_Conditions::set_dirichlet
+********* Input_Expression::eval
+******** Elastic::Boundary_Conditions::set_shear_derivs
+********* Input_Expression::eval
+******** Elastic::Boundary_Conditions::set_normal_stress
+********* Input_Expression::eval
+**** Elastic::FACSolver::initializeSolverState
+**** Elastic::FACSolver::solveSystem
+***** SAMRAI::solv::FACPreconditioner::solveSystem
+****** SAMRAI::solv::FACPreconditioner::computeFullCompositeResidual
+******* Elastic::FACOps::computeCompositeResidualOnLevel
+******** Elastic::FACOPS::residual_2D
+********* Elastic::FACOPS::v_operator_2D
+********** Elastic::FACOPS::aligned_terms
+********** Elastic::FACOPS::lame_mixed
+********** Elastic::FACOPS::shear_noncell
+******* Elastic::FACOps::restrictSolution
+******* Elastic::FACOps::computeCompositeResidualOnLevel
+******* Elastic::FACOps::restrictResidual
+******* Elastic::FACOps::computeResidualNorm
+****** SAMRAI::solv::FACPreconditioner::facCycle_Recursive
+******* Elastic::FACOps::solveCoarsestLevel
+******* Elastic::FACOps::smoothError
+******** Elastic::FACOps::smooth_2D
+********* Elastic::FACOps::set_boundaries
+********* Elastic::FACOps::smooth_V_2D
+********** Elastic::FACOps::v_operator_2D
+******* Elastic::FACOps::computeCompositeResidualOnLevel
+******* Elastic::FACOps::restrictResidual
+******* SAMRAI::solv::FACPreconditioner::facCycle_Recursive
+******* Elastic::FACOps::prolongErrorAndCorrect
+******* Elastic::FACOps::smoothError
+*** SAMRAI::appu::VisItDataWriter
+**** Elastic::FAC::packDerivedDataIntoDoubleBuffer
+***** Elastic::FAC::pack_strain
+***** Elastic::FAC::pack_level_set
+***** Elastic::FAC::pack_v_v_rhs
+      
+
