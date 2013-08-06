@@ -6,7 +6,7 @@
 
 void Elastic::Boundary_Conditions::set_boundary
 (const SAMRAI::hier::Patch& patch, const int &v_id, const bool &homogeneous,
- const bool &apply_normal_stress)
+ const bool &apply_normal_stress) const
 {
   try
     {

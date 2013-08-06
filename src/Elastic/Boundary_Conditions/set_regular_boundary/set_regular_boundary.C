@@ -6,7 +6,7 @@
 
 void Elastic::Boundary_Conditions::set_regular_boundary
 (const SAMRAI::hier::Patch& patch, const int &v_id, const bool &homogeneous,
- const bool &apply_normal_stress)
+ const bool &apply_normal_stress) const
 {
   /* We need to set dirichlet boundaries before traction
      boundaries, and tangential traction boudaries before normal

@@ -14,7 +14,7 @@ void Elastic::Boundary_Conditions::set_dirichlet
  const SAMRAI::hier::Box &gbox,
  const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
  const double *dx,
- const bool &homogeneous)
+ const bool &homogeneous) const
 {
   for(int ix=0; ix<dim; ++ix)
     {

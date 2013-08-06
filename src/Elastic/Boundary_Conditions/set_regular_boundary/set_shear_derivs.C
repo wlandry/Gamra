@@ -10,7 +10,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
  const SAMRAI::hier::Box &gbox,
  const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
  const double *dx,
- const bool &homogeneous)
+ const bool &homogeneous) const
 {
   for(int ix=0; ix<dim; ++ix)
     {
@@ -40,6 +40,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                   if(dim==3 && at_corner(geom,pbox,x,ix,iz))
                     continue;
 
+                  double coord[3];
                   for(int d=0;d<dim;++d)
                     coord[d]=geom->getXLower()[d]
                       + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
@@ -71,6 +72,7 @@ void Elastic::Boundary_Conditions::set_shear_derivs
                   if(dim==3 && at_corner(geom,pbox,x,ix,iz))
                     continue;
 
+                  double coord[3];
                   for(int d=0;d<dim;++d)
                     coord[d]=geom->getXLower()[d]
                       + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);

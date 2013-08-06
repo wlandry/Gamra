@@ -23,22 +23,22 @@ namespace Elastic {
                         const std::string& object_name,
                         boost::shared_ptr<SAMRAI::tbox::Database> database);
     void set_boundary(const SAMRAI::hier::Patch& patch,
-                      const int &v_id, const bool &homogeneous)
+                      const int &v_id, const bool &homogeneous) const
     {
       set_boundary(patch,v_id,homogeneous,true);
     }
     void set_boundary(const SAMRAI::hier::Patch& patch,
                       const int &v_id, const bool &homogeneous,
-                      const bool &apply_normal_stress);
+                      const bool &apply_normal_stress)  const;
     void set_regular_boundary(const SAMRAI::hier::Patch& patch,
                               const int &v_id, const bool &homogeneous,
-                              const bool &apply_normal_stress);
+                              const bool &apply_normal_stress)  const;
     static void set_embedded_boundary(const SAMRAI::hier::Patch& patch,
                                       const int &level_id,
                                       const int &dv_mixed_id);
 
     void set_dirichlet(const SAMRAI::hier::Patch& patch,
-                       const int &v_id, const bool &rhs);
+                       const int &v_id, const bool &rhs) const;
     void set_extra_ids(const int &Edge_moduli_id, const int &Dv_diagonal_id,
                        const int &Dv_mixed_id, const int &Level_set_id)
     {
@@ -50,7 +50,6 @@ namespace Elastic {
 
     Input_Expression expression[3][3][2];
     bool is_dirichlet[3][3][2];
-    double coord[3];
     std::string d_object_name;
     int edge_moduli_id, dv_diagonal_id, dv_mixed_id, level_set_id;
 
@@ -73,7 +72,7 @@ namespace Elastic {
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
-     const bool &homogeneous);
+     const bool &homogeneous) const;
 
     void set_shear_derivs
     (SAMRAI::pdat::SideData<double> &v,
@@ -84,14 +83,14 @@ namespace Elastic {
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
-     const bool &homogeneous);
+     const bool &homogeneous) const;
 
     bool at_corner
     (const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::pdat::SideIndex &x,
      const int &ix,
-     const int &iz)
+     const int &iz) const
     {
       return (geom->getTouchesRegularBoundary(ix,0)
               && (x[ix]<pbox.lower(ix)
@@ -114,7 +113,7 @@ namespace Elastic {
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
-     const bool &homogeneous)
+     const bool &homogeneous) const
     {
       for(int ix=0; ix<dim; ++ix)
         {
@@ -141,6 +140,7 @@ namespace Elastic {
 
                   if(!on_corner)
                     {
+                      double coord[3];
                       for(int d=0;d<dim;++d)
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
@@ -204,6 +204,7 @@ namespace Elastic {
 
                   if(!on_corner)
                     {
+                      double coord[3];
                       for(int d=0;d<dim;++d)
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
