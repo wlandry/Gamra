@@ -17,7 +17,7 @@ public:
   SAMRAI::tbox::Array<int> ijk;
 
   int dim, slice;
-  double coord[3];
+  mutable double coord[3];
   bool use_equation, is_valid;
 
   static double* variable_factory(const char *, void *)
@@ -132,7 +132,7 @@ public:
                  << data_size*num_components << " but got " << data.size());
   }
 
-  double eval(const double Coord[3])
+  double eval(const double Coord[3]) const
   {
     double result;
 
