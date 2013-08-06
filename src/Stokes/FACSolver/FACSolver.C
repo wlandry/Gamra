@@ -24,10 +24,8 @@
 */
 
 bool Stokes::FACSolver::s_initialized = 0;
-int Stokes::FACSolver::s_weight_id[SAMRAI::tbox::Dimension::
-                                   MAXIMUM_DIMENSION_VALUE];
-int Stokes::FACSolver::s_instance_counter[SAMRAI::tbox::Dimension::
-                                          MAXIMUM_DIMENSION_VALUE];
+int Stokes::FACSolver::s_weight_id[SAMRAI::MAX_DIM_VAL];
+int Stokes::FACSolver::s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
 /*
 *************************************************************************
@@ -49,8 +47,9 @@ Stokes::FACSolver::FACSolver(const SAMRAI::tbox::Dimension& dim,
                              boost::shared_ptr<SAMRAI::tbox::Database> database):
   d_dim(dim),
   d_object_name(object_name),
-  d_fac_ops(d_dim, object_name + "::fac_ops",database),
-  d_fac_precond(object_name + "::fac_precond", d_fac_ops),
+  d_fac_ops(boost::make_shared<FACOps>(d_dim, object_name + "::fac_ops",
+                                       database)),
+  d_fac_precond(object_name + "::fac_precond",d_fac_ops,database),
   d_bc_object(),
   d_simple_bc(d_dim, object_name + "::bc"),
   d_hierarchy(),
@@ -68,10 +67,6 @@ Stokes::FACSolver::FACSolver(const SAMRAI::tbox::Dimension& dim,
     initializeStatics();
   }
 
-  setMaxCycles(10);
-  setResidualTolerance(1e-6);
-  setPresmoothingSweeps(1);
-  setPostsmoothingSweeps(1);
   setCoarseFineDiscretization("Ewing");
   // #ifdef HAVE_HYPRE
   //       setCoarsestLevelSolverChoice("hypre");
@@ -120,7 +115,7 @@ Stokes::FACSolver::FACSolver(const SAMRAI::tbox::Dimension& dim,
       (var_db->getVariable(side_weight_name));
     if (!weight) {
       weight = boost::make_shared<SAMRAI::pdat::SideVariable<double> >
-        (d_dim, side_weight_name, 1);
+        (d_dim, side_weight_name,SAMRAI::hier::IntVector::getOne(d_dim),1);
     }
 
     if (s_weight_id[d_dim.getValue() - 2] < 0) {
@@ -142,8 +137,8 @@ Stokes::FACSolver::FACSolver(const SAMRAI::tbox::Dimension& dim,
    * The FAC operator optionally uses the preconditioner
    * to get data for logging.
    */
-  d_fac_ops.setPreconditioner((const SAMRAI::solv::FACPreconditioner *)
-                              (&d_fac_precond));
+  d_fac_ops->setPreconditioner((const SAMRAI::solv::FACPreconditioner *)
+                               (&d_fac_precond));
 
   if (database) {
     getFromInput(database);

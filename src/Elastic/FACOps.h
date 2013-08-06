@@ -123,8 +123,8 @@ namespace Elastic {
      */
     FACOps(const SAMRAI::tbox::Dimension& dim,
            const std::string& object_name,
-           boost::shared_ptr<SAMRAI::tbox::Database> database,
-           Boundary_Conditions &bc);
+           const boost::shared_ptr<SAMRAI::tbox::Database> &database,
+           const Boundary_Conditions &bc);
 
     /*!
      * @brief Destructor.
@@ -871,10 +871,10 @@ namespace Elastic {
     //@{ @name Internal context and scratch data
 
     static boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    s_cell_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+    s_cell_scratch_var[SAMRAI::MAX_DIM_VAL];
 
     static boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-    s_side_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+    s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
     /*!
      * @brief Default context of internally maintained hierarchy data.
@@ -964,7 +964,7 @@ namespace Elastic {
      */
     const SAMRAI::solv::FACPreconditioner* d_preconditioner;
 
-    Boundary_Conditions &d_boundary_conditions;
+    const Boundary_Conditions &d_boundary_conditions;
         
     /*!
      * @brief Hierarchy side operator used in debugging.

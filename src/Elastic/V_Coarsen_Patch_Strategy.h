@@ -41,10 +41,9 @@ namespace Elastic {
      * @param object_name Name of the object, for general referencing.
      * @param coef_strategy Coefficients strategy being helped.
      */
-    V_Coarsen_Patch_Strategy(const SAMRAI::tbox::Dimension& dim,
-                             std::string object_name,
-                             Boundary_Conditions &bc):
-      SAMRAI::xfer::CoarsenPatchStrategy(dim),
+    V_Coarsen_Patch_Strategy(std::string object_name,
+                             const Boundary_Conditions &bc):
+      SAMRAI::xfer::CoarsenPatchStrategy(),
       d_object_name(object_name),
       dv_diagonal_id(invalid_id),
       dv_mixed_id(invalid_id),
@@ -59,8 +58,8 @@ namespace Elastic {
     //@{ @name SAMRAI::xfer::CoarsenPatchStrategy virtuals
 
     virtual SAMRAI::hier::IntVector
-    getCoarsenOpStencilWidth() const
-    { return SAMRAI::hier::IntVector::getOne(getDim()); }
+    getCoarsenOpStencilWidth(const SAMRAI::tbox::Dimension &dim) const
+    { return SAMRAI::hier::IntVector::getOne(dim); }
 
     virtual void
     preprocessCoarsen(SAMRAI::hier::Patch& ,
@@ -216,7 +215,7 @@ namespace Elastic {
      */
     int dv_diagonal_id, dv_mixed_id, level_set_id;
 
-    Boundary_Conditions& d_boundary_conditions;
+    const Boundary_Conditions& d_boundary_conditions;
 
     /*!
      * @brief Timers for performance measurement.

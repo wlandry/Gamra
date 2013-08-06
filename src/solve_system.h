@@ -12,7 +12,7 @@ bool solve_system
 {
   boost::shared_ptr<SAMRAI::mesh::StandardTagAndInitialize>
     tag_and_initializer(new SAMRAI::mesh::StandardTagAndInitialize
-                        (dim,"CellTaggingMethod",&fac,
+                        ("CellTaggingMethod",&fac,
                          input_db->getDatabase("StandardTagAndInitialize")));
 
   boost::shared_ptr<SAMRAI::mesh::BergerRigoutsos>
@@ -71,7 +71,7 @@ bool solve_system
         {
           tag_buffer[ln] = 1;
         }
-      gridding_algorithm->regridAllFinerLevels(0,0.0,tag_buffer);
+      gridding_algorithm->regridAllFinerLevels(0,tag_buffer,0,0.0);
       SAMRAI::tbox::plog << "Newly adapted hierarchy\n";
 
       done = !(patch_hierarchy->finerLevelExists(lnum));

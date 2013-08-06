@@ -16,7 +16,7 @@ void Elastic::FACOps::xeqScheduleProlongation
   if (!v_prolongation_refine_schedules[dest_ln]) {
     TBOX_ERROR("Expected schedule not found.");
   }
-  SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
+  SAMRAI::xfer::RefineAlgorithm refiner;
   refiner.registerRefine(v_dst, v_src, v_scr, v_prolongation_refine_operator);
   if(have_embedded_boundary())
     {

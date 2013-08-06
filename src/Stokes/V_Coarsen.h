@@ -46,8 +46,8 @@ namespace Stokes {
     /**
      * Uninteresting default constructor.
      */
-    explicit V_Coarsen(const SAMRAI::tbox::Dimension& dim):
-      SAMRAI::hier::CoarsenOperator(dim, "V_COARSEN")
+    explicit V_Coarsen():
+      SAMRAI::hier::CoarsenOperator("V_COARSEN")
     {
       d_name_id = "V_COARSEN";
     }
@@ -66,7 +66,7 @@ namespace Stokes {
     (const boost::shared_ptr<SAMRAI::hier::Variable>& var,
      const std::string& op_name) const
     {
-      TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
+      TBOX_ASSERT_OBJDIM_EQUALITY2(*this, *var);
 
       const boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
         cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >
@@ -95,9 +95,9 @@ namespace Stokes {
       return 0;
     }
 
-    SAMRAI::hier::IntVector getStencilWidth() const
+    SAMRAI::hier::IntVector getStencilWidth(const SAMRAI::tbox::Dimension& dim) const
     {
-      return SAMRAI::hier::IntVector::getOne(getDim());
+      return SAMRAI::hier::IntVector::getOne(dim);
     }
 
     /**
@@ -116,7 +116,7 @@ namespace Stokes {
             const SAMRAI::hier::Box& coarse_box,
             const SAMRAI::hier::IntVector& ratio) const
     {
-      if(getDim().getValue()==2)
+      if(fine.getDim().getValue()==2)
         coarsen_2D(coarse,fine,dst_component,src_component,coarse_box,ratio);
       else
         coarsen_3D(coarse,fine,dst_component,src_component,coarse_box,ratio);

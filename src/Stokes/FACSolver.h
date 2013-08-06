@@ -422,55 +422,10 @@ namespace Stokes {
      * @param prolongation_method String selecting the coarse-fine discretization method.
      */
     void
-    set_P_ProlongationMethod(
-                             const std::string& prolongation_method);
+    set_P_ProlongationMethod(const std::string& prolongation_method);
 
     void
-    set_V_ProlongationMethod(
-                             const std::string& prolongation_method);
-
-    /*!
-     * @brief Set the number of pre-smoothing sweeps during
-     * FAC iteration process.
-     *
-     * Presmoothing is applied during the fine-to-coarse phase of the
-     * iteration.  The default is to use one sweep.
-     *
-     * @param num_pre_sweeps Number of presmoothing sweeps
-     */
-    void
-    setPresmoothingSweeps(
-                          int num_pre_sweeps);
-
-    /*!
-     * @brief Set the number of post-smoothing sweeps during
-     * FAC iteration process.
-     *
-     * Postsmoothing is applied during the coarse-to-fine phase of the
-     * iteration.  The default is to use one sweep.
-     *
-     * @param num_post_sweeps Number of postsmoothing sweeps
-     */
-    void
-    setPostsmoothingSweeps(
-                           int num_post_sweeps);
-
-    /*!
-     * @brief Set the max number of iterations (cycles) to use per solve.
-     */
-    void
-    setMaxCycles(
-                 int max_cycles);
-
-    /*!
-     * @brief Set the residual tolerance for stopping.
-     *
-     * If you want the prescribed maximum number of cycles to always be taken,
-     * set the residual tolerance to a negative number.
-     */
-    void
-    setResidualTolerance(
-                         double residual_tol);
+    set_V_ProlongationMethod(const std::string& prolongation_method);
 
     //@}
 
@@ -565,7 +520,7 @@ namespace Stokes {
                         boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
                         const bool &homogeneous)
     {
-      d_fac_ops.set_boundaries(p_id,v_id,level,homogeneous);
+      d_fac_ops->set_boundaries(p_id,v_id,level,homogeneous);
     }
 
 
@@ -582,8 +537,7 @@ namespace Stokes {
      * nothing is done.
      */
     void
-    getFromInput(
-                 boost::shared_ptr<SAMRAI::tbox::Database> database);
+    getFromInput(boost::shared_ptr<SAMRAI::tbox::Database> database);
 
     /*
      * @brief Set @c d_uv and @c d_fv to vectors wrapping the data
@@ -615,7 +569,7 @@ namespace Stokes {
      * @brief FAC operator implementation corresponding to cell-centered
      * Stokes discretization.
      */
-    FACOps d_fac_ops;
+    boost::shared_ptr<FACOps> d_fac_ops;
 
     /*!
      * @brief FAC preconditioner algorithm.
@@ -655,8 +609,8 @@ namespace Stokes {
     bool d_enable_logging;
 
     static bool s_initialized;
-    static int s_weight_id[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
-    static int s_instance_counter[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+    static int s_weight_id[SAMRAI::MAX_DIM_VAL];
+    static int s_instance_counter[SAMRAI::MAX_DIM_VAL];
   };
 
 }

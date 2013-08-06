@@ -15,7 +15,7 @@ void Elastic::FACOps::xeqScheduleGhostFill(int v_id, int dest_ln)
   if (!v_ghostfill_refine_schedules[dest_ln]) {
     TBOX_ERROR("Expected schedule not found.");
   }
-  SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
+  SAMRAI::xfer::RefineAlgorithm refiner;
 
   refiner.registerRefine(v_id,v_id,v_id,v_ghostfill_refine_operator);
   if(have_faults())

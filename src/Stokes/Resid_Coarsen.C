@@ -15,7 +15,7 @@ void Stokes::Resid_Coarsen::coarsen(SAMRAI::hier::Patch& coarse,
                                                   const SAMRAI::hier::Box&,
                                                   const SAMRAI::hier::IntVector&) const
 {
-  const SAMRAI::tbox::Dimension& dimension(getDim());
+  const SAMRAI::tbox::Dimension& dimension(fine.getDim());
   
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > r_fine_ptr =
     boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >

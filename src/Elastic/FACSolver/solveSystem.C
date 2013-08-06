@@ -61,7 +61,7 @@ bool Elastic::FACSolver::solveSystem
  int fine_ln)
 {
   TBOX_ASSERT(hierarchy);
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(d_dim, *hierarchy);
 
   if (d_enable_logging) {
     SAMRAI::tbox::plog << "Elastic::FACSolver::solveSystem (" << d_object_name

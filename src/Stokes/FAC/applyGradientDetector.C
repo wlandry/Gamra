@@ -48,8 +48,8 @@ void Stokes::FAC::applyGradientDetector
         }
       SAMRAI::pdat::CellData<double>& soln_cell_data = *soln_cell_data_;
       SAMRAI::pdat::CellData<int>& tag_cell_data = *tag_cell_data_;
-      SAMRAI::pdat::CellData<double> estimate_data(patch.getBox(),1,
-                                           SAMRAI::hier::IntVector(d_dim, 0));
+      SAMRAI::pdat::CellData<double> estimate_data
+        (patch.getBox(),1,SAMRAI::hier::IntVector::getZero(d_dim));
       computeAdaptionEstimate(estimate_data,soln_cell_data);
                               
       tag_cell_data.fill(0);

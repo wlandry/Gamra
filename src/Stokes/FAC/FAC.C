@@ -91,7 +91,7 @@ Stokes::FAC::FAC(const std::string& object_name,
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
     p_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim, object_name + ":p", 1));
   p_id = vdb->registerVariableAndContext(p_ptr, d_context,
-                                         SAMRAI::hier::IntVector(d_dim, 1)
+                                         SAMRAI::hier::IntVector::getOne(d_dim)
                                          /* ghost cell width is 1 for
                                             stencil widths */);
 
@@ -101,7 +101,7 @@ Stokes::FAC::FAC(const std::string& object_name,
                                                       + ":cell_viscosity"));
   cell_viscosity_id = vdb->registerVariableAndContext(cell_viscosity_ptr,
                                                       d_context,
-                                                      SAMRAI::hier::IntVector(d_dim, 1)
+                                                      SAMRAI::hier::IntVector::getOne(d_dim)
                                                       /* ghost cell width is
                                                          1 in case needed */);
 
@@ -133,14 +133,14 @@ Stokes::FAC::FAC(const std::string& object_name,
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
     dp_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim, object_name + ":dp"));
   dp_id = vdb->registerVariableAndContext(dp_ptr,d_context,
-                                          SAMRAI::hier::IntVector(d_dim, 1)
+                                          SAMRAI::hier::IntVector::getOne(d_dim)
                                           /* ghost cell width is
                                              1 in case needed */);
 
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
     p_exact_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim, object_name + ":p exact"));
   p_exact_id = vdb->registerVariableAndContext(p_exact_ptr,d_context,
-                                               SAMRAI::hier::IntVector(d_dim, 1)
+                                               SAMRAI::hier::IntVector::getOne(d_dim)
                                                /* ghost cell width is
                                                   1 in case needed */);
 
@@ -148,20 +148,22 @@ Stokes::FAC::FAC(const std::string& object_name,
     p_rhs_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim,object_name
                                              + ":p right hand side"));
   p_rhs_id = vdb->registerVariableAndContext(p_rhs_ptr,d_context,
-                                             SAMRAI::hier::IntVector(d_dim, 1));
+                                             SAMRAI::hier::IntVector::getOne(d_dim));
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-    v_ptr(new SAMRAI::pdat::SideVariable<double>(d_dim, object_name + ":v", 1));
+    v_ptr(new SAMRAI::pdat::SideVariable<double>
+          (d_dim, object_name + ":v",SAMRAI::hier::IntVector::getOne(d_dim),1));
   v_id = vdb->registerVariableAndContext(v_ptr, d_context,
-                                         SAMRAI::hier::IntVector(d_dim, 1)
+                                         SAMRAI::hier::IntVector::getOne(d_dim)
                                          /* ghost cell width is 1 for
                                             stencil widths */);
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-    v_rhs_ptr(new SAMRAI::pdat::SideVariable<double>(d_dim,object_name
-                                             + ":v right hand side"));
+    v_rhs_ptr(new SAMRAI::pdat::SideVariable<double>
+              (d_dim,object_name + ":v right hand side",
+               SAMRAI::hier::IntVector::getOne(d_dim)));
   v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,
-                                             SAMRAI::hier::IntVector(d_dim, 1)
+                                             SAMRAI::hier::IntVector::getOne(d_dim)
                                              /* ghost cell width is
                                                 1 for coarsening
                                                 operator */);

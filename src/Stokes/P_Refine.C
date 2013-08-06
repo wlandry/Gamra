@@ -47,7 +47,7 @@ void Stokes::P_Refine::refine(
    const SAMRAI::hier::Box& fine_box,
    const SAMRAI::hier::IntVector&) const
 {
-  const SAMRAI::tbox::Dimension& dim(getDim());
+  const SAMRAI::tbox::Dimension& dim(fine_patch.getDim());
 
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > p =
     boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >

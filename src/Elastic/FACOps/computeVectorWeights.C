@@ -51,7 +51,7 @@ void Elastic::FACOps::computeVectorWeights
  int finest_ln) const
 {
   TBOX_ASSERT(hierarchy);
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(d_dim, *hierarchy);
 
   if (coarsest_ln == -1) coarsest_ln = 0;
   if (finest_ln == -1) finest_ln = hierarchy->getFinestLevelNumber();

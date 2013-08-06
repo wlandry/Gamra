@@ -32,7 +32,7 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
 
   TBOX_ASSERT(t_overlap);
 
-  for(int axis=0; axis<getDim().getValue(); ++axis)
+  for(int axis=0; axis<fine.getDim().getValue(); ++axis)
     {
       const SAMRAI::hier::BoxContainer&
         boxes = t_overlap->getDestinationBoxContainer(axis);
@@ -52,7 +52,7 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
                                             const SAMRAI::hier::IntVector&,
                                             const int &axis) const
 {
-  const SAMRAI::tbox::Dimension& dimension(getDim());
+  const SAMRAI::tbox::Dimension& dimension(fine.getDim());
   const int dim(dimension.getValue());
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =

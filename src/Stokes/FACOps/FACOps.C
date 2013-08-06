@@ -10,10 +10,10 @@
 #include "Stokes/FACOps.h"
 
 boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-Stokes::FACOps::s_cell_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+Stokes::FACOps::s_cell_scratch_var[SAMRAI::MAX_DIM_VAL];
 
 boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-Stokes::FACOps::s_side_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+Stokes::FACOps::s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
 SAMRAI::tbox::StartupShutdownManager::Handler
 Stokes::FACOps::s_finalize_handler(
@@ -86,12 +86,9 @@ Stokes::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   v_ghostfill_refine_schedules(),
   p_nocoarse_refine_schedules(),
   v_nocoarse_refine_schedules(),
-  p_refine_patch_strategy(dim,
-                          d_object_name + "::refine patch strategy"),
-  v_refine_patch_strategy(dim,
-                          d_object_name + "::refine patch strategy"),
-  v_coarsen_patch_strategy(dim,
-                           d_object_name + "::coarsen patch strategy"),
+  p_refine_patch_strategy(d_object_name + "::refine patch strategy"),
+  v_refine_patch_strategy(d_object_name + "::refine patch strategy"),
+  v_coarsen_patch_strategy(d_object_name + "::coarsen patch strategy"),
   d_enable_logging(false),
   d_preconditioner(),
   d_hopscell(),
@@ -126,7 +123,8 @@ Stokes::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
     ss.str("");
     ss << "Stokes::FACOps::private_side_scratch" << dim.getValue();
     s_side_scratch_var[dim.getValue() - 1] =
-      boost::make_shared<SAMRAI::pdat::SideVariable<double> >(dim, ss.str());
+      boost::make_shared<SAMRAI::pdat::SideVariable<double> >
+      (dim, ss.str(),SAMRAI::hier::IntVector::getOne(d_dim));
   }
 
   SAMRAI::hier::VariableDatabase* vdb = SAMRAI::hier::VariableDatabase::getDatabase();

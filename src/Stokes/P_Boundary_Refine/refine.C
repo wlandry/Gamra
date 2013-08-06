@@ -13,7 +13,7 @@ void Stokes::P_Boundary_Refine::refine
   const SAMRAI::pdat::CellOverlap* t_overlap =
     dynamic_cast<const SAMRAI::pdat::CellOverlap *>(&overlap);
   const SAMRAI::hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
-  const SAMRAI::tbox::Dimension& dimension(getDim());
+  const SAMRAI::tbox::Dimension& dimension(fine.getDim());
   const int dim(dimension.getValue());
 
   Stokes_set_boundary(coarse,src_component,invalid_id,true);

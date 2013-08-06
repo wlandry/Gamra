@@ -39,9 +39,8 @@ public:
     * @param object_name Name of the object, for general referencing.
     * @param coef_strategy Coefficients strategy being helped.
     */
-  V_Refine_Patch_Strategy(const SAMRAI::tbox::Dimension& dim,
-                          std::string object_name, Boundary_Conditions &bc):
-    SAMRAI::xfer::RefinePatchStrategy(dim), d_dim(dim), d_object_name(object_name),
+  V_Refine_Patch_Strategy(std::string object_name, const Boundary_Conditions &bc):
+    SAMRAI::xfer::RefinePatchStrategy(), d_object_name(object_name),
     d_boundary_conditions(bc) {}
 
   /*!
@@ -61,9 +60,9 @@ public:
     d_boundary_conditions.set_boundary(patch,data_id,is_residual,false);
   }
   SAMRAI::hier::IntVector
-  getRefineOpStencilWidth() const
+  getRefineOpStencilWidth(const SAMRAI::tbox::Dimension& dim) const
   {
-    return SAMRAI::hier::IntVector::getOne(d_dim);
+    return SAMRAI::hier::IntVector::getOne(dim);
   }
   virtual void
   preprocessRefine(SAMRAI::hier::Patch& ,
@@ -116,11 +115,9 @@ public:
   //@}
 
 private:
-  const SAMRAI::tbox::Dimension d_dim;
-
   std::string d_object_name;
 
-  Boundary_Conditions &d_boundary_conditions;
+  const Boundary_Conditions &d_boundary_conditions;
 
   /*!
    * @brief Timers for performance measurement.

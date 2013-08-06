@@ -24,10 +24,8 @@
 */
 
 bool Elastic::FACSolver::s_initialized = 0;
-int Elastic::FACSolver::s_weight_id[SAMRAI::tbox::Dimension::
-                                    MAXIMUM_DIMENSION_VALUE];
-int Elastic::FACSolver::s_instance_counter[SAMRAI::tbox::Dimension::
-                                           MAXIMUM_DIMENSION_VALUE];
+int Elastic::FACSolver::s_weight_id[SAMRAI::MAX_DIM_VAL];
+int Elastic::FACSolver::s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
 /*
 *************************************************************************
@@ -52,8 +50,9 @@ Elastic::FACSolver::FACSolver
   d_dim(dim),
   d_object_name(object_name),
   d_boundary_conditions(bc),
-  d_fac_ops(d_dim, object_name + "::fac_ops",database,bc),
-  d_fac_precond(object_name + "::fac_precond", d_fac_ops),
+  d_fac_ops(boost::make_shared<FACOps>(d_dim, object_name + "::fac_ops",
+                                       database,bc)),
+  d_fac_precond(object_name + "::fac_precond",d_fac_ops,database),
   d_hierarchy(),
   d_ln_min(-1),
   d_ln_max(-1),
@@ -69,10 +68,6 @@ Elastic::FACSolver::FACSolver
     initializeStatics();
   }
 
-  setMaxCycles(10);
-  setResidualTolerance(1e-6);
-  setPresmoothingSweeps(1);
-  setPostsmoothingSweeps(1);
   setCoarseFineDiscretization("Ewing");
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);
@@ -114,7 +109,7 @@ Elastic::FACSolver::FACSolver
       (var_db->getVariable(side_weight_name));
     if (!weight) {
       weight = boost::make_shared<SAMRAI::pdat::SideVariable<double> >
-        (d_dim,side_weight_name,1);
+        (d_dim,side_weight_name,SAMRAI::hier::IntVector::getOne(d_dim),1);
     }
 
     if (s_weight_id[d_dim.getValue() - 2] < 0) {
@@ -130,7 +125,7 @@ Elastic::FACSolver::FACSolver
    * The FAC operator optionally uses the preconditioner
    * to get data for logging.
    */
-  d_fac_ops.setPreconditioner(&d_fac_precond);
+  d_fac_ops->setPreconditioner(&d_fac_precond);
 
   if (database) {
     getFromInput(database);

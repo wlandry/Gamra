@@ -927,10 +927,10 @@ namespace Stokes {
     //@{ @name Internal context and scratch data
 
     static boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    s_cell_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+    s_cell_scratch_var[SAMRAI::MAX_DIM_VAL];
 
     static boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-    s_side_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+    s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
     /*!
      * @brief Default context of internally maintained hierarchy data.

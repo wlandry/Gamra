@@ -252,7 +252,7 @@ extern "C" {
 }
 
 boost::shared_ptr<SAMRAI::pdat::OutersideVariable<double> >
-Stokes::HypreSolver::s_Ak0_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+Stokes::HypreSolver::s_Ak0_var[SAMRAI::MAX_DIM_VAL];
 
 tbox::StartupShutdownManager::Handler Stokes::HypreSolver::s_finalize_handler(
                                                                               0,
@@ -386,7 +386,7 @@ void Stokes::HypreSolver::initializeSolverState(
                                                 int ln)
 {
   TBOX_ASSERT(hierarchy);
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(d_dim, *hierarchy);
 
   deallocateSolverState();
 
@@ -448,7 +448,7 @@ void Stokes::HypreSolver::allocateHypreData()
   SAMRAI::hier::IntVector periodic_shift =
     grid_geometry->getPeriodicShift(ratio);
 
-  int periodic_flag[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+  int periodic_flag[SAMRAI::MAX_DIM_VAL];
   int d;
   bool is_periodic = false;
   for (d = 0; d < d_dim.getValue(); ++d) {
@@ -670,7 +670,7 @@ void Stokes::HypreSolver::copyToHypre(
                                       int depth,
                                       const SAMRAI::hier::Box& box)
 {
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS2(d_dim, src, box);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY2(d_dim, src, box);
 
   for (SAMRAI::pdat::CellIterator c(box); c; ++c) {
     SAMRAI::hier::IntVector ic = c();
@@ -692,7 +692,7 @@ void Stokes::HypreSolver::copyFromHypre(
                                         HYPRE_StructVector vector,
                                         const SAMRAI::hier::Box box)
 {
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS2(d_dim, dst, box);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY2(d_dim, dst, box);
 
   for (SAMRAI::pdat::CellIterator c(box); c; ++c) {
     double value;
@@ -1024,7 +1024,7 @@ void Stokes::HypreSolver::add_gAk0_toRhs(
                                          const RobinBcCoefStrategy* robin_bc_coef,
                                          SAMRAI::pdat::CellData<double>& rhs)
 {
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS2(d_dim, patch, rhs);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY2(d_dim, patch, rhs);
 
   /*
    * g*A*k0(a) is the storage for adjustments to be made to the rhs
@@ -1362,7 +1362,7 @@ void Stokes::HypreSolver::computeDiagonalEntries(
                                                  const SAMRAI::pdat::SideData<double>& off_diagonal,
                                                  const SAMRAI::hier::Box& patch_box)
 {
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS4(d_dim,
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY4(d_dim,
                                   diagonal,
                                   C_data,
                                   off_diagonal,
@@ -1398,7 +1398,7 @@ void Stokes::HypreSolver::computeDiagonalEntries(
                                                  const SAMRAI::pdat::SideData<double>& off_diagonal,
                                                  const SAMRAI::hier::Box& patch_box)
 {
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS3(d_dim, diagonal, off_diagonal, patch_box);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY3(d_dim, diagonal, off_diagonal, patch_box);
 
   const SAMRAI::hier::Index patch_lo = patch_box.lower();
   const SAMRAI::hier::Index patch_up = patch_box.upper();
@@ -1432,7 +1432,7 @@ void Stokes::HypreSolver::computeDiagonalEntries(
                                                  const SAMRAI::pdat::SideData<double>& off_diagonal,
                                                  const SAMRAI::hier::Box& patch_box)
 {
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS3(d_dim, diagonal, off_diagonal, patch_box);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY3(d_dim, diagonal, off_diagonal, patch_box);
 
   const SAMRAI::hier::Index patch_lo = patch_box.lower();
   const SAMRAI::hier::Index patch_up = patch_box.upper();
@@ -1468,9 +1468,9 @@ void Stokes::HypreSolver::adjustBoundaryEntries(
                                                 const SAMRAI::hier::Box bccoef_box,
                                                 SAMRAI::pdat::ArrayData<double>& Ak0_data,
                                                 const SAMRAI::hier::BoundaryBox& trimmed_boundary_box,
-                                                const double h[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE])
+                                                const double h[SAMRAI::MAX_DIM_VAL])
 {
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS8(d_dim, diagonal, off_diagonal, patch_box,
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY8(d_dim, diagonal, off_diagonal, patch_box,
                                   acoef_data, bcoef_data,
                                   bccoef_box, Ak0_data, trimmed_boundary_box);
 
@@ -1533,7 +1533,7 @@ void Stokes::HypreSolver::adjustBoundaryEntries(
 void
 Stokes::HypreSolver::finalizeCallback()
 {
-  for (int d = 0; d < SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE; ++d) {
+  for (int d = 0; d < SAMRAI::MAX_DIM_VAL; ++d) {
     s_Ak0_var[d].reset();
   }
 }

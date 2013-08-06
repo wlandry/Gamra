@@ -14,7 +14,7 @@ void Elastic::FACOps::xeqScheduleGhostFillNoCoarse(int v_id, int dest_ln)
   if (!v_nocoarse_refine_schedules[dest_ln]) {
     TBOX_ERROR("Expected side schedule not found.");
   }
-  SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
+  SAMRAI::xfer::RefineAlgorithm refiner;
   refiner.registerRefine(v_id,v_id,v_id,
                          boost::shared_ptr<SAMRAI::hier::RefineOperator>());
   refiner.resetSchedule(v_nocoarse_refine_schedules[dest_ln]);

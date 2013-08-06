@@ -25,7 +25,7 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
         (fine_patch.getPatchData(dv_diagonal_id));
     }
 
-  if(getDim().getValue()==2)
+  if(fine_patch.getDim().getValue()==2)
     {
       coarsen_2D(*v,*v_fine,dv_mixed_ptr,dv_diagonal_ptr,
                  coarse_patch,fine_patch,coarse_box);

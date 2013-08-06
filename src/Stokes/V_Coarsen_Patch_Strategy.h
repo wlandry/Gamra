@@ -40,9 +40,8 @@ namespace Stokes {
      * @param object_name Name of the object, for general referencing.
      * @param coef_strategy Coefficients strategy being helped.
      */
-    V_Coarsen_Patch_Strategy(const SAMRAI::tbox::Dimension& dim,
-                             std::string object_name = std::string()):
-      SAMRAI::xfer::CoarsenPatchStrategy(dim),
+    V_Coarsen_Patch_Strategy(std::string object_name = std::string()):
+      SAMRAI::xfer::CoarsenPatchStrategy(),
       d_object_name(object_name) {}
 
     /*!
@@ -53,8 +52,8 @@ namespace Stokes {
     //@{ @name SAMRAI::xfer::CoarsenPatchStrategy virtuals
 
     virtual SAMRAI::hier::IntVector
-    getCoarsenOpStencilWidth() const
-    { return SAMRAI::hier::IntVector::getOne(getDim()); }
+    getCoarsenOpStencilWidth(const SAMRAI::tbox::Dimension& dim) const
+    { return SAMRAI::hier::IntVector::getOne(dim); }
 
     virtual void
     preprocessCoarsen(SAMRAI::hier::Patch& ,
@@ -71,7 +70,7 @@ namespace Stokes {
                        const SAMRAI::hier::Box& coarse_box,
                        const SAMRAI::hier::IntVector& ratio)
     {
-      if(getDim().getValue()==2)
+      if(fine.getDim().getValue()==2)
         postprocessCoarsen_2D(coarse,fine,coarse_box,ratio);
       else
         postprocessCoarsen_3D(coarse,fine,coarse_box,ratio);

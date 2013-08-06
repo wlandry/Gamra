@@ -38,22 +38,6 @@ void Elastic::FACSolver::getFromInput
       bool logging = database->getBool("enable_logging");
       enableLogging(logging);
     }
-    if (database->isInteger("max_cycles")) {
-      int max_cycles = database->getInteger("max_cycles");
-      setMaxCycles(max_cycles);
-    }
-    if (database->isDouble("residual_tol")) {
-      double residual_tol = database->getDouble("residual_tol");
-      setResidualTolerance(residual_tol);
-    }
-    if (database->isInteger("num_pre_sweeps")) {
-      int num_pre_sweeps = database->getInteger("num_pre_sweeps");
-      setPresmoothingSweeps(num_pre_sweeps);
-    }
-    if (database->isInteger("num_post_sweeps")) {
-      int num_post_sweeps = database->getInteger("num_post_sweeps");
-      setPostsmoothingSweeps(num_post_sweeps);
-    }
     if (database->isString("coarse_fine_discretization")) {
       std::string s = database->getString("coarse_fine_discretization");
       setCoarseFineDiscretization(s);

@@ -10,10 +10,10 @@
 #include "Elastic/FACOps.h"
 
 boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-Elastic::FACOps::s_cell_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+Elastic::FACOps::s_cell_scratch_var[SAMRAI::MAX_DIM_VAL];
 
 boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-Elastic::FACOps::s_side_scratch_var[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE];
+Elastic::FACOps::s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
 SAMRAI::tbox::StartupShutdownManager::Handler Elastic::FACOps::s_finalize_handler
 (0,
@@ -29,8 +29,8 @@ SAMRAI::tbox::StartupShutdownManager::Handler Elastic::FACOps::s_finalize_handle
 */
 Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
                         const std::string& object_name,
-                        boost::shared_ptr<SAMRAI::tbox::Database> database,
-                        Boundary_Conditions &bc):
+                        const boost::shared_ptr<SAMRAI::tbox::Database> &database,
+                        const Boundary_Conditions &bc):
   d_dim(dim),
   d_object_name(object_name),
   d_hierarchy(),
@@ -59,10 +59,8 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   v_ghostfill_refine_operator(),
   v_ghostfill_refine_schedules(),
   v_nocoarse_refine_schedules(),
-  v_refine_patch_strategy(dim,
-                          d_object_name + "::refine patch strategy",bc),
-  v_coarsen_patch_strategy(dim,
-                           d_object_name + "::coarsen patch strategy",bc),
+  v_refine_patch_strategy(d_object_name + "::refine patch strategy",bc),
+  v_coarsen_patch_strategy(d_object_name + "::coarsen patch strategy",bc),
   d_enable_logging(false),
   d_preconditioner(),
   d_boundary_conditions(bc),
@@ -98,7 +96,8 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
     ss.str("");
     ss << "Elastic::FACOps::private_side_scratch" << dim.getValue();
     s_side_scratch_var[dim.getValue() - 1] =
-      boost::make_shared<SAMRAI::pdat::SideVariable<double> >(dim, ss.str());
+      boost::make_shared<SAMRAI::pdat::SideVariable<double> >
+      (dim, ss.str(),SAMRAI::hier::IntVector::getOne(d_dim));
   }
 
   SAMRAI::hier::VariableDatabase*

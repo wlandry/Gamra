@@ -28,7 +28,7 @@ void Stokes::V_Boundary_Refine::refine
 
    Stokes_set_boundary(coarse,invalid_id,src_component,true);
 
-   for(int axis=0; axis<getDim().getValue(); ++axis)
+   for(int axis=0; axis<fine.getDim().getValue(); ++axis)
      {
        const SAMRAI::hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer(axis);
        for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
@@ -48,7 +48,7 @@ void Stokes::V_Boundary_Refine::refine
  const SAMRAI::hier::IntVector&,
  const int &axis) const
 {
-  const SAMRAI::tbox::Dimension& dimension(getDim());
+  const SAMRAI::tbox::Dimension& dimension(fine.getDim());
    const int dim(dimension.getValue());
 
    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =

@@ -126,28 +126,28 @@ int main(int argc, char* argv[])
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::CellVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
-           (new Stokes::P_Refine(dim)));
+           (new Stokes::P_Refine()));
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::SideVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
-           (new Stokes::V_Refine(dim)));
+           (new Stokes::V_Refine()));
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::CellVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
-           (new Stokes::P_Boundary_Refine(dim)));
+           (new Stokes::P_Boundary_Refine()));
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::SideVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
-           (new Stokes::V_Boundary_Refine(dim)));
+           (new Stokes::V_Boundary_Refine()));
         grid_geometry->addCoarsenOperator
           (typeid(SAMRAI::pdat::SideVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
-           (new Stokes::V_Coarsen(dim)));
+           (new Stokes::V_Coarsen()));
         grid_geometry->addCoarsenOperator
           (typeid(SAMRAI::pdat::CellVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
            (new Stokes::Resid_Coarsen
-            (dim,fac_stokes.cell_viscosity_id)));
+            (fac_stokes.cell_viscosity_id)));
 
         converged=solve_system(fac_stokes,main_db,input_db,patch_hierarchy,
                                base_name,dim);
@@ -160,15 +160,15 @@ int main(int argc, char* argv[])
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::SideVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
-           (new Elastic::V_Refine(dim)));
+           (new Elastic::V_Refine()));
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::SideVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
-           (new Elastic::V_Boundary_Refine(dim)));
+           (new Elastic::V_Boundary_Refine()));
         grid_geometry->addCoarsenOperator
           (typeid(SAMRAI::pdat::CellVariable<double>).name(),
            boost::make_shared<SAMRAI::geom::CartesianCellDoubleWeightedAverage>
-           (dim));
+           ());
 
         converged=solve_system(fac_elastic,main_db,input_db,patch_hierarchy,
                                base_name,dim);

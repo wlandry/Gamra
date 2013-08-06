@@ -41,7 +41,7 @@ void Stokes::FACSolver::initializeSolverState
  const int fine_level)
 {
   TBOX_ASSERT(hierarchy);
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(d_dim, *hierarchy);
 
   if (!d_bc_object) {
     TBOX_ERROR(
@@ -86,7 +86,7 @@ void Stokes::FACSolver::initializeSolverState
     d_hierarchy->getPatchLevel(ln)->allocatePatchData(s_weight_id[d_dim.getValue() - 1]);
   }
 
-  d_fac_ops.computeVectorWeights(d_hierarchy,
+  d_fac_ops->computeVectorWeights(d_hierarchy,
                                  s_weight_id[d_dim.getValue() - 1],
                                  d_ln_min,
                                  d_ln_max);
@@ -97,7 +97,7 @@ void Stokes::FACSolver::initializeSolverState
                              d_ln_max);
   }
 
-  d_fac_ops.set_viscosity_dp_id(cell_viscosity,edge_viscosity,dp);
+  d_fac_ops->set_viscosity_dp_id(cell_viscosity,edge_viscosity,dp);
 
   createVectorWrappers(p, p_rhs, v, v_rhs);
 

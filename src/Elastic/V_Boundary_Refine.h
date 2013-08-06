@@ -48,8 +48,8 @@ namespace Elastic {
     /**
      * Uninteresting default constructor.
      */
-    explicit V_Boundary_Refine(const SAMRAI::tbox::Dimension& dim):
-      SAMRAI::hier::RefineOperator(dim, "V_BOUNDARY_REFINE")
+    explicit V_Boundary_Refine():
+      SAMRAI::hier::RefineOperator("V_BOUNDARY_REFINE")
     {
       d_name_id = "V_BOUNDARY_REFINE";
     }
@@ -76,7 +76,7 @@ namespace Elastic {
     (const boost::shared_ptr<SAMRAI::hier::Variable>& var,
      const std::string& op_name) const
     {
-      TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
+      TBOX_ASSERT_OBJDIM_EQUALITY2(*this, *var);
 
       const boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
         cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >(var));
@@ -107,9 +107,9 @@ namespace Elastic {
      * The stencil width of the linear interpolation operator is the vector
      * of ones.  That is, its stencil extends one side outside the fine box.
      */
-    SAMRAI::hier::IntVector getStencilWidth() const
+    SAMRAI::hier::IntVector getStencilWidth(const SAMRAI::tbox::Dimension &dim) const
     {
-      return SAMRAI::hier::IntVector::getOne(getDim());
+      return SAMRAI::hier::IntVector::getOne(dim);
     }
 
     /**

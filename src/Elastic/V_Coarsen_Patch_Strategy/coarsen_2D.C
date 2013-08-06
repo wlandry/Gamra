@@ -108,7 +108,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
      intersection. */
 
   SAMRAI::hier::Box big_box(coarse_box);
-  big_box.growUpper(SAMRAI::hier::IntVector::getOne(getDim()));
+  big_box.growUpper(SAMRAI::hier::IntVector::getOne(fine_patch.getDim()));
   const SAMRAI::pdat::CellIterator end(big_box,false);
   const int dim(2);
 

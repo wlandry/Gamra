@@ -24,6 +24,5 @@
 void Elastic::FACSolver::enableLogging(bool logging)
 {
   d_enable_logging = logging;
-  d_fac_precond.enableLogging(d_enable_logging);
-  d_fac_ops.enableLogging(d_enable_logging);
+  d_fac_ops->enableLogging(d_enable_logging);
 }

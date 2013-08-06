@@ -286,12 +286,12 @@ void Stokes::FACOps::initializeOperatorState
   v_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
   v_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
 
-  SAMRAI::xfer::RefineAlgorithm p_prolongation_refine_algorithm(d_dim),
-    v_prolongation_refine_algorithm(d_dim),
-    p_ghostfill_refine_algorithm(d_dim),
-    v_ghostfill_refine_algorithm(d_dim),
-    p_nocoarse_refine_algorithm(d_dim),
-    v_nocoarse_refine_algorithm(d_dim);
+  SAMRAI::xfer::RefineAlgorithm p_prolongation_refine_algorithm,
+    v_prolongation_refine_algorithm,
+    p_ghostfill_refine_algorithm,
+    v_ghostfill_refine_algorithm,
+    p_nocoarse_refine_algorithm,
+    v_nocoarse_refine_algorithm;
   SAMRAI::xfer::CoarsenAlgorithm p_urestriction_coarsen_algorithm(d_dim),
     p_rrestriction_coarsen_algorithm(d_dim),
     v_urestriction_coarsen_algorithm(d_dim),

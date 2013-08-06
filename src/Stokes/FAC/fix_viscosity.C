@@ -119,7 +119,7 @@ void Stokes::FAC::fix_viscosity()
         }
 
       /* Ghost fill */
-      SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
+      SAMRAI::xfer::RefineAlgorithm refiner;
       refiner.registerRefine(edge_viscosity_id,edge_viscosity_id,
                              edge_viscosity_id,
                              boost::shared_ptr<SAMRAI::hier::RefineOperator>());

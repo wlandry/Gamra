@@ -18,7 +18,7 @@ void Stokes::FACOps::xeqScheduleProlongation
     if (!p_prolongation_refine_schedules[dest_ln]) {
       TBOX_ERROR("Expected schedule not found.");
     }
-    SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
+    SAMRAI::xfer::RefineAlgorithm refiner;
     refiner.registerRefine(p_dst, p_src, p_scr, p_prolongation_refine_operator);
     refiner.resetSchedule(p_prolongation_refine_schedules[dest_ln]);
     p_prolongation_refine_schedules[dest_ln]->fillData(0.0,false);
@@ -29,7 +29,7 @@ void Stokes::FACOps::xeqScheduleProlongation
     if (!v_prolongation_refine_schedules[dest_ln]) {
       TBOX_ERROR("Expected schedule not found.");
     }
-    SAMRAI::xfer::RefineAlgorithm refiner(d_dim);
+    SAMRAI::xfer::RefineAlgorithm refiner;
     refiner.registerRefine(v_dst, v_src, v_scr, v_prolongation_refine_operator);
     refiner.resetSchedule(v_prolongation_refine_schedules[dest_ln]);
     v_prolongation_refine_schedules[dest_ln]->fillData(0.0,false);

@@ -12,52 +12,28 @@ inline
 void Elastic::FACSolver::set_V_ProlongationMethod(
    const std::string& v_prolongation_method)
 {
-   d_fac_ops.set_V_ProlongationMethod(v_prolongation_method);
+   d_fac_ops->set_V_ProlongationMethod(v_prolongation_method);
 }
 
 inline
 void Elastic::FACSolver::setCoarsestLevelSolverTolerance(
    double tol)
 {
-   d_fac_ops.setCoarsestLevelSolverTolerance(tol);
+   d_fac_ops->setCoarsestLevelSolverTolerance(tol);
 }
 
 inline
 void Elastic::FACSolver::setCoarsestLevelSolverMaxIterations(
    int max_iterations)
 {
-   d_fac_ops.setCoarsestLevelSolverMaxIterations(max_iterations);
+   d_fac_ops->setCoarsestLevelSolverMaxIterations(max_iterations);
 }
 
 inline
 void Elastic::FACSolver::setCoarseFineDiscretization(
    const std::string& coarsefine_method)
 {
-   d_fac_ops.setCoarseFineDiscretization(coarsefine_method);
-}
-
-inline
-void Elastic::FACSolver::setPresmoothingSweeps(
-   int num_pre_sweeps) {
-   d_fac_precond.setPresmoothingSweeps(num_pre_sweeps);
-}
-
-inline
-void Elastic::FACSolver::setPostsmoothingSweeps(
-   int num_post_sweeps) {
-   d_fac_precond.setPostsmoothingSweeps(num_post_sweeps);
-}
-
-inline
-void Elastic::FACSolver::setMaxCycles(
-   int max_cycles) {
-   d_fac_precond.setMaxCycles(max_cycles);
-}
-
-inline
-void Elastic::FACSolver::setResidualTolerance(
-   double residual_tol) {
-   d_fac_precond.setResidualTolerance(residual_tol);
+   d_fac_ops->setCoarseFineDiscretization(coarsefine_method);
 }
 
 inline

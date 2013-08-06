@@ -29,7 +29,7 @@ void Elastic::V_Boundary_Refine::refine
       strategy */
    // boundary_conditions.set_boundary(coarse,src_component,true);
 
-   for(int ix=0; ix<getDim().getValue(); ++ix)
+   for(int ix=0; ix<fine_patch.getDim().getValue(); ++ix)
      {
        const SAMRAI::hier::BoxContainer&
          boxes = t_overlap->getDestinationBoxContainer(ix);
@@ -50,7 +50,7 @@ void Elastic::V_Boundary_Refine::refine
  const SAMRAI::hier::IntVector &,
  const int &ix) const
 {
-  const SAMRAI::tbox::Dimension &dimension(getDim());
+  const SAMRAI::tbox::Dimension &dimension(fine_patch.getDim());
   const int dim(dimension.getValue());
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =

@@ -41,7 +41,7 @@ void Elastic::FACSolver::initializeSolverState
  const int fine_level)
 {
   TBOX_ASSERT(hierarchy);
-  TBOX_DIM_ASSERT_CHECK_DIM_ARGS1(d_dim, *hierarchy);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(d_dim, *hierarchy);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (v_id < 0 || v_rhs_id < 0) {
@@ -78,13 +78,13 @@ void Elastic::FACSolver::initializeSolverState
     d_hierarchy->getPatchLevel(ln)->allocatePatchData(s_weight_id[d_dim.getValue() - 1]);
   }
 
-  d_fac_ops.computeVectorWeights(d_hierarchy,
-                                 s_weight_id[d_dim.getValue() - 1],
-                                 d_ln_min,
-                                 d_ln_max);
+  d_fac_ops->computeVectorWeights(d_hierarchy,
+                                  s_weight_id[d_dim.getValue() - 1],
+                                  d_ln_min,
+                                  d_ln_max);
 
-  d_fac_ops.set_extra_ids(cell_moduli_id,edge_moduli_id,dv_diagonal_id,
-                          dv_mixed_id,level_set_id);
+  d_fac_ops->set_extra_ids(cell_moduli_id,edge_moduli_id,dv_diagonal_id,
+                           dv_mixed_id,level_set_id);
 
   createVectorWrappers(v_id, v_rhs_id);
 

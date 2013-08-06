@@ -437,7 +437,7 @@ namespace Stokes {
                           const SAMRAI::hier::Box bccoef_box,
                           SAMRAI::pdat::ArrayData<double>& Ak0_data,
                           const SAMRAI::hier::BoundaryBox& trimmed_boundary_box,
-                          const double h[SAMRAI::tbox::Dimension::MAXIMUM_DIMENSION_VALUE]);
+                          const double h[SAMRAI::MAX_DIM_VAL]);
 
     //@}
 
@@ -535,9 +535,7 @@ namespace Stokes {
      */
     int d_Ak0_id;
 
-    static boost::shared_ptr<SAMRAI::pdat::OutersideVariable<double> > s_Ak0_var[SAMRAI::tbox
-                                                                         Dimension::
-                                                                         MAXIMUM_DIMENSION_VALUE];
+    static boost::shared_ptr<SAMRAI::pdat::OutersideVariable<double> > s_Ak0_var[SAMRAI::MAX_DIM_VAL];
 
     /*!
      * @brief Depth of the solution variable.

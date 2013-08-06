@@ -19,9 +19,8 @@ namespace Stokes {
     public SAMRAI::hier::CoarsenOperator
   {
   public:
-    explicit Resid_Coarsen(const SAMRAI::tbox::Dimension& dim,
-                           const int &cell_viscosity):
-      SAMRAI::hier::CoarsenOperator(dim, "RESID_COARSEN"),
+    explicit Resid_Coarsen(const int &cell_viscosity):
+      SAMRAI::hier::CoarsenOperator("RESID_COARSEN"),
       cell_viscosity_id(cell_viscosity)
     {
       d_name_id = "RESID_COARSEN";
@@ -32,7 +31,7 @@ namespace Stokes {
     bool findCoarsenOperator(const boost::shared_ptr<SAMRAI::hier::Variable>& var,
                              const std::string& op_name) const
     {
-      TBOX_DIM_ASSERT_CHECK_ARGS2(*this, *var);
+      TBOX_ASSERT_OBJDIM_EQUALITY2(*this, *var);
 
       const boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
         cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::CellVariable<double> >
@@ -54,9 +53,9 @@ namespace Stokes {
       return 0;
     }
 
-    SAMRAI::hier::IntVector getStencilWidth() const
+    SAMRAI::hier::IntVector getStencilWidth(const SAMRAI::tbox::Dimension& dim) const
     {
-      return SAMRAI::hier::IntVector::getZero(getDim());
+      return SAMRAI::hier::IntVector::getZero(dim);
     }
 
     void coarsen(SAMRAI::hier::Patch& coarse,

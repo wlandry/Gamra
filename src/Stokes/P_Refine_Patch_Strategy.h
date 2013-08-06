@@ -39,9 +39,8 @@ namespace Stokes {
      * @param object_name Name of the object, for general referencing.
      * @param coef_strategy Coefficients strategy being helped.
      */
-    P_Refine_Patch_Strategy(const SAMRAI::tbox::Dimension& dim,
-                            std::string object_name = std::string()):
-      SAMRAI::xfer::RefinePatchStrategy(dim), d_dim(dim),
+    P_Refine_Patch_Strategy(std::string object_name = std::string()):
+      SAMRAI::xfer::RefinePatchStrategy(),
       d_object_name(object_name) {}
 
     /*!
@@ -56,8 +55,8 @@ namespace Stokes {
                                   const double ,
                                   const SAMRAI::hier::IntVector& ) {}
     SAMRAI::hier::IntVector
-    getRefineOpStencilWidth() const
-    { return SAMRAI::hier::IntVector::getOne(d_dim); }
+    getRefineOpStencilWidth(const SAMRAI::tbox::Dimension& dim) const
+    { return SAMRAI::hier::IntVector::getOne(dim); }
     // virtual void
     // preprocessRefineBoxes(
     //    SAMRAI::hier::Patch& fine,
@@ -370,8 +369,6 @@ namespace Stokes {
     // SAMRAI::hier::Box
     // makeFaceBoundaryBox(
     //    const SAMRAI::hier::BoundaryBox& boundary_box) const;
-
-    const SAMRAI::tbox::Dimension d_dim;
 
     std::string d_object_name;
 
