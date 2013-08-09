@@ -7,7 +7,7 @@ namespace {
   (const bool &boundary_positive,
    const int &axis,
    const SAMRAI::pdat::SideIndex &fine,
-   const SAMRAI::hier::Index &ip_s,
+   const SAMRAI::hier::IntVector &ip_s,
    const double &coarse_correction,
    const SAMRAI::pdat::CellData<double> &dv_diagonal_fine)
   {
@@ -43,7 +43,7 @@ namespace {
    const int &axis,
    const SAMRAI::pdat::SideIndex &fine,
    const SAMRAI::pdat::SideIndex &coarse,
-   const SAMRAI::hier::Index &ip,
+   const SAMRAI::hier::IntVector &ip,
    const int &i_min,
    const int &i_max,
    const SAMRAI::pdat::SideData<double> &dv_mixed,
@@ -78,7 +78,7 @@ namespace {
   double linear_fine_correction
   (const bool &boundary_positive,
    const SAMRAI::pdat::SideIndex &fine,
-   const SAMRAI::hier::Index &jp_s,
+   const SAMRAI::hier::IntVector &jp_s,
    const SAMRAI::pdat::SideData<double> &dv_mixed_fine)
   {
     double result;
@@ -106,8 +106,8 @@ void Elastic::V_Boundary_Refine::Correction_2D
  const int &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
- const SAMRAI::hier::Index &ip,
- const SAMRAI::hier::Index &jp,
+ const SAMRAI::hier::IntVector &ip,
+ const SAMRAI::hier::IntVector &jp,
  const int &i,
  const int &j,
  const int &i_min,
@@ -146,7 +146,7 @@ void Elastic::V_Boundary_Refine::Correction_2D
 
   if(boundary_direction==axis)
     {
-      SAMRAI::hier::Index ip_s(boundary_positive ? ip : -ip);
+      SAMRAI::hier::IntVector ip_s(boundary_positive ? ip : -ip);
       SAMRAI::pdat::SideIndex coarse(fine-ip_s);
       coarse.coarsen(SAMRAI::hier::Index(2,2));
 

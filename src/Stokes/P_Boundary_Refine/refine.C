@@ -64,7 +64,7 @@ void Stokes::P_Boundary_Refine::refine
           p_max[d]=std::min(overlap_box.upper(d),gbox.upper(d));
         }
 
-      SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+      SAMRAI::hier::IntVector ip(SAMRAI::hier::IntVector::getZero(dimension)), jp(ip), kp(ip);
       ip[0]=1;
       jp[1]=1;
       if(dim>2)

@@ -49,8 +49,8 @@
 
 void Stokes::P_Boundary_Refine::Update_P_3D
 (const SAMRAI::pdat::CellIndex &fine,
- const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
- const SAMRAI::hier::Index &kp,
+ const SAMRAI::hier::IntVector &ip, const SAMRAI::hier::IntVector &jp,
+ const SAMRAI::hier::IntVector &kp,
  const int &j, const int &k, const int &j_max, const int &k_max,
  SAMRAI::pdat::CellData<double> &p,
  SAMRAI::pdat::CellData<double> &p_fine) const

@@ -9,8 +9,8 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  const int &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
- const SAMRAI::hier::Index unit[],
- const SAMRAI::hier::Index &ijk,
+ const SAMRAI::hier::IntVector unit[],
+ const SAMRAI::hier::IntVector &ijk,
  const SAMRAI::hier::Box &coarse_box,
  const SAMRAI::hier::Index &fine_min,
  const SAMRAI::hier::Index &fine_max,
@@ -76,13 +76,13 @@ void Elastic::V_Boundary_Refine::Update_V_3D
   if(boundary_direction==ix)
     {
       const int iy((ix+1)%3), iz((ix+2)%3);
-      const SAMRAI::hier::Index ip_s(boundary_positive ? unit[ix] : -unit[ix]);
+      const SAMRAI::hier::IntVector ip_s(boundary_positive ? unit[ix] : -unit[ix]);
 
       SAMRAI::pdat::SideIndex coarse(fine-ip_s);
       coarse.coarsen(SAMRAI::hier::Index(2,2,2));
       coarse+=ip_s;
 
-      SAMRAI::hier::Index jp(unit[iy]),kp(unit[iz]);
+      SAMRAI::hier::IntVector jp(unit[iy]),kp(unit[iz]);
       const int ijk_mod_y(ijk[iy]%2), ijk_mod_z(ijk[iz]%2);
       int lower_y, upper_y, lower_z, upper_z;
       if(ijk_mod_y==0)

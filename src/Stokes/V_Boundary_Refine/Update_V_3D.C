@@ -8,8 +8,8 @@ void Stokes::V_Boundary_Refine::Update_V_3D
  const int &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
- const SAMRAI::hier::Index pp[],
- const SAMRAI::hier::Index &ijk,
+ const SAMRAI::hier::IntVector pp[],
+ const SAMRAI::hier::IntVector &ijk,
  const SAMRAI::hier::Index &p_min, const SAMRAI::hier::Index &p_max,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
@@ -63,7 +63,7 @@ void Stokes::V_Boundary_Refine::Update_V_3D
         return;
       /* Compute the derivative at all of the interpolation points.  */
 
-      const SAMRAI::hier::Index ip(boundary_positive ? pp[axis] : -pp[axis]),
+      const SAMRAI::hier::IntVector ip(boundary_positive ? pp[axis] : -pp[axis]),
         jp(pp[(axis+1)%3]), kp(pp[(axis+2)%3]);
 
       SAMRAI::pdat::SideIndex center(fine-ip);

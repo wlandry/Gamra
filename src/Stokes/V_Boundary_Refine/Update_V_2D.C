@@ -9,7 +9,7 @@ void Stokes::V_Boundary_Refine::Update_V_2D
  const int &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
- const SAMRAI::hier::Index &ip, const SAMRAI::hier::Index &jp,
+ const SAMRAI::hier::IntVector &ip, const SAMRAI::hier::IntVector &jp,
  int &i, int &j,
  const int &i_max,
  const int &j_min,
@@ -58,7 +58,7 @@ void Stokes::V_Boundary_Refine::Update_V_2D
       /* Compute the derivative at the nearest three coarse points and
          then interpolate */
 
-      SAMRAI::hier::Index ip_s(boundary_positive ? ip : -ip);
+      SAMRAI::hier::IntVector ip_s(boundary_positive ? ip : -ip);
 
       SAMRAI::pdat::SideIndex center(fine-ip_s);
       center.coarsen(SAMRAI::hier::Index(2,2));
