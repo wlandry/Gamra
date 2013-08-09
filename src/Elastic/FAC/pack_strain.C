@@ -42,8 +42,9 @@ Elastic::FAC::pack_strain(double* buffer,
                    <SAMRAI::geom::CartesianPatchGeometry>
                    (patch.getPatchGeometry())->getDx());
 
-  SAMRAI::pdat::CellData<double>::iterator iend(region,false);
-  for(SAMRAI::pdat::CellData<double>::iterator icell(region,true);
+  SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
+  for(SAMRAI::pdat::CellIterator
+        icell(SAMRAI::pdat::CellGeometry::begin(region));
       icell!=iend; ++icell)
     {
       const SAMRAI::pdat::SideIndex

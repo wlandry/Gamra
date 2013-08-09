@@ -798,7 +798,7 @@ namespace Elastic {
      * SAMRAI::hier::CoarseFineBoundary is a light object before
      * it is set for a level.
      */
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
+    std::vector<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
     d_cf_boundary;
 
     //@}

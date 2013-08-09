@@ -54,8 +54,9 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
     {
       const SAMRAI::hier::Index ip(1,0), jp(0,1);
 
-      SAMRAI::pdat::CellData<double>::iterator iend(region,false);
-      for (SAMRAI::pdat::CellData<double>::iterator icell(region,true);
+      SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
+      for (SAMRAI::pdat::CellIterator
+             icell(SAMRAI::pdat::CellGeometry::begin(region));
            icell!=iend; ++icell) {
 
         const SAMRAI::pdat::CellIndex &center(*icell);
@@ -90,8 +91,9 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
   else
     {
       const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
-      SAMRAI::pdat::CellData<double>::iterator iend(region,false);
-      for (SAMRAI::pdat::CellData<double>::iterator icell(region,true);
+      SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
+      for (SAMRAI::pdat::CellIterator
+             icell(SAMRAI::pdat::CellGeometry::begin(region));
            icell!=iend; ++icell) {
 
         const SAMRAI::pdat::CellIndex &center(*icell);

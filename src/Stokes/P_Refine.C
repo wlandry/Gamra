@@ -66,8 +66,9 @@ void Stokes::P_Refine::refine(
      boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
      (coarse_patch.getPatchGeometry());
 
-   SAMRAI::pdat::CellIterator cend(fine_box,false);
-   for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ++ci)
+   SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(fine_box));
+   for(SAMRAI::pdat::CellIterator
+         ci(SAMRAI::pdat::CellGeometry::begin(fine_box)); ci!=cend; ++ci)
      {
        const SAMRAI::pdat::CellIndex &fine(*ci);
 

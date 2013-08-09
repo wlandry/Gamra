@@ -311,7 +311,7 @@ namespace Stokes {
 
     //@}
 
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
+    std::vector<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
     coarse_fine;
 
   private:

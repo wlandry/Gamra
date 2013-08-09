@@ -49,7 +49,7 @@
 void Stokes::FACOps::deallocateOperatorState()
 {
   if (d_hierarchy) {
-    d_cf_boundary.resizeArray(0);
+    d_cf_boundary.clear();
 #ifdef HAVE_HYPRE
     d_hypre_solver.deallocateSolverState();
 #endif
@@ -57,15 +57,15 @@ void Stokes::FACOps::deallocateOperatorState()
     d_ln_min = -1;
     d_ln_max = -1;
 
-    p_prolongation_refine_schedules.setNull();
-    v_prolongation_refine_schedules.setNull();
-    p_urestriction_coarsen_schedules.setNull();
-    v_urestriction_coarsen_schedules.setNull();
-    p_rrestriction_coarsen_schedules.setNull();
-    v_rrestriction_coarsen_schedules.setNull();
-    p_ghostfill_refine_schedules.setNull();
-    v_ghostfill_refine_schedules.setNull();
-    p_nocoarse_refine_schedules.setNull();
-    v_nocoarse_refine_schedules.setNull();
+    p_prolongation_refine_schedules.clear();
+    v_prolongation_refine_schedules.clear();
+    p_urestriction_coarsen_schedules.clear();
+    v_urestriction_coarsen_schedules.clear();
+    p_rrestriction_coarsen_schedules.clear();
+    v_rrestriction_coarsen_schedules.clear();
+    p_ghostfill_refine_schedules.clear();
+    v_ghostfill_refine_schedules.clear();
+    p_nocoarse_refine_schedules.clear();
+    v_nocoarse_refine_schedules.clear();
   }
 }

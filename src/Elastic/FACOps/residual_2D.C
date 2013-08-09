@@ -21,7 +21,7 @@ void Elastic::FACOps::residual_2D
   double dx = geom.getDx()[0];
   double dy = geom.getDx()[1];
 
-  SAMRAI::pdat::CellIterator cend(pbox,false);
+  SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(pbox));
 
   if(have_embedded_boundary())
     {
@@ -29,7 +29,8 @@ void Elastic::FACOps::residual_2D
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (patch.getPatchData(level_set_id));
       SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
-      for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
+      for(SAMRAI::pdat::CellIterator
+            ci(SAMRAI::pdat::CellGeometry::begin(pbox)); ci!=cend; ++ci)
         {
           const SAMRAI::pdat::CellIndex &cell(*ci);
 
@@ -70,7 +71,8 @@ void Elastic::FACOps::residual_2D
     }
   else
     {
-      for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
+      for(SAMRAI::pdat::CellIterator
+            ci(SAMRAI::pdat::CellGeometry::begin(pbox)); ci!=cend; ++ci)
         {
           const SAMRAI::pdat::CellIndex &cell(*ci);
 

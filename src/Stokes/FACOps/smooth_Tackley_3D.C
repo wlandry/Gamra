@@ -178,8 +178,10 @@ void Stokes::FACOps::smooth_Tackley_3D
             (patch->getPatchGeometry());
           const double *Dx = geom->getDx();
 
-          SAMRAI::pdat::CellIterator cend(pbox,false);
-          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
+          SAMRAI::pdat::CellIterator
+            cend(SAMRAI::pdat::CellGeometry::end(pbox));
+          for(SAMRAI::pdat::CellIterator
+                ci(SAMRAI::pdat::CellGeometry::begin(pbox)); ci!=cend; ++ci)
             {
               const SAMRAI::pdat::CellIndex &center(*ci);
 
@@ -236,8 +238,9 @@ void Stokes::FACOps::smooth_Tackley_3D
 
           pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
 
-          SAMRAI::pdat::CellIterator cend(pbox,true);
-          for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
+          SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(pbox));
+          for(SAMRAI::pdat::CellIterator
+                ci(SAMRAI::pdat::CellGeometry::begin(pbox)); ci!=cend; ++ci)
             {
               const SAMRAI::pdat::CellIndex &center(*ci);
 

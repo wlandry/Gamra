@@ -35,8 +35,8 @@ bool Stokes::FAC::packDerivedDataIntoDoubleBuffer(
 {
   (void)depth_id;
 
-  SAMRAI::pdat::CellData<double>::iterator icell(region,true);
-  SAMRAI::pdat::CellData<double>::iterator iend(region,false);
+  SAMRAI::pdat::CellIterator icell(SAMRAI::pdat::CellGeometry::begin(region));
+  SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
 
   if (variable_name == "Error") {
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > current_solution_ =

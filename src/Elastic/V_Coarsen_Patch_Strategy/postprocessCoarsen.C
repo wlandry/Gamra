@@ -30,7 +30,7 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
       coarsen_2D(*v,*v_fine,dv_mixed_ptr,dv_diagonal_ptr,
                  coarse_patch,fine_patch,coarse_box);
 
-      const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
+      const std::vector<SAMRAI::hier::BoundaryBox>
         &boundaries=coarse_fine[fine_patch.getPatchLevelNumber()]
         ->getEdgeBoundaries(coarse_patch.getGlobalId());
 
@@ -44,7 +44,7 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
 
       coarsen_3D(*v,*v_fine,dv_mixed_ptr,dv_diagonal_ptr,*coarse_geom,coarse_box);
 
-      const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
+      const std::vector<SAMRAI::hier::BoundaryBox>
         &boundaries=coarse_fine[fine_patch.getPatchLevelNumber()]
         ->getFaceBoundaries(coarse_patch.getGlobalId());
 

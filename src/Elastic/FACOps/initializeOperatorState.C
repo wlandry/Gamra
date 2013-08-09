@@ -155,7 +155,7 @@ void Elastic::FACOps::initializeOperatorState
    * Initialize the coarse-fine boundary description for the
    * hierarchy.
    */
-  d_cf_boundary.resizeArray(d_hierarchy->getNumberOfLevels());
+  d_cf_boundary.resize(d_hierarchy->getNumberOfLevels());
 
   SAMRAI::hier::IntVector max_gcw(d_dim, 1);
   for (ln = d_ln_min; ln <= d_ln_max; ++ln)

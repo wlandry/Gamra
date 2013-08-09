@@ -56,8 +56,10 @@ void Elastic::Boundary_Conditions::set_regular_boundary
       SAMRAI::pdat::SideData<double> &dv_mixed(*dv_mixed_ptr);
       for(int ix=0; ix<dim; ++ix)
         {
-          SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
-          for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end; ++si)
+          SAMRAI::pdat::SideIterator
+            s_end(SAMRAI::pdat::SideGeometry::end(gbox,ix));
+          for(SAMRAI::pdat::SideIterator
+                si(SAMRAI::pdat::SideGeometry::begin(gbox,ix)); si!=s_end; ++si)
             {
               const SAMRAI::pdat::SideIndex &s(*si);
               if((s[ix]<pbox.lower(ix)
@@ -90,8 +92,9 @@ void Elastic::Boundary_Conditions::set_regular_boundary
         (patch.getPatchData(dv_diagonal_id));
       SAMRAI::pdat::CellData<double>& dv_diagonal(*dv_diagonal_ptr);
 
-      SAMRAI::pdat::CellIterator c_end(gbox,false);
-      for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=c_end; ++ci)
+      SAMRAI::pdat::CellIterator c_end(SAMRAI::pdat::CellGeometry::end(gbox));
+      for(SAMRAI::pdat::CellIterator
+            ci(SAMRAI::pdat::CellGeometry::begin(gbox)); ci!=c_end; ++ci)
         {
           const SAMRAI::pdat::CellIndex &c(*ci);
           bool is_boundary(false);

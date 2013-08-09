@@ -34,15 +34,13 @@ bool solve_system
                         load_balancer));
   gridding_algorithm->makeCoarsestLevel(0.0);
 
-  SAMRAI::tbox::Array<std::string> vis_writer(1);
+  std::vector<std::string> vis_writer(1);
   vis_writer[0] = "Visit";
   if (main_db->keyExists("vis_writer"))
-    vis_writer = main_db->getStringArray("vis_writer");
-  bool use_visit = false;
-  for (int i = 0; i < vis_writer.getSize(); ++i)
-    {
-      if (vis_writer[i] == "VisIt") use_visit = true;
-    }
+    vis_writer = main_db->getStringVector("vis_writer");
+  bool use_visit(std::find(vis_writer.begin(),vis_writer.end(),"VisIt")
+                 !=vis_writer.end());
+
   bool intermediate_output(main_db->getBoolWithDefault("intermediate_output",
                                                        false));
 
@@ -66,11 +64,7 @@ bool solve_system
     {
       if (use_visit && intermediate_output)
         visit_writer->writePlotData(patch_hierarchy, lnum);
-      SAMRAI::tbox::Array<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels());
-      for (int ln = 0; ln < tag_buffer.getSize(); ++ln)
-        {
-          tag_buffer[ln] = 1;
-        }
+      std::vector<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels(),1);
       gridding_algorithm->regridAllFinerLevels(0,tag_buffer,0,0.0);
       SAMRAI::tbox::plog << "Newly adapted hierarchy\n";
 

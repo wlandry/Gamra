@@ -35,8 +35,10 @@ void Stokes::Resid_Coarsen::coarsen(SAMRAI::hier::Patch& coarse,
   TBOX_ASSERT(r_fine.getDepth() == r.getDepth());
   TBOX_ASSERT(r.getDepth() == 1);
 
-  SAMRAI::pdat::CellIterator cend(coarse.getBox(),false);
-  for(SAMRAI::pdat::CellIterator ci(coarse.getBox(),true); ci!=cend; ++ci)
+  SAMRAI::pdat::CellIterator
+    cend(SAMRAI::pdat::CellGeometry::end(coarse.getBox()));
+  for(SAMRAI::pdat::CellIterator
+        ci(SAMRAI::pdat::CellGeometry::begin(coarse.getBox())); ci!=cend; ++ci)
     {
       const SAMRAI::pdat::CellIndex &coarse(*ci);
       SAMRAI::pdat::CellIndex fine(coarse*2);

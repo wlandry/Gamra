@@ -109,7 +109,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
 
   SAMRAI::hier::Box big_box(coarse_box);
   big_box.growUpper(SAMRAI::hier::IntVector::getOne(fine_patch.getDim()));
-  const SAMRAI::pdat::CellIterator end(big_box,false);
+  const SAMRAI::pdat::CellIterator end(SAMRAI::pdat::CellGeometry::end(big_box));
   const int dim(2);
 
   if(have_embedded_boundary())
@@ -124,7 +124,8 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
         (fine_patch.getPatchData(level_set_id));
       SAMRAI::pdat::SideData<double> &level_set_fine(*level_set_fine_ptr);
 
-      for(SAMRAI::pdat::CellIterator ci(big_box,true); ci!=end; ++ci)
+      for(SAMRAI::pdat::CellIterator
+            ci(SAMRAI::pdat::CellGeometry::begin(big_box)); ci!=end; ++ci)
         {
           const SAMRAI::pdat::CellIndex &coarse_cell(*ci);
           for(int ix=0;ix<dim;++ix)
@@ -219,7 +220,8 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
         (coarse_patch.getPatchGeometry());
 
-      for(SAMRAI::pdat::CellIterator ci(big_box,true); ci!=end; ++ci)
+      for(SAMRAI::pdat::CellIterator
+            ci(SAMRAI::pdat::CellGeometry::begin(big_box)); ci!=end; ++ci)
         {
           const SAMRAI::pdat::CellIndex &cell(*ci);
           for(int ix=0;ix<2;++ix)

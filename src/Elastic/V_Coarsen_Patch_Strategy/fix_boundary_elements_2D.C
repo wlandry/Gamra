@@ -5,7 +5,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
 (SAMRAI::pdat::SideData<double>& v,
  const SAMRAI::pdat::SideData<double>& v_fine,
  const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
- const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries) const
+ const std::vector<SAMRAI::hier::BoundaryBox> &boundaries) const
 {
   /* FIXME: Why is this required?  Shouldn't the boundary points be
      ok?  They are partially interpolated from the coarse level, but
@@ -20,7 +20,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_2D
 
   SAMRAI::hier::Box gbox(v_fine.getGhostBox());
   SAMRAI::hier::Index ip(1,0), jp(0,1);
-  for(int mm=0; mm<boundaries.size(); ++mm)
+  for(size_t mm=0; mm<boundaries.size(); ++mm)
     {
       SAMRAI::hier::Box bbox=boundaries[mm].getBox();
       int location_index=boundaries[mm].getLocationIndex();

@@ -38,8 +38,11 @@ void Elastic::Boundary_Conditions::set_dirichlet
               SAMRAI::hier::Box y_box(x_box);
               y_box.upper(iy)=y_box.lower(iy);
 
-              SAMRAI::pdat::SideIterator end(y_box,ix,false);
-              for(SAMRAI::pdat::SideIterator si(y_box,ix,true); si!=end; ++si)
+              SAMRAI::pdat::SideIterator
+                end(SAMRAI::pdat::SideGeometry::end(y_box,ix));
+              for(SAMRAI::pdat::SideIterator
+                    si(SAMRAI::pdat::SideGeometry::begin(y_box,ix));
+                  si!=end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   v(x)=-v(x+unit[iy]);
@@ -61,8 +64,11 @@ void Elastic::Boundary_Conditions::set_dirichlet
               SAMRAI::hier::Box y_box(x_box);
               y_box.lower(iy)=y_box.upper(iy);
 
-              SAMRAI::pdat::SideIterator end(y_box,ix,false);
-              for(SAMRAI::pdat::SideIterator si(y_box,ix,true); si!=end; ++si)
+              SAMRAI::pdat::SideIterator
+                end(SAMRAI::pdat::SideGeometry::end(y_box,ix));
+              for(SAMRAI::pdat::SideIterator
+                    si(SAMRAI::pdat::SideGeometry::begin(y_box,ix));
+                  si!=end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   v(x)=-v(x-unit[iy]);
@@ -88,8 +94,10 @@ void Elastic::Boundary_Conditions::set_dirichlet
           SAMRAI::hier::Box x_box(box);
           x_box.upper(ix)=x_box.lower(ix);
 
-          SAMRAI::pdat::SideIterator end(x_box,ix,false);
-          for(SAMRAI::pdat::SideIterator si(x_box,ix,true); si!=end; ++si)
+          SAMRAI::pdat::SideIterator
+            end(SAMRAI::pdat::SideGeometry::end(x_box,ix));
+          for(SAMRAI::pdat::SideIterator
+                si(SAMRAI::pdat::SideGeometry::begin(x_box,ix)); si!=end; ++si)
             {
               const SAMRAI::pdat::SideIndex &x(*si);
               if(x[ix]<pbox.lower(ix))
@@ -116,8 +124,10 @@ void Elastic::Boundary_Conditions::set_dirichlet
           SAMRAI::hier::Box x_box(box);
           x_box.lower(ix)=x_box.upper(ix);
 
-          SAMRAI::pdat::SideIterator end(x_box,ix,false);
-          for(SAMRAI::pdat::SideIterator si(x_box,ix,true); si!=end; ++si)
+          SAMRAI::pdat::SideIterator
+            end(SAMRAI::pdat::SideGeometry::end(x_box,ix));
+          for(SAMRAI::pdat::SideIterator
+                si(SAMRAI::pdat::SideGeometry::begin(x_box,ix)); si!=end; ++si)
             {
               const SAMRAI::pdat::SideIndex &x(*si);
               if(x[ix]>pbox.upper(ix)+1)

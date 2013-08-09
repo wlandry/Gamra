@@ -12,7 +12,7 @@ Stokes::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
 
   /* We only care about edges, not corners, so we only iterate over
      edge boundary boxes. */
-  const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>
+  const std::vector<SAMRAI::hier::BoundaryBox>
     &boundaries=coarse_fine[fine.getPatchLevelNumber()]->getEdgeBoundaries(coarse.getGlobalId());
      
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_fine =
@@ -29,7 +29,7 @@ Stokes::V_Coarsen_Patch_Strategy::postprocessCoarsen_2D
 
   SAMRAI::hier::Box gbox(v_fine->getGhostBox());
   SAMRAI::hier::Index ip(1,0), jp(0,1);
-  for(int mm=0; mm<boundaries.size(); ++mm)
+  for(size_t mm=0; mm<boundaries.size(); ++mm)
     {
       SAMRAI::hier::Box bbox=boundaries[mm].getBox();
       int location_index=boundaries[mm].getLocationIndex();

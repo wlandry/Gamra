@@ -44,8 +44,10 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
 
       SAMRAI::hier::Box gbox=p.getGhostBox();
 
-      SAMRAI::pdat::CellIterator cend(gbox,false);      
-      for(SAMRAI::pdat::CellIterator ci(gbox,true); ci!=cend; ++ci)
+      SAMRAI::pdat::CellIterator
+        cend(SAMRAI::pdat::CellGeometry::end(gbox));      
+      for(SAMRAI::pdat::CellIterator
+            ci(SAMRAI::pdat::CellGeometry::begin(gbox)); ci!=cend; ++ci)
         {
           const SAMRAI::pdat::CellIndex &center(*ci);
           SAMRAI::hier::Index ip(zero), jp(zero), kp(zero);
@@ -107,8 +109,10 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
       SAMRAI::hier::Box gbox=v.getGhostBox();
       for(int ix=0; ix<dim; ++ix)
         {
-          SAMRAI::pdat::SideIterator send(gbox,ix,false);
-          for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
+          SAMRAI::pdat::SideIterator
+            send(SAMRAI::pdat::SideGeometry::end(gbox,ix));
+          for(SAMRAI::pdat::SideIterator
+                si(SAMRAI::pdat::SideGeometry::begin(gbox,ix)); si!=send; ++si)
             {
               const SAMRAI::pdat::SideIndex &x(*si);
 
@@ -170,7 +174,8 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
              same number, as long as we have pure Neumann boundary
              conditions, and not Robin. */
 
-          for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
+          for(SAMRAI::pdat::SideIterator
+                si(SAMRAI::pdat::SideGeometry::begin(gbox,ix)); si!=send; ++si)
             {
               const SAMRAI::pdat::SideIndex &x(*si);
               if((x[ix]<pbox.lower(ix)
@@ -200,8 +205,11 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
           if(dim==3)
             {
               const int iy((ix+1)%dim), iz((iy+1)%dim);
-              SAMRAI::pdat::SideIterator send(gbox,ix,false);
-              for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=send; ++si)
+              SAMRAI::pdat::SideIterator
+                send(SAMRAI::pdat::SideGeometry::end(gbox,ix));
+              for(SAMRAI::pdat::SideIterator
+                    si(SAMRAI::pdat::SideGeometry::begin(gbox,ix));
+                  si!=send; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   if(((x[ix]<pbox.lower(ix)

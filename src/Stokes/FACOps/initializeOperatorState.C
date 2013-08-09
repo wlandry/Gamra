@@ -170,7 +170,7 @@ void Stokes::FACOps::initializeOperatorState
    * Initialize the coarse-fine boundary description for the
    * hierarchy.
    */
-  d_cf_boundary.resizeArray(d_hierarchy->getNumberOfLevels());
+  d_cf_boundary.resize(d_hierarchy->getNumberOfLevels());
 
   SAMRAI::hier::IntVector max_gcw(d_dim, 1);
   for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
@@ -275,16 +275,16 @@ void Stokes::FACOps::initializeOperatorState
    * There is no need to delete the old schedules first
    * because we have deallocated the solver state above.
    */
-  p_prolongation_refine_schedules.resizeArray(d_ln_max + 1);
-  v_prolongation_refine_schedules.resizeArray(d_ln_max + 1);
-  p_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
-  v_ghostfill_refine_schedules.resizeArray(d_ln_max + 1);
-  p_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
-  v_nocoarse_refine_schedules.resizeArray(d_ln_max + 1);
-  p_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
-  p_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
-  v_urestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
-  v_rrestriction_coarsen_schedules.resizeArray(d_ln_max + 1);
+  p_prolongation_refine_schedules.resize(d_ln_max + 1);
+  v_prolongation_refine_schedules.resize(d_ln_max + 1);
+  p_ghostfill_refine_schedules.resize(d_ln_max + 1);
+  v_ghostfill_refine_schedules.resize(d_ln_max + 1);
+  p_nocoarse_refine_schedules.resize(d_ln_max + 1);
+  v_nocoarse_refine_schedules.resize(d_ln_max + 1);
+  p_urestriction_coarsen_schedules.resize(d_ln_max + 1);
+  p_rrestriction_coarsen_schedules.resize(d_ln_max + 1);
+  v_urestriction_coarsen_schedules.resize(d_ln_max + 1);
+  v_rrestriction_coarsen_schedules.resize(d_ln_max + 1);
 
   SAMRAI::xfer::RefineAlgorithm p_prolongation_refine_algorithm,
     v_prolongation_refine_algorithm,

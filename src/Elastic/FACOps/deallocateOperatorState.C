@@ -48,7 +48,7 @@
 void Elastic::FACOps::deallocateOperatorState()
 {
   if (d_hierarchy) {
-    d_cf_boundary.resizeArray(0);
+    d_cf_boundary.clear();
     d_hierarchy.reset();
     d_ln_min = -1;
     d_ln_max = -1;

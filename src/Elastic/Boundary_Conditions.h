@@ -125,8 +125,10 @@ namespace Elastic {
               SAMRAI::hier::Box box(gbox);
               box.upper(ix)=pbox.lower(ix)-1;
 
-              SAMRAI::pdat::CellIterator end(box,false);
-              for(SAMRAI::pdat::CellIterator ci(box,true); ci!=end; ++ci)
+              SAMRAI::pdat::CellIterator
+                end(SAMRAI::pdat::CellGeometry::end(box));
+              for(SAMRAI::pdat::CellIterator
+                    ci(SAMRAI::pdat::CellGeometry::begin(box)); ci!=end; ++ci)
                 {
                   const SAMRAI::pdat::SideIndex
                     x(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
@@ -189,8 +191,10 @@ namespace Elastic {
               box.lower(ix)=pbox.upper(ix)+2;
               box.upper(ix)=std::max(box.upper(ix),box.lower(ix));
 
-              SAMRAI::pdat::CellIterator end(box,false);
-              for(SAMRAI::pdat::CellIterator ci(box,true); ci!=end; ++ci)
+              SAMRAI::pdat::CellIterator
+                end(SAMRAI::pdat::CellGeometry::end(box));
+              for(SAMRAI::pdat::CellIterator
+                    ci(SAMRAI::pdat::CellGeometry::begin(box)); ci!=end; ++ci)
                 {
                   const SAMRAI::pdat::SideIndex
                     x(*ci,ix,SAMRAI::pdat::SideIndex::Lower);

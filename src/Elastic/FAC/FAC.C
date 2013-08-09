@@ -73,7 +73,7 @@ Elastic::FAC::FAC(const std::string& object_name,
 
   if(database->keyExists("faults"))
     {
-      faults=database->getDoubleArray("faults");
+      faults=database->getDoubleVector("faults");
     }
   if(faults.size()%9!=0)
     TBOX_ERROR("The number of points in refinement_points must be "
@@ -97,7 +97,7 @@ Elastic::FAC::FAC(const std::string& object_name,
                                         SAMRAI::hier::IntVector::getOne(d_dim));
     }
   if(database->keyExists("refinement_points"))
-    refinement_points=database->getDoubleArray("refinement_points");
+    refinement_points=database->getDoubleVector("refinement_points");
   if(refinement_points.size()%3!=0)
     TBOX_ERROR("The number of points in refinement_points must be "
                "divisible by 3.  Read "

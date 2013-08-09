@@ -185,14 +185,14 @@ namespace Stokes {
     int p_id, cell_viscosity_id, edge_viscosity_id, dp_id, p_exact_id,
       p_rhs_id, v_id, v_rhs_id;
 
-    SAMRAI::tbox::Array<double> viscosity, viscosity_xyz_max, viscosity_xyz_min;
-    SAMRAI::tbox::Array<int> viscosity_ijk;
+    std::vector<double> viscosity, viscosity_xyz_max, viscosity_xyz_min;
+    std::vector<int> viscosity_ijk;
 
-    SAMRAI::tbox::Array<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
-    SAMRAI::tbox::Array<int> v_rhs_ijk;
+    std::vector<double> v_rhs, v_rhs_xyz_max, v_rhs_xyz_min;
+    std::vector<int> v_rhs_ijk;
 
-    SAMRAI::tbox::Array<double> p_initial, p_initial_xyz_max, p_initial_xyz_min;
-    SAMRAI::tbox::Array<int> p_initial_ijk;
+    std::vector<double> p_initial, p_initial_xyz_max, p_initial_xyz_min;
+    std::vector<int> p_initial_ijk;
     //@}
 
   };

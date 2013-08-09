@@ -73,8 +73,10 @@ void Elastic::FAC::initializeLevelData
 
     SAMRAI::hier::Box cell_moduli_box = cell_moduli->getBox();
 
-    SAMRAI::pdat::CellIterator cend(cell_moduli->getGhostBox(),false);
-    for(SAMRAI::pdat::CellIterator ci(cell_moduli->getGhostBox(),true);
+    SAMRAI::pdat::CellIterator
+      cend(SAMRAI::pdat::CellGeometry::end(cell_moduli->getGhostBox()));
+    for(SAMRAI::pdat::CellIterator
+          ci(SAMRAI::pdat::CellGeometry::begin(cell_moduli->getGhostBox()));
         ci!=cend; ++ci)
       {
         const SAMRAI::pdat::CellIndex &c(*ci);
@@ -110,8 +112,12 @@ void Elastic::FAC::initializeLevelData
           {
             double offset[]={0.5,0.5,0.5};
             offset[ix]=0;
-            SAMRAI::pdat::SideIterator end(level_set_ptr->getGhostBox(),ix,false);
-            for(SAMRAI::pdat::SideIterator si(level_set_ptr->getGhostBox(),ix,true);
+            SAMRAI::pdat::SideIterator
+              end(SAMRAI::pdat::SideGeometry::end
+                  (level_set_ptr->getGhostBox(),ix));
+            for(SAMRAI::pdat::SideIterator
+                  si(SAMRAI::pdat::SideGeometry::begin
+                     (level_set_ptr->getGhostBox(),ix));
                 si!=end; ++si)
               {
                 const SAMRAI::pdat::SideIndex &x(*si);

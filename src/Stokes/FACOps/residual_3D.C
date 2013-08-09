@@ -22,8 +22,9 @@ void Stokes::FACOps::residual_3D
   const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   const SAMRAI::hier::Index pp[]={ip,jp,kp};
 
-  SAMRAI::pdat::CellIterator cend(pbox,false);
-  for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
+  SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(pbox));
+  for(SAMRAI::pdat::CellIterator ci(SAMRAI::pdat::CellGeometry::begin(pbox));
+      ci!=cend; ++ci)
     {
       const SAMRAI::pdat::CellIndex &center(*ci);
       SAMRAI::pdat::CellIndex up(center), down(center), right(center),

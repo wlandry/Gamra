@@ -22,11 +22,11 @@
 
 namespace Stokes {
   /* A little utility routine to validate the sizes of input arrays */
-  void check_array_sizes(const SAMRAI::tbox::Array<int> ijk,
-                         const SAMRAI::tbox::Array<double> min,
-                         const SAMRAI::tbox::Array<double> max,
-                         const SAMRAI::tbox::Array<double> data,
-                         const int dim, const std::string &name,
+  void check_array_sizes(const std::vector<int> ijk,
+                         const std::vector<double> min,
+                         const std::vector<double> max,
+                         const std::vector<double> data,
+                         const unsigned dim, const std::string &name,
                          const int num_components=1)
   {
     if(ijk.size()!=dim)
@@ -40,8 +40,8 @@ namespace Stokes {
       TBOX_ERROR("Bad number of elements in "
                  << name << "_coord_max.  Expected "
                  << dim << " but got " << max.size());
-    int data_size(1);
-    for(int d=0; d<dim; ++d)
+    size_t data_size(1);
+    for(unsigned d=0; d<dim; ++d)
       data_size*=ijk[d];
     if(data.size()!=data_size*num_components)
       TBOX_ERROR("Bad number of elements in "
@@ -74,7 +74,7 @@ Stokes::FAC::FAC(const std::string& object_name,
              boost::shared_ptr<SAMRAI::tbox::Database>()),
   d_context()
 {
-  const int dim(d_dim.getValue());
+  const unsigned dim(d_dim.getValue());
   SAMRAI::hier::VariableDatabase* vdb =
     SAMRAI::hier::VariableDatabase::getDatabase();
 
@@ -175,30 +175,30 @@ Stokes::FAC::FAC(const std::string& object_name,
 
   if(database->keyExists("viscosity_data"))
     {
-      viscosity_ijk=database->getIntegerArray("viscosity_ijk");
-      viscosity_xyz_min=database->getDoubleArray("viscosity_coord_min");
-      viscosity_xyz_max=database->getDoubleArray("viscosity_coord_max");
-      viscosity=database->getDoubleArray("viscosity_data");
+      viscosity_ijk=database->getIntegerVector("viscosity_ijk");
+      viscosity_xyz_min=database->getDoubleVector("viscosity_coord_min");
+      viscosity_xyz_max=database->getDoubleVector("viscosity_coord_max");
+      viscosity=database->getDoubleVector("viscosity_data");
       check_array_sizes(viscosity_ijk,viscosity_xyz_min,viscosity_xyz_max,
                         viscosity,dim,"viscosity");
     }
 
   if(database->keyExists("v_rhs_data"))
     {
-      v_rhs_ijk=database->getIntegerArray("v_rhs_ijk");
-      v_rhs_xyz_min=database->getDoubleArray("v_rhs_coord_min");
-      v_rhs_xyz_max=database->getDoubleArray("v_rhs_coord_max");
-      v_rhs=database->getDoubleArray("v_rhs_data");
+      v_rhs_ijk=database->getIntegerVector("v_rhs_ijk");
+      v_rhs_xyz_min=database->getDoubleVector("v_rhs_coord_min");
+      v_rhs_xyz_max=database->getDoubleVector("v_rhs_coord_max");
+      v_rhs=database->getDoubleVector("v_rhs_data");
       check_array_sizes(v_rhs_ijk,v_rhs_xyz_min,v_rhs_xyz_max,
                         v_rhs,dim,"v_rhs",dim);
     }
 
   if(database->keyExists("p_initial_data"))
     {
-      p_initial_ijk=database->getIntegerArray("p_initial_ijk");
-      p_initial_xyz_min=database->getDoubleArray("p_initial_coord_min");
-      p_initial_xyz_max=database->getDoubleArray("p_initial_coord_max");
-      p_initial=database->getDoubleArray("p_initial_data");
+      p_initial_ijk=database->getIntegerVector("p_initial_ijk");
+      p_initial_xyz_min=database->getDoubleVector("p_initial_coord_min");
+      p_initial_xyz_max=database->getDoubleVector("p_initial_coord_max");
+      p_initial=database->getDoubleVector("p_initial_data");
       check_array_sizes(p_initial_ijk,p_initial_xyz_min,p_initial_xyz_max,
                         p_initial,dim,"p_initial");
     }

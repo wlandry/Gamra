@@ -5,7 +5,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
 (SAMRAI::pdat::SideData<double>& v,
  const SAMRAI::pdat::SideData<double>& v_fine,
  const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
- const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries) const
+ const std::vector<SAMRAI::hier::BoundaryBox> &boundaries) const
 {
   /* Fix up the boundary elements by iterating through the boundary
      boxes */
@@ -15,7 +15,7 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
 
   SAMRAI::hier::Box gbox(v_fine.getGhostBox());
   SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
-  for(int mm=0; mm<boundaries.size(); ++mm)
+  for(size_t mm=0; mm<boundaries.size(); ++mm)
     {
       SAMRAI::hier::Box bbox=boundaries[mm].getBox();
       /* location_index tells where, in relation to the box, the boundary is.

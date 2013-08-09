@@ -71,8 +71,11 @@ int Stokes::FAC::solve()
             di[d]=di[d-1]*p_initial_ijk[d-1];
 
           SAMRAI::hier::Box pbox = p->getBox();
-          SAMRAI::pdat::CellIterator cend(p->getGhostBox(),false);
-          for(SAMRAI::pdat::CellIterator ci(p->getGhostBox(),true); ci!=cend; ++ci)
+          SAMRAI::pdat::CellIterator
+            cend(SAMRAI::pdat::CellGeometry::end(p->getGhostBox()));
+          for(SAMRAI::pdat::CellIterator
+                ci(SAMRAI::pdat::CellGeometry::begin(p->getGhostBox()));
+              ci!=cend; ++ci)
             {
               const SAMRAI::pdat::CellIndex &c(*ci);
               double xyz[dim], weight[dim][2];

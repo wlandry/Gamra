@@ -13,8 +13,8 @@ class Input_Expression
 {
 public:
   mu::Parser equation;
-  SAMRAI::tbox::Array<double> data, xyz_min, xyz_max;
-  SAMRAI::tbox::Array<int> ijk;
+  std::vector<double> data, xyz_min, xyz_max;
+  std::vector<int> ijk;
 
   int dim, slice;
   mutable double coord[3];
@@ -66,10 +66,10 @@ public:
       }
     else if(database->keyExists(name+"_data"))
       {
-        ijk=database->getIntegerArray(name+"_ijk");
-        xyz_min=database->getDoubleArray(name+"_coord_min");
-        xyz_max=database->getDoubleArray(name+"_coord_max");
-        data=database->getDoubleArray(name+"_data");
+        ijk=database->getIntegerVector(name+"_ijk");
+        xyz_min=database->getDoubleVector(name+"_coord_min");
+        xyz_max=database->getDoubleVector(name+"_coord_max");
+        data=database->getDoubleVector(name+"_data");
         check_array_sizes(name,num_components);
         use_equation=false;
       }
@@ -109,7 +109,7 @@ public:
   /* A little utility routine to validate the sizes of input arrays */
   void check_array_sizes(const std::string &name, const int &num_components)
   {
-    const int array_dim(slice==-1 ? dim : dim-1);
+    const size_t array_dim(slice==-1 ? dim : dim-1);
     if(ijk.size()!=array_dim)
       TBOX_ERROR("Bad number of elements in " << name << "_ijk.  Expected "
                  << array_dim << " but got " << ijk.size());
@@ -121,7 +121,7 @@ public:
       TBOX_ERROR("Bad number of elements in "
                  << name << "_coord_max.  Expected "
                  << array_dim << " but got " << xyz_max.size());
-    int data_size(1);
+    size_t data_size(1);
     for(int d=0; d<dim; ++d)
       if(d!=slice)
         data_size*=ijk[d];

@@ -83,8 +83,9 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
     kp[2]=1;
   SAMRAI::hier::Index pp[]={ip,jp,kp};
 
-  SAMRAI::pdat::CellIterator cend(fine_box,false);
-  for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ++ci)
+  SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(fine_box));
+  for(SAMRAI::pdat::CellIterator
+        ci(SAMRAI::pdat::CellGeometry::begin(fine_box)); ci!=cend; ++ci)
     {
       SAMRAI::pdat::SideIndex fine(*ci,axis,SAMRAI::pdat::SideIndex::Lower);
 

@@ -217,8 +217,8 @@ namespace Elastic {
 
     Input_Expression lambda, mu, v_rhs, level_set;
 
-    SAMRAI::tbox::Array<double> faults;
-    SAMRAI::tbox::Array<double> refinement_points;
+    std::vector<double> faults;
+    std::vector<double> refinement_points;
     //@}
 
     bool have_embedded_boundary() const
@@ -384,7 +384,7 @@ void Elastic::FAC::add_faults()
 
           /* Iterate over the faults */
           const int params_per_fault(9);
-          for(int fault_index=0;fault_index<faults.size();
+          for(size_t fault_index=0;fault_index<faults.size();
               fault_index+=params_per_fault)
             {
               const double pi=4*atan(1);
@@ -430,9 +430,11 @@ void Elastic::FAC::add_faults()
                   double offset[]={0.5,0.5,0.5};
                   offset[ix]=0;
 
-                  SAMRAI::pdat::SideIterator s_end(gbox,ix,false);
-                  for(SAMRAI::pdat::SideIterator si(gbox,ix,true); si!=s_end;
-                      ++si)
+                  SAMRAI::pdat::SideIterator
+                    s_end(SAMRAI::pdat::SideGeometry::end(gbox,ix));
+                  for(SAMRAI::pdat::SideIterator
+                        si(SAMRAI::pdat::SideGeometry::begin(gbox,ix));
+                      si!=s_end; ++si)
                     {
                       const SAMRAI::pdat::SideIndex &s(*si);
 
@@ -491,9 +493,11 @@ void Elastic::FAC::add_faults()
           /* Corrections to the rhs */
           for(int ix=0;ix<dim;++ix)
             {
-              SAMRAI::pdat::SideIterator s_end(pbox,ix,false);
-              for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=s_end;
-                  ++si)
+              SAMRAI::pdat::SideIterator
+                s_end(SAMRAI::pdat::SideGeometry::end(pbox,ix));
+              for(SAMRAI::pdat::SideIterator
+                    si(SAMRAI::pdat::SideGeometry::begin(pbox,ix));
+                  si!=s_end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &s(*si);
                   SAMRAI::pdat::CellIndex c(s);

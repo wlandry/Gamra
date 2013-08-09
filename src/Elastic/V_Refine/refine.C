@@ -76,7 +76,7 @@ void Elastic::V_Refine::refine
      kp[2]=1;
    SAMRAI::hier::Index unit[]={ip,jp,kp};
 
-   SAMRAI::pdat::CellIterator cend(fine_box,false);
+   SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(fine_box));
 
    if(have_embedded_boundary())
      {
@@ -99,8 +99,10 @@ void Elastic::V_Refine::refine
 
        /* The copy of the coarse values does not include the edges, so
         * we have so manually set the level set on the edges */
-       SAMRAI::pdat::CellIterator coarse_end(coarse_ghost_box,false);
-       for(SAMRAI::pdat::CellIterator ci(coarse_ghost_box,true);
+       SAMRAI::pdat::CellIterator
+         coarse_end(SAMRAI::pdat::CellGeometry::end(coarse_ghost_box));
+       for(SAMRAI::pdat::CellIterator
+             ci(SAMRAI::pdat::CellGeometry::begin(coarse_ghost_box));
            ci!=coarse_end; ++ci)
          {
            SAMRAI::pdat::SideIndex
@@ -117,7 +119,8 @@ void Elastic::V_Refine::refine
              }
          }
 
-       for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ++ci)
+       for(SAMRAI::pdat::CellIterator
+             ci(SAMRAI::pdat::CellGeometry::begin(fine_box)); ci!=cend; ++ci)
          {
            SAMRAI::pdat::SideIndex
              fine(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
@@ -178,7 +181,8 @@ void Elastic::V_Refine::refine
          boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
          (coarse_patch.getPatchGeometry());
 
-       for(SAMRAI::pdat::CellIterator ci(fine_box,true); ci!=cend; ++ci)
+       for(SAMRAI::pdat::CellIterator
+             ci(SAMRAI::pdat::CellGeometry::begin(fine_box)); ci!=cend; ++ci)
          {
            SAMRAI::pdat::SideIndex fine(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
 

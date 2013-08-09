@@ -53,8 +53,11 @@ void Stokes::FAC::applyGradientDetector
       computeAdaptionEstimate(estimate_data,soln_cell_data);
                               
       tag_cell_data.fill(0);
-      SAMRAI::pdat::CellIterator cend(patch.getBox(),false);
-      for (SAMRAI::pdat::CellIterator ci(patch.getBox(),true); ci!=cend; ++ci)
+      SAMRAI::pdat::CellIterator
+        cend(SAMRAI::pdat::CellGeometry::end(patch.getBox()));
+      for (SAMRAI::pdat::CellIterator
+             ci(SAMRAI::pdat::CellGeometry::begin(patch.getBox()));
+           ci!=cend; ++ci)
         {
           const SAMRAI::pdat::CellIndex cell_index(*ci);
           if (maxestimate < estimate_data(cell_index))

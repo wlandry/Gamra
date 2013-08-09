@@ -19,7 +19,7 @@ Elastic::Boundary_Conditions::Boundary_Conditions
   std::string xyz("xyz");
   std::string upper_string[]={"lower","upper"};
 
-  SAMRAI::tbox::Array<std::string> keys(database->getAllKeys());
+  std::vector<std::string> keys(database->getAllKeys());
 
   for(int vxyz=0;vxyz<dim;++vxyz)
     for(int direction=0;direction<dim;++direction)

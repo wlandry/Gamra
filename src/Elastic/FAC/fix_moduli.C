@@ -1,5 +1,6 @@
 #include "Elastic/FAC.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
+#include "SAMRAI/pdat/NodeGeometry.h"
 
 /* Fix the moduli on the coarse grids by coarsening from the finer
    grids geometrically averaging the cell moduli to get the edge
@@ -94,8 +95,10 @@ void Elastic::FAC::fix_moduli()
                 (patch->getPatchData(edge_moduli_id));
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
-              SAMRAI::pdat::NodeIterator nend(edge_moduli.getBox(),false);
-              for(SAMRAI::pdat::NodeIterator ni(edge_moduli.getBox(),true);
+              SAMRAI::pdat::NodeIterator
+                nend(SAMRAI::pdat::NodeGeometry::end(edge_moduli.getBox()));
+              for(SAMRAI::pdat::NodeIterator
+                    ni(SAMRAI::pdat::NodeGeometry::begin(edge_moduli.getBox()));
                   ni!=nend; ni++)
                 {
                   for (int m=0;m<2;++m)
@@ -124,8 +127,10 @@ void Elastic::FAC::fix_moduli()
                      corners */
                   pbox.grow(axis,edge_moduli.getGhostCellWidth()[axis]);
 
-                  SAMRAI::pdat::EdgeIterator nend(pbox,axis,false);
-                  for(SAMRAI::pdat::EdgeIterator ni(pbox,axis,true);
+                  SAMRAI::pdat::EdgeIterator
+                    nend(SAMRAI::pdat::EdgeGeometry::end(pbox,axis));
+                  for(SAMRAI::pdat::EdgeIterator
+                        ni(SAMRAI::pdat::EdgeGeometry::begin(pbox,axis));
                       ni!=nend; ++ni)
                     {
                       const SAMRAI::pdat::EdgeIndex &e(*ni);

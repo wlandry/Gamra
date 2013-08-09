@@ -100,7 +100,7 @@ namespace Elastic {
     (SAMRAI::pdat::SideData<double>& v,
      const SAMRAI::pdat::SideData<double>& v_fine,
      const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
-     const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
+     const std::vector<SAMRAI::hier::BoundaryBox>& boundaries) const;
 
     void
     coarsen_3D
@@ -116,7 +116,7 @@ namespace Elastic {
     (SAMRAI::pdat::SideData<double>& v,
      const SAMRAI::pdat::SideData<double>& v_fine,
      const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
-     const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox>& boundaries) const;
+     const std::vector<SAMRAI::hier::BoundaryBox>& boundaries) const;
 
 
     double coarsen_plane(const SAMRAI::pdat::SideData<double>& v_fine,
@@ -203,7 +203,7 @@ namespace Elastic {
       return level_set_id!=invalid_id;
     }
 
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
+    std::vector<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
     coarse_fine;
 
   private:

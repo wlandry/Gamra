@@ -835,7 +835,8 @@ namespace Stokes {
      * SAMRAI::hier::CoarseFineBoundary is a light object before
      * it is set for a level.
      */
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> > d_cf_boundary;
+    std::vector<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
+    d_cf_boundary;
 
     //@}
 
@@ -956,46 +957,52 @@ namespace Stokes {
      */
 
     //! @brief Error prolongation (refinement) operator.
-    boost::shared_ptr<SAMRAI::hier::RefineOperator> p_prolongation_refine_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    boost::shared_ptr<SAMRAI::hier::RefineOperator>
+    p_prolongation_refine_operator;
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     p_prolongation_refine_schedules;
 
-    boost::shared_ptr<SAMRAI::hier::RefineOperator> v_prolongation_refine_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    boost::shared_ptr<SAMRAI::hier::RefineOperator>
+    v_prolongation_refine_operator;
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_prolongation_refine_schedules;
 
     //! @brief Solution restriction (coarsening) operator.
-    boost::shared_ptr<SAMRAI::hier::CoarsenOperator> p_urestriction_coarsen_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
+    boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
+    p_urestriction_coarsen_operator;
+    std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     p_urestriction_coarsen_schedules;
 
-    boost::shared_ptr<SAMRAI::hier::CoarsenOperator> v_urestriction_coarsen_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
+    boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
+    v_urestriction_coarsen_operator;
+    std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     v_urestriction_coarsen_schedules;
 
     //! @brief Residual restriction (coarsening) operator.
-    boost::shared_ptr<SAMRAI::hier::CoarsenOperator> p_rrestriction_coarsen_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
+    boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
+    p_rrestriction_coarsen_operator;
+    std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     p_rrestriction_coarsen_schedules;
 
-    boost::shared_ptr<SAMRAI::hier::CoarsenOperator> v_rrestriction_coarsen_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
+    boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
+    v_rrestriction_coarsen_operator;
+    std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     v_rrestriction_coarsen_schedules;
 
     //! @brief Refine operator for data from coarser level.
     boost::shared_ptr<SAMRAI::hier::RefineOperator> p_ghostfill_refine_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     p_ghostfill_refine_schedules;
 
     boost::shared_ptr<SAMRAI::hier::RefineOperator> v_ghostfill_refine_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_ghostfill_refine_schedules;
 
     //! @brief Refine operator for data from same level.
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     p_nocoarse_refine_schedules;
 
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_nocoarse_refine_schedules;
 
     //@}

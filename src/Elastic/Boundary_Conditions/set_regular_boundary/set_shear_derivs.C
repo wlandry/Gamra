@@ -33,8 +33,10 @@ void Elastic::Boundary_Conditions::set_shear_derivs
             {
               SAMRAI::hier::Box box(x_box);
               box.upper(iy)=pbox.lower(iy)-1;
-              SAMRAI::pdat::SideIterator end(box,ix,false);
-              for(SAMRAI::pdat::SideIterator si(box,ix,true); si!=end; ++si)
+              SAMRAI::pdat::SideIterator
+                end(SAMRAI::pdat::SideGeometry::end(box,ix));
+              for(SAMRAI::pdat::SideIterator
+                    si(SAMRAI::pdat::SideGeometry::begin(box,ix)); si!=end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   if(dim==3 && at_corner(geom,pbox,x,ix,iz))
@@ -65,8 +67,10 @@ void Elastic::Boundary_Conditions::set_shear_derivs
             {
               SAMRAI::hier::Box box(x_box);
               box.lower(iy)=pbox.upper(iy)+1;
-              SAMRAI::pdat::SideIterator end(box,ix,false);
-              for(SAMRAI::pdat::SideIterator si(box,ix,true); si!=end; ++si)
+              SAMRAI::pdat::SideIterator
+                end(SAMRAI::pdat::SideGeometry::end(box,ix));
+              for(SAMRAI::pdat::SideIterator
+                    si(SAMRAI::pdat::SideGeometry::begin(box,ix)); si!=end; ++si)
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   if(dim==3 && at_corner(geom,pbox,x,ix,iz))

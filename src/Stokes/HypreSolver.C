@@ -672,8 +672,10 @@ void Stokes::HypreSolver::copyToHypre(
 {
   TBOX_ASSERT_DIM_OBJDIM_EQUALITY2(d_dim, src, box);
 
-  for (SAMRAI::pdat::CellIterator c(box); c; ++c) {
-    SAMRAI::hier::IntVector ic = c();
+  SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(box));
+  for (SAMRAI::pdat::CellIterator c(SAMRAI::pdat::CellGeometry::begin(box));
+       c!=cend; ++c) {
+    SAMRAI::hier::IntVector ic = *c;
     HYPRE_StructVectorSetValues(vector, &ic[0], src(c(), depth));
   }
 }
@@ -694,9 +696,11 @@ void Stokes::HypreSolver::copyFromHypre(
 {
   TBOX_ASSERT_DIM_OBJDIM_EQUALITY2(d_dim, dst, box);
 
-  for (SAMRAI::pdat::CellIterator c(box); c; ++c) {
+  SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(box));
+  for (SAMRAI::pdat::CellIterator c(SAMRAI::pdat::CellGeometry::begin(box));
+       c!=cend; ++c) {
     double value;
-    SAMRAI::hier::IntVector ic = c();
+    SAMRAI::hier::IntVector ic = *c;
     HYPRE_StructVectorGetValues(vector, &ic[0], &value);
     dst(c(), depth) = value;
   }
@@ -955,14 +959,16 @@ void Stokes::HypreSolver::setMatrixCoefficients()
 
     for (i = 0; i < stencil_size; ++i) stencil_indices[i] = i;
 
-    SAMRAI::pdat::CellIterator ic(patch_box);
+    SAMRAI::pdat::CellIterator ic(SAMRAI::pdat::CellGeometry::begin(patch_box)),
+      i_end(SAMRAI::pdat::CellGeometry::end(patch_box));
+
 
     /*
      * To do: This loop uses inefficient high-level syntax.
      * See if it can be replaced by a Fortran loop or if we
      * can set matrix entries for an entire box at once.
      */
-    for ( ; ic; ++ic) {
+    for ( ; ic!=i_end; ++ic) {
 
       SAMRAI::hier::IntVector icell = ic();
       SAMRAI::pdat::SideIndex ixlower(ic(),

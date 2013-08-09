@@ -12,7 +12,7 @@ Stokes::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
 
   /* We only care about faces, not edges or corners, so we only
      iterate over face boundary boxes. */
-  const SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> &boundaries
+  const std::vector<SAMRAI::hier::BoundaryBox> &boundaries
     (coarse_fine[fine.getPatchLevelNumber()]
      ->getFaceBoundaries(coarse.getGlobalId()));
      
@@ -30,7 +30,7 @@ Stokes::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
 
   SAMRAI::hier::Box gbox(v_fine->getGhostBox());
   SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
-  for(int mm=0; mm<boundaries.size(); ++mm)
+  for(size_t mm=0; mm<boundaries.size(); ++mm)
     {
       SAMRAI::hier::Box bbox=boundaries[mm].getBox();
       /* location_index tells where, in relation to the box, the boundary is.

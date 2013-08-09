@@ -23,8 +23,9 @@ void Stokes::FACOps::residual_2D
   double dx = geom.getDx()[0];
   double dy = geom.getDx()[1];
 
-  SAMRAI::pdat::CellIterator cend(pbox,false);
-  for(SAMRAI::pdat::CellIterator ci(pbox,true); ci!=cend; ++ci)
+  SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(pbox));
+  for(SAMRAI::pdat::CellIterator ci(SAMRAI::pdat::CellGeometry::begin(pbox));
+      ci!=cend; ++ci)
     {
       const SAMRAI::pdat::CellIndex &center(*ci);
       SAMRAI::pdat::CellIndex up(center), down(center), right(center),

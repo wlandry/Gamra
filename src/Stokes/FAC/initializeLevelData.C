@@ -66,8 +66,11 @@ void Stokes::FAC::initializeLevelData
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch->getPatchData(cell_viscosity_id));
 
     SAMRAI::hier::Box cell_visc_box = cell_viscosity->getBox();
-    SAMRAI::pdat::CellIterator cend(cell_viscosity->getGhostBox(),false);
-    for(SAMRAI::pdat::CellIterator ci(cell_viscosity->getGhostBox(),true); ci!=cend; ++ci)
+    SAMRAI::pdat::CellIterator
+      cend(SAMRAI::pdat::CellGeometry::end(cell_viscosity->getGhostBox()));
+    for(SAMRAI::pdat::CellIterator
+          ci(SAMRAI::pdat::CellGeometry::begin(cell_viscosity->getGhostBox()));
+        ci!=cend; ++ci)
       {
         const SAMRAI::pdat::CellIndex &c(*ci);
         double xyz[dim];
@@ -113,8 +116,10 @@ void Stokes::FAC::initializeLevelData
             double offset[]={0.5,0.5,0.5};
             offset[ix]=0;
 
-            SAMRAI::pdat::SideIterator send(pbox,ix,false);
-            for(SAMRAI::pdat::SideIterator si(pbox,ix,true); si!=send; ++si)
+            SAMRAI::pdat::SideIterator
+              send(SAMRAI::pdat::SideGeometry::end(pbox,ix));
+            for(SAMRAI::pdat::SideIterator
+                  si(SAMRAI::pdat::SideGeometry::begin(pbox,ix)); si!=send; ++si)
               {
                 const SAMRAI::pdat::SideIndex &s(*si);
                 double xyz[dim];
