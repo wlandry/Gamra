@@ -5,15 +5,15 @@ Prerequisites:
   Boost
   muparser http://muparser.beltoforion.de/ (tested with v2.2.2)
 
-1) Build SAMRAI
+1) Build SAMRAI 3.6.3
 
-  mkdir SAMRAI
-  cd SAMRAI
-  hg clone -r 3 ssh://$USER@fram.caltech.edu//home/walter/SAMRAI-3.4.1 SAMRAI
+  mkdir SAMRAI-3.6.3
+  cd SAMRAI-3.6.3
+  tar -zxf SAMRAI-v3.6.3-beta.tar.gz
   mkdir opt_objs
   cd opt_objs
   ../SAMRAI/configure --with-CC=mpicc --with-CXX=mpicxx --with-F77=mpif77 --with-boost=$BOOST_DIR --with-hdf5=$HDF5_DIR --disable-debug --enable-opt --prefix=$PWD/../opt
-  make
+  make -j 4
   make install
 
 
