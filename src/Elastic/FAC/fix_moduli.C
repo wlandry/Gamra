@@ -34,7 +34,7 @@ void Elastic::FAC::fix_moduli()
 
   cell_moduli_coarsen_schedules.resizeArray(ln_max + 1);
   cell_moduli_coarsen_algorithm =
-    boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(d_dim,true);
+    boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(d_dim);
   cell_moduli_coarsen_algorithm->
     registerCoarsen(cell_moduli_id,cell_moduli_id,
                     cell_moduli_coarsen_operator);
