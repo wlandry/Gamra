@@ -64,8 +64,6 @@ namespace Stokes {
     bool findRefineOperator(const boost::shared_ptr<SAMRAI::hier::Variable>& var,
                             const std::string& op_name) const
     {
-      TBOX_ASSERT_OBJDIM_EQUALITY2(*this, *var);
-
       const boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
         cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >
                  (var));
