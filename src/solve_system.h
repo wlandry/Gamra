@@ -70,12 +70,12 @@ bool solve_system
 
       done = !(patch_hierarchy->finerLevelExists(lnum));
       converged=fac.solve();
+      SAMRAI::tbox::TimerManager::getManager()->print(SAMRAI::tbox::plog);
       done=(!converged || done);
     }
   if (use_visit)
     visit_writer->writePlotData(patch_hierarchy, lnum);
 
-  SAMRAI::tbox::TimerManager::getManager()->print(SAMRAI::tbox::plog);
   return converged;
 }
 
