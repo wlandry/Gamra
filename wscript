@@ -101,6 +101,20 @@ def configure_variant(conf):
                   rpath=[conf.options.hdf5_libdir],
                   lib=['hdf5'])
 
+    # Optimization flags
+    optimize_msg="Checking for optimization flag "
+    optimize_fragment="int main() {}\n"
+    optimize_flags=['-Ofast','-O3','-O2','-O']
+    for flag in optimize_flags:
+        try:
+            conf.check_cxx(msg=optimize_msg+flag, fragment=optimize_fragment,
+                           cxxflags=flag, uselib_store='optimize')
+        except conf.errors.ConfigurationError:
+            continue
+        else:
+            found_optimize=True
+            break
+
 def build(bld):
     if not bld.variant:
         bld.fatal('call "waf build_debug" or "waf build_release", and try "waf --help"')
@@ -111,6 +125,11 @@ def build(bld):
     linkflags_variant={'release' : [],
                        'prof' : ['-pg'],
                        'debug' : []}
+
+    use_array=['samrai','muparser','hdf5']
+    if bld.variant=='release':
+        use_array.append('optimize')
+
     bld.program(
         features     = ['cxx','cprogram'],
         source       = ['src/main.C',
@@ -249,7 +268,7 @@ def build(bld):
         libpath      = ['/sw/lib/gcc4.7/lib','/sw/lib/gcc4.7/lib/gcc/x86_64-apple-darwin11.4.0/4.7.2'],
         linkflags    = linkflags_variant[bld.variant],
         includes = ['src','../FTensor'],
-        use=['samrai','muparser','hdf5']
+        use=use_array
         )
 
 from waflib.Build import BuildContext, CleanContext, \
