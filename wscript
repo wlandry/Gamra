@@ -2,7 +2,7 @@
 # out = 'build'
 
 def options(opt):
-    opt.load('compiler_cxx')
+    opt.load('compiler_cxx FTensor')
 
     samrai=opt.add_option_group('SAMRAI Options')
     samrai.add_option('--samrai-dir',
@@ -46,7 +46,7 @@ def configure(conf):
     configure_variant(conf);
 
 def configure_variant(conf):
-    conf.load('compiler_cxx')
+    conf.load('compiler_cxx FTensor')
 
     # Find SAMRAI
     if conf.options.samrai_dir:
@@ -116,9 +116,7 @@ def configure_variant(conf):
             break
 
 def build(bld):
-    if not bld.variant:
-        bld.fatal('call "waf build_debug" or "waf build_release", and try "waf --help"')
-    default_flags=['-Wall', '-Wextra', '-Wconversion', '-Drestrict=']
+    default_flags=['-Wall', '-Wextra', '-Wconversion']
     cxxflags_variant= {'release' : ['-Ofast', '-DTESTING=0'],
                     'prof' : ['-pg','-Ofast', '-DTESTING=0'],
                     'debug' : ['-g']}
@@ -126,7 +124,7 @@ def build(bld):
                        'prof' : ['-pg'],
                        'debug' : []}
 
-    use_array=['samrai','muparser','hdf5']
+    use_array=['samrai','muparser','hdf5','FTensor']
     if bld.variant=='release':
         use_array.append('optimize')
 
@@ -267,7 +265,7 @@ def build(bld):
         lib          = ['dl','gfortranbegin', 'gfortran', 'm'],
         libpath      = ['/sw/lib/gcc4.7/lib','/sw/lib/gcc4.7/lib/gcc/x86_64-apple-darwin11.4.0/4.7.2'],
         linkflags    = linkflags_variant[bld.variant],
-        includes = ['src','../FTensor'],
+        includes = ['src'],
         use=use_array
         )
 
@@ -278,5 +276,8 @@ for x in 'debug prof release'.split():
     for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
         name = y.__name__.replace('Context','').lower()
         class tmp(y):
-            cmd = name + '_' + x
+            if x=='release':
+                cmd = name
+            else:
+                cmd = name + '_' + x
             variant = x
