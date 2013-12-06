@@ -2,7 +2,7 @@
 # out = 'build'
 
 def options(opt):
-    opt.load('compiler_cxx FTensor')
+    opt.load('compiler_cxx FTensor okada')
 
     samrai=opt.add_option_group('SAMRAI Options')
     samrai.add_option('--samrai-dir',
@@ -46,7 +46,7 @@ def configure(conf):
     configure_variant(conf);
 
 def configure_variant(conf):
-    conf.load('compiler_cxx FTensor')
+    conf.load('compiler_cxx FTensor okada')
 
     # Find SAMRAI
     if conf.options.samrai_dir:

@@ -15,18 +15,33 @@ Prerequisites:
   ../SAMRAI/configure --with-CC=mpicc --with-CXX=mpicxx --with-F77=mpif77 --with-boost=$BOOST_DIR --with-hdf5=$HDF5_DIR --disable-debug --enable-opt --prefix=$PWD/../opt
   make -j 4
   make install
+  cd ../..
 
-
-2) Build Gamra
+2) Build FTensor
 
   hg clone https://code.google.com/p/ftensor/ FTensor
+  cd FTensor
+  ./waf configure --prefix=$PWD
+  ./waf install
+  cd ..
+
+3) Build libokada
+
+  git clone https://code.google.com/p/libokada/ libokada
+  cd libokada
+  ./waf configure --ftensor-dir=$PWD/../FTensor --prefix=$PWD
+  ./waf install
+  cd ..
+
+4) Build Gamra
+
   hg clone https://code.google.com/p/gamra/
   cd gamra
-  CXX=mpicxx ./waf-1.7.2 configure --samrai-dir=$SAMRAI_DIR --hdf5-dir=$HDF5_DIR --muparser-dir=$MUPARSER_DIR
-  ./waf-1.7.2 build_release
+  CXX=mpicxx ./waf configure --samrai-dir=$PWD/../SAMRAI-3.6.3/opt --hdf5-dir=$HDF5_DIR --muparser-dir=$MUPARSER_DIR
+  ./waf
 
-3) Simple test
+5) Simple test
 
-  ./build/release/gamra input/multilayer.input
+  ./build/release/gamra input/benchmarks/multilayer.input
     (On a Mac, you may have to set DYLD_LIBRARY_PATH)
   visit  (open multilayer.visit/dumps.visit)
