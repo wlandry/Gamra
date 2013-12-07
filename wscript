@@ -124,7 +124,7 @@ def build(bld):
                        'prof' : ['-pg'],
                        'debug' : []}
 
-    use_array=['samrai','muparser','hdf5','FTensor']
+    use_array=['samrai','muparser','hdf5','FTensor','okada']
     if bld.variant=='release':
         use_array.append('optimize')
 

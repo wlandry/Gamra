@@ -8,6 +8,7 @@
 #include <list>
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/Database.h"
+#include "Okada.hxx"
 
 class Input_Expression
 {
@@ -25,6 +26,42 @@ public:
     static std::list<double> variables;
     variables.push_back(0);
     return &variables.back();
+  }
+
+  static double okada(const double* args, const int n)
+  {
+    if(n!=16)
+      TBOX_ERROR("Wrong number of arguments for okada.  Expected 16, got "
+                 << n << "\n");
+      
+    int index(static_cast<int>(args[15]));
+    if(index<0 || index>2)
+      TBOX_ERROR("Bad index for okada.  Expected 0, 1, or 2, got "
+                 << args[15] << "\n");
+
+    return okada_internal(args).first(index);
+  }
+
+  static double d_okada(const double* args, const int n)
+  {
+    if(n!=17)
+      TBOX_ERROR("Wrong number of arguments for d_okada.  Expected 17, got "
+                 << n << "\n");
+      
+    int index0(static_cast<int>(args[15])), index1(static_cast<int>(args[16]));
+    if(index0<0 || index0>2 || index1<0 || index1>2)
+      TBOX_ERROR("Bad index for d_okada.  Expected 0, 1, or 2, got "
+                 << args[15] << " and " << args[16] << "\n");
+
+    return okada_internal(args).second(index0,index1);
+  }
+
+  static Okada::Displacement okada_internal(const double* args)
+  {
+    FTensor::Tensor1<double,3> origin(args[9],args[10],args[11]),
+      coord(args[12],args[13],args[14]);
+    return Okada(args[0],args[1],args[2],args[3],args[4],args[5],args[6],
+                 args[7],args[8],origin).displacement(coord);
   }
 
   Input_Expression(): is_valid(false) {}
@@ -60,6 +97,7 @@ public:
         equation.DefineVar("x",&coord[0]);
         equation.DefineVar("y",&coord[1]);
         equation.DefineVar("z",&coord[2]);
+        equation.DefineFun("okada",okada);
         equation.SetVarFactory(variable_factory, NULL);
         equation.SetExpr(database->getString(name));
         use_equation=true;
