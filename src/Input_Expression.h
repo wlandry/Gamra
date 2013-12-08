@@ -30,38 +30,39 @@ public:
 
   static double okada(const double* args, const int n)
   {
-    if(n!=16)
-      TBOX_ERROR("Wrong number of arguments for okada.  Expected 16, got "
+    if(n!=15)
+      TBOX_ERROR("Wrong number of arguments for okada.  Expected 15, got "
                  << n << "\n");
       
-    int index(static_cast<int>(args[15]));
+    int index(static_cast<int>(args[14]));
     if(index<0 || index>2)
       TBOX_ERROR("Bad index for okada.  Expected 0, 1, or 2, got "
-                 << args[15] << "\n");
+                 << args[14] << "\n");
 
     return okada_internal(args).first(index);
   }
 
   static double d_okada(const double* args, const int n)
   {
-    if(n!=17)
-      TBOX_ERROR("Wrong number of arguments for d_okada.  Expected 17, got "
+    if(n!=16)
+      TBOX_ERROR("Wrong number of arguments for d_okada.  Expected 16, got "
                  << n << "\n");
       
-    int index0(static_cast<int>(args[15])), index1(static_cast<int>(args[16]));
+    int index0(static_cast<int>(args[14])), index1(static_cast<int>(args[15]));
     if(index0<0 || index0>2 || index1<0 || index1>2)
       TBOX_ERROR("Bad index for d_okada.  Expected 0, 1, or 2, got "
-                 << args[15] << " and " << args[16] << "\n");
+                 << args[14] << " and " << args[15] << "\n");
 
     return okada_internal(args).second(index0,index1);
   }
 
   static Okada::Displacement okada_internal(const double* args)
   {
-    FTensor::Tensor1<double,3> origin(args[9],args[10],args[11]),
+    FTensor::Tensor1<double,3> origin(args[3],args[4],args[5]),
       coord(args[12],args[13],args[14]);
-    return Okada(args[0],args[1],args[2],args[3],args[4],args[5],args[6],
-                 args[7],args[8],origin).displacement(coord);
+    /* Opening=0 */
+    return Okada(args[0],args[1],args[2],0.0,args[7],args[6],args[8],args[9],
+                 args[10],origin).displacement(coord);
   }
 
   Input_Expression(): is_valid(false) {}
