@@ -28,25 +28,44 @@ public:
     return &variables.back();
   }
 
-  static double okada(const double* args, const int n)
+  static double okada(const double* arg_array, const int n)
   {
-    if(n!=15)
+    std::vector<double> args(arg_array,arg_array+n);
+    if(args.size()!=15)
       TBOX_ERROR("Wrong number of arguments for okada.  Expected 15, got "
-                 << n << "\n");
+                 << args.size() << "\n");
       
     int index(static_cast<int>(args[14]));
     if(index<0 || index>2)
       TBOX_ERROR("Bad index for okada.  Expected 0, 1, or 2, got "
                  << args[14] << "\n");
 
-    return okada_internal(args).first(index);
+    /* If trying to get displacement above the surface, then compute
+       the derivative and use that to extend the solution.  This works
+       since we only need the displacement above the surface in order
+       to compute a numerical derivative at the surface. */
+    double z(args[13]), result;
+    if(z<0)
+      {
+        std::vector<double> diff_args(args);
+        args[13]=-z;
+        diff_args[13]=0;
+        result=okada_internal(args).first(index)
+          + 2*z*okada_internal(diff_args).second(index,2);
+      }
+    else
+      {
+        result=okada_internal(args).first(index);
+      }
+    return result;
   }
 
-  static double d_okada(const double* args, const int n)
+  static double d_okada(const double* arg_array, const int n)
   {
-    if(n!=16)
+    std::vector<double> args(arg_array,arg_array+n);
+    if(args.size()!=16)
       TBOX_ERROR("Wrong number of arguments for d_okada.  Expected 16, got "
-                 << n << "\n");
+                 << args.size() << "\n");
       
     int index0(static_cast<int>(args[14])), index1(static_cast<int>(args[15]));
     if(index0<0 || index0>2 || index1<0 || index1>2)
@@ -56,11 +75,27 @@ public:
     return okada_internal(args).second(index0,index1);
   }
 
-  static Okada::Displacement okada_internal(const double* args)
+  static Okada::Displacement okada_internal(const std::vector<double> &args)
   {
     FTensor::Tensor1<double,3> origin(args[3],args[4],args[5]),
-      coord(args[12],args[13],args[14]);
+      coord(args[11],args[12],args[13]);
     /* Opening=0 */
+
+
+    // if(coord(2)==0)
+    //   std::cout << "okada params "
+    //             << args[0] << " " << args[1] << " " << args[2] << " "
+    //             << 0.0 << " " << args[7] << " " << args[6] << " "
+    //             << args[8] << " " << args[9] << " " << args[10] << " "
+    //             << origin(0) << " "
+    //             << origin(1) << " "
+    //             << origin(2) << " "
+    //             << coord(0) << " "
+    //             << coord(1) << " "
+    //             << coord(2) << " "
+    //             << "\n";
+
+
     return Okada(args[0],args[1],args[2],0.0,args[7],args[6],args[8],args[9],
                  args[10],origin).displacement(coord);
   }
