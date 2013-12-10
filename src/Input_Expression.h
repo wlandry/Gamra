@@ -80,22 +80,6 @@ public:
     FTensor::Tensor1<double,3> origin(args[3],args[4],args[5]),
       coord(args[11],args[12],args[13]);
     /* Opening=0 */
-
-
-    // if(coord(2)==0)
-    //   std::cout << "okada params "
-    //             << args[0] << " " << args[1] << " " << args[2] << " "
-    //             << 0.0 << " " << args[7] << " " << args[6] << " "
-    //             << args[8] << " " << args[9] << " " << args[10] << " "
-    //             << origin(0) << " "
-    //             << origin(1) << " "
-    //             << origin(2) << " "
-    //             << coord(0) << " "
-    //             << coord(1) << " "
-    //             << coord(2) << " "
-    //             << "\n";
-
-
     return Okada(args[0],args[1],args[2],0.0,args[7],args[6],args[8],args[9],
                  args[10],origin).displacement(coord);
   }
@@ -134,6 +118,7 @@ public:
         equation.DefineVar("y",&coord[1]);
         equation.DefineVar("z",&coord[2]);
         equation.DefineFun("okada",okada);
+        equation.DefineFun("d_okada",d_okada);
         equation.SetVarFactory(variable_factory, NULL);
         equation.SetExpr(database->getString(name));
         use_equation=true;
