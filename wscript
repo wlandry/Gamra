@@ -2,7 +2,7 @@
 # out = 'build'
 
 def options(opt):
-    opt.load('compiler_cxx FTensor okada')
+    opt.load('compiler_cxx FTensor okada boost')
 
     samrai=opt.add_option_group('SAMRAI Options')
     samrai.add_option('--samrai-dir',
@@ -46,7 +46,11 @@ def configure(conf):
     configure_variant(conf);
 
 def configure_variant(conf):
-    conf.load('compiler_cxx FTensor okada')
+    conf.load('compiler_cxx FTensor okada boost')
+    conf.check_boost()
+
+    if(int(conf.env.BOOST_VERSION[-2:]) >= 53):
+        conf.fatal('Bad version of boost.  Boost must be version 1.52 or earlier.\nThe configuration failed')
 
     # Find SAMRAI
     if conf.options.samrai_dir:
@@ -60,14 +64,15 @@ def configure_variant(conf):
         conf.options.samrai_incdir='/usr/include'
 
     conf.check_cxx(msg="Checking for SAMRAI",
-                  header_name='SAMRAI/SAMRAI_config.h',
-                  includes=[conf.options.samrai_incdir], uselib_store='samrai',
-                  libpath=[conf.options.samrai_libdir],
-                  rpath=[conf.options.samrai_libdir],
-                  lib=['SAMRAI_appu', 'SAMRAI_algs', 'SAMRAI_solv',
-                       'SAMRAI_geom', 'SAMRAI_mesh', 'SAMRAI_math',
-                       'SAMRAI_pdat', 'SAMRAI_xfer', 'SAMRAI_hier',
-                       'SAMRAI_tbox'])
+                   header_name='SAMRAI/SAMRAI_config.h',
+                   includes=[conf.options.samrai_incdir], uselib_store='samrai',
+                   libpath=[conf.options.samrai_libdir],
+                   rpath=[conf.options.samrai_libdir],
+                   lib=['SAMRAI_appu', 'SAMRAI_algs', 'SAMRAI_solv',
+                        'SAMRAI_geom', 'SAMRAI_mesh', 'SAMRAI_math',
+                        'SAMRAI_pdat', 'SAMRAI_xfer', 'SAMRAI_hier',
+                        'SAMRAI_tbox'],
+                   use=['BOOST'])
 
     # Find muParser
     if conf.options.muparser_dir:
@@ -124,7 +129,7 @@ def build(bld):
                        'prof' : ['-pg'],
                        'debug' : []}
 
-    use_array=['samrai','muparser','hdf5','FTensor','okada']
+    use_array=['samrai','muparser','hdf5','FTensor','okada','boost']
     if bld.variant=='release':
         use_array.append('optimize')
 
