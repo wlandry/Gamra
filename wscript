@@ -47,6 +47,7 @@ def configure(conf):
 
 def configure_variant(conf):
     conf.load('compiler_cxx FTensor okada boost')
+    # conf.env.SHLIB_MARKER = '-Wl,-Bstatic'
     conf.check_boost()
 
     if(int(conf.env.BOOST_VERSION[-2:]) >= 53):
@@ -125,11 +126,11 @@ def build(bld):
     cxxflags_variant= {'release' : ['-Ofast', '-DTESTING=0'],
                     'prof' : ['-pg','-Ofast', '-DTESTING=0'],
                     'debug' : ['-g']}
-    linkflags_variant={'release' : [],
+    linkflags_variant={'release' : ['-Wl,-Bstatic','-static'],
                        'prof' : ['-pg'],
                        'debug' : []}
 
-    use_array=['samrai','muparser','hdf5','FTensor','okada','boost']
+    use_array=['samrai','muparser','hdf5','FTensor','okada','BOOST']
     if bld.variant=='release':
         use_array.append('optimize')
 
