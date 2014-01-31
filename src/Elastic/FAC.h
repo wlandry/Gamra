@@ -409,7 +409,7 @@ void Elastic::FAC::add_faults()
               FTensor::Index<'c',3> c;
               rot(a,b)=rot_dip(a,c)*rot_strike(c,b);
 
-              FTensor::Tensor1<double,3> Dx[dim];
+              std::vector<FTensor::Tensor1<double,3> > Dx(dim);
               for(int d0=0;d0<dim;++d0)
                 {
                   Dx[d0](a)=0.0;
@@ -451,8 +451,9 @@ void Elastic::FAC::add_faults()
                       if(dim==2)
                         {
                           int intersect, intersect_mixed[2];
-                          compute_intersections_2D(ntt,xyz,rot,Dx,fault,dim,ix,
-                                                   intersect,intersect_mixed);
+                          compute_intersections_2D(ntt,xyz,rot,Dx.data(),fault,
+                                                   dim,ix,intersect,
+                                                   intersect_mixed);
 
                           /* d/dx, d/dy, d/dz */
                           if(gbox.contains(s))
@@ -468,8 +469,8 @@ void Elastic::FAC::add_faults()
                         {
                           int intersect_diagonal, intersect_mixed[4],
                             intersect_corner[4];
-                          compute_intersections_3D(ntt,xyz,rot,Dx,fault,dim,ix,
-                                                   intersect_diagonal,
+                          compute_intersections_3D(ntt,xyz,rot,Dx.data(),fault,
+                                                   dim,ix,intersect_diagonal,
                                                    intersect_mixed,
                                                    intersect_corner);
 

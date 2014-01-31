@@ -48,14 +48,14 @@ void Elastic::Boundary_Conditions::set_dirichlet
                   v(x)=-v(x+unit[iy]);
                   if(!homogeneous)
                     {
-                      double coord[dim];
+                      std::vector<double> coord(dim);
                       coord[iy]=geom->getXLower()[iy];
                       for(int d=(iy+1)%dim;d!=iy;d=(d+1)%dim)
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
                       if(have_faults())
                         v(x)+= -(*dv_mixed_ptr)(x+unit[iy],ix_iy+1);
-                      v(x)+=2*expression[ix][iy][0].eval(coord);
+                      v(x)+=2*expression[ix][iy][0].eval(coord.data());
                     }
                 }
             }
@@ -74,14 +74,14 @@ void Elastic::Boundary_Conditions::set_dirichlet
                   v(x)=-v(x-unit[iy]);
                   if(!homogeneous)
                     {
-                      double coord[dim];
+                      std::vector<double> coord(dim);
                       coord[iy]=geom->getXUpper()[iy];
                       for(int d=(iy+1)%dim;d!=iy;d=(d+1)%dim)
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
                       if(have_faults())
                         v(x)+= -(*dv_mixed_ptr)(x-unit[iy],ix_iy);
-                      v(x)+=2*expression[ix][iy][1].eval(coord);
+                      v(x)+=2*expression[ix][iy][1].eval(coord.data());
                     }
                 }
             }
@@ -110,11 +110,11 @@ void Elastic::Boundary_Conditions::set_dirichlet
                     }
                   else
                     {
-                      double coord[dim];
+                      std::vector<double> coord(dim);
                       for(int d=0;d<dim;++d)
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
-                      v(x)=expression[ix][ix][0].eval(coord);
+                      v(x)=expression[ix][ix][0].eval(coord.data());
                     }
                 }
             }
@@ -140,11 +140,11 @@ void Elastic::Boundary_Conditions::set_dirichlet
                     }
                   else
                     {
-                      double coord[dim];
+                      std::vector<double> coord(dim);
                       for(int d=0;d<dim;++d)
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
-                      v(x)=expression[ix][ix][1].eval(coord);
+                      v(x)=expression[ix][ix][1].eval(coord.data());
                     }
                 }
             }

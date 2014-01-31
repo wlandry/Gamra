@@ -73,7 +73,7 @@ void Stokes::FAC::initializeLevelData
         ci!=cend; ++ci)
       {
         const SAMRAI::pdat::CellIndex &c(*ci);
-        double xyz[dim];
+        std::vector<double> xyz(dim);
         for(int d=0;d<dim;++d)
           xyz[d]=geom->getXLower()[d]
             + dx[d]*(c[d]-cell_visc_box.lower()[d] + 0.5);
@@ -122,7 +122,7 @@ void Stokes::FAC::initializeLevelData
                   si(SAMRAI::pdat::SideGeometry::begin(pbox,ix)); si!=send; ++si)
               {
                 const SAMRAI::pdat::SideIndex &s(*si);
-                double xyz[dim];
+                std::vector<double> xyz(dim);
                 for(int d=0;d<dim;++d)
                   xyz[d]=geom->getXLower()[d]
                     + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);

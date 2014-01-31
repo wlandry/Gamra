@@ -61,11 +61,12 @@ int Stokes::FAC::solve()
         {
           const int dim=d_dim.getValue();
           const double *dx=geom->getDx();
-          double dx_p[dim];
+          std::vector<double> xyz(dim);
+          std::vector<double> dx_p(dim);
           for(int d=0;d<dim;++d)
             dx_p[d]=(p_initial_xyz_max[d]
                      - p_initial_xyz_min[d])/(p_initial_ijk[d]-1);
-          int di[dim];
+          std::vector<int> di(dim);
           di[0]=1;
           for(int d=1;d<dim;++d)
             di[d]=di[d-1]*p_initial_ijk[d-1];
@@ -78,13 +79,15 @@ int Stokes::FAC::solve()
               ci!=cend; ++ci)
             {
               const SAMRAI::pdat::CellIndex &c(*ci);
-              double xyz[dim], weight[dim][2];
+              std::vector<double> xyz(dim);
+              /* VLA's not allowed by clang */
+              double weight[3][2];
               for(int d=0;d<dim;++d)
                 xyz[d]=geom->getXLower()[d]
                   + dx[d]*(c[d]-pbox.lower()[d] + 0.5);
 
               int ijk(0);
-              int ddi[dim];
+              std::vector<int> ddi(dim);
               for(int d=0;d<dim;++d)
                 {
                   int i=static_cast<int>(xyz[d]*(p_initial_ijk[d]-1)
