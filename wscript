@@ -47,7 +47,6 @@ def configure(conf):
 
 def configure_variant(conf):
     conf.load('compiler_cxx FTensor okada boost')
-    # conf.env.SHLIB_MARKER = '-Wl,-Bstatic'
     conf.check_boost()
 
     if(int(conf.env.BOOST_VERSION[-2:]) >= 53):
@@ -122,11 +121,11 @@ def configure_variant(conf):
             break
 
 def build(bld):
-    default_flags=['-Wall', '-Wextra', '-Wconversion']
+    default_flags=['-Wall', '-Wextra', '-Wconversion', '-Wvla']
     cxxflags_variant= {'release' : ['-Ofast', '-DTESTING=0'],
                     'prof' : ['-pg','-Ofast', '-DTESTING=0'],
                     'debug' : ['-g']}
-    linkflags_variant={'release' : ['-Wl,-Bstatic','-static'],
+    linkflags_variant={'release' : [],
                        'prof' : ['-pg'],
                        'debug' : []}
 
@@ -269,7 +268,6 @@ def build(bld):
         target       = 'gamra',
         cxxflags     = cxxflags_variant[bld.variant] + default_flags,
         lib          = ['dl','gfortranbegin', 'gfortran', 'm'],
-        libpath      = ['/sw/lib/gcc4.7/lib','/sw/lib/gcc4.7/lib/gcc/x86_64-apple-darwin11.4.0/4.7.2'],
         linkflags    = linkflags_variant[bld.variant],
         includes = ['src'],
         use=use_array
