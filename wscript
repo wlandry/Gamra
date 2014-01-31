@@ -122,11 +122,11 @@ def configure_variant(conf):
             break
 
 def build(bld):
-    default_flags=['-Wall', '-Wextra', '-Wconversion']
+    default_flags=['-Wall', '-Wextra', '-Wconversion', '-Wvla']
     cxxflags_variant= {'release' : ['-Ofast', '-DTESTING=0'],
                     'prof' : ['-pg','-Ofast', '-DTESTING=0'],
                     'debug' : ['-g']}
-    linkflags_variant={'release' : ['-Wl,-Bstatic','-static'],
+    linkflags_variant={'release' : [],
                        'prof' : ['-pg'],
                        'debug' : []}
 
@@ -269,7 +269,6 @@ def build(bld):
         target       = 'gamra',
         cxxflags     = cxxflags_variant[bld.variant] + default_flags,
         lib          = ['dl','gfortranbegin', 'gfortran', 'm'],
-        libpath      = ['/sw/lib/gcc4.8/lib','/sw/lib/gcc4.8/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2'],
         linkflags    = linkflags_variant[bld.variant],
         includes = ['src'],
         use=use_array
