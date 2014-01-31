@@ -1,7 +1,5 @@
 #include "Elastic/FAC.h"
 #include "SAMRAI/geom/CartesianGridGeometry.h"
-#include "SAMRAI/pdat/MDA_Access.h"
-#include "SAMRAI/pdat/ArrayDataAccess.h"
 
 void Elastic::FAC::applyGradientDetector
 (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy_,
