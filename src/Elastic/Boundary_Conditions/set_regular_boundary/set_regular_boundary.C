@@ -114,7 +114,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
     }
 
   set_dirichlet(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
-  set_shear_derivs(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
+  set_shear_stress(v,dv_mixed_ptr,unit,dim,pbox,gbox,geom,dx,homogeneous);
 
   if(apply_normal_stress)
     {

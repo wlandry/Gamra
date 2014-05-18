@@ -1,7 +1,7 @@
 #include "Constants.h"
 #include "Elastic/Boundary_Conditions.h"
 
-void Elastic::Boundary_Conditions::set_shear_derivs
+void Elastic::Boundary_Conditions::set_shear_stress
 (SAMRAI::pdat::SideData<double> &v,
  const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_ptr,
  const SAMRAI::hier::Index unit[],
