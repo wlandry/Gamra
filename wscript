@@ -167,7 +167,7 @@ def build(bld):
                         'src/Elastic/Boundary_Conditions/set_embedded_boundary.C',
                         'src/Elastic/Boundary_Conditions/set_regular_boundary/set_regular_boundary.C',
                         'src/Elastic/Boundary_Conditions/set_regular_boundary/set_dirichlet.C',
-                        'src/Elastic/Boundary_Conditions/set_regular_boundary/set_shear_derivs.C',
+                        'src/Elastic/Boundary_Conditions/set_regular_boundary/set_shear_stress.C',
                         'src/Elastic/FACOps/FACOps.C',
                         'src/Elastic/FACOps/v_level_set_operator_2D.C',
                         'src/Elastic/FACOps/computeCompositeResidualOnLevel.C',
