@@ -12,7 +12,9 @@ Elastic {
 
     lambda="1"
     mu="1"
-    v_rhs="0"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
     faults= 10, 0.000001, -.1, 0.0, 0.2, 0.25, 90, 90, 0
 
