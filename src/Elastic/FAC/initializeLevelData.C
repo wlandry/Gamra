@@ -11,9 +11,9 @@
 #include "SAMRAI/geom/CartesianGridGeometry.h"
 #include "FTensor.hpp"
 
-/* Initialize data on a level, including allocating memory.  It does
-   not set the terms due to the faults, since the moduli have to be
-   fixed first. */
+/// Initialize data on a level, including allocating memory.  It does
+/// not set the terms due to the faults, since the moduli have to be
+/// fixed first.
 
 void Elastic::FAC::initializeLevelData
 (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& patch_hierarchy,
@@ -50,9 +50,7 @@ void Elastic::FAC::initializeLevelData
           level->allocatePatchData(level_set_id);
         }
     }
-  /*
-   * Initialize data in all patches in the level.
-   */
+  /// Initialize data in all patches in the level.
   SAMRAI::hier::PatchLevel::Iterator p_i(level->begin());
   for (; p_i!=level->end(); ++p_i) {
 
@@ -66,7 +64,7 @@ void Elastic::FAC::initializeLevelData
       (patch->getPatchGeometry());
     const double *dx=geom->getDx();
 
-    /* Initialize cell moduli */
+    /// Initialize cell moduli
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli =
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
       (patch->getPatchData(cell_moduli_id));
@@ -89,13 +87,14 @@ void Elastic::FAC::initializeLevelData
         (*cell_moduli)(c,1)=mu.eval(coord);
       }
 
-    /* v_rhs */
+    /// v_rhs
     boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_data =
       boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
       (patch->getPatchData(v_rhs_id));
 
+    /// FIXME: need to use the input file rather than always setting
+    /// it so zero.
     v_rhs_data->fillAll(0);
-    /* FIXME: need to add in the v_rhs from the input file */
 
     if(have_embedded_boundary())
       {
