@@ -69,6 +69,7 @@ void Elastic::FACOps::restrictSolution
   v_refine_patch_strategy.data_id=d.getComponentDescriptorIndex(0);
   V_Boundary_Refine::is_residual=false;
 
+  /// FIXME: Is this necessary?
   if (dest_ln == d_ln_min) {
     xeqScheduleGhostFillNoCoarse(v_dst,dest_ln);
   } else {
