@@ -2,7 +2,7 @@
 
 /* Strain correction is stored on the cell centers and edges */
 
-bool
+void
 Elastic::FAC::pack_strain(double* buffer,
                           const SAMRAI::hier::Patch& patch,
                           const SAMRAI::hier::Box& region,
@@ -70,5 +70,4 @@ Elastic::FAC::pack_strain(double* buffer,
         }
       ++buffer;
     }
-  return true;
 }

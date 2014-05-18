@@ -20,12 +20,9 @@
 #include "SAMRAI/hier/Variable.h"
 #include "SAMRAI/hier/VariableDatabase.h"
 
-/*
-*************************************************************************
-* Write derived data to the given stream.                               *
-*************************************************************************
-*/
-bool
+/// Write derived data to the given stream.
+
+void
 Elastic::FAC::pack_v_v_rhs(double* buffer,
                            const SAMRAI::hier::Patch& patch,
                            const SAMRAI::hier::Box& region,
@@ -44,7 +41,6 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
     }
   else
     {
-      // Did not register this name.
       TBOX_ERROR("Unregistered variable name '" << variable_name << "' in\n"
                  << "Elastic::FAC::packDerivedDataIntoDoubleBuffer");
     }
@@ -66,16 +62,6 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
 	
         double vx=(v(x+ip) + v(x))/2.;
         double vy=(v(y+jp) + v(y))/2.;
-
-        // if(variable_name=="Displacement")
-        //   SAMRAI::tbox::plog << variable_name << " "
-        //                      << depth << " "
-        //                      << center << " "
-        //                      << v(x) << " "
-        //                      << v(x+ip) << " "
-        //                      << v(y) << " "
-        //                      << v(y+jp) << " "
-        //                      << "\n";
 
         if (0==depth)
           {
@@ -106,17 +92,6 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
         double vy=(v(y+jp) + v(y))/2.;
         double vz=(v(z+kp) + v(z))/2.;
 
-        // if(variable_name=="Displacement")
-        //   SAMRAI::tbox::plog << variable_name
-        //                      << center << " "
-        //                      << v(x) << " "
-        //                      << v(x+ip) << " "
-        //                      << v(y) << " "
-        //                      << v(y+jp) << " "
-        //                      << v(z) << " "
-        //                      << v(z+kp) << " "
-        //                      << "\n";
-
         if (0==depth)
           {
             *buffer = vx;
@@ -132,7 +107,4 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
         buffer = buffer + 1;
       }
     }
-  // Return true if this patch has derived data on it.
-  // False otherwise.
-  return true;
 }
