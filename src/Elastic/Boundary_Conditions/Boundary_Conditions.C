@@ -19,8 +19,6 @@ Elastic::Boundary_Conditions::Boundary_Conditions
   std::string xyz("xyz");
   std::string upper_string[]={"lower","upper"};
 
-  std::vector<std::string> keys(database->getAllKeys());
-
   for(int vxyz=0;vxyz<dim;++vxyz)
     for(int direction=0;direction<dim;++direction)
       for(int upper_lower=0;upper_lower<2;++upper_lower)
