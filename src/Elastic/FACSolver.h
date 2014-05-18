@@ -124,49 +124,6 @@ namespace Elastic {
     enableLogging(bool logging);
 
     /*!
-     * @brief Solve Elastic's equation, assuming an uninitialized
-     * solver state.
-     *
-     * Here, u is the "solution" patch data index and f is the
-     * right hand side patch data index.
-     * The return value is true if the solver converged and false otherwise.
-     *
-     * This function is a wrapper.
-     * It simply initializes the solver state, call the
-     * solveSystem(const int,const int) for the initialized solver then
-     * deallocates the solver state.
-     *
-     * Upon return from this function,
-     * solution will contain the result of the solve.
-     *
-     * See initializeSolverState() for opportunities to save overhead
-     * when using multiple consecutive solves.
-     *
-     * @see solveSystem(const int,const int)
-     *
-     * @param solution hier::Patch data index for solution u
-     * @param rhs hier::Patch data index for right hand side f
-     * @param hierarchy The patch hierarchy to solve on
-     * @param coarse_ln The coarsest level in the solve.
-     * @param fine_ln The finest level in the solve.
-     *
-     * @return whether solver converged to specified level
-     *
-     * @see initializeSolverState
-     */
-    bool
-    solveSystem(const int cell_moduli_id,
-                const int edge_moduli_id,
-                const int dv_diagonal_id,
-                const int dv_mixed_id, 
-                const int level_set_id,
-                const int v_id,
-                const int v_rhs_id,
-                boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
-                int coarse_ln = -1,
-                int fine_ln = -1);
-
-    /*!
      * @brief Solve Elastic's equation using the current solver state
      * set by initializeSolverState().
      *

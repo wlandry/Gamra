@@ -119,8 +119,6 @@ Elastic::FACSolver::FACSolver
     }
   }
 
-  // d_fac_precond.setAlgorithmChoice("fas");
-
   /*
    * The FAC operator optionally uses the preconditioner
    * to get data for logging.
