@@ -1,86 +1,27 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Input file for example FAC Stokes solver 
- *
- ************************************************************************/
-// This is the input file for the 2D FAC example
-// demonstrating changes in boundary conditions.
-//
-// Note that using constant refine prolongation
-// lead to slower convergence.
-
+// 2D fault with Okada with analytic boundar
 Main {
     dim = 2
-    // Base name for output files.
     base_name = "okada"
-    // Whether to log all nodes in a parallel run.
     log_all_nodes = TRUE
-    // Visualization writers to write files for.
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    // The FACStokes class is the "user class" in this example.
-    // It owns the solver and contains the code to set up the solver.
-    // The inputs for FACStokes is simply the inputs for the individual
-    // parts owned by the FACStokes class.
     adaption_threshold = 1.0e-3
     min_full_refinement_level = 10
 
-    lambda_ijk= 2, 2
-    lambda_coord_min= -10.001, -10.001
-    lambda_coord_max= 10.001, 10.001
-    lambda_data= 
-    1, 1,
-    1, 1
+    lambda="1"
+    mu="1"
+    v_rhs="0"
 
-    mu_ijk= 3, 3
-    mu_coord_min= -10.001, -10.001
-    mu_coord_max= 10.001, 10.001
-    mu_data= 1, 1, 1,
-    1, 1, 1,
-    1, 1, 1
-
-    v_rhs_ijk= 11, 11
-    v_rhs_coord_min= -10.001, -10.001
-    v_rhs_coord_max= 10.001, 10.001
-
-    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-    faults= -10, 0.000001, -.1, 0.0, 0.2, 0.25, 0, 0, 0
+    faults= 10, 0.000001, -.1, 0.0, 0.2, 0.25, 90, 90, 0
 
     fac_solver {
-        enable_logging = TRUE   // Bool flag to switch logging on/off
-        max_cycles = 100         // Max number of FAC cycles to use
-        residual_tol = 1e-3     // Residual tolerance to solve for
-        num_pre_sweeps = 2      // Number of presmoothing sweeps to use
-        num_post_sweeps = 2     // Number of postsmoothing sweeps to use
+        enable_logging = TRUE
+        max_cycles = 100
+        residual_tol = 1e-3
+        num_pre_sweeps = 2
+        num_post_sweeps = 2
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
@@ -88,35 +29,27 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
-        dirichlet_vx_x_lower="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
-        dirichlet_vy_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
-        dirichlet_vy_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
-        neumann_vx_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), -duxp_y+duxm_y"
-        neumann_vx_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), -duxp_y+duxm_y"
-        neumann_vy_x_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duyp_x+duym_x"
-        neumann_vy_x_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duyp_x+duym_x"
+        vx_x_upper="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
+        vx_x_upper_is_dirichlet=TRUE
+        vx_x_lower="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
+        vx_x_lower_is_dirichlet=TRUE
+        vy_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
+        vy_y_upper_is_dirichlet=TRUE
+        vy_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
+        vy_y_lower_is_dirichlet=TRUE
+
+        vx_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y - duyp_x+duym_x"
+        vx_y_upper_is_dirichlet=FALSE
+        vx_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y - duyp_x+duym_x"
+        vx_y_lower_is_dirichlet=FALSE
+        vy_x_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y - duyp_x+duym_x"
+        vy_x_upper_is_dirichlet=FALSE
+        vy_x_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y - duyp_x+duym_x"
+        vy_x_lower_is_dirichlet=FALSE
     }
 }
 
 CartesianGridGeometry {
-    //  Specify lower/upper corners of the computational domain and a
-    //  set of non-overlapping boxes defining domain interior.  If union 
-    //  of boxes is not a parallelpiped, lower/upper corner data corresponds 
-    //  to min/max corner indices over all boxes given.
-    //  x_lo  -- (double array) lower corner of computational domain [REQD]
-    //  x_up  -- (double array) upper corner of computational domain [REQD]
-    //  domain_boxes  -- (box array) set of boxes that define interior of 
-    //                   physical domain. [REQD]
-    //  periodic_dimension -- (int array) coordinate directions in which 
-    //                        domain is periodic.  Zero indicates not
-    //                        periodic, non-zero value indicates periodicity.
-    //                        [0]
-    // domain_boxes = [(0,0), (127,127)]
-    // domain_boxes = [(0,0), (63,63)]
-    // domain_boxes = [(0,0), (31,31)]
-    // domain_boxes = [(0,0), (15,15)]
-    // domain_boxes = [(0,0), (7,7)]
     domain_boxes = [(0,0), (3,3)]
     x_lo         = -.5, -.5
     x_up         = .5, .5
@@ -129,31 +62,6 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    // Information used to create patches in AMR hierarchy.
-    // max_levels -- (int) max number of mesh levels in hierarchy [REQD]
-    // 
-    // For most of the following parameters, the number of precribed data
-    // values need not match the number of levels in the hierarchy 
-    // (determined by max_levels).  If more values are given than number 
-    // of levels, extraneous values will be ignored.  If less are give, then
-    // values that correspond to individual levels will apply to those 
-    // levels.  Missing values will be taken from those for the finest
-    // level specified.
-    //
-    // ratio_to_coarser {
-    //   level_1 -- (int array) ratio between index spaces on 
-    //              level 1 to level 0 [REQD]
-    //   level_2 -- (int array)  ratio between index spaces on 
-    //              level 2 to level 1 [REQD]
-    //   etc....
-    // }
-    // largest_patch_size {
-    //   level_0 -- (int array) largest patch allowed on level 0. 
-    //              [REQD]    
-    //   level_1 -- (int array)    "       "      "   "  level 1 
-    //              [level 0 entry]
-    //   etc....                       
-    // }
     max_levels = 6
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
