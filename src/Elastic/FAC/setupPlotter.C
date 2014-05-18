@@ -21,13 +21,10 @@
 #include "SAMRAI/hier/VariableDatabase.h"
 
 #ifdef HAVE_HDF5
-/*
-*************************************************************************
-* Set up external plotter to plot internal data from this class.        *
-* Register variables appropriate for plotting.                          *
-*************************************************************************
-*/
-int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
+/// Set up external plotter to plot internal data from this class.
+/// Register variables appropriate for plotting.
+
+void Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   if (!d_hierarchy) {
     TBOX_ERROR(d_object_name << ": No hierarchy in\n"
                << " Elastic::FAC::setupPlotter\n"
@@ -59,6 +56,5 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
                                           (SAMRAI::appu::VisDerivedDataStrategy *)
                                           this);
     }
-  return 0;
 }
 #endif

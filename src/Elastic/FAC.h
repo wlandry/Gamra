@@ -168,7 +168,7 @@ namespace Elastic {
      *
      * @param viz_writer VisIt writer
      */
-    int
+    void
     setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const;
 #endif
 
