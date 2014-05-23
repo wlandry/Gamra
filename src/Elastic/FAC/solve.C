@@ -57,7 +57,6 @@ int Elastic::FAC::solve()
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (patch->getPatchData(v_id));
       v->fill(0.0);
-      // v->fill(13.0);
     }
     d_elastic_fac_solver.set_boundaries(v_id,level,false);
   }
@@ -69,9 +68,8 @@ int Elastic::FAC::solve()
   SAMRAI::tbox::plog << "solving..." << std::endl;
   int solver_ret;
   solver_ret = d_elastic_fac_solver.solveSystem(v_id,v_rhs_id);
-  /*
-   * Present data on the solve.
-   */
+
+  /// Write out convergence data
   double avg_factor, final_factor;
   d_elastic_fac_solver.getConvergenceFactors(avg_factor, final_factor);
   SAMRAI::tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
