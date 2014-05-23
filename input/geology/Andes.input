@@ -607,7 +607,9 @@ Elastic {
     26624000000.0
 
 
-    v_rhs="0"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
