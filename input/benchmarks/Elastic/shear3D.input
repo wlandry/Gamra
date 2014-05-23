@@ -10,7 +10,7 @@
 
 Main {
     dim = 3
-    base_name = "shear3D_normal"
+    base_name = "shear3D"
     log_all_nodes = TRUE
     vis_writer = "Vizamrai", "VisIt"
 }
@@ -21,14 +21,16 @@ Elastic {
 
     lambda="1"
     mu="1"
-    v_rhs="0"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
     fac_solver {
-        enable_logging = TRUE   // Bool flag to switch logging on/off
-        max_cycles = 100         // Max number of FAC cycles to use
-        residual_tol = 1e-10     // Residual tolerance to solve for
-        num_pre_sweeps = 1      // Number of presmoothing sweeps to use
-        num_post_sweeps = 1     // Number of postsmoothing sweeps to use
+        enable_logging = TRUE
+        max_cycles = 100
+        residual_tol = 1e-10
+        num_pre_sweeps = 1
+        num_post_sweeps = 1
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
@@ -45,7 +47,7 @@ Elastic {
         vy_y_lower="0"
         vy_y_lower_is_dirichlet=TRUE
         vz_z_upper="0"
-        vz_z_upper_is_dirichlet=FALSE
+        vz_z_upper_is_dirichlet=TRUE
         vz_z_lower="0"
         vz_z_lower_is_dirichlet=TRUE
         vx_y_upper="1"
@@ -72,41 +74,10 @@ Elastic {
         vz_y_upper_is_dirichlet=FALSE
         vz_y_lower="0"
         vz_y_lower_is_dirichlet=FALSE
-
-        dirichlet_vx_x_upper="y"
-        dirichlet_vx_x_lower="y"
-        dirichlet_vy_y_upper="0"
-        dirichlet_vy_y_lower="0"
-        normal_stress_vz_z_lower="0"
-        dirichlet_vz_z_upper="0"
-        shear_deriv_vx_y_upper="1"
-        shear_deriv_vx_y_lower="1"
-        shear_deriv_vx_z_upper="0"
-        shear_deriv_vx_z_lower="0"
-        shear_deriv_vy_x_upper="1"
-        shear_deriv_vy_x_lower="1"
-        shear_deriv_vy_z_upper="0"
-        shear_deriv_vy_z_lower="0"
-        shear_deriv_vz_x_upper="0"
-        shear_deriv_vz_x_lower="0"
-        shear_deriv_vz_y_upper="0"
-        shear_deriv_vz_y_lower="0"
     }
 }
 
 CartesianGridGeometry {
-    //  Specify lower/upper corners of the computational domain and a
-    //  set of non-overlapping boxes defining domain interior.  If union 
-    //  of boxes is not a parallelpiped, lower/upper corner data corresponds 
-    //  to min/max corner indices over all boxes given.
-    //  x_lo  -- (double array) lower corner of computational domain [REQD]
-    //  x_up  -- (double array) upper corner of computational domain [REQD]
-    //  domain_boxes  -- (box array) set of boxes that define interior of 
-    //                   physical domain. [REQD]
-    //  periodic_dimension -- (int array) coordinate directions in which 
-    //                        domain is periodic.  Zero indicates not
-    //                        periodic, non-zero value indicates periodicity.
-    //                        [0]
     domain_boxes = [(0,0,0), (3,3,3)]
     x_lo         = 0, 0, 0
     x_up         = 1, 1, 1
@@ -117,32 +88,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    // Information used to create patches in AMR hierarchy.
-    // max_levels -- (int) max number of mesh levels in hierarchy [REQD]
-    // 
-    // For most of the following parameters, the number of precribed data
-    // values need not match the number of levels in the hierarchy 
-    // (determined by max_levels).  If more values are given than number 
-    // of levels, extraneous values will be ignored.  If less are give, then
-    // values that correspond to individual levels will apply to those 
-    // levels.  Missing values will be taken from those for the finest
-    // level specified.
-    //
-    // ratio_to_coarser {
-    //   level_1 -- (int array) ratio between index spaces on 
-    //              level 1 to level 0 [REQD]
-    //   level_2 -- (int array)  ratio between index spaces on 
-    //              level 2 to level 1 [REQD]
-    //   etc....
-    // }
-    // largest_patch_size {
-    //   level_0 -- (int array) largest patch allowed on level 0. 
-    //              [REQD]    
-    //   level_1 -- (int array)    "       "      "   "  level 1 
-    //              [level 0 entry]
-    //   etc....                       
-    // }
-    max_levels = 2
+    max_levels = 4
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2

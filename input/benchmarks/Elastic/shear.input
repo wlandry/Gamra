@@ -1,59 +1,67 @@
-// 2D fault with Okada with analytic boundar
+/*************************************************************************
+ *
+ * This file is part of the SAMRAI distribution.  For full copyright 
+ * information, see COPYRIGHT and COPYING.LESSER. 
+ *
+ * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
+ * Description:   Input file for example FAC Stokes solver 
+ *
+ ************************************************************************/
+// This is the input file for the 2D FAC example
+// demonstrating changes in boundary conditions.
+
 Main {
     dim = 2
-    base_name = "forcing"
+    base_name = "shear"
     log_all_nodes = TRUE
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    adaption_threshold = 1.0e-3
+    adaption_threshold = 1.0e-2
     min_full_refinement_level = 10
 
     lambda="1"
     mu="1"
-    v_rhs_x="1"
+    v_rhs_x="0"
     v_rhs_y="0"
-    v_rhs_z="0"
 
     fac_solver {
-        enable_logging = TRUE
-        max_cycles = 100
-        residual_tol = 1e-3
-        num_pre_sweeps = 2
-        num_post_sweeps = 2
+        enable_logging = TRUE   // Bool flag to switch logging on/off
+        max_cycles = 100         // Max number of FAC cycles to use
+        residual_tol = 1e-10     // Residual tolerance to solve for
+        num_pre_sweeps = 1      // Number of presmoothing sweeps to use
+        num_post_sweeps = 1     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
-        coarse_solver_tolerance = 1e-5
+        coarse_solver_tolerance = 1e-10
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        vx_x_upper="0"
+        vx_x_upper="y"
         vx_x_upper_is_dirichlet=TRUE
-        vx_x_lower="0"
+        vx_x_lower="y"
         vx_x_lower_is_dirichlet=TRUE
         vy_y_upper="0"
         vy_y_upper_is_dirichlet=TRUE
         vy_y_lower="0"
         vy_y_lower_is_dirichlet=TRUE
-        vx_y_upper="0"
+        vx_y_upper="1"
         vx_y_upper_is_dirichlet=FALSE
-        vx_y_lower="0"
+        vx_y_lower="1"
         vx_y_lower_is_dirichlet=FALSE
-        vy_x_upper="0"
+        vy_x_upper="1"
         vy_x_upper_is_dirichlet=FALSE
-        vy_x_lower="0"
+        vy_x_lower="1"
         vy_x_lower_is_dirichlet=FALSE
     }
 }
 
 CartesianGridGeometry {
     domain_boxes = [(0,0), (3,3)]
-    x_lo         = -.5, -.5
-    x_up         = .5, .5
-    // x_lo         = -4, -4
-    // x_up         = 4, 4
+    x_lo         = 0, 0
+    x_up         = 1, 1
 }
 
 StandardTagAndInitialize {
@@ -61,7 +69,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 6
+    max_levels = 4
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
@@ -73,10 +81,7 @@ PatchHierarchy {
         level_7            = 2, 2
     }
     largest_patch_size {
-        // level_0 = 32, 32
-        // level_0 = 8, 8
         level_0 = -1, -1
-        // all finer levels will use same values as level_0...
     }
 }
 

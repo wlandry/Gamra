@@ -10,7 +10,7 @@
 
 Main {
     dim = 2
-    base_name = "multilayer"
+    base_name = "embedded_boundary"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
@@ -19,9 +19,12 @@ Elastic {
     adaption_threshold = 1.0e-3
     min_full_refinement_level = 1
 
-    lambda="y<0.5001 ? 1 : 2"
-    mu="y<0.5001 ? 1 : 2"
-    v_rhs="0"
+    lambda="1"
+    mu="1"
+    v_rhs_x="0"
+    v_rhs_y="0"
+
+    level_set="1-((x-0.5)^2 + y^2)"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off

@@ -7,26 +7,26 @@
  * Description:   Input file for example FAC Stokes solver 
  *
  ************************************************************************/
-// Input file for strike-slip displacement on a vertical fault
-//
 
 Main {
     dim = 3
-    base_name = "ss_s0_ml4"
+    base_name = "ss_s90"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    adaption_threshold = 5.0e-3
-    min_full_refinement_level = 3
+    adaption_threshold = 1.0e-2
+    min_full_refinement_level = 2
 
     lambda="1"
     mu="1"
-    v_rhs="0"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
     faults= 
-    1.0, 0.0, 0.0, 0.0, 10.0, 10.0, 0.0, 90.0, 0.0
+    1.0, 0.0, 0.0, 0.0, 10.0, 10.0, 90.0, 90.0, 0.0
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
@@ -98,8 +98,8 @@ CartesianGridGeometry {
     //                        [0]
     // domain_boxes = [(0,0), (15,15)]
     domain_boxes = [(0,0,0), (7,7,1)]
-    x_lo         = -128, -128, 0.01
-    x_up         =  127,  127,  90
+    x_lo         = -130, -130, 0.01
+    x_up         =   90,   90,  80
 }
 
 StandardTagAndInitialize {
@@ -132,7 +132,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 6
+    max_levels = 4
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2

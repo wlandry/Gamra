@@ -7,30 +7,29 @@
  * Description:   Input file for example FAC Stokes solver 
  *
  ************************************************************************/
-// This is the input file for the 2D FAC example
-// demonstrating changes in boundary conditions.
 
 Main {
     dim = 2
-    base_name = "shear"
-    log_all_nodes = TRUE
+    base_name = "multilayer"
+    log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    adaption_threshold = 1.0e-2
-    min_full_refinement_level = 10
+    adaption_threshold = 1.0e-3
+    min_full_refinement_level = 1
 
-    lambda="1"
-    mu="1"
-    v_rhs="0"
+    lambda="y<0.5001 ? 1 : 2"
+    mu="y<0.5001 ? 1 : 2"
+    v_rhs_x="0"
+    v_rhs_y="0"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
         residual_tol = 1e-10     // Residual tolerance to solve for
-        num_pre_sweeps = 1      // Number of presmoothing sweeps to use
-        num_post_sweeps = 1     // Number of postsmoothing sweeps to use
+        num_pre_sweeps = 2      // Number of presmoothing sweeps to use
+        num_post_sweeps = 2     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
@@ -38,21 +37,28 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        vx_x_upper="y"
+        vx_x_upper="0"
         vx_x_upper_is_dirichlet=TRUE
-        vx_x_lower="y"
+        vx_x_lower="0"
         vx_x_lower_is_dirichlet=TRUE
-        vy_y_upper="0"
-        vy_y_upper_is_dirichlet=TRUE
+
+        vy_y_upper_ijk=5
+        vy_y_upper_coord_min=0
+        vy_y_upper_coord_max=1
+        vy_y_upper_data=0, 0, -1, 0, 0
+        
+        // vy_y_upper="-exp(-((x-.5)/.1)^2)"
+        vy_y_upper_is_dirichlet=FALSE
+
         vy_y_lower="0"
         vy_y_lower_is_dirichlet=TRUE
-        vx_y_upper="1"
+        vx_y_upper="0"
         vx_y_upper_is_dirichlet=FALSE
-        vx_y_lower="1"
+        vx_y_lower="0"
         vx_y_lower_is_dirichlet=FALSE
-        vy_x_upper="1"
+        vy_x_upper="0"
         vy_x_upper_is_dirichlet=FALSE
-        vy_x_lower="1"
+        vy_x_lower="0"
         vy_x_lower_is_dirichlet=FALSE
     }
 }
@@ -68,7 +74,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 4
+    max_levels = 5
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2

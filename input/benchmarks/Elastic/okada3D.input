@@ -1,6 +1,6 @@
 Main {
     dim = 3
-    base_name = "fault3D"
+    base_name = "okada3D"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
@@ -11,7 +11,9 @@ Elastic {
 
     lambda="1"
     mu="1"
-    v_rhs="0"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
     faults= -10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0
 
@@ -28,51 +30,54 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        vx_x_upper="0"
+        vx_x_upper="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0)"
         vx_x_upper_is_dirichlet=TRUE
-        vx_x_lower="0"
+        vx_x_lower="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0)"
         vx_x_lower_is_dirichlet=TRUE
-        vy_y_upper="0"
+        vy_y_upper="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1)"
         vy_y_upper_is_dirichlet=TRUE
-        vy_y_lower="0"
+        vy_y_lower="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1)"
         vy_y_lower_is_dirichlet=TRUE
 
-        vz_z_upper="0"
+        vz_z_upper="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2)"
         vz_z_upper_is_dirichlet=TRUE
-        vz_z_lower="0"
+        vz_z_lower="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2)"
         vz_z_lower_is_dirichlet=FALSE
 
-        vx_y_upper="0"
+        vx_y_upper="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0,1) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1,0)"
+        // vx_y_upper="0"
         vx_y_upper_is_dirichlet=FALSE
-        vx_y_lower="0"
+        vx_y_lower="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0,1) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1,0)"
         vx_y_lower_is_dirichlet=FALSE
-        vx_z_upper="0"
+        vx_z_upper="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0,2) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2,0)"
         vx_z_upper_is_dirichlet=FALSE
-        vx_z_lower="0"
+        vx_z_lower="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0,2) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2,0)"
         vx_z_lower_is_dirichlet=FALSE
-        vy_x_upper="0"
+
+        vy_x_upper="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0,1) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1,0)"
         vy_x_upper_is_dirichlet=FALSE
-        vy_x_lower="0"
+        vy_x_lower="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0,1) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1,0)"
         vy_x_lower_is_dirichlet=FALSE
-        vy_z_upper="0"
+        vy_z_upper="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2,1) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1,2)"
         vy_z_upper_is_dirichlet=FALSE
-        vy_z_lower="0"
+        vy_z_lower="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2,1) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1,2)"
         vy_z_lower_is_dirichlet=FALSE
-        vz_x_upper="0"
+
+        vz_x_upper="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0,2) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2,0)"
         vz_x_upper_is_dirichlet=FALSE
-        vz_x_lower="0"
+        vz_x_lower="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0,2) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2,0)"
         vz_x_lower_is_dirichlet=FALSE
-        vz_y_upper="0"
+        vz_y_upper="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2,1) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1,2)"
         vz_y_upper_is_dirichlet=FALSE
-        vz_y_lower="0"
+        vz_y_lower="d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2,1) + d_okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1,2)"
         vz_y_lower_is_dirichlet=FALSE
     }
 }
 
 CartesianGridGeometry {
     domain_boxes = [(0,0,0), (3,3,3)]
-    x_lo         = -.5, -.5, 0.
-    x_up         = .5, .5, 1.
+    x_lo         = -0.5, -0.5, 0.
+    x_up         = 0.5, 0.5, 1.
 }
 
 StandardTagAndInitialize {

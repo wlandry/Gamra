@@ -1,56 +1,65 @@
+/*************************************************************************
+ *
+ * This file is part of the SAMRAI distribution.  For full copyright 
+ * information, see COPYRIGHT and COPYING.LESSER. 
+ *
+ * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
+ * Description:   Input file for example FAC Stokes solver 
+ *
+ ************************************************************************/
+
 Main {
     dim = 2
-    base_name = "fault_bisect_x"
-    log_all_nodes = FALSE
+    base_name = "shear_x_normal"
+    log_all_nodes = TRUE
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    adaption_threshold = 1.0e-1
-    min_full_refinement_level = 1
+    adaption_threshold = 1.0e-2
+    min_full_refinement_level = 0
 
     lambda="1"
     mu="1"
-    v_rhs="0"
-
-    faults= -10, -1, -0.5, 0.0, 10, 0.25, 30, 90, 0
+    v_rhs_x="0"
+    v_rhs_y="0"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
-        residual_tol = 1e-3     // Residual tolerance to solve for
-        num_pre_sweeps = 2      // Number of presmoothing sweeps to use
-        num_post_sweeps = 2     // Number of postsmoothing sweeps to use
+        residual_tol = 1e-10     // Residual tolerance to solve for
+        num_pre_sweeps = 1      // Number of presmoothing sweeps to use
+        num_post_sweeps = 1     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
-        coarse_solver_tolerance = 1e-5
+        coarse_solver_tolerance = 1e-10
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        vx_x_upper="-2.5"
+        vx_x_upper="x"
         vx_x_upper_is_dirichlet=TRUE
-        vx_x_lower="2.5"
+        vx_x_lower="x"
         vx_x_lower_is_dirichlet=TRUE
-        vy_y_upper="x<0.366025403782 ? 4.33012701893 : -4.33012701893"
-        vy_y_upper_is_dirichlet=TRUE
-        vy_y_lower="x<-0.211324865406 ? 4.33012701893 : -4.33012701893"
+        vy_y_upper="1"
+        vy_y_upper_is_dirichlet=FALSE
+        vy_y_lower="0"
         vy_y_lower_is_dirichlet=TRUE
-        vx_y_upper="x<0.366025403782 ? 2.5 : -2.5"
-        vx_y_upper_is_dirichlet=TRUE
-        vx_y_lower="x<-0.211324865406 ? 2.5 : -2.5"
-        vx_y_lower_is_dirichlet=TRUE
-        vy_x_upper="-4.33012701893"
-        vy_x_upper_is_dirichlet=TRUE
-        vy_x_lower="4.33012701893"
-        vy_x_lower_is_dirichlet=TRUE
+        vx_y_upper="0"
+        vx_y_upper_is_dirichlet=FALSE
+        vx_y_lower="0"
+        vx_y_lower_is_dirichlet=FALSE
+        vy_x_upper="0"
+        vy_x_upper_is_dirichlet=FALSE
+        vy_x_lower="0"
+        vy_x_lower_is_dirichlet=FALSE
     }
 }
 
 CartesianGridGeometry {
     domain_boxes = [(0,0), (3,3)]
-    x_lo         = -.5, -.5
-    x_up         = .5, .5
+    x_lo         = 0, 0
+    x_up         = 1, 1
 }
 
 StandardTagAndInitialize {
@@ -58,7 +67,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 7
+    max_levels = 2
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2

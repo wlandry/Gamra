@@ -1,26 +1,26 @@
+// 2D fault with Okada with analytic boundar
 Main {
     dim = 2
-    base_name = "fault_bisect_y"
-    log_all_nodes = FALSE
+    base_name = "forcing"
+    log_all_nodes = TRUE
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    adaption_threshold = 1.0e-1
-    min_full_refinement_level = 1
+    adaption_threshold = 1.0e-3
+    min_full_refinement_level = 10
 
     lambda="1"
     mu="1"
-    v_rhs="0"
-
-    faults= -10, -0.5, -1,  0.0, 10, 0.25, 60, 90, 0
+    v_rhs_x="1"
+    v_rhs_y="0"
 
     fac_solver {
-        enable_logging = TRUE   // Bool flag to switch logging on/off
-        max_cycles = 100         // Max number of FAC cycles to use
-        residual_tol = 1e-3     // Residual tolerance to solve for
-        num_pre_sweeps = 2      // Number of presmoothing sweeps to use
-        num_post_sweeps = 2     // Number of postsmoothing sweeps to use
+        enable_logging = TRUE
+        max_cycles = 100
+        residual_tol = 1e-3
+        num_pre_sweeps = 2
+        num_post_sweeps = 2
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
@@ -28,22 +28,22 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        vx_x_upper="y<0.366025403782 ? -4.33012701893 : 4.33012701893"
+        vx_x_upper="0"
         vx_x_upper_is_dirichlet=TRUE
-        vx_x_lower="y<-0.211324865406 ? -4.33012701893 : 4.33012701893"
+        vx_x_lower="0"
         vx_x_lower_is_dirichlet=TRUE
-        vy_y_upper="2.5"
+        vy_y_upper="0"
         vy_y_upper_is_dirichlet=TRUE
-        vy_y_lower="-2.5"
+        vy_y_lower="0"
         vy_y_lower_is_dirichlet=TRUE
-        vx_y_upper="4.33012701893"
-        vx_y_upper_is_dirichlet=TRUE
-        vx_y_lower="-4.33012701893"
-        vx_y_lower_is_dirichlet=TRUE
-        vy_x_upper="y<0.366025403782 ? -2.5 : 2.5"
-        vy_x_upper_is_dirichlet=TRUE
-        vy_x_lower="y<-0.211324865406 ? -2.5 : 2.5"
-        vy_x_lower_is_dirichlet=TRUE
+        vx_y_upper="0"
+        vx_y_upper_is_dirichlet=FALSE
+        vx_y_lower="0"
+        vx_y_lower_is_dirichlet=FALSE
+        vy_x_upper="0"
+        vy_x_upper_is_dirichlet=FALSE
+        vy_x_lower="0"
+        vy_x_lower_is_dirichlet=FALSE
     }
 }
 
@@ -51,6 +51,8 @@ CartesianGridGeometry {
     domain_boxes = [(0,0), (3,3)]
     x_lo         = -.5, -.5
     x_up         = .5, .5
+    // x_lo         = -4, -4
+    // x_up         = 4, 4
 }
 
 StandardTagAndInitialize {
@@ -58,7 +60,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 7
+    max_levels = 6
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
@@ -70,7 +72,10 @@ PatchHierarchy {
         level_7            = 2, 2
     }
     largest_patch_size {
+        // level_0 = 32, 32
+        // level_0 = 8, 8
         level_0 = -1, -1
+        // all finer levels will use same values as level_0...
     }
 }
 

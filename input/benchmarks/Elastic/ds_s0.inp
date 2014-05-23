@@ -7,62 +7,81 @@
  * Description:   Input file for example FAC Stokes solver 
  *
  ************************************************************************/
-// This test case should give vx=vx(x,y) and vy=0
+// Input file for dip-slip displacement on a vertical fault
+//
 
 Main {
-    dim = 2
-    // Base name for output files.
-    base_name = "quadratic_shear"
-    // Whether to log all nodes in a parallel run.
-    log_all_nodes = TRUE
-    // Visualization writers to write files for.
+    dim = 3
+    base_name = "ds_s0_ml8"
+    log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
 
 Elastic {
-    adaption_threshold = 1.0e-3
-    min_full_refinement_level = 0
+    adaption_threshold = 5e-3
+    min_full_refinement_level = 3
 
-    lambda_ijk= 2, 2
-    lambda_coord_min= -10.001, -10.001
-    lambda_coord_max= 10.001, 10.001
-    lambda_data= 
-    1, 1,
-    1, 1
+    lambda="1"
+    mu="1"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
-    mu_ijk= 2, 2
-    mu_coord_min= -10.001, -10.001
-    mu_coord_max= 10.001, 10.001
-    mu_data= 1, 1,
-    1, 1
-
-    v_rhs_ijk= 2, 2
-    v_rhs_coord_min= -10.001, -10.001
-    v_rhs_coord_max= 10.001, 10.001
-
-    v_rhs_data= 0, 0, 0, 0, 0, 0, 0, 0
+    faults= 
+    1.0, 0.0, 0.0, 0.0, 10.0, 10.0, 0.0, 90.0, 90.0
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
-        residual_tol = 1e-6     // Residual tolerance to solve for
-        num_pre_sweeps = 1      // Number of presmoothing sweeps to use
-        num_post_sweeps = 1     // Number of postsmoothing sweeps to use
+        residual_tol = 1e-3     // Residual tolerance to solve for
+        num_pre_sweeps =  2      // Number of presmoothing sweeps to use
+        num_post_sweeps =  2     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
-        coarse_solver_max_iterations = 32
-        coarse_solver_tolerance = 1e-7
+        coarse_solver_max_iterations =  32
+        coarse_solver_tolerance = 1e-12
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        dirichlet_vx_x_upper="y-y^2"
-        dirichlet_vx_x_lower="y-y^2"
-        dirichlet_vy_y_upper="0"
-        dirichlet_vy_y_lower="0"
-        neumann_vx_y_upper="1-2*y"
-        neumann_vx_y_lower="1-2*y"
-        neumann_vy_x_upper="0"
-        neumann_vy_x_lower="0"
+        vx_x_upper="0"
+        vx_x_upper_is_dirichlet=TRUE
+        vx_x_lower="0"
+        vx_x_lower_is_dirichlet=TRUE
+        vy_y_upper="0"
+        vy_y_upper_is_dirichlet=TRUE
+        vy_y_lower="0"
+        vy_y_lower_is_dirichlet=TRUE
+        vz_z_upper="0"
+        vz_z_upper_is_dirichlet=TRUE
+
+        // Free surface
+        vz_z_lower="0"
+        vz_z_lower_is_dirichlet=FALSE
+
+        vx_y_upper="0"
+        vx_y_upper_is_dirichlet=FALSE
+        vx_y_lower="0"
+        vx_y_lower_is_dirichlet=FALSE
+        vx_z_upper="0"
+        vx_z_upper_is_dirichlet=FALSE
+        vx_z_lower="0"
+        vx_z_lower_is_dirichlet=FALSE
+        vy_x_upper="0"
+        vy_x_upper_is_dirichlet=FALSE
+        vy_x_lower="0"
+        vy_x_lower_is_dirichlet=FALSE
+        vy_z_upper="0"
+        vy_z_upper_is_dirichlet=FALSE
+        vy_z_lower="0"
+        vy_z_lower_is_dirichlet=FALSE
+        vz_x_upper="0"
+        vz_x_upper_is_dirichlet=FALSE
+        vz_x_lower="0"
+        vz_x_lower_is_dirichlet=FALSE
+        vz_y_upper="0"
+        vz_y_upper_is_dirichlet=FALSE
+        vz_y_lower="0"
+        vz_y_lower_is_dirichlet=FALSE
     }
 }
 
@@ -75,9 +94,14 @@ CartesianGridGeometry {
     //  x_up  -- (double array) upper corner of computational domain [REQD]
     //  domain_boxes  -- (box array) set of boxes that define interior of 
     //                   physical domain. [REQD]
-    domain_boxes = [(0,0), (3,3)]
-    x_lo         = 0, 0
-    x_up         = 1, 1
+    //  periodic_dimension -- (int array) coordinate directions in which 
+    //                        domain is periodic.  Zero indicates not
+    //                        periodic, non-zero value indicates periodicity.
+    //                        [0]
+    // domain_boxes = [(0,0), (15,15)]
+    domain_boxes = [(0,0,0), (7,7,1)]
+    x_lo         = -128, -128, 0.01
+    x_up         =  127,  127,  90
 }
 
 StandardTagAndInitialize {
@@ -110,26 +134,26 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 3
-    proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
+    max_levels = 8
+    proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
-        level_1            = 2, 2
-        level_2            = 2, 2
-        level_3            = 2, 2
-        level_4            = 2, 2
-        level_5            = 2, 2
-        level_6            = 2, 2
-        level_7            = 2, 2
+        level_1            = 2, 2, 2
+        level_2            = 2, 2, 2
+        level_3            = 2, 2, 2
+        level_4            = 2, 2, 2
     }
     largest_patch_size {
-        level_0 = -1, -1
+        // level_0 = 32, 32
+        // level_0 = 8, 8
+        level_0 = -1, -1, -1
+        // all finer levels will use same values as level_0...
     }
 }
 
 GriddingAlgorithm {
     enforce_proper_nesting = TRUE
     extend_to_domain_boundary = FALSE
-    proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
+    proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     // load_balance = FALSE
     efficiency_tolerance = 0.80
     combine_efficiency = 0.75
@@ -150,3 +174,4 @@ GriddingAlgorithm {
     barrier_after_find_refinement = TRUE
     coalesce_boxes = FALSE
 }
+

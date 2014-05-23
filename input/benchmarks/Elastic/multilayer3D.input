@@ -22,19 +22,9 @@ Elastic {
     lambda="z<0.5001 ? 1 : 2"
     mu="z<0.5001 ? 1 : 2"
 
-    v_rhs_ijk= 2, 2, 2
-    v_rhs_coord_min= -10.001, -10.001, -10.001
-    v_rhs_coord_max= 10.001, 10.001, 10.001
-
-    v_rhs_data= 0, 0, 0,
-    0, 0, 0,
-    0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
