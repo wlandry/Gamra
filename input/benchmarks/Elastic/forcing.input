@@ -14,6 +14,8 @@ Elastic {
     mu="1"
     v_rhs_x="1"
     v_rhs_y="0"
+    v_initial_x="x"
+    v_initial_y="y"
 
     fac_solver {
         enable_logging = TRUE

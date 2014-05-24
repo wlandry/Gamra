@@ -52,7 +52,12 @@ Elastic::FAC::FAC(const std::string& object_name,
 
   std::string xyz("xyz");
   for(int d=0; d<dim; ++d)
-    v_rhs[d]=Input_Expression(std::string("v_rhs_")+xyz[d],database,dimension,true);
+    {
+      v_rhs[d]=Input_Expression(std::string("v_rhs_")+xyz[d],database,
+                                dimension,true);
+      v_initial[d]=Input_Expression(std::string("v_initial_")+xyz[d],database,
+                                    dimension);
+    }
 
   SAMRAI::hier::VariableDatabase* vdb =
     SAMRAI::hier::VariableDatabase::getDatabase();

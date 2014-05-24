@@ -113,6 +113,8 @@ namespace Elastic {
         pack_strain(buffer,patch,region,depth);
       else if(variable_name=="Level Set")
         pack_level_set(buffer,patch,region);
+      else if(variable_name=="Initial Displacement")
+        pack_v_initial(buffer,patch,region,depth);
       else
         pack_v_v_rhs(buffer,patch,region,variable_name,depth);
       // Always return true, since every patch has derived data.
@@ -136,6 +138,12 @@ namespace Elastic {
                  const SAMRAI::hier::Box& region,
                  const std::string& variable_name,
                  const int &depth) const;
+
+    void
+    pack_v_initial(double* buffer,
+                   const SAMRAI::hier::Patch& patch,
+                   const SAMRAI::hier::Box& region,
+                   const int &depth) const;
     //@}
 
     /*!
@@ -217,7 +225,7 @@ namespace Elastic {
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id, dv_diagonal_id,
       dv_mixed_id, level_set_id;
 
-    Input_Expression lambda, mu, v_rhs[3], level_set;
+    Input_Expression lambda, mu, v_rhs[3], v_initial[3], level_set;
 
     std::vector<double> faults;
     std::vector<double> refinement_points;

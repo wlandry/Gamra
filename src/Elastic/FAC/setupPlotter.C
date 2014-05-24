@@ -35,7 +35,7 @@ void Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
                                       "VECTOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
-  plotter.registerDerivedPlotQuantity("Fault Correction",
+  plotter.registerDerivedPlotQuantity("Fault Correction + RHS",
                                       "VECTOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
@@ -48,6 +48,11 @@ void Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   plotter.registerDerivedPlotQuantity("Strain","TENSOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
+  if(v_initial[0].is_valid)
+    plotter.registerDerivedPlotQuantity("Initial Displacement",
+                                        "VECTOR",
+                                        (SAMRAI::appu::VisDerivedDataStrategy *)
+                                        this);
 
   if(have_embedded_boundary())
     {
