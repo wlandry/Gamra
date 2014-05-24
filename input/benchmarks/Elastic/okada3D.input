@@ -3,6 +3,7 @@ Main {
     base_name = "okada3D"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
+    intermediate_output = TRUE
 }
 
 Elastic {
@@ -14,6 +15,10 @@ Elastic {
     v_rhs_x="0"
     v_rhs_y="0"
     v_rhs_z="0"
+
+    v_initial_x="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,0)"
+    v_initial_y="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,1)"
+    v_initial_z="okada(1,1,-10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0,x,y,z,2)"
 
     faults= -10, -.1001, -0.05001, 0.0, 0.2, 0.25, 30, 90, 0
 
@@ -83,7 +88,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 5
+    max_levels = 6
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2

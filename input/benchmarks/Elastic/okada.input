@@ -4,6 +4,7 @@ Main {
     base_name = "okada"
     log_all_nodes = TRUE
     vis_writer = "Vizamrai", "VisIt"
+    intermediate_output = TRUE
 }
 
 Elastic {
@@ -15,6 +16,9 @@ Elastic {
     v_rhs_x="0"
     v_rhs_y="0"
     v_rhs_z="0"
+
+    v_initial_x="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
+    v_initial_y="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
 
     faults= 10, 0.000001, -.1, 0.0, 0.2, 0.25, 90, 90, 0
 
@@ -62,7 +66,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 6
+    max_levels = 5
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
