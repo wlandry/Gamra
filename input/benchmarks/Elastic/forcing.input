@@ -59,7 +59,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 1
+    max_levels = 6
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
