@@ -147,8 +147,6 @@ namespace Elastic {
     //@}
 
     /*!
-     * @brief Solve using HYPRE Elastic solver
-     *
      * Set up the linear algebra problem and use a
      * solv::Elastic::FACSolver object to solve it.
      * -# Set initial guess
@@ -156,8 +154,7 @@ namespace Elastic {
      * -# Specify Elastic equation parameters
      * -# Call solver
      */
-    int
-    solve();
+    bool solve();
 
 #ifdef HAVE_HDF5
     /*!
@@ -348,15 +345,15 @@ void Elastic::FAC::add_faults()
       for(SAMRAI::hier::PatchLevel::Iterator p(level->begin());
           p!=level->end(); ++p)
         {
-          boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
-            boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-            ((*p)->getPatchGeometry());
+          const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom
+            (boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+             ((*p)->getPatchGeometry()));
           const double *dx=geom->getDx();
 
           /* v_rhs */
-          boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-            ((*p)->getPatchData(v_rhs_id));
+          const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_rhs_ptr
+            (boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+             ((*p)->getPatchData(v_rhs_id)));
           SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
 
 

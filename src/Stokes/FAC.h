@@ -105,8 +105,6 @@ namespace Stokes {
     //@}
 
     /*!
-     * @brief Solve using HYPRE Stokes solver
-     *
      * Set up the linear algebra problem and use a
      * Stokes::FACSolver object to solve it.
      * -# Set initial guess
@@ -114,7 +112,7 @@ namespace Stokes {
      * -# Specify Stokes equation parameters
      * -# Call solver
      */
-    int solve();
+    bool solve();
 
 #ifdef HAVE_HDF5
     /*!
