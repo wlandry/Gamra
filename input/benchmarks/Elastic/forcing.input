@@ -14,8 +14,7 @@ Elastic {
     mu="1"
     v_rhs_x="1"
     v_rhs_y="0"
-    v_initial_x="x"
-    v_initial_y="y"
+    v_initial_x="(x-0.5)*(x+0.5)/6"
 
     fac_solver {
         enable_logging = TRUE
@@ -23,8 +22,6 @@ Elastic {
         residual_tol = 1e-3
         num_pre_sweeps = 2
         num_post_sweeps = 2
-        smoothing_choice = "Tackley"
-        coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
         coarse_solver_tolerance = 1e-5
         v_prolongation_method = "V_REFINE"
@@ -62,7 +59,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 6
+    max_levels = 1
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2

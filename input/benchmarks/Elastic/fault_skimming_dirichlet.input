@@ -28,8 +28,6 @@ Elastic {
         residual_tol = 1e-3     // Residual tolerance to solve for
         num_pre_sweeps = 2      // Number of presmoothing sweeps to use
         num_post_sweeps = 2     // Number of postsmoothing sweeps to use
-        smoothing_choice = "Tackley"
-        coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
         coarse_solver_tolerance = 1e-5
         v_prolongation_method = "V_REFINE"
