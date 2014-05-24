@@ -53,26 +53,33 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
       SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
       for (SAMRAI::pdat::CellIterator
              icell(SAMRAI::pdat::CellGeometry::begin(region));
-           icell!=iend; ++icell) {
+           icell!=iend; ++icell)
+        {
 
-        const SAMRAI::pdat::CellIndex &center(*icell);
-        const SAMRAI::pdat::SideIndex
-          x(center,0,SAMRAI::pdat::SideIndex::Lower),
-          y(center,1,SAMRAI::pdat::SideIndex::Lower);
+          const SAMRAI::pdat::CellIndex &center(*icell);
+          const SAMRAI::pdat::SideIndex
+            x(center,0,SAMRAI::pdat::SideIndex::Lower),
+            y(center,1,SAMRAI::pdat::SideIndex::Lower);
 	
-        double vx=(v(x+ip) + v(x))/2.;
-        double vy=(v(y+jp) + v(y))/2.;
+          double vx=v(x);
+          double vy=v(y);
 
-        if (0==depth)
-          {
-            *buffer = vx;
-          }
-        else
-          {
-            *buffer = vy;
-          }
-        buffer = buffer + 1;
-      }
+          if(!offset_vector_on_output)
+            {
+              vx=(v(x+ip) + vx)/2;
+              vy=(v(y+jp) + vy)/2;
+            }
+
+          if (0==depth)
+            {
+              *buffer = vx;
+            }
+          else
+            {
+              *buffer = vy;
+            }
+          buffer = buffer + 1;
+        }
     }
   else
     {
@@ -80,31 +87,39 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
       SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
       for (SAMRAI::pdat::CellIterator
              icell(SAMRAI::pdat::CellGeometry::begin(region));
-           icell!=iend; ++icell) {
+           icell!=iend; ++icell)
+        {
 
-        const SAMRAI::pdat::CellIndex &center(*icell);
-        const SAMRAI::pdat::SideIndex
-          x(center,0,SAMRAI::pdat::SideIndex::Lower),
-          y(center,1,SAMRAI::pdat::SideIndex::Lower),
-          z(center,2,SAMRAI::pdat::SideIndex::Lower);
+          const SAMRAI::pdat::CellIndex &center(*icell);
+          const SAMRAI::pdat::SideIndex
+            x(center,0,SAMRAI::pdat::SideIndex::Lower),
+            y(center,1,SAMRAI::pdat::SideIndex::Lower),
+            z(center,2,SAMRAI::pdat::SideIndex::Lower);
 	
-        double vx=(v(x+ip) + v(x))/2.;
-        double vy=(v(y+jp) + v(y))/2.;
-        double vz=(v(z+kp) + v(z))/2.;
+          double vx=v(x);
+          double vy=v(y);
+          double vz=v(z);
 
-        if (0==depth)
-          {
-            *buffer = vx;
-          }
-        else if (1==depth)
-          {
-            *buffer = vy;
-          }
-        else
-          {
-            *buffer = vz;
-          }
-        buffer = buffer + 1;
-      }
+          if(!offset_vector_on_output)
+            {
+              vx=(v(x+ip) + vx)/2;
+              vy=(v(y+jp) + vy)/2;
+              vz=(v(z+kp) + vz)/2;
+            }
+
+          if (0==depth)
+            {
+              *buffer = vx;
+            }
+          else if (1==depth)
+            {
+              *buffer = vy;
+            }
+          else
+            {
+              *buffer = vz;
+            }
+          ++buffer;
+        }
     }
 }

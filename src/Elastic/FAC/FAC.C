@@ -46,7 +46,9 @@ Elastic::FAC::FAC(const std::string& object_name,
   level_set_id(invalid_id),
   lambda("lambda",database,dimension),
   mu("mu",database,dimension),
-  level_set("level_set",database,dimension)
+  level_set("level_set",database,dimension),
+  offset_vector_on_output
+  (database->getBoolWithDefault("offset_vector_on_output",false))
 {
   const int dim(d_dim.getValue());
 

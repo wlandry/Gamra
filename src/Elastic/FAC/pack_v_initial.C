@@ -14,59 +14,23 @@ Elastic::FAC::pack_v_initial(double* buffer,
   const SAMRAI::hier::Box &pbox(patch.getBox());
   const double *dx=geom->getDx();
 
-  if(d_dim.getValue()==2)
+  double offset[]={0.5,0.5,0.5};
+  if(offset_vector_on_output)
+    offset[depth]=0;
+
+  SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
+  for(SAMRAI::pdat::CellIterator
+        icell(SAMRAI::pdat::CellGeometry::begin(region));
+      icell!=iend; ++icell)
     {
-      SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
-      for (SAMRAI::pdat::CellIterator
-             icell(SAMRAI::pdat::CellGeometry::begin(region));
-           icell!=iend; ++icell) {
-
-        const SAMRAI::pdat::CellIndex &center(*icell);
-        const SAMRAI::pdat::SideIndex
-          x(center,0,SAMRAI::pdat::SideIndex::Lower),
-          y(center,1,SAMRAI::pdat::SideIndex::Lower);
+      const SAMRAI::pdat::CellIndex &center(*icell);
 	
-        double coord[3];
-        for(int d=0;d<d_dim.getValue();++d)
-          coord[d]=geom->getXLower()[d] + dx[d]*(x[d]-pbox.lower()[d]+0.5);
+      double coord[3];
+      for(int d=0;d<d_dim.getValue();++d)
+        coord[d]=geom->getXLower()[d]
+          + dx[d]*(center[d]-pbox.lower()[d]+offset[d]);
 
-        if (0==depth)
-          {
-            *buffer = (v_initial[0].is_valid ? v_initial[0].eval(coord) : 0);
-          }
-        else
-          {
-            *buffer = (v_initial[1].is_valid ? v_initial[1].eval(coord) : 0);
-          }
-        buffer = buffer + 1;
-      }
-    }
-  else
-    {
-      SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
-      for (SAMRAI::pdat::CellIterator
-             icell(SAMRAI::pdat::CellGeometry::begin(region));
-           icell!=iend; ++icell) {
-
-        const SAMRAI::pdat::CellIndex &center(*icell);
-	
-        double coord[3];
-        for(int d=0;d<d_dim.getValue();++d)
-          coord[d]=geom->getXLower()[d] + dx[d]*(center[d]-pbox.lower()[d]+0.5);
-
-        if (0==depth)
-          {
-            *buffer = (v_initial[0].is_valid ? v_initial[0].eval(coord) : 0);
-          }
-        else if (1==depth)
-          {
-            *buffer = (v_initial[1].is_valid ? v_initial[1].eval(coord) : 0);
-          }
-        else
-          {
-            *buffer = (v_initial[2].is_valid ? v_initial[2].eval(coord) : 0);
-          }
-        buffer = buffer + 1;
-      }
+      *buffer = (v_initial[depth].is_valid ? v_initial[depth].eval(coord) : 0);
+      ++buffer;
     }
 }

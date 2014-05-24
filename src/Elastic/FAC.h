@@ -224,6 +224,11 @@ namespace Elastic {
 
     Input_Expression lambda, mu, v_rhs[3], v_initial[3], level_set;
 
+    /// Offset the vector when outputing.  This removes interpolation
+    /// errors, especially across faults where there is a jump in
+    /// values
+    bool offset_vector_on_output;
+
     std::vector<double> faults;
     std::vector<double> refinement_points;
     //@}
