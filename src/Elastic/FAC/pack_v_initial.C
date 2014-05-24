@@ -32,11 +32,11 @@ Elastic::FAC::pack_v_initial(double* buffer,
 
         if (0==depth)
           {
-            *buffer = v_initial[0].eval(coord);
+            *buffer = (v_initial[0].is_valid ? v_initial[0].eval(coord) : 0);
           }
         else
           {
-            *buffer = v_initial[1].eval(coord);
+            *buffer = (v_initial[1].is_valid ? v_initial[1].eval(coord) : 0);
           }
         buffer = buffer + 1;
       }
@@ -56,15 +56,15 @@ Elastic::FAC::pack_v_initial(double* buffer,
 
         if (0==depth)
           {
-            *buffer = v_initial[0].eval(coord);
+            *buffer = (v_initial[0].is_valid ? v_initial[0].eval(coord) : 0);
           }
         else if (1==depth)
           {
-            *buffer = v_initial[1].eval(coord);
+            *buffer = (v_initial[1].is_valid ? v_initial[1].eval(coord) : 0);
           }
         else
           {
-            *buffer = v_initial[2].eval(coord);
+            *buffer = (v_initial[2].is_valid ? v_initial[2].eval(coord) : 0);
           }
         buffer = buffer + 1;
       }

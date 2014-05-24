@@ -48,7 +48,7 @@ void Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   plotter.registerDerivedPlotQuantity("Strain","TENSOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
-  if(v_initial[0].is_valid)
+  if(v_initial[0].is_valid || v_initial[1].is_valid || v_initial[2].is_valid)
     plotter.registerDerivedPlotQuantity("Initial Displacement",
                                         "VECTOR",
                                         (SAMRAI::appu::VisDerivedDataStrategy *)
