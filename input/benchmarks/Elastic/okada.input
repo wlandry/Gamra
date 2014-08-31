@@ -9,7 +9,7 @@ Main {
 
 Elastic {
     adaption_threshold = 1.0e-3
-    min_full_refinement_level = 10
+    min_full_refinement_level = 1
 
     offset_vector_on_output=TRUE
 
@@ -80,10 +80,7 @@ PatchHierarchy {
         level_7            = 2, 2
     }
     largest_patch_size {
-        // level_0 = 32, 32
-        // level_0 = 8, 8
         level_0 = -1, -1
-        // all finer levels will use same values as level_0...
     }
 }
 
