@@ -74,7 +74,7 @@ Elastic {
 CartesianGridGeometry {
     domain_boxes = [(0,0), (3,3)]
     x_lo         = 0.1, 0.15
-    x_up         = 100.1, 100.15
+    x_up         = 10.1, 10.15
 }
 
 StandardTagAndInitialize {
