@@ -1,21 +1,34 @@
 // Cylindrical elastic modulus test.  The parameters are
-//
+
+// xp=x*cos_theta + z*sin_theta
+// yp=y
+
+// r=sqrt(xp*xp + y*y)
+
 // mu=1.4*r
 // lambda=2*mu/3
-// v=3.14*r^(-3/2)
-// => vx=x*v/r
-//    vy=y*v/r
+// v=3.14/(r*sqrt(r))
+
+// vx = cos_theta*v*xp/r
+// vy = v*y/r
+// vz = sin_theta*v*xp/r
+
+
+// dvx/dy=(-5*y/(2r*r))*vx
+// dvy/dx=(-5*cos_theta*xp/(2*r*r))*vy
 //
-// For boundary conditions
+// => bc=dvx/dy + dvy/dx
+
+// dvy/dz=(-5*sin_theta*xp/(2*r*r))*vy
+// dvz/dy=(-5*y/(2r*r))*vz
 //
-// shear stress
-// dvx/dy= -5*3.14*x*y/(2*r^(9/2))
-// dvx/dy=dvy/dx
-// => bc = -5*3.14*x*y/(r^(9/2))
+// => bc=dvz/dy + dvy/dz
+
+// dvx/dz=3.14*cos_theta*sin_theta*(1-5*xp*xp/(2*r*r))/(r*r*sqrt(r))
+// dvz/dx=dvx/dz
 //
-// normal stress
-//
-//
+// => bc=2*3.14*cos_theta*sin_theta*(1-5*xp*xp/(2*r*r))/(r*r*sqrt(r))
+
 
 Main {
     dim = 3
@@ -31,20 +44,23 @@ Elastic {
 
     offset_vector_on_output=TRUE
 
-    lambda="(2*1.4/3)*sqrt(x*x+y*y)"
-    mu="1.4*sqrt(x*x+y*y)"
+    mu="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),1.4*r"
+
+    lambda="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),1.4*r*2/3"
+
     v_rhs_x="0"
     v_rhs_y="0"
     v_rhs_z="0"
 
-    v_initial_x="r=sqrt(x*x+y*y),3.14*x/(r*r*sqrt(r))"
-    v_initial_y="r=sqrt(x*x+y*y),3.14*y/(r*r*sqrt(r))"
-    v_initial_z="0"
+    v_initial_x="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),cos_theta*v*xp/r"
+    v_initial_y="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),v*y/r"
+    v_initial_z="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),sin_theta*v*xp/r"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
-        residual_tol = 1e-10     // Residual tolerance to solve for
+        residual_tol = 1e-5     // Residual tolerance to solve for
+        // residual_tol = 1e-10     // Residual tolerance to solve for
         num_pre_sweeps = 2      // Number of presmoothing sweeps to use
         num_post_sweeps = 2     // Number of postsmoothing sweeps to use
         coarse_solver_max_iterations = 32
@@ -52,49 +68,50 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        vx_x_upper="r=sqrt(x*x+y*y),3.14*x/(r*r*sqrt(r))"
+        vx_x_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),cos_theta*v*xp/r"
         vx_x_upper_is_dirichlet=TRUE
-        vx_x_lower="r=sqrt(x*x+y*y),3.14*x/(r*r*sqrt(r))"
+        vx_x_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),cos_theta*v*xp/r"
         vx_x_lower_is_dirichlet=TRUE
 
-        vy_y_upper="r=sqrt(x*x+y*y),3.14*y/(r*r*sqrt(r))"
+        vy_y_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),v*y/r"
         vy_y_upper_is_dirichlet=TRUE
-        vy_y_lower="r=sqrt(x*x+y*y),3.14*y/(r*r*sqrt(r))"
+        vy_y_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),v*y/r"
         vy_y_lower_is_dirichlet=TRUE
 
-        vz_z_upper="0"
+        vz_z_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),sin_theta*v*xp/r"
         vz_z_upper_is_dirichlet=TRUE
-        vz_z_lower="0"
+        vz_z_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),sin_theta*v*xp/r"
         vz_z_lower_is_dirichlet=TRUE
 
-        vx_y_upper="r=sqrt(x*x+y*y),-5*3.14*x*y/(r*r*r*r*sqrt(r))"
+        vx_y_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx=cos_theta*v*xp/r,vy=v*y/r,vz=sin_theta*v*xp/r,(-5*y/(2*r*r))*vx + (-5*cos_theta*xp/(2*r*r))*vy"
         vx_y_upper_is_dirichlet=FALSE
-        vx_y_lower="r=sqrt(x*x+y*y),-5*3.14*x*y/(r*r*r*r*sqrt(r))"
+        vx_y_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx=cos_theta*v*xp/r,vy=v*y/r,vz=sin_theta*v*xp/r,(-5*y/(2*r*r))*vx + (-5*cos_theta*xp/(2*r*r))*vy"
         vx_y_lower_is_dirichlet=FALSE
 
-        vx_z_upper="0"
+        vx_z_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx=cos_theta*v*xp/r,vy=v*y/r,vz=sin_theta*v*xp/r,2*3.14*cos_theta*sin_theta*(1-5*xp*xp/(2*r*r))/(r*r*sqrt(r))"
         vx_z_upper_is_dirichlet=FALSE
-        vx_z_lower="0"
+        vx_z_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx=cos_theta*v*xp/r,vy=v*y/r,vz=sin_theta*v*xp/r,2*3.14*cos_theta*sin_theta*(1-5*xp*xp/(2*r*r))/(r*r*sqrt(r))"
         vx_z_lower_is_dirichlet=FALSE
 
-        vy_x_upper="r=sqrt(x*x+y*y),-5*3.14*x*y/(r*r*r*r*sqrt(r))"
+        vy_x_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx=cos_theta*v*xp/r,vy=v*y/r,vz=sin_theta*v*xp/r,(-5*y/(2*r*r))*vx + (-5*cos_theta*xp/(2*r*r))*vy"
         vy_x_upper_is_dirichlet=FALSE
-        vy_x_lower="r=sqrt(x*x+y*y),-5*3.14*x*y/(r*r*r*r*sqrt(r))"
+        vy_x_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx=cos_theta*v*xp/r,vy=v*y/r,vz=sin_theta*v*xp/r,(-5*y/(2*r*r))*vx + (-5*cos_theta*xp/(2*r*r))*vy"
         vy_x_lower_is_dirichlet=FALSE
 
-        vy_z_upper="0"
+        vy_z_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx = cos_theta*v*xp/r,vy = v*y/r,vz = sin_theta*v*xp/r,(-5*sin_theta*xp/(2*r*r))*vy + (-5*y/(2*r*r))*vz"
         vy_z_upper_is_dirichlet=FALSE
-        vy_z_lower="0"
+        vy_z_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx = cos_theta*v*xp/r,vy = v*y/r,vz = sin_theta*v*xp/r,(-5*sin_theta*xp/(2*r*r))*vy + (-5*y/(2*r*r))*vz"
         vy_z_lower_is_dirichlet=FALSE
 
-        vz_x_upper="0"
+
+        vz_x_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx=cos_theta*v*xp/r,vy=v*y/r,vz=sin_theta*v*xp/r,2*3.14*cos_theta*sin_theta*(1-5*xp*xp/(2*r*r))/(r*r*sqrt(r))"
         vz_x_upper_is_dirichlet=FALSE
-        vz_x_lower="0"
+        vz_x_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx=cos_theta*v*xp/r,vy=v*y/r,vz=sin_theta*v*xp/r,2*3.14*cos_theta*sin_theta*(1-5*xp*xp/(2*r*r))/(r*r*sqrt(r))"
         vz_x_lower_is_dirichlet=FALSE
 
-        vz_y_upper="0"
+        vz_y_upper="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx = cos_theta*v*xp/r,vy = v*y/r,vz = sin_theta*v*xp/r,(-5*sin_theta*xp/(2*r*r))*vy + (-5*y/(2*r*r))*vz"
         vz_y_upper_is_dirichlet=FALSE
-        vz_y_lower="0"
+        vz_y_lower="theta=3.14/10,cos_theta=cos(theta),sin_theta=sin(theta),xp=x*cos_theta + z*sin_theta,r=sqrt(xp*xp + y*y),v=3.14/(r*sqrt(r)),vx = cos_theta*v*xp/r,vy = v*y/r,vz = sin_theta*v*xp/r,(-5*sin_theta*xp/(2*r*r))*vy + (-5*y/(2*r*r))*vz"
         vz_y_lower_is_dirichlet=FALSE
     }
 }
