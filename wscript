@@ -270,6 +270,7 @@ def build(bld):
         target       = 'gamra',
         cxxflags     = cxxflags_variant[bld.variant] + default_flags,
         lib          = ['dl','gfortranbegin', 'gfortran', 'm'],
+        libpath      = ['/sw/lib/gcc4.8/lib','/sw/lib/gcc4.8/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2'],
         linkflags    = linkflags_variant[bld.variant],
         includes = ['src'],
         use=use_array
