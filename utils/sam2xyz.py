@@ -1,4 +1,4 @@
-#!pvpython
+#!/usr/bin/env pvpython
 
 # export three .xyz files for displacement on a horizontal slice out of gamra HDF5 output
 
