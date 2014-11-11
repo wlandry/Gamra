@@ -12,7 +12,7 @@
 
 Main {
     dim = 3
-    base_name = "Landers_ml8"
+    base_name = "Landers"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
@@ -570,8 +570,9 @@ PatchHierarchy {
         level_0 = -1, -1, -1
         // all finer levels will use same values as level_0...
     }
+    // This minimum patch size works better for larger levels (>=10)
     smallest_patch_size {
-        level_0 = 4, 4, 2
+        level_0 = 8, 8, 2
         // all finer levels will use same values as level_0...
     }
 }
