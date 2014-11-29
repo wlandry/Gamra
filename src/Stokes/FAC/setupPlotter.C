@@ -27,7 +27,7 @@
 * Register variables appropriate for plotting.                          *
 *************************************************************************
 */
-int Stokes::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
+void Stokes::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   if (!d_hierarchy) {
     TBOX_ERROR(d_object_name << ": No hierarchy in\n"
                << " Stokes::FAC::setupPlotter\n"
@@ -49,7 +49,5 @@ int Stokes::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   plotter.registerPlotQuantity("Stokes source",
                                "SCALAR",
                                p_rhs_id);
-
-  return 0;
 }
 #endif

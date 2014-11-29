@@ -21,13 +21,10 @@
 #include "SAMRAI/hier/VariableDatabase.h"
 
 #ifdef HAVE_HDF5
-/*
-*************************************************************************
-* Set up external plotter to plot internal data from this class.        *
-* Register variables appropriate for plotting.                          *
-*************************************************************************
-*/
-int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
+/// Set up external plotter to plot internal data from this class.
+/// Register variables appropriate for plotting.
+
+void Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   if (!d_hierarchy) {
     TBOX_ERROR(d_object_name << ": No hierarchy in\n"
                << " Elastic::FAC::setupPlotter\n"
@@ -38,7 +35,7 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
                                       "VECTOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
-  plotter.registerDerivedPlotQuantity("Fault Correction",
+  plotter.registerDerivedPlotQuantity("Fault Correction + RHS",
                                       "VECTOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
@@ -51,6 +48,11 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   plotter.registerDerivedPlotQuantity("Strain","TENSOR",
                                       (SAMRAI::appu::VisDerivedDataStrategy *)
                                       this);
+  if(v_initial[0].is_valid || v_initial[1].is_valid || v_initial[2].is_valid)
+    plotter.registerDerivedPlotQuantity("Initial Displacement",
+                                        "VECTOR",
+                                        (SAMRAI::appu::VisDerivedDataStrategy *)
+                                        this);
 
   if(have_embedded_boundary())
     {
@@ -59,6 +61,5 @@ int Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
                                           (SAMRAI::appu::VisDerivedDataStrategy *)
                                           this);
     }
-  return 0;
 }
 #endif

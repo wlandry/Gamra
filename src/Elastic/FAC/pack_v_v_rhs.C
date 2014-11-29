@@ -20,12 +20,9 @@
 #include "SAMRAI/hier/Variable.h"
 #include "SAMRAI/hier/VariableDatabase.h"
 
-/*
-*************************************************************************
-* Write derived data to the given stream.                               *
-*************************************************************************
-*/
-bool
+/// Write derived data to the given stream.
+
+void
 Elastic::FAC::pack_v_v_rhs(double* buffer,
                            const SAMRAI::hier::Patch& patch,
                            const SAMRAI::hier::Box& region,
@@ -37,14 +34,13 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
     v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
       (patch.getPatchData(v_id));
   }
-  else if ("Fault Correction" == variable_name)
+  else if ("Fault Correction + RHS" == variable_name)
     {
       v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (patch.getPatchData(v_rhs_id));
     }
   else
     {
-      // Did not register this name.
       TBOX_ERROR("Unregistered variable name '" << variable_name << "' in\n"
                  << "Elastic::FAC::packDerivedDataIntoDoubleBuffer");
     }
@@ -57,36 +53,33 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
       SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
       for (SAMRAI::pdat::CellIterator
              icell(SAMRAI::pdat::CellGeometry::begin(region));
-           icell!=iend; ++icell) {
+           icell!=iend; ++icell)
+        {
 
-        const SAMRAI::pdat::CellIndex &center(*icell);
-        const SAMRAI::pdat::SideIndex
-          x(center,0,SAMRAI::pdat::SideIndex::Lower),
-          y(center,1,SAMRAI::pdat::SideIndex::Lower);
+          const SAMRAI::pdat::CellIndex &center(*icell);
+          const SAMRAI::pdat::SideIndex
+            x(center,0,SAMRAI::pdat::SideIndex::Lower),
+            y(center,1,SAMRAI::pdat::SideIndex::Lower);
 	
-        double vx=(v(x+ip) + v(x))/2.;
-        double vy=(v(y+jp) + v(y))/2.;
+          double vx=v(x);
+          double vy=v(y);
 
-        // if(variable_name=="Displacement")
-        //   SAMRAI::tbox::plog << variable_name << " "
-        //                      << depth << " "
-        //                      << center << " "
-        //                      << v(x) << " "
-        //                      << v(x+ip) << " "
-        //                      << v(y) << " "
-        //                      << v(y+jp) << " "
-        //                      << "\n";
+          if(!offset_vector_on_output)
+            {
+              vx=(v(x+ip) + vx)/2;
+              vy=(v(y+jp) + vy)/2;
+            }
 
-        if (0==depth)
-          {
-            *buffer = vx;
-          }
-        else
-          {
-            *buffer = vy;
-          }
-        buffer = buffer + 1;
-      }
+          if (0==depth)
+            {
+              *buffer = vx;
+            }
+          else
+            {
+              *buffer = vy;
+            }
+          buffer = buffer + 1;
+        }
     }
   else
     {
@@ -94,45 +87,39 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
       SAMRAI::pdat::CellIterator iend(SAMRAI::pdat::CellGeometry::end(region));
       for (SAMRAI::pdat::CellIterator
              icell(SAMRAI::pdat::CellGeometry::begin(region));
-           icell!=iend; ++icell) {
+           icell!=iend; ++icell)
+        {
 
-        const SAMRAI::pdat::CellIndex &center(*icell);
-        const SAMRAI::pdat::SideIndex
-          x(center,0,SAMRAI::pdat::SideIndex::Lower),
-          y(center,1,SAMRAI::pdat::SideIndex::Lower),
-          z(center,2,SAMRAI::pdat::SideIndex::Lower);
+          const SAMRAI::pdat::CellIndex &center(*icell);
+          const SAMRAI::pdat::SideIndex
+            x(center,0,SAMRAI::pdat::SideIndex::Lower),
+            y(center,1,SAMRAI::pdat::SideIndex::Lower),
+            z(center,2,SAMRAI::pdat::SideIndex::Lower);
 	
-        double vx=(v(x+ip) + v(x))/2.;
-        double vy=(v(y+jp) + v(y))/2.;
-        double vz=(v(z+kp) + v(z))/2.;
+          double vx=v(x);
+          double vy=v(y);
+          double vz=v(z);
 
-        // if(variable_name=="Displacement")
-        //   SAMRAI::tbox::plog << variable_name
-        //                      << center << " "
-        //                      << v(x) << " "
-        //                      << v(x+ip) << " "
-        //                      << v(y) << " "
-        //                      << v(y+jp) << " "
-        //                      << v(z) << " "
-        //                      << v(z+kp) << " "
-        //                      << "\n";
+          if(!offset_vector_on_output)
+            {
+              vx=(v(x+ip) + vx)/2;
+              vy=(v(y+jp) + vy)/2;
+              vz=(v(z+kp) + vz)/2;
+            }
 
-        if (0==depth)
-          {
-            *buffer = vx;
-          }
-        else if (1==depth)
-          {
-            *buffer = vy;
-          }
-        else
-          {
-            *buffer = vz;
-          }
-        buffer = buffer + 1;
-      }
+          if (0==depth)
+            {
+              *buffer = vx;
+            }
+          else if (1==depth)
+            {
+              *buffer = vy;
+            }
+          else
+            {
+              *buffer = vz;
+            }
+          ++buffer;
+        }
     }
-  // Return true if this patch has derived data on it.
-  // False otherwise.
-  return true;
 }

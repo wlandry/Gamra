@@ -92,7 +92,7 @@ public:
                    const bool &error_if_missing,
                    const int num_components=1,
                    const int Slice=-1):
-    dim(dimension.getValue()), slice(Slice), is_valid(true)
+    dim(dimension.getValue()), slice(Slice)
   {
     Init(name,database,num_components,error_if_missing);
   }
@@ -102,16 +102,20 @@ public:
                    const SAMRAI::tbox::Dimension& dimension,
                    const int num_components=1,
                    const int Slice=-1):
-    dim(dimension.getValue()), slice(Slice), is_valid(true)
+    dim(dimension.getValue()), slice(Slice)
   {
     Init(name,database,num_components,false);
   }
 
+  /// Make this private so that I do not accidentally use it and not
+  /// set dim or slice.
+private:
   void Init(const std::string &name,
             boost::shared_ptr<SAMRAI::tbox::Database> database,
             const int num_components,
             const bool &error_if_missing)
   {
+    is_valid=true;
     if(database->keyExists(name))
       {
         equation.DefineVar("x",&coord[0]);
@@ -140,6 +144,7 @@ public:
       }
   }
 
+public:
   Input_Expression(const Input_Expression &e): dim(e.dim)
   {
     *this=e;
@@ -147,20 +152,24 @@ public:
 
   Input_Expression& operator=(const Input_Expression &e)
   {
-    equation=e.equation;
-    data=e.data;
-    xyz_min=e.xyz_min;
-    xyz_max=e.xyz_max;
-    ijk=e.ijk;
-    use_equation=e.use_equation;
-    dim=e.dim;
-    slice=e.slice;
-
-    if(use_equation)
+    is_valid=e.is_valid;
+    if(is_valid)
       {
-        equation.DefineVar("x",&coord[0]);
-        equation.DefineVar("y",&coord[1]);
-        equation.DefineVar("z",&coord[2]);
+        equation=e.equation;
+        data=e.data;
+        xyz_min=e.xyz_min;
+        xyz_max=e.xyz_max;
+        ijk=e.ijk;
+        use_equation=e.use_equation;
+        dim=e.dim;
+        slice=e.slice;
+
+        if(use_equation)
+          {
+            equation.DefineVar("x",&coord[0]);
+            equation.DefineVar("y",&coord[1]);
+            equation.DefineVar("z",&coord[2]);
+          }
       }
     return *this;
   }
@@ -193,13 +202,15 @@ public:
 
   double eval(const double Coord[3]) const
   {
+    if(!is_valid)
+      TBOX_ERROR("INTERNAL ERROR: Tried to use an invalid Input_Expression");
+
     double result;
 
     if(use_equation)
       {
-        coord[0]=Coord[0];
-        coord[1]=Coord[1];
-        coord[2]=Coord[2];
+        for(int d=0; d<dim; ++d)
+          coord[d]=Coord[d];
         result=equation.Eval();
       }
     else

@@ -50,7 +50,7 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
     {
       const int iy((ix+1)%dim), iz((ix+2)%dim);
 
-      std::vector<int> corners[dim];
+      std::vector<std::vector<int> > corners(dim);
       corners[ix].push_back(box.lower(ix));
       corners[ix].push_back(box.upper(ix)+1);
 

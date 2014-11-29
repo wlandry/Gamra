@@ -47,6 +47,7 @@ def configure(conf):
 
 def configure_variant(conf):
     conf.load('compiler_cxx FTensor okada boost')
+    # conf.env.SHLIB_MARKER = '-Wl,-Bstatic'
     conf.check_boost()
 
     if(int(conf.env.BOOST_VERSION[-2:]) >= 53):
@@ -121,7 +122,7 @@ def configure_variant(conf):
             break
 
 def build(bld):
-    default_flags=['-Wall', '-Wextra', '-Wconversion']
+    default_flags=['-Wall', '-Wextra', '-Wconversion', '-Wvla']
     cxxflags_variant= {'release' : ['-Ofast', '-DTESTING=0'],
                     'prof' : ['-pg','-Ofast', '-DTESTING=0'],
                     'debug' : ['-g']}
@@ -129,7 +130,7 @@ def build(bld):
                        'prof' : ['-pg'],
                        'debug' : []}
 
-    use_array=['samrai','muparser','hdf5','FTensor','okada','boost']
+    use_array=['samrai','muparser','hdf5','FTensor','okada','BOOST']
     if bld.variant=='release':
         use_array.append('optimize')
 
@@ -144,6 +145,7 @@ def build(bld):
                         'src/Elastic/FAC/pack_strain.C',
                         'src/Elastic/FAC/pack_level_set.C',
                         'src/Elastic/FAC/pack_v_v_rhs.C',
+                        'src/Elastic/FAC/pack_v_initial.C',
                         'src/Elastic/FAC/resetHierarchyConfiguration.C',
                         'src/Elastic/FAC/setupPlotter.C',
                         'src/Elastic/FAC/solve.C',
@@ -166,7 +168,7 @@ def build(bld):
                         'src/Elastic/Boundary_Conditions/set_embedded_boundary.C',
                         'src/Elastic/Boundary_Conditions/set_regular_boundary/set_regular_boundary.C',
                         'src/Elastic/Boundary_Conditions/set_regular_boundary/set_dirichlet.C',
-                        'src/Elastic/Boundary_Conditions/set_regular_boundary/set_shear_derivs.C',
+                        'src/Elastic/Boundary_Conditions/set_regular_boundary/set_shear_stress.C',
                         'src/Elastic/FACOps/FACOps.C',
                         'src/Elastic/FACOps/v_level_set_operator_2D.C',
                         'src/Elastic/FACOps/computeCompositeResidualOnLevel.C',
@@ -268,7 +270,7 @@ def build(bld):
         target       = 'gamra',
         cxxflags     = cxxflags_variant[bld.variant] + default_flags,
         lib          = ['dl','gfortranbegin', 'gfortran', 'm'],
-        libpath      = ['/sw/lib/gcc4.7/lib','/sw/lib/gcc4.7/lib/gcc/x86_64-apple-darwin11.4.0/4.7.2'],
+        libpath      = ['/sw/lib/gcc4.8/lib','/sw/lib/gcc4.8/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2'],
         linkflags    = linkflags_variant[bld.variant],
         includes = ['src'],
         use=use_array

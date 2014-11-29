@@ -12,7 +12,7 @@
 
 Main {
     dim = 3
-    base_name = "Landers_ml8"
+    base_name = "Landers"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
 }
@@ -23,7 +23,9 @@ Elastic {
 
     lambda="1"
     mu="1"
-    v_rhs="0"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
     faults= 
     1.3475, 14.246, -45.439, 10.056, 5.6, 4.94, 132.7, 91.0, -114.7,
@@ -460,8 +462,6 @@ Elastic {
         residual_tol = 1e-3     // Residual tolerance to solve for
         num_pre_sweeps =  2      // Number of presmoothing sweeps to use
         num_post_sweeps =  2     // Number of postsmoothing sweeps to use
-        smoothing_choice = "Tackley"
-        coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations =  32
         coarse_solver_tolerance = 1e-12
         v_prolongation_method = "V_REFINE"
@@ -567,9 +567,12 @@ PatchHierarchy {
         level_4            = 2, 2, 2
     }
     largest_patch_size {
-        // level_0 = 32, 32
-        // level_0 = 8, 8
         level_0 = -1, -1, -1
+        // all finer levels will use same values as level_0...
+    }
+    // This minimum patch size works better for larger levels (>=10)
+    smallest_patch_size {
+        level_0 = 8, 8, 2
         // all finer levels will use same values as level_0...
     }
 }

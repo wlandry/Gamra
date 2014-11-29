@@ -2,7 +2,7 @@
 
 /* Strain correction is stored on the cell centers and edges */
 
-bool
+void
 Elastic::FAC::pack_strain(double* buffer,
                           const SAMRAI::hier::Patch& patch,
                           const SAMRAI::hier::Box& region,
@@ -59,8 +59,8 @@ Elastic::FAC::pack_strain(double* buffer,
       else
         {
           const int ix_iy(index_map(ix,iy,dim));
-          double diff(v(s) - v(s-jp) + v(s+ip) - v(s+ip-jp)
-                      + v(s+jp) - v(s) + v(s+ip+jp) - v(s+ip));
+          double diff(- v(s-jp) - v(s+ip-jp) + v(s+jp)  + v(s+ip+jp));
+
           if(!faults.empty())
             diff+=(*dv_mixed)(s,ix_iy+1) - (*dv_mixed)(s-jp,ix_iy)
               + (*dv_mixed)(s+ip,ix_iy+1) - (*dv_mixed)(s+ip-jp,ix_iy)
@@ -70,5 +70,4 @@ Elastic::FAC::pack_strain(double* buffer,
         }
       ++buffer;
     }
-  return true;
 }

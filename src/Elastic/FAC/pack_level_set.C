@@ -25,7 +25,7 @@
 * Write derived data to the given stream.                               *
 *************************************************************************
 */
-bool
+void
 Elastic::FAC::pack_level_set(double* buffer,
                              const SAMRAI::hier::Patch& patch,
                              const SAMRAI::hier::Box& region) const
@@ -78,5 +78,4 @@ Elastic::FAC::pack_level_set(double* buffer,
         buffer = buffer + 1;
       }
     }
-  return true;
 }

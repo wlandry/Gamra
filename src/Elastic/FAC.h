@@ -110,35 +110,43 @@ namespace Elastic {
                                     int depth) const
     {
       if(variable_name=="Strain")
-        return pack_strain(buffer,patch,region,depth);
+        pack_strain(buffer,patch,region,depth);
       else if(variable_name=="Level Set")
-        return pack_level_set(buffer,patch,region);
+        pack_level_set(buffer,patch,region);
+      else if(variable_name=="Initial Displacement")
+        pack_v_initial(buffer,patch,region,depth);
       else
-        return pack_v_v_rhs(buffer,patch,region,variable_name,depth);
+        pack_v_v_rhs(buffer,patch,region,variable_name,depth);
+      // Always return true, since every patch has derived data.
+      return true;
     }
 
-    bool
+    void
     pack_strain(double* buffer,
                 const SAMRAI::hier::Patch& patch,
                 const SAMRAI::hier::Box& region,
                 const int &depth) const;
 
-    bool
+    void
     pack_level_set(double* buffer,
                    const SAMRAI::hier::Patch& patch,
                    const SAMRAI::hier::Box& region) const;
 
-    bool
+    void
     pack_v_v_rhs(double* buffer,
                  const SAMRAI::hier::Patch& patch,
                  const SAMRAI::hier::Box& region,
                  const std::string& variable_name,
                  const int &depth) const;
+
+    void
+    pack_v_initial(double* buffer,
+                   const SAMRAI::hier::Patch& patch,
+                   const SAMRAI::hier::Box& region,
+                   const int &depth) const;
     //@}
 
     /*!
-     * @brief Solve using HYPRE Elastic solver
-     *
      * Set up the linear algebra problem and use a
      * solv::Elastic::FACSolver object to solve it.
      * -# Set initial guess
@@ -146,8 +154,7 @@ namespace Elastic {
      * -# Specify Elastic equation parameters
      * -# Call solver
      */
-    int
-    solve();
+    bool solve();
 
 #ifdef HAVE_HDF5
     /*!
@@ -166,7 +173,7 @@ namespace Elastic {
      *
      * @param viz_writer VisIt writer
      */
-    int
+    void
     setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const;
 #endif
 
@@ -215,7 +222,12 @@ namespace Elastic {
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id, dv_diagonal_id,
       dv_mixed_id, level_set_id;
 
-    Input_Expression lambda, mu, v_rhs, level_set;
+    Input_Expression lambda, mu, v_rhs[3], v_initial[3], level_set;
+
+    /// Offset the vector when outputing.  This removes interpolation
+    /// errors, especially across faults where there is a jump in
+    /// values
+    bool offset_vector_on_output;
 
     std::vector<double> faults;
     std::vector<double> refinement_points;
@@ -338,15 +350,15 @@ void Elastic::FAC::add_faults()
       for(SAMRAI::hier::PatchLevel::Iterator p(level->begin());
           p!=level->end(); ++p)
         {
-          boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
-            boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-            ((*p)->getPatchGeometry());
+          const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom
+            (boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+             ((*p)->getPatchGeometry()));
           const double *dx=geom->getDx();
 
           /* v_rhs */
-          boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-            ((*p)->getPatchData(v_rhs_id));
+          const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_rhs_ptr
+            (boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+             ((*p)->getPatchData(v_rhs_id)));
           SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
 
 
@@ -409,7 +421,7 @@ void Elastic::FAC::add_faults()
               FTensor::Index<'c',3> c;
               rot(a,b)=rot_dip(a,c)*rot_strike(c,b);
 
-              FTensor::Tensor1<double,3> Dx[dim];
+              std::vector<FTensor::Tensor1<double,3> > Dx(dim);
               for(int d0=0;d0<dim;++d0)
                 {
                   Dx[d0](a)=0.0;
@@ -451,8 +463,9 @@ void Elastic::FAC::add_faults()
                       if(dim==2)
                         {
                           int intersect, intersect_mixed[2];
-                          compute_intersections_2D(ntt,xyz,rot,Dx,fault,dim,ix,
-                                                   intersect,intersect_mixed);
+                          compute_intersections_2D(ntt,xyz,rot,Dx.data(),fault,
+                                                   dim,ix,intersect,
+                                                   intersect_mixed);
 
                           /* d/dx, d/dy, d/dz */
                           if(gbox.contains(s))
@@ -468,8 +481,8 @@ void Elastic::FAC::add_faults()
                         {
                           int intersect_diagonal, intersect_mixed[4],
                             intersect_corner[4];
-                          compute_intersections_3D(ntt,xyz,rot,Dx,fault,dim,ix,
-                                                   intersect_diagonal,
+                          compute_intersections_3D(ntt,xyz,rot,Dx.data(),fault,
+                                                   dim,ix,intersect_diagonal,
                                                    intersect_mixed,
                                                    intersect_corner);
 

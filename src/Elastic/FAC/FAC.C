@@ -46,22 +46,30 @@ Elastic::FAC::FAC(const std::string& object_name,
   level_set_id(invalid_id),
   lambda("lambda",database,dimension),
   mu("mu",database,dimension),
-  v_rhs("v_rhs",database,dimension,dimension.getValue()),
-  level_set("level_set",database,dimension)
+  level_set("level_set",database,dimension),
+  offset_vector_on_output
+  (database->getBoolWithDefault("offset_vector_on_output",false))
 {
   const int dim(d_dim.getValue());
+
+  std::string xyz("xyz");
+  for(int d=0; d<dim; ++d)
+    {
+      v_rhs[d]=Input_Expression(std::string("v_rhs_")+xyz[d],database,
+                                dimension,true);
+      v_initial[d]=Input_Expression(std::string("v_initial_")+xyz[d],database,
+                                    dimension);
+    }
+
   SAMRAI::hier::VariableDatabase* vdb =
     SAMRAI::hier::VariableDatabase::getDatabase();
 
-  /*
-   * Get a unique context for variables owned by this object.
-   */
+  /// Get a unique context for variables owned by this object.
   d_context = vdb->getContext(d_object_name + ":Context");
 
-  /* Register variables with SAMRAI::hier::VariableDatabase and get
-     the descriptor indices for those variables.  Ghost cells width
-     are 1 just in case it is needed.
-  */
+  /// Register variables with SAMRAI::hier::VariableDatabase and get
+  /// the descriptor indices for those variables.  Ghost cells width
+  /// are 1 just in case it is needed.
 
   int depth=2;
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >

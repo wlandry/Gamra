@@ -57,10 +57,9 @@ bool solve_system
   if(main_db->getBoolWithDefault("print_input_file",true))
     input_db->printClassData(SAMRAI::tbox::plog);
 
-  bool done(!fac.solve());
   int lnum = 0;
-  bool converged(false);
-  for (;patch_hierarchy->levelCanBeRefined(lnum) && !done; ++lnum)
+  bool converged(fac.solve());
+  for (;patch_hierarchy->levelCanBeRefined(lnum) && converged; ++lnum)
     {
       if (use_visit && intermediate_output)
         visit_writer->writePlotData(patch_hierarchy, lnum);
@@ -68,10 +67,8 @@ bool solve_system
       gridding_algorithm->regridAllFinerLevels(0,tag_buffer,0,0.0);
       SAMRAI::tbox::plog << "Newly adapted hierarchy\n";
 
-      done = !(patch_hierarchy->finerLevelExists(lnum));
       converged=fac.solve();
       SAMRAI::tbox::TimerManager::getManager()->print(SAMRAI::tbox::plog);
-      done=(!converged || done);
     }
   if (use_visit)
     visit_writer->writePlotData(patch_hierarchy, lnum);

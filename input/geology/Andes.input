@@ -607,7 +607,9 @@ Elastic {
     26624000000.0
 
 
-    v_rhs="0"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
     fac_solver {
         enable_logging = TRUE   // Bool flag to switch logging on/off
@@ -615,8 +617,6 @@ Elastic {
         residual_tol = 1e5     // Residual tolerance to solve for
         num_pre_sweeps = 2      // Number of presmoothing sweeps to use
         num_post_sweeps = 2     // Number of postsmoothing sweeps to use
-        smoothing_choice = "Tackley"
-        coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 32
         coarse_solver_tolerance = 1e3
         v_prolongation_method = "V_REFINE"
