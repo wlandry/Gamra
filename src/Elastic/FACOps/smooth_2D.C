@@ -49,8 +49,7 @@ void Elastic::FACOps::smooth_2D
 
   const SAMRAI::hier::Index unit[]={SAMRAI::hier::Index(1,0),SAMRAI::hier::Index(0,1)};
   bool converged = false;
-  for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
-       ++sweep)
+  for (int sweep=0; sweep < num_sweeps && !converged; ++sweep)
     {
       double max_residual(0);
 
