@@ -558,7 +558,7 @@ PatchHierarchy {
     //              [level 0 entry]
     //   etc....                       
     // }
-    max_levels = 8
+    max_levels = 12
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2
@@ -570,7 +570,6 @@ PatchHierarchy {
         level_0 = -1, -1, -1
         // all finer levels will use same values as level_0...
     }
-    // This minimum patch size works better for larger levels (>=10)
     smallest_patch_size {
         level_0 = 8, 8, 2
         // all finer levels will use same values as level_0...
