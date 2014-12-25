@@ -28,8 +28,8 @@ Elastic {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 40         // Max number of FAC cycles to use
         residual_tol = 1e-3     // Residual tolerance to solve for
-        num_pre_sweeps =  2      // Number of presmoothing sweeps to use
-        num_post_sweeps =  2     // Number of postsmoothing sweeps to use
+        num_pre_sweeps =  4      // Number of presmoothing sweeps to use
+        num_post_sweeps =  4     // Number of postsmoothing sweeps to use
         coarse_solver_max_iterations =  32
         coarse_solver_tolerance = 1e-12
         v_prolongation_method = "V_REFINE"
@@ -89,7 +89,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 5
+    max_levels = 10
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2, 2
@@ -99,6 +99,9 @@ PatchHierarchy {
     }
     largest_patch_size {
         level_0 = -1, -1, -1
+    }
+    smallest_patch_size {
+        level_0 = 4, 4, 4
     }
 }
 
