@@ -18,7 +18,9 @@ Elastic {
 
 #include "include/ElMayor_3d.inc"
 
-    v_rhs="0"
+    v_rhs_x="0"
+    v_rhs_y="0"
+    v_rhs_z="0"
 
 #include "faults/ElMayor.inc"
 
@@ -98,6 +100,9 @@ PatchHierarchy {
     }
     largest_patch_size {
         level_0 = -1, -1, -1
+    }
+    smallest_patch_size {
+        level_0 = 8, 8, 4
     }
 }
 
