@@ -14,6 +14,7 @@ Main {
     dim = 3
     base_name = "Landers"
     log_all_nodes = FALSE
+    intermediate_output=TRUE
     vis_writer = "Vizamrai", "VisIt"
 }
 
@@ -460,8 +461,8 @@ Elastic {
         enable_logging = TRUE   // Bool flag to switch logging on/off
         max_cycles = 100         // Max number of FAC cycles to use
         residual_tol = 1e-3     // Residual tolerance to solve for
-        num_pre_sweeps =  2      // Number of presmoothing sweeps to use
-        num_post_sweeps =  2     // Number of postsmoothing sweeps to use
+        num_pre_sweeps =  4      // Number of presmoothing sweeps to use
+        num_post_sweeps =  4     // Number of postsmoothing sweeps to use
         coarse_solver_max_iterations =  32
         coarse_solver_tolerance = 1e-12
         v_prolongation_method = "V_REFINE"
@@ -523,9 +524,9 @@ CartesianGridGeometry {
     //                        periodic, non-zero value indicates periodicity.
     //                        [0]
     // domain_boxes = [(0,0), (15,15)]
-    domain_boxes = [(0,0,0), (7,7,1)]
-    x_lo         = -153.6, -153.6, 0.01
-    x_up         =  152.4,  152.4, 100
+    domain_boxes = [(0,0,0), (7,7,3)]
+    x_lo         = -150, -150, 0.01
+    x_up         =  150,  150, 150
 }
 
 StandardTagAndInitialize {
@@ -568,11 +569,9 @@ PatchHierarchy {
     }
     largest_patch_size {
         level_0 = -1, -1, -1
-        // all finer levels will use same values as level_0...
     }
     smallest_patch_size {
-        level_0 = 8, 8, 2
-        // all finer levels will use same values as level_0...
+        level_0 = 8, 8, 4
     }
 }
 
