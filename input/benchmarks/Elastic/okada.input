@@ -17,12 +17,13 @@ Elastic {
     mu="1"
     v_rhs_x="0"
     v_rhs_y="0"
-    v_rhs_z="0"
 
-    v_initial_x="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
-    v_initial_y="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
+    // This angle makes a triangle with side of 3:4:5.
+    v_initial_x="okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,0)"
+    v_initial_y="okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,1)"
 
-    faults= 10, 0.000001, -.1, 0.0, 0.2, 0.25, 90, 90, 0
+
+    faults= 10, -.08, -.06, 0.0, 0.2, 0.25, 36.8698976459, 90, 0
 
     fac_solver {
         enable_logging = TRUE
@@ -35,22 +36,23 @@ Elastic {
         v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
-        vx_x_upper="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
+        vx_x_upper="okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,0)"
         vx_x_upper_is_dirichlet=TRUE
-        vx_x_lower="xx=x-0.000001, yp=y+.1,ym=y-.1,b=10,lam=1,mu=1,pi=4*atan(1.0),uxp=-(b/(2*pi))*(-mu*ln(xx^2+yp^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + yp^2)),uxm=-(b/(2*pi))*(-mu*ln(xx^2+ym^2)/(2*(lam+2*mu)) + ((lam + mu)/(lam+2*mu))*xx^2/(xx^2 + ym^2)),-uxp+uxm"
+        vx_x_lower="okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,0)"
         vx_x_lower_is_dirichlet=TRUE
-        vy_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
+        vy_y_upper="okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,1)"
         vy_y_upper_is_dirichlet=TRUE
-        vy_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), uyp=-(b/(2*pi))*(-atan(yp/xx) + ((lam + mu)/(lam+2*mu))*(xx*yp)/(xx^2 + yp^2)), uym=-(b/(2*pi))*(-atan(ym/xx) + ((lam + mu)/(lam+2*mu))*(xx*ym)/(xx^2 + ym^2)), -uyp+uym"
+        vy_y_lower="okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,1)"
         vy_y_lower_is_dirichlet=TRUE
 
-        vx_y_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y - duyp_x+duym_x"
+        vx_y_upper="d_okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,0,1) + d_okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,1,0)"
         vx_y_upper_is_dirichlet=FALSE
-        vx_y_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y - duyp_x+duym_x"
+        vx_y_lower="d_okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,0,1) + d_okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,1,0)"
         vx_y_lower_is_dirichlet=FALSE
-        vy_x_upper="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y - duyp_x+duym_x"
+
+        vy_x_upper="d_okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,0,1) + d_okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,1,0)"
         vy_x_upper_is_dirichlet=FALSE
-        vy_x_lower="xx=x-0.000001, yp=y+.1, ym=y-.1, b=10, lam=1, mu=1, pi=4*atan(1.0), duxp_y=(b/(2*pi))*yp*(mu*yp^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + yp^2)^2), duxm_y=(b/(2*pi))*ym*(mu*ym^2 + (2*lam + 3*mu)*xx^2)/((lam + 2*mu)*(xx^2 + ym^2)^2), duyp_x=(-b/(2*pi))*yp*(mu*xx^2 + (2*lam + 3*mu)*yp^2)/((lam + 2*mu)*(xx^2 + yp^2)*(xx^2 + yp^2)), duym_x=(-b/(2*pi))*ym*(mu*xx^2 + (2*lam + 3*mu)*ym^2)/((lam + 2*mu)*(xx^2 + ym^2)*(xx^2 + ym^2)), -duxp_y+duxm_y - duyp_x+duym_x"
+        vy_x_lower="d_okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,0,1) + d_okada(1,1,10, -.08, -.06, 0, .2, 10000, 36.8698976459, 90, 0,x,y,5000,1,0)"
         vy_x_lower_is_dirichlet=FALSE
     }
 }
@@ -59,8 +61,6 @@ CartesianGridGeometry {
     domain_boxes = [(0,0), (3,3)]
     x_lo         = -.5, -.5
     x_up         = .5, .5
-    // x_lo         = -4, -4
-    // x_up         = 4, 4
 }
 
 StandardTagAndInitialize {
@@ -68,7 +68,7 @@ StandardTagAndInitialize {
 }
 
 PatchHierarchy {
-    max_levels = 9
+    max_levels = 10
     proper_nesting_buffer = 2, 2, 2, 2, 2, 2, 2
     ratio_to_coarser {
         level_1            = 2, 2
