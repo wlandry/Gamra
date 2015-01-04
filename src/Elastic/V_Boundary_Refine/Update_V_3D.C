@@ -138,25 +138,28 @@ void Elastic::V_Boundary_Refine::Update_V_3D
         }
           
       /* We need to check when interpolating whether the stencil goes
-         off to a corner.  Boundary values are not defined at the
-         outside corner, so we use a simpler interpolation there. */
+         off a boundary.  Fault corrections are not defined outside
+         the boundary.  Also, boundary values are not defined at the
+         outside corner.  So we use a simpler interpolation there. */
       double v_coarse;
-      if(coarse[iy]==lower_y
-         && coarse_geom.getTouchesRegularBoundary(iy,ijk_mod_y)
-         && coarse[iz]==lower_z
-         && coarse_geom.getTouchesRegularBoundary(iz,ijk_mod_z))
+      if((coarse[iy]==lower_y
+          && coarse_geom.getTouchesRegularBoundary(iy,ijk_mod_y))
+         || (coarse[iz]==lower_z
+             && coarse_geom.getTouchesRegularBoundary(iz,ijk_mod_z)))
         {
           v_coarse=(5*v(coarse) - v(coarse+jp+kp))/4;
+          /// Correct v(coarse+jp+kp) to v(coarse)
           if(have_faults() && !is_residual)
             v_coarse-=
               ((*dv_mixed)(coarse+jp+kp,minus) - (*dv_mixed)(coarse,plus))/4;
         }
-      else if(coarse[iy]==upper_y
-              && coarse_geom.getTouchesRegularBoundary(iy,(ijk_mod_y+1)%2)
-              && coarse[iz]==upper_z
-              && coarse_geom.getTouchesRegularBoundary(iz,(ijk_mod_z+1)%2))
+      else if((coarse[iy]==upper_y
+               && coarse_geom.getTouchesRegularBoundary(iy,(ijk_mod_y+1)%2))
+              || (coarse[iz]==upper_z
+                  && coarse_geom.getTouchesRegularBoundary(iz,(ijk_mod_z+1)%2)))
         {
           v_coarse=(3*v(coarse) + v(coarse-jp-kp))/4;
+          /// Correct v(coarse-jp-kp) to v(coarse)
           if(have_faults() && !is_residual)
             v_coarse+=
               ((*dv_mixed)(coarse-jp-kp,plus) - (*dv_mixed)(coarse,minus))/4;
@@ -165,18 +168,22 @@ void Elastic::V_Boundary_Refine::Update_V_3D
         {
           v_coarse=
             quad_offset_interpolate(v(coarse-jp-kp),v(coarse),v(coarse+jp+kp));
+          /// Correct to v(coarse)
           if(have_faults() && !is_residual)
             v_coarse+=quad_offset_correction((*dv_mixed)(coarse-jp-kp,plus),
                                              (*dv_mixed)(coarse,minus),
                                              (*dv_mixed)(coarse,plus),
                                              (*dv_mixed)(coarse+jp+kp,minus));
         }
+
+      /// Previous corrections translated the result to v(coarse)
+      /// This last bit translates to v(coarse-ip_s) and then to v(fine-ip_s);
       if(have_faults() && !is_residual)
         {
           SAMRAI::pdat::CellIndex cell(coarse);
-          v_coarse-=(*dv_mixed_fine)(fine-ip_s,plus)
-            - (boundary_positive ? -(*dv_diagonal)(cell-ip_s,ix) :
-               (*dv_diagonal)(cell,ix));
+          v_coarse+=(boundary_positive ? -(*dv_diagonal)(cell-ip_s,ix) :
+                     (*dv_diagonal)(cell,ix))
+            - (*dv_mixed_fine)(fine-ip_s,plus);
         }
       v_fine(fine)=v_fine(fine-ip_s) + (v_coarse - v_fine(fine-ip_s*2))/3;
       if(have_faults() && !is_residual)
@@ -235,15 +242,25 @@ void Elastic::V_Boundary_Refine::Update_V_3D
 
       double v_coarse(quad_offset_interpolate(v(coarse+kp),v(coarse),
                                               v(coarse-kp)));
-
       const int dim(3);
       int ix_iz(index_map(ix,iz,dim));
       if(have_faults() && !is_residual)
-        v_coarse+=quad_offset_correction((*dv_mixed)(coarse+kp,ix_iz+1),
-                                     (*dv_mixed)(coarse,ix_iz),
-                                     (*dv_mixed)(coarse,ix_iz+1),
-                                     (*dv_mixed)(coarse-kp,ix_iz));
-
+        {
+          if(ijk[iz]%2==0)
+            {
+              v_coarse+=quad_offset_correction((*dv_mixed)(coarse+kp,ix_iz),
+                                               (*dv_mixed)(coarse,ix_iz+1),
+                                               (*dv_mixed)(coarse,ix_iz),
+                                               (*dv_mixed)(coarse-kp,ix_iz+1));
+            }
+          else
+            {
+              v_coarse+=quad_offset_correction((*dv_mixed)(coarse+kp,ix_iz+1),
+                                               (*dv_mixed)(coarse,ix_iz),
+                                               (*dv_mixed)(coarse,ix_iz+1),
+                                               (*dv_mixed)(coarse-kp,ix_iz));
+            }
+        }      
       double v_m(v_fine(fine-jp)), v_mm(v_fine(fine-jp-jp));
 
       if(have_faults() && !is_residual)
@@ -302,6 +319,10 @@ void Elastic::V_Boundary_Refine::Update_V_3D
                     - (*dv_diagonal_fine)(cell,ix);
                 }
 
+              /// If the fine mesh does not cover the sides where the
+              /// coarse points are, then we use the correction from
+              /// the other coarse point and then correct with
+              /// dv_diagonal.
               if(fine_min(ix)==fine(ix))
                 coarse_to_fine[0]=coarse_to_fine[1]
                   + (*dv_diagonal)(coarse_cell,ix);
@@ -312,12 +333,23 @@ void Elastic::V_Boundary_Refine::Update_V_3D
 
               v_coarse+=coarse_to_fine[0];
                 
-              v_coarse_p+=
-                quad_offset_correction((*dv_mixed)(coarse+kp+ip,ix_iz+1),
-                                       (*dv_mixed)(coarse+ip,ix_iz),
-                                       (*dv_mixed)(coarse+ip,ix_iz+1),
-                                       (*dv_mixed)(coarse-kp+ip,ix_iz))
-                + coarse_to_fine[1];
+              v_coarse_p+=coarse_to_fine[1];
+              if(ijk[iz]%2==0)
+                {
+                  v_coarse_p+=
+                    quad_offset_correction((*dv_mixed)(coarse+kp+ip,ix_iz),
+                                           (*dv_mixed)(coarse+ip,ix_iz+1),
+                                           (*dv_mixed)(coarse+ip,ix_iz),
+                                           (*dv_mixed)(coarse-kp+ip,ix_iz+1));
+                }
+              else
+                {
+                  v_coarse_p+=
+                    quad_offset_correction((*dv_mixed)(coarse+kp+ip,ix_iz+1),
+                                           (*dv_mixed)(coarse+ip,ix_iz),
+                                           (*dv_mixed)(coarse+ip,ix_iz+1),
+                                           (*dv_mixed)(coarse-kp+ip,ix_iz));
+                }
             }
           v_fine(fine)=(4*(v_coarse + v_coarse_p) + 10*v_m - 3*v_mm)/15;
         }
