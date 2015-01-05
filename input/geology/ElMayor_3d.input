@@ -6,7 +6,7 @@
 
 Main {
     dim = 3
-    base_name = "ElMayor_3d_ml8"
+    base_name = "ElMayor_3d"
     log_all_nodes = FALSE
     vis_writer = "Vizamrai", "VisIt"
     intermediate_output=TRUE
