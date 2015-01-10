@@ -2,56 +2,31 @@
 
 # export three .xyz files for displacement on a horizontal slice out of gamra HDF5 output
 
-import getopt
+"""
+Usage: 
+    sam2xyz.py [options] summary.samrai
+
+Options:
+    -d --depth:  the depth of the horizontal slice [0]
+
+Description:
+    sam2xyz.py exports a slice of samrai hdf5 export file to .xyz format
+
+Examples:
+    ./sam2xyz.py --depth=0 ./Landers.visit/visit_dump.00000/summary.samrai
+    ./sam2xyz.py --depth=0 */*/summary.samrai
+"""
+
 import glob
 import os
 import sys
+from docopt import docopt
 from paraview.simple import *
-
-def usage():
-    print 'sam2xyz.py exports a slice of samrai hdf5 export file to .xyz format'
-    print ''
-    print 'usage: sam2xyz.py --depth=0 summary.samrai'
-    print ''
-    print 'options:'
-    print '  -d --depth:  the depth of the horizontal slice'
-    print ''
-    print 'example:'
-    print './sam2xyz.py --depth=0 ./Landers.visit/visit_dump.00000/summary.samrai'
-    print ''
-    print 'or'
-    print ''
-    print './sam2xyz.py --depth=0 */*/summary.samrai'
-    print ''
-
 
 def main():
 
-    # default parameters
-    depth = 0
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:", ["help","depth="])
-    except getopt.GetoptError, err:
-        # print help information and exit:
-        print >> sys.stderr, 'sam2xyz.py:', str(err) # will print something like "option -a not recognized"
-        print ''
-        usage()
-        sys.exit(2)
-
-    if 0 == len(args):
-	usage()
-	sys.exit(2)
-
-    for o, a in opts:
-        if o in ("-h","--help"):
-            usage()
-            sys.exit()
-        elif o in ("-d", "--depth"):
-            depth = float(a)
-        else:
-            print >> sys.stderr, 'sam2xyz.py: unhandled option:', o, a
-            assert False, "unhandled option"
+    arguments = docopt(__doc__, version='1.0')
+    depth=arguments['--depth']
 
     # loop over the models
     for i in xrange(len(args)):
