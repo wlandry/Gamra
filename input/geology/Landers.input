@@ -19,7 +19,7 @@ Main {
 }
 
 Elastic {
-    adaption_threshold = 5.0e-3
+    adaption_threshold = 5.0e-2
     min_full_refinement_level = 3
 
     lambda="1"
