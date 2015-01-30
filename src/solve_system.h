@@ -34,12 +34,14 @@ bool solve_system
                         load_balancer));
   gridding_algorithm->makeCoarsestLevel(0.0);
 
-  std::vector<std::string> vis_writer(1);
-  vis_writer[0] = "Visit";
+  bool use_visit=true;
   if (main_db->keyExists("vis_writer"))
-    vis_writer = main_db->getStringVector("vis_writer");
-  bool use_visit(std::find(vis_writer.begin(),vis_writer.end(),"VisIt")
+    {
+      std::vector<std::string> vis_writer;
+      vis_writer = main_db->getStringVector("vis_writer");
+      use_visit=(std::find(vis_writer.begin(),vis_writer.end(),"VisIt")
                  !=vis_writer.end());
+    }
 
   bool intermediate_output(main_db->getBoolWithDefault("intermediate_output",
                                                        false));
