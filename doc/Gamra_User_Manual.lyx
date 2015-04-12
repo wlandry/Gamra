@@ -1,0 +1,589 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Gamra
+\end_layout
+
+\begin_layout Standard
+Gamra is a parallel, adaptive 2D and 3D finite difference C++ code for modeling
+ processes in the Earth such as earthquakes, tides and volcanic processes.
+\end_layout
+
+\begin_layout Standard
+Gamra (Geodynamique Avec Maille Rafinee Adaptivement) computes elasto-static
+ deformation in heterogeneous media due to surface loads and moving faults
+ using finite difference and adaptive mesh refinement.
+\end_layout
+
+\begin_layout Section
+Running Gamra
+\end_layout
+
+\begin_layout Subsection
+Options
+\end_layout
+
+\begin_layout Description
+-h,--help Prints a short message and exits
+\end_layout
+
+\begin_layout Description
+--version Prints the version number and exits
+\end_layout
+
+\begin_layout Subsection
+Input File
+\end_layout
+
+\begin_layout Standard
+The input files are in a JSON-like format.
+ There is a hierarchy.
+\end_layout
+
+\begin_layout Subsubsection
+Basic Options
+\end_layout
+
+\begin_layout Itemize
+Main
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+dim
+\family default
+ (integer): number of dimensions.
+ Must be 2 or 3.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+base_name
+\family default
+ (string): Prefix of the name of the log file.
+ Logs will be stored in {
+\family typewriter
+base_name
+\family default
+}.log
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+intermediate_output
+\family default
+ (bool): Whether or not to output intermediate solution at coarse levels.
+ This can be useful for convergence tests.
+ Default is FALSE.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\family typewriter
+Elastic
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+adaption_threshold
+\family default
+: minimum size of the curvature where the mesh should be adapted.
+ This is essentially 
+\begin_inset Formula 
+\[
+v_{+}-2v_{0}+v_{-}<adaption\_threshold,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $v$
+\end_inset
+
+ is the displacement.
+  So 
+\family typewriter
+adaption_threshold
+\family default
+ is an absolute, not relative criteria.
+ You should set this to the largest displacement error you will tolerate.
+ For example, if you are trying to match GPS measurements with an accuracy
+ of 0.01 cm, then set 
+\family typewriter
+adaption_threshold
+\family default
+ to 0.01 cm.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+min_full_refinement_level
+\family default
+: the finest level that will always be fully refined.
+ If min_full_refinement_level=max_levels, then all levels will be fully
+ refined and there will be no adaptive refinement.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+lambda, mu
+\family default
+: Mathematical expression (string) that defines the Lame parameters, for
+ example: 
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+lambda = "1"
+\family default
+ 
+\begin_inset Newline newline
+\end_inset
+
+or 
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+lambda = "z<20 ? 30 : 50"
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+v_rhs_x, v_rhs_y, v_rhs_z
+\family default
+: Right hand side of the stress equation.
+ Also known as the forcing term.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+faults
+\family default
+: List of dislocations.
+ For example,
+\family typewriter
+
+\begin_inset Newline newline
+\end_inset
+
+faults = 1.0, 0.0, 0.0, 0.0, 10.0, 10.0, 0.0, 90.0, 0.0
+\family default
+
+\begin_inset Newline newline
+\end_inset
+
+for a single fault, or
+\family typewriter
+
+\begin_inset Newline newline
+\end_inset
+
+faults= 1.3475, 14.246, -45.439, 10.056, 5.6, 4.94, 132.7, 91.0, -114.7, 1.8921, 10.446,
+ -41.319, 10.056, 5.6, 4.94, 132.7, 91.0, -151.8
+\family default
+
+\begin_inset Newline newline
+\end_inset
+
+for two fault segments.
+ Static dislocation sources are discretized into a series of planar segments.
+ Slip patches are defined in terms of position, orientation, and slip, as
+ illustrated in the following figure.
+ For positive slip, a zero rake corresponds to left-lateral strike-slip
+ motion and a 90 degree rake corresponds to a thrust motion (when dip is
+ smaller than 90 degrees).
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Graphics
+	filename fault_orientation.pdf
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+refinement_points
+\family default
+: List of points to always refine.
+ For very coarse solutions, the automatic criteria for refining may miss
+ some faults.
+ Setting refinement_points will ensure that cells that contain those points
+ will always be refined.
+ For example, to always refine cells covering the beginning of the faults
+ in the previous faults example
+\begin_inset Newline newline
+\end_inset
+
+
+\family typewriter
+refinement_points
+\family default
+ = 
+\family typewriter
+14.246, -45.439, 10.056, 10.446, -41.319, 10.056
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+fac_solver
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+max_cycles
+\family default
+: Maximum number of multigrid iterations
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+residual_tol
+\family default
+: Continue multigrid iterations until the maximum size of the 
+\begin_inset Formula $L_{\infty}$
+\end_inset
+
+of the residual for the entire solution is less than residual_tol.
+ Note that this is an absolute residual, so you probably want to set it
+ to something like
+\begin_inset Formula $\left(\min\left(\lambda\right)+\min\left(\mu\right)\right)\delta v/l^{2},$
+\end_inset
+
+ where 
+\begin_inset Formula $\delta v$
+\end_inset
+
+ is the largest error you can tolerate (see also 
+\family typewriter
+adaption_threshold
+\family default
+) and 
+\begin_inset Formula $l$
+\end_inset
+
+ is the characteristic size of your fault patches.
+ The minimum values of 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ should be for values near the fault.
+ Far from the fault, the variation in the displacement, and thus the residual,
+ is much smaller anyway.
+ On the other hand, if a fault cuts through layers, then you should use
+ the smaller moduli of the two layers.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+num_pre_sweeps
+\family default
+: During a multigrid cycle, the number of smoothings before recursing down
+ to the next coarser level.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+num_post_sweeps
+\family default
+: During a multigrid cycle, the number of smoothings after recursing down
+ to the next coarser level.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+coarse_solver_max_iterations
+\family default
+: Maximum number of iterations on the coarsest level.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+coarse_solver_tolerance
+\family default
+: Continue iterations on the coarsest level until the maximum size of the
+ 
+\begin_inset Formula $L_{\infty}$
+\end_inset
+
+of the residual on the coarsest level is less than coarse_solver_tolerance.
+ Note that this is an absolute residual, so you probably want to scale this
+ by something like
+\begin_inset Formula $\left(\min\left(\lambda\right)+\min\left(\mu\right)\right)\max\left(v\right)$
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+
+\family typewriter
+CartesianGridGeometry
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+domain_boxes
+\family default
+: The numerical box covering the coarsest mesh.
+ The bottom corner should always be 
+\family typewriter
+(0,0)
+\family default
+ in 2D and 
+\family typewriter
+(0,0,0)
+\family default
+ in 3D.
+ The top corner is the offset of the top corner.
+ So a domain box 
+\family typewriter
+[(0,0,0),(7,5,3)]
+\family default
+ has 8x6x4 elements.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+x_lo, x_up
+\family default
+: Coordinates of the bottom and top corner of the coarsest mesh.
+ The 
+\family typewriter
+faults
+\family default
+ keyword uses the convention that z=depth, x=north-south, and y=east-west.
+ If the faults go right up to the surface, then there may be numerical issues
+ because the algorithm requires comparing two floating point numbers which
+ are almost the same.
+ The easiest fix it to make the surface slightly lower (e.g.
+ 
+\family typewriter
+z_lo=0.01
+\family default
+ instead of 
+\family typewriter
+0
+\family default
+).
+ This makes the faults unambiguously intersect with the surface.
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+Advanced Debugging Options
+\end_layout
+
+\begin_layout Standard
+These options are mostly for debugging Gamra itself.
+ You can safely leave them as the default.
+\end_layout
+
+\begin_layout Itemize
+Main
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+log_all_nodes
+\family default
+ (bool): Whether to write logging output for all mpi processes, or just
+ a single process.
+ This is mostly useful for debugging.
+ The default is FALSE.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+vis_writer
+\family default
+ (list(string)): List of visualization writers.
+ If 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+VisIt
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ is on the list, then Gamra will write out VisIT and Paraview compatible
+ visualization files into the {
+\family typewriter
+vis_filename
+\family default
+}.visit directory.
+ If this key is omitted, then Gamra will automatically write these files.
+ To inhibit this, set 
+\family typewriter
+vis_writer
+\family default
+ to an empty list.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+vis_filename
+\family default
+ (string): Prefix of the name of the visualization directory.
+ Visualization output will be stored in the directory {
+\family typewriter
+vis_filename
+\family default
+}.visit.
+ The default is {
+\family typewriter
+base_name
+\family default
+}.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\family typewriter
+Elastic
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+fac_solver
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+enable_logging
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+smoothing_choice
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+coarse_solver_choice
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+v_prolongation_method
+\end_layout
+
+\end_deeper
+\end_deeper
+\end_body
+\end_document
