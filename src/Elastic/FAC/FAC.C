@@ -84,7 +84,7 @@ Elastic::FAC::FAC(const std::string& object_name,
       faults=database->getDoubleVector("faults");
     }
   if(faults.size()%9!=0)
-    TBOX_ERROR("The number of points in refinement_points must be "
+    TBOX_ERROR("The number of points in faults must be "
                "divisible by 9.  Read "
                << faults.size() << " points");
   if(!faults.empty())
