@@ -196,8 +196,10 @@ min_full_refinement_level
 \family typewriter
 lambda, mu
 \family default
-: Mathematical expression (string) that defines the Lame parameters, for
- example: 
+: There are two different methods for entering material properties.
+ The simplest method is to use a mathematical expression (string) to define
+ the Lame parameters.
+ For example: 
 \begin_inset Newline newline
 \end_inset
 
@@ -216,8 +218,90 @@ or
 
 \family typewriter
 lambda = "z<20 ? 30 : 50"
+\family default
+
+\begin_inset Newline newline
+\end_inset
+
+You can also set the Lame parameters using an array of values.
+ The Lame parameter will be set by interpolating into this array.
+ The characteristics of the array are set with 
+\family typewriter
+_ijk
+\family default
+ (e.g.
+ 
+\family typewriter
+lambda_ijk
+\family default
+ or 
+\family typewriter
+mu_ijk
+\family default
+), 
+\family typewriter
+_coord_min
+\family default
+, 
+\family typewriter
+_coord_max
+\family default
+, and 
+\family typewriter
+_data
+\family default
+ variables.
 \end_layout
 
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+_ijk
+\family default
+: Number of points in the array (nx, ny, nz).
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+_coord_min
+\family default
+, 
+\family typewriter
+_coord_max
+\family default
+: Location of the bottom and top corners of the array.
+ If a point is required outside of the defined area of the array, the location
+ is truncated to the edge of the box.
+ For example, if 
+\begin_inset Formula 
+\[
+\begin{array}{ccc}
+\text{coord\_min} & = & 0,0,0\\
+\text{coord\_min} & = & 10,20,10
+\end{array}
+\]
+
+\end_inset
+
+but the computational domain includes the point 15,10,5, then Gamra will
+ use the value of array at 10,10,5.
+ Similarly, for 15,-2,13, Gamra will use 10,0,10.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+_data
+\family default
+: The value in the array.
+ This must be a list of numbers with the length of the array equal to nx*ny*nz.
+ The elements must be in row major order (varying first in x, then y, then
+ z).
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 
 \family typewriter
@@ -225,7 +309,15 @@ v_rhs_x, v_rhs_y, v_rhs_z
 \family default
 : Right hand side of the stress equation.
  Also known as the forcing term.
- 
+ You can set it as an equation or, like 
+\family typewriter
+lambda
+\family default
+ and 
+\family typewriter
+mu
+\family default
+, you can set it with an array.
 \end_layout
 
 \begin_layout Itemize
