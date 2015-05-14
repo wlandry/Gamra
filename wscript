@@ -50,9 +50,6 @@ def configure_variant(conf):
     # conf.env.SHLIB_MARKER = '-Wl,-Bstatic'
     conf.check_boost()
 
-    if(int(conf.env.BOOST_VERSION[-2:]) >= 53):
-        conf.fatal('Bad version of boost.  Boost must be version 1.52 or earlier.\nThe configuration failed')
-
     # Find SAMRAI
     if conf.options.samrai_dir:
         if not conf.options.samrai_incdir:
