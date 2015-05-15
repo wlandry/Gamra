@@ -5,8 +5,8 @@
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
 void Elastic::V_Boundary_Refine::Update_V_3D
-(const int &ix,
- const int &boundary_direction,
+(const Gamra::Dir &ix,
+ const Gamra::Dir &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::hier::IntVector unit[],
@@ -75,7 +75,8 @@ void Elastic::V_Boundary_Refine::Update_V_3D
 
   if(boundary_direction==ix)
     {
-      const int iy((ix+1)%3), iz((ix+2)%3);
+      const Gamra::Dir iy(ix.next(3));
+      const Gamra::Dir iz(iy.next(3));
       const SAMRAI::hier::IntVector ip_s(boundary_positive ? unit[ix] : -unit[ix]);
 
       SAMRAI::pdat::SideIndex coarse(fine-ip_s);
@@ -231,7 +232,8 @@ void Elastic::V_Boundary_Refine::Update_V_3D
  */
   else
     {
-      const int iz((ix+1)%3 != boundary_direction ? (ix+1)%3 : (ix+2)%3);
+      const Gamra::Dir iz(ix.next(3) != boundary_direction
+                          ? ix.next(3) : ix.next(3).next(3));
       const SAMRAI::hier::Index ip(unit[ix]),
         jp(boundary_positive ? unit[boundary_direction]
            : -unit[boundary_direction]),
@@ -242,8 +244,8 @@ void Elastic::V_Boundary_Refine::Update_V_3D
 
       double v_coarse(quad_offset_interpolate(v(coarse+kp),v(coarse),
                                               v(coarse-kp)));
-      const int dim(3);
-      int ix_iz(index_map(ix,iz,dim));
+      const Gamra::Dir dim(3);
+      const Gamra::Dir ix_iz(index_map(ix,iz,dim));
       if(have_faults() && !is_residual)
         {
           if(ijk[iz]%2==0)

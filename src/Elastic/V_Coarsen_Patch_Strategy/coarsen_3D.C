@@ -97,9 +97,10 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
     for(ijk[1]=coarse_box.lower(1); ijk[1]<=coarse_box.upper(1)+1; ++ijk[1])
       for(ijk[0]=coarse_box.lower(0); ijk[0]<=coarse_box.upper(0)+1; ++ijk[0])
         {
-          for(int ix=0;ix<dim;++ix)
+          for(Gamra::Dir ix=0;ix<dim;++ix)
             {
-              const int iy((ix+1)%dim), iz((ix+2)%dim);
+              const Gamra::Dir iy(ix.next(dim));
+              const Gamra::Dir iz(iy.next(dim));
               if(ijk[iy]!=coarse_box.upper(iy)+1
                  && ijk[iz]!=coarse_box.upper(iz)+1)
                 {

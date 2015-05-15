@@ -14,7 +14,7 @@ void Elastic::V_Boundary_Refine::Update_V_embedded_2D
  const int &i,
  const int &j,
  const SAMRAI::pdat::SideData<double> &level_set,
- const SAMRAI::pdat::SideData<double> &level_set_fine,
+ const SAMRAI::pdat::SideData<double> &,
  const SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {

@@ -35,8 +35,9 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
       const SAMRAI::hier::Index unit[]={ip,jp,kp};
       const int dim(3);
 
-      const int ix(location_index/2);
-      const int iy((ix+1)%dim), iz((ix+2)%dim);
+      const Gamra::Dir ix(Gamra::Dir::from_int(location_index/2));
+      const Gamra::Dir iy(ix.next(dim));
+      const Gamra::Dir iz(iy.next(dim));
       int side(location_index%2==0 ? SAMRAI::pdat::SideIndex::Upper
                : SAMRAI::pdat::SideIndex::Lower);
 

@@ -13,8 +13,8 @@
 
 double Elastic::V_Refine::refine_along_line
 (SAMRAI::pdat::SideData<double> &v,
- const int &ix,
- const int &dim,
+ const Gamra::Dir &ix,
+ const Gamra::Dir &dim,
  const SAMRAI::hier::Index unit[],
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::pdat::SideIndex &coarse,
@@ -23,7 +23,7 @@ double Elastic::V_Refine::refine_along_line
 {
   double result=v(coarse);
 
-  for(int d=(ix+1)%dim;d!=ix;d=(d+1)%dim)
+  for(Gamra::Dir d=ix.next(dim);d!=ix;d=d.next(dim))
     {
       const int sgn(fine[d]%2==0 ? -1 : 1);
 
@@ -51,8 +51,8 @@ double Elastic::V_Refine::refine_along_line
 
 double Elastic::V_Refine::refine_along_line
 (SAMRAI::pdat::SideData<double> &v,
- const int &ix,
- const int &dim,
+ const Gamra::Dir &ix,
+ const Gamra::Dir &dim,
  const SAMRAI::hier::Index unit[],
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::pdat::SideIndex &coarse,

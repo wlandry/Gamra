@@ -128,12 +128,12 @@ namespace Elastic {
                 const int src_component,
                 const SAMRAI::hier::Box& fine_box,
                 const SAMRAI::hier::IntVector& ratio,
-                const int &axis) const;
+                const Gamra::Dir &axis) const;
 
     double refine_along_line
     (SAMRAI::pdat::SideData<double> &v,
-     const int &axis,
-     const int &dim,
+     const Gamra::Dir &axis,
+     const Gamra::Dir &dim,
      const SAMRAI::hier::Index pp[],
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::pdat::SideIndex &coarse,
@@ -142,8 +142,8 @@ namespace Elastic {
 
     double refine_along_line
     (SAMRAI::pdat::SideData<double> &v,
-     const int &ix,
-     const int &dim,
+     const Gamra::Dir &ix,
+     const Gamra::Dir &dim,
      const SAMRAI::hier::Index unit[],
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::pdat::SideIndex &coarse,

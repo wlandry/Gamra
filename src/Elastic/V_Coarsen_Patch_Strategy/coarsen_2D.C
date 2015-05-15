@@ -128,9 +128,9 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
             ci(SAMRAI::pdat::CellGeometry::begin(big_box)); ci!=end; ++ci)
         {
           const SAMRAI::pdat::CellIndex &coarse_cell(*ci);
-          for(int ix=0;ix<dim;++ix)
+          for(Gamra::Dir ix=0;ix<dim;++ix)
             {
-              const int iy((ix+1)%dim);
+              const Gamra::Dir iy(ix.next(dim));
               if(coarse_cell[iy]!=big_box.upper(iy))
                 {
                   SAMRAI::pdat::SideIndex
@@ -224,9 +224,9 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
             ci(SAMRAI::pdat::CellGeometry::begin(big_box)); ci!=end; ++ci)
         {
           const SAMRAI::pdat::CellIndex &cell(*ci);
-          for(int ix=0;ix<2;++ix)
+          for(Gamra::Dir ix=0;ix<2;++ix)
             {
-              const int iy((ix+1)%dim);
+              const Gamra::Dir iy(ix.next(dim));
               if(cell[iy]!=coarse_box.upper(iy)+1)
                 {
                   SAMRAI::pdat::SideIndex

@@ -140,7 +140,7 @@ namespace Elastic {
                 const int src_component,
                 const SAMRAI::hier::Box &fine_box,
                 const SAMRAI::hier::IntVector &ratio,
-                const int &axis) const;
+                const Gamra::Dir &axis) const;
 
   private:
     std::string d_name_id;
@@ -189,8 +189,8 @@ namespace Elastic {
      SAMRAI::pdat::SideData<double> &v_fine) const;
 
     void Update_V_3D
-    (const int &ix,
-     const int &boundary_direction,
+    (const Gamra::Dir &ix,
+     const Gamra::Dir &boundary_direction,
      const bool &boundary_positive,
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::hier::IntVector unit[],

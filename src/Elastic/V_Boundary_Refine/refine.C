@@ -29,7 +29,7 @@ void Elastic::V_Boundary_Refine::refine
       strategy */
    // boundary_conditions.set_boundary(coarse,src_component,true);
 
-   for(int ix=0; ix<fine_patch.getDim().getValue(); ++ix)
+   for(Gamra::Dir ix=0; ix<fine_patch.getDim().getValue(); ++ix)
      {
        const SAMRAI::hier::BoxContainer&
          boxes = t_overlap->getDestinationBoxContainer(ix);
@@ -48,7 +48,7 @@ void Elastic::V_Boundary_Refine::refine
  const int src_component,
  const SAMRAI::hier::Box &overlap_box,
  const SAMRAI::hier::IntVector &,
- const int &ix) const
+ const Gamra::Dir &ix) const
 {
   const SAMRAI::tbox::Dimension &dimension(fine_patch.getDim());
   const int dim(dimension.getValue());
@@ -95,10 +95,11 @@ void Elastic::V_Boundary_Refine::refine
    SAMRAI::hier::Box fine_box=fine_patch.getBox();
 
    /* We have to infer where the boundary is from the boxes */
-   int boundary_direction;
+   /// FIXME: A lambda would be nice here :(
+   Gamra::Dir boundary_direction(0);
    bool boundary_positive(false);
 
-   for(int d=0;d<dim;++d)
+   for(Gamra::Dir d=0;d<dim;++d)
      {
        if(std::abs(overlap_box.lower(d)-overlap_box.upper(d))==(ix==d ? 1 : 0))
          {

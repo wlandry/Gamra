@@ -35,7 +35,7 @@ void Elastic::V_Refine::refine(SAMRAI::hier::Patch& fine,
 
    TBOX_ASSERT(t_overlap != NULL);
 
-   for(int ix=0; ix<fine.getDim().getValue(); ++ix)
+   for(Gamra::Dir ix=0; ix<fine.getDim().getValue(); ++ix)
      {
        const SAMRAI::hier::BoxContainer&
          boxes = t_overlap->getDestinationBoxContainer(ix);
@@ -54,10 +54,10 @@ void Elastic::V_Refine::refine
  const int src_component,
  const SAMRAI::hier::Box &fine_box,
  const SAMRAI::hier::IntVector &,
- const int &ix) const
+ const Gamra::Dir &ix) const
 {
    const SAMRAI::tbox::Dimension &dimension(fine_patch.getDim());
-   const int dim(dimension.getValue());
+   const Gamra::Dir dim(dimension.getValue());
 
    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
@@ -107,7 +107,7 @@ void Elastic::V_Refine::refine
          {
            SAMRAI::pdat::SideIndex
              coarse(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
-           for(int d=(ix+1)%dim;d!=ix;d=(d+1)%dim)
+           for(Gamra::Dir d=ix.next(dim);d!=ix;d=d.next(dim))
              {
                if((coarse[d]<coarse_box.lower(d)
                    && geom->getTouchesRegularBoundary(d,0))
