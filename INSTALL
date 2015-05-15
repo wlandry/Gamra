@@ -5,11 +5,11 @@ Prerequisites:
   Boost
   muparser http://muparser.beltoforion.de/ (tested with v2.2.2)
 
-1) Build SAMRAI 3.6.3
+1) Build SAMRAI 3.9.1
 
-  mkdir SAMRAI-3.6.3
-  cd SAMRAI-3.6.3
-  tar -zxf SAMRAI-v3.6.3-beta.tar.gz
+  mkdir SAMRAI-3.9.1
+  cd SAMRAI-3.9.1
+  tar -zxf SAMRAI-v3.9.1.tar.gz
   mkdir opt_objs
   cd opt_objs
   ../SAMRAI/configure --with-CC=mpicc --with-CXX=mpicxx --with-F77=mpif77 --with-boost=$BOOST_DIR --with-hdf5=$HDF5_DIR --disable-debug --enable-opt --prefix=$PWD/../opt
@@ -19,7 +19,8 @@ Prerequisites:
 
 2) Build FTensor
 
-  hg clone https://code.google.com/p/ftensor/ FTensor
+
+  hg clone https://bitbucket.org/wlandry/ftensor FTensor
   cd FTensor
   ./waf configure --prefix=$PWD
   ./waf install
@@ -27,7 +28,7 @@ Prerequisites:
 
 3) Build libokada
 
-  git clone https://code.google.com/p/libokada/ libokada
+  git clone https://bitbucket.org/wlandry/libokada.git
   cd libokada
   ./waf configure --ftensor-dir=$PWD/../FTensor --prefix=$PWD
   ./waf install
@@ -35,9 +36,9 @@ Prerequisites:
 
 4) Build Gamra
 
-  hg clone https://code.google.com/p/gamra/
+  hg clone https://bitbucket.org/wlandry/gamra
   cd gamra
-  CXX=mpicxx ./waf configure --samrai-dir=$PWD/../SAMRAI-3.6.3/opt --hdf5-dir=$HDF5_DIR --muparser-dir=$MUPARSER_DIR
+  CXX=mpicxx ./waf configure --samrai-dir=$PWD/../SAMRAI-3.9.1/opt --hdf5-dir=$HDF5_DIR --muparser-dir=$MUPARSER_DIR
   ./waf
 
 5) Simple test
