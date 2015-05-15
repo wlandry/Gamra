@@ -14,7 +14,7 @@ void Stokes::FAC::applyGradientDetector
   SAMRAI::hier::PatchLevel& level =
     (SAMRAI::hier::PatchLevel &) * hierarchy.getPatchLevel(ln);
   
-  int ntag = 0, ntotal = 0;
+  size_t ntag = 0, ntotal = 0;
   double maxestimate = 0;
   for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); ++pi)
     {
@@ -85,8 +85,10 @@ void Stokes::FAC::applyGradientDetector
 
 
 void Stokes::FAC::computeAdaptionEstimate
-(SAMRAI::pdat::CellData<double>& estimate_data,
- const SAMRAI::pdat::CellData<double>& soln_cell_data) const
+(SAMRAI::pdat::CellData<double>&,
+ const SAMRAI::pdat::CellData<double>&) const
+// (SAMRAI::pdat::CellData<double>& estimate_data,
+//  const SAMRAI::pdat::CellData<double>& soln_cell_data) const
 {
   TBOX_ERROR("Need to implement computeAdaptionEstimate without MDA_AccessConst");
 

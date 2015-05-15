@@ -31,7 +31,8 @@ bool Stokes::FAC::packDerivedDataIntoDoubleBuffer(
                                                   const SAMRAI::hier::Box& region,
                                                   const std::string&
                                                   variable_name,
-                                                  int depth_id) const
+                                                  int depth_id,
+                                                  double) const
 {
   (void)depth_id;
 

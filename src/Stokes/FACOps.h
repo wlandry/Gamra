@@ -509,7 +509,7 @@ namespace Stokes {
                  double residual_tolerance = -1.0);
 
     void smooth_V_2D
-    (const int &axis,
+    (const Gamra::Dir &axis,
      const SAMRAI::hier::Box &pbox,
      boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom,
      const SAMRAI::pdat::CellIndex &center,
@@ -526,7 +526,7 @@ namespace Stokes {
      const double &theta_momentum);
 
     void smooth_V_3D
-    (const int &ix,
+    (const Gamra::Dir &ix,
      const SAMRAI::hier::Box &pbox,
      boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom,
      SAMRAI::pdat::CellData<double> &p,

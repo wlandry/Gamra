@@ -112,7 +112,7 @@ void Stokes::FAC::fix_viscosity()
                 (patch->getPatchData(edge_viscosity_id));
               SAMRAI::pdat::EdgeData<double>
                 &edge_viscosity(*edge_viscosity_ptr);
-              for(int axis=0;axis<3;++axis)
+              for(Gamra::Dir axis=0;axis<3;++axis)
                 {
                   const int axis2((axis+1)%3), axis3((axis+2)%3);
                   SAMRAI::hier::Box pbox=patch->getBox();

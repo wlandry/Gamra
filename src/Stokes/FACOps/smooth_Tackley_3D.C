@@ -73,7 +73,7 @@ void Stokes::FACOps::smooth_Tackley_3D
       /* v sweeps */
       xeqScheduleGhostFillNoCoarse(p_id,invalid_id,ln);
 
-      for(int ix=0;ix<3;++ix)
+      for(Gamra::Dir ix=0;ix<3;++ix)
         for(int rb=0;rb<2;++rb)
           {
             xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
@@ -245,9 +245,10 @@ void Stokes::FACOps::smooth_Tackley_3D
               const SAMRAI::pdat::CellIndex &center(*ci);
 
               /* Update v */
-              for(int ix=0;ix<3;++ix)
+              for(Gamra::Dir ix=0;ix<3;++ix)
                 {
-                  const int iy((ix+1)%3), iz((ix+2)%3);
+                  const Gamra::Dir iy(ix.next(3));
+                  const Gamra::Dir iz(iy.next(3));
                   if(center[iy]<pbox.upper(iy) && center[iz]<pbox.upper(iz))
                     {
                       const SAMRAI::pdat::SideIndex

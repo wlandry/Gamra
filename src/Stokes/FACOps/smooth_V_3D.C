@@ -8,7 +8,7 @@
 ********************************************************************
 */
 void Stokes::FACOps::smooth_V_3D
-(const int &ix,
+(const Gamra::Dir &ix,
  const SAMRAI::hier::Box &pbox,
  boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom,
  SAMRAI::pdat::CellData<double> &p,

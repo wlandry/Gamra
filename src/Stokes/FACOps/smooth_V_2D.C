@@ -8,7 +8,7 @@
 ********************************************************************
 */
 void Stokes::FACOps::smooth_V_2D
-(const int &axis,
+(const Gamra::Dir &axis,
  const SAMRAI::hier::Box &pbox,
  boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom,
  const SAMRAI::pdat::CellIndex &center,
@@ -24,7 +24,7 @@ void Stokes::FACOps::smooth_V_2D
  SAMRAI::pdat::NodeData<double> &edge_viscosity,
  const double &theta_momentum)
 {
-  const int off_axis=(axis==0) ? 1 : 0;
+  const Gamra::Dir off_axis=axis.next(2);
 
   const SAMRAI::pdat::SideIndex x(center,axis,SAMRAI::pdat::SideIndex::Lower),
     y(center,off_axis,SAMRAI::pdat::SideIndex::Lower);

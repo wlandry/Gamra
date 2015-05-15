@@ -111,7 +111,7 @@ void Stokes::FAC::initializeLevelData
       {
         SAMRAI::hier::Box pbox = v_rhs_data->getBox();
         int ix_offset(0);
-        for(int ix=0;ix<dim;++ix)
+        for(Gamra::Dir ix=0;ix<dim;++ix)
           {
             double offset[]={0.5,0.5,0.5};
             offset[ix]=0;
