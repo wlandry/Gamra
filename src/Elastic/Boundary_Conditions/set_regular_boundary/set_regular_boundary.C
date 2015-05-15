@@ -29,7 +29,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
     }
 
   const SAMRAI::tbox::Dimension Dim(patch.getDim());
-  const int dim(Dim.getValue());
+  const Gamra::Dir dim(Dim.getValue());
   const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(Dim));
 
   SAMRAI::hier::Index unit[]={zero,zero,zero};
@@ -54,7 +54,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
   if(have_faults() && !homogeneous)
     {
       SAMRAI::pdat::SideData<double> &dv_mixed(*dv_mixed_ptr);
-      for(int ix=0; ix<dim; ++ix)
+      for(Gamra::Dir ix=0; ix<dim; ++ix)
         {
           SAMRAI::pdat::SideIterator
             s_end(SAMRAI::pdat::SideGeometry::end(gbox,ix));
@@ -72,7 +72,8 @@ void Elastic::Boundary_Conditions::set_regular_boundary
                 }
               else
                 {
-                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                  for(Gamra::Dir iy=ix.next(dim); iy!=ix;
+                      iy=iy.next(dim))
                     {
                       if((s[iy]<pbox.lower(iy)
                           && geom->getTouchesRegularBoundary(iy,0))
@@ -98,7 +99,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
         {
           const SAMRAI::pdat::CellIndex &c(*ci);
           bool is_boundary(false);
-          for(int d=0;d<dim;++d)
+          for(Gamra::Dir d=0;d<dim;++d)
             is_boundary= is_boundary
               || ((c[d]<pbox.lower(d)
                    && geom->getTouchesRegularBoundary(d,0))
@@ -107,7 +108,7 @@ void Elastic::Boundary_Conditions::set_regular_boundary
 
           if(is_boundary)
             {
-              for(int ix=0;ix<dim;++ix)
+              for(Gamra::Dir ix=0;ix<dim;++ix)
                 dv_diagonal(c,ix)=0;
             }
         }

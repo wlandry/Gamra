@@ -8,7 +8,7 @@
 ********************************************************************
 */
 void Elastic::FACOps::smooth_V_3D
-(const int &ix,
+(const Gamra::Dir &ix,
  const SAMRAI::hier::Box &pbox,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_rhs,
@@ -20,7 +20,8 @@ void Elastic::FACOps::smooth_V_3D
  const SAMRAI::hier::Index unit[3],
  double &maxres)
 {
-  const int iy((ix+1)%3), iz((ix+2)%3);
+  const Gamra::Dir iy(ix.next(3));
+  const Gamra::Dir iz(iy.next(3));
   const SAMRAI::pdat::SideIndex x(cell,ix,SAMRAI::pdat::SideIndex::Lower),
     y(cell,iy,SAMRAI::pdat::SideIndex::Lower),
     z(cell,iz,SAMRAI::pdat::SideIndex::Lower);

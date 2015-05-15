@@ -92,7 +92,7 @@ void Elastic::FAC::initializeLevelData
       boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
       (patch->getPatchData(v_rhs_id));
 
-    for(int ix=0; ix<dim; ++ix)
+    for(Gamra::Dir ix=0; ix<dim; ++ix)
       {
         double offset[]={0.5,0.5,0.5};
         offset[ix]=0;
@@ -126,7 +126,7 @@ void Elastic::FAC::initializeLevelData
         for(int d=0;d<dim;++d)
           dx_max=std::max(dx_max,dx[d]);
         double epsilon((grid_geom->getXUpper()[0]-grid_geom->getXLower()[0])/1e10);
-        for(int ix=0;ix<dim;++ix)
+        for(Gamra::Dir ix=0;ix<dim;++ix)
           {
             double offset[]={0.5,0.5,0.5};
             offset[ix]=0;

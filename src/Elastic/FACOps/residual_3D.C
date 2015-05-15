@@ -34,9 +34,10 @@ void Elastic::FACOps::residual_3D
       ++front[2];
       --back[2];
 
-      for(int ix=0;ix<3;++ix)
+      for(Gamra::Dir ix=0;ix<3;++ix)
         {
-          const int iy((ix+1)%3), iz((ix+2)%3);
+          const Gamra::Dir iy(ix.next(3));
+          const Gamra::Dir iz(iy.next(3));
           const SAMRAI::pdat::SideIndex
             x(center,ix,SAMRAI::pdat::SideIndex::Lower),
             y(center,iy,SAMRAI::pdat::SideIndex::Lower),

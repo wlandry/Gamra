@@ -58,7 +58,7 @@ void Elastic::FACOps::smooth_3D
       maxres=0;
 
       /* v sweeps */
-      for(int ix=0;ix<3;++ix)
+      for(Gamra::Dir ix=0;ix<3;++ix)
         for(int rb=0;rb<2;++rb)
           {
             xeqScheduleGhostFillNoCoarse(v_id,ln);

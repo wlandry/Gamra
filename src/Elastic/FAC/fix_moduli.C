@@ -118,7 +118,7 @@ void Elastic::FAC::fix_moduli()
                 boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
                 (patch->getPatchData(edge_moduli_id));
               SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
-              for(int axis=0;axis<3;++axis)
+              for(Gamra::Dir axis=0;axis<3;++axis)
                 {
                   const int axis2((axis+1)%3), axis3((axis+2)%3);
                   SAMRAI::hier::Box pbox=patch->getBox();

@@ -38,9 +38,9 @@ void Elastic::FACOps::residual_2D
             edge(cell,SAMRAI::pdat::NodeIndex::LowerLeft);
 
           const int dim(2);
-          for(int ix=0;ix<dim;++ix)
+          for(Gamra::Dir ix=0;ix<dim;++ix)
             {
-              const int iy((ix+1)%dim);
+              const Gamra::Dir iy(ix.next(dim));
               const SAMRAI::pdat::SideIndex
                 x(cell,ix,SAMRAI::pdat::SideIndex::Lower),
                 y(cell,iy,SAMRAI::pdat::SideIndex::Lower);
@@ -80,9 +80,9 @@ void Elastic::FACOps::residual_2D
             edge(cell,SAMRAI::pdat::NodeIndex::LowerLeft);
 
           const int dim(2);
-          for(int ix=0;ix<dim;++ix)
+          for(Gamra::Dir ix=0;ix<dim;++ix)
             {
-              const int iy((ix+1)%dim);
+              const Gamra::Dir iy(ix.next(dim));
               const SAMRAI::pdat::SideIndex
                 x(cell,ix,SAMRAI::pdat::SideIndex::Lower),
                 y(cell,iy,SAMRAI::pdat::SideIndex::Lower);

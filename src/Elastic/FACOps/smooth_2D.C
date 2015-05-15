@@ -53,10 +53,10 @@ void Elastic::FACOps::smooth_2D
     {
       double max_residual(0);
 
-      const int dim(2);
-      for(int ix=0; ix<dim; ++ix)
+      const Gamra::Dir dim(2);
+      for(Gamra::Dir ix=0; ix<dim; ++ix)
         {
-          const int iy((ix+1)%dim);
+          const Gamra::Dir iy(ix.next(dim));
           const SAMRAI::hier::Index ip(unit[ix]), jp(unit[iy]);
           for(int rb=0;rb<2;++rb)
             {

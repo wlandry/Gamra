@@ -8,7 +8,7 @@
 ********************************************************************
 */
 void Elastic::FACOps::smooth_V_2D
-(const int &axis,
+(const Gamra::Dir &axis,
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::pdat::CellIndex &cell,
  const SAMRAI::hier::Index &ip,
@@ -22,7 +22,7 @@ void Elastic::FACOps::smooth_V_2D
  SAMRAI::pdat::NodeData<double> &edge_moduli,
  const double &theta_momentum)
 {
-  const int off_axis=(axis==0) ? 1 : 0;
+  const Gamra::Dir off_axis=(axis==0) ? 1 : 0;
 
   const SAMRAI::pdat::SideIndex x(cell,axis,SAMRAI::pdat::SideIndex::Lower),
     y(cell,off_axis,SAMRAI::pdat::SideIndex::Lower);

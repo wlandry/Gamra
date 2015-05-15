@@ -5,34 +5,33 @@ void Elastic::Boundary_Conditions::set_shear_stress
 (SAMRAI::pdat::SideData<double> &v,
  const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_ptr,
  const SAMRAI::hier::Index unit[],
- const int &dim,
+ const Gamra::Dir &dim,
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::hier::Box &gbox,
  const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
  const double *dx,
  const bool &homogeneous) const
 {
-  for(int ix=0; ix<dim; ++ix)
+  for(Gamra::Dir ix=0; ix<dim; ++ix)
     {
       double offset[]={0.5,0.5,0.5};
       offset[ix]=0;
 
       SAMRAI::hier::Box x_box(gbox);
-      x_box.lower(ix)=pbox.lower(ix);
-      x_box.upper(ix)=pbox.upper(ix);
+      x_box.setLower(ix,pbox.lower(ix));
+      x_box.setUpper(ix,pbox.upper(ix));
 
-      for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+      for(Gamra::Dir iy=ix.next(dim); iy!=ix; iy=iy.next(dim))
         {
-          const int ix_iy(index_map(ix,iy,dim));
-          const int iy_ix(index_map(iy,ix,dim));
-
-
-          const int iz((iy+1)%dim!=ix ? (iy+1)%dim : (iy+2)%dim);
+          const Gamra::Dir ix_iy(index_map(ix,iy,dim));
+          const Gamra::Dir iy_ix(index_map(iy,ix,dim));
+          const Gamra::Dir iz(iy.next(dim)!=ix ? iy.next(dim)
+                              : iy.next(dim).next(dim));
 
           if(geom->getTouchesRegularBoundary(iy,0) && !is_dirichlet[ix][iy][0])
             {
               SAMRAI::hier::Box box(x_box);
-              box.upper(iy)=pbox.lower(iy)-1;
+              box.setUpper(iy,pbox.lower(iy)-1);
               SAMRAI::pdat::SideIterator
                 end(SAMRAI::pdat::SideGeometry::end(box,ix));
               for(SAMRAI::pdat::SideIterator
@@ -66,7 +65,7 @@ void Elastic::Boundary_Conditions::set_shear_stress
           if(geom->getTouchesRegularBoundary(iy,1) && !is_dirichlet[ix][iy][1])
             {
               SAMRAI::hier::Box box(x_box);
-              box.lower(iy)=pbox.upper(iy)+1;
+              box.setLower(iy,pbox.upper(iy)+1);
               SAMRAI::pdat::SideIterator
                 end(SAMRAI::pdat::SideGeometry::end(box,ix));
               for(SAMRAI::pdat::SideIterator

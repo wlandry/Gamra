@@ -67,7 +67,7 @@ namespace Elastic {
     (SAMRAI::pdat::SideData<double> &v,
      const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_ptr,
      const SAMRAI::hier::Index unit[],
-     const int &dim,
+     const Gamra::Dir &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
@@ -78,7 +78,7 @@ namespace Elastic {
     (SAMRAI::pdat::SideData<double> &v,
      const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_ptr,
      const SAMRAI::hier::Index unit[],
-     const int &dim,
+     const Gamra::Dir &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
@@ -89,8 +89,8 @@ namespace Elastic {
     (const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::pdat::SideIndex &x,
-     const int &ix,
-     const int &iz) const
+     const Gamra::Dir &ix,
+     const Gamra::Dir &iz) const
     {
       return (geom->getTouchesRegularBoundary(ix,0)
               && (x[ix]<pbox.lower(ix)
@@ -108,14 +108,14 @@ namespace Elastic {
      const boost::shared_ptr<SAMRAI::pdat::CellData<double> > &dv_diagonal_ptr,
      const T &edge_moduli,
      const SAMRAI::hier::Index unit[],
-     const int &dim,
+     const Gamra::Dir &dim,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::hier::Box &gbox,
      const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom,
      const double *dx,
      const bool &homogeneous) const
     {
-      for(int ix=0; ix<dim; ++ix)
+      for(Gamra::Dir ix=0; ix<dim; ++ix)
         {
           double offset[]={0.5,0.5,0.5};
           offset[ix]=0;
@@ -123,7 +123,7 @@ namespace Elastic {
           if(geom->getTouchesRegularBoundary(ix,0) && !is_dirichlet[ix][ix][0])
             {
               SAMRAI::hier::Box box(gbox);
-              box.upper(ix)=pbox.lower(ix)-1;
+              box.setUpper(ix,pbox.lower(ix)-1);
 
               SAMRAI::pdat::CellIterator
                 end(SAMRAI::pdat::CellGeometry::end(box));
@@ -134,7 +134,8 @@ namespace Elastic {
                     x(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
 
                   bool on_corner(false);
-                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                  for(Gamra::Dir iy=ix.next(dim);
+                      iy!=ix; iy=iy.next(dim))
                     {
                       on_corner=on_corner
                         || !(x[iy]>=pbox.lower(iy) && x[iy]<=pbox.upper(iy));
@@ -147,7 +148,8 @@ namespace Elastic {
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
                       double duyy=0;
-                      for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                      for(Gamra::Dir iy=ix.next(dim);
+                          iy!=ix; iy=iy.next(dim))
                         {
                           SAMRAI::pdat::SideIndex
                             y(x,iy,SAMRAI::pdat::SideIndex::Lower);
@@ -188,8 +190,8 @@ namespace Elastic {
           if(geom->getTouchesRegularBoundary(ix,1) && !is_dirichlet[ix][ix][1])
             {
               SAMRAI::hier::Box box(gbox);
-              box.lower(ix)=pbox.upper(ix)+2;
-              box.upper(ix)=std::max(box.upper(ix),box.lower(ix));
+              box.setLower(ix,pbox.upper(ix)+2);
+              box.setUpper(ix,std::max(box.upper(ix),box.lower(ix)));
 
               SAMRAI::pdat::CellIterator
                 end(SAMRAI::pdat::CellGeometry::end(box));
@@ -200,7 +202,7 @@ namespace Elastic {
                     x(*ci,ix,SAMRAI::pdat::SideIndex::Lower);
 
                   bool on_corner(false);
-                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                  for(Gamra::Dir iy=ix.next(dim); iy!=ix; iy=iy.next(dim))
                     {
                       on_corner=on_corner
                         || !(x[iy]>=pbox.lower(iy) && x[iy]<=pbox.upper(iy));
@@ -209,12 +211,12 @@ namespace Elastic {
                   if(!on_corner)
                     {
                       double coord[3];
-                      for(int d=0;d<dim;++d)
+                      for(Gamra::Dir d=0;d<dim;++d)
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
 
                       double duyy=0;
-                      for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                      for(Gamra::Dir iy=ix.next(dim); iy!=ix; iy=iy.next(dim))
                         {
                           SAMRAI::pdat::SideIndex
                             y(x-unit[ix],iy,SAMRAI::pdat::SideIndex::Lower);

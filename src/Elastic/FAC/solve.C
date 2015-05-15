@@ -69,7 +69,7 @@ bool Elastic::FAC::solve()
           const SAMRAI::hier::Box &pbox(v.getBox());
           const SAMRAI::hier::Box &gbox(v.getGhostBox());
           const double *dx=geom->getDx();
-          for(int ix=0;ix<dim;++ix)
+          for(Gamra::Dir ix=0;ix<dim;++ix)
             {
               if(v_initial[ix].is_valid)
                 {
@@ -85,7 +85,7 @@ bool Elastic::FAC::solve()
                       const SAMRAI::pdat::SideIndex &s(*si);
 
                       double coord[3];
-                      for(int d=0;d<dim;++d)
+                      for(Gamra::Dir d=0;d<dim;++d)
                         coord[d]=geom->getXLower()[d]
                           + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
                       v(s)=v_initial[ix].eval(coord);

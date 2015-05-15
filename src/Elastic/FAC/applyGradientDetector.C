@@ -15,7 +15,7 @@ void Elastic::FAC::applyGradientDetector
   SAMRAI::hier::PatchLevel& level =
     (SAMRAI::hier::PatchLevel &) * hierarchy.getPatchLevel(ln);
   
-  int ntag = 0, ntotal = 0;
+  size_t ntag = 0, ntotal = 0;
   double max_curvature(0);
   for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
       pi!=level.end(); ++pi)
@@ -62,7 +62,7 @@ void Elastic::FAC::applyGradientDetector
           const SAMRAI::pdat::CellIndex &cell(*ci);
 
           double curvature(0);
-	  for (int ix=0; ix<dim; ++ix)
+	  for (Gamra::Dir ix=0; ix<dim; ++ix)
             {
               const SAMRAI::pdat::SideIndex x(cell,ix,
                                               SAMRAI::pdat::SideIndex::Lower);

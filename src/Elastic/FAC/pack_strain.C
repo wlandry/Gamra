@@ -23,7 +23,7 @@ Elastic::FAC::pack_strain(double* buffer,
         (patch.getPatchData(dv_mixed_id));
     }
 
-  const int dim=d_dim.getValue();
+  const Gamra::Dir dim=d_dim.getValue();
   if(have_embedded_boundary())
     {
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
@@ -32,7 +32,8 @@ Elastic::FAC::pack_strain(double* buffer,
           (patch.getPatchData(level_set_id));
     }
 
-  int ix(depth/dim), iy(depth%dim);
+  Gamra::Dir ix(Gamra::Dir::from_int(depth/dim)),
+    iy(Gamra::Dir::from_int(depth%dim));
   const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(d_dim));
   SAMRAI::hier::Index ip(zero), jp(zero);
   ip[ix]=1;

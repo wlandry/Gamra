@@ -33,7 +33,7 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
       <SAMRAI::pdat::SideData<double> >(patch.getPatchData(dv_mixed_id));
 
   const SAMRAI::tbox::Dimension dimension(patch.getDim());
-  const int dim(dimension.getValue());
+  const Gamra::Dir dim(dimension.getValue());
 
   const SAMRAI::hier::Box gbox=level_set.getGhostBox();
   const SAMRAI::hier::Box box=level_set.getBox();
@@ -46,9 +46,10 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
    * negative value and dv_mixed to zero.  Setting dv_mixed to zero
    * implies that we do not care about faults that intersect that
    * corner (nor should we). */
-  for(int ix=0; ix<dim; ++ix)
+  for(Gamra::Dir ix=0; ix<dim; ++ix)
     {
-      const int iy((ix+1)%dim), iz((ix+2)%dim);
+      const Gamra::Dir iy(ix.next(dim));
+      const Gamra::Dir iz(iy.next(dim));
 
       std::vector<std::vector<int> > corners(dim);
       corners[ix].push_back(box.lower(ix));

@@ -107,7 +107,7 @@ namespace Elastic {
                                     const SAMRAI::hier::Patch& patch,
                                     const SAMRAI::hier::Box& region,
                                     const std::string& variable_name,
-                                    int depth) const
+                                    int depth, double) const
     {
       if(variable_name=="Strain")
         pack_strain(buffer,patch,region,depth);
@@ -335,7 +335,7 @@ template<class T>
 void Elastic::FAC::add_faults()
 {
   const int max_level(d_hierarchy->getFinestLevelNumber());
-  const int dim=d_dim.getValue();
+  const Gamra::Dir dim=d_dim.getValue();
 
   const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(d_dim));
   SAMRAI::hier::Index unit[]={zero,zero,zero};
@@ -386,7 +386,7 @@ void Elastic::FAC::add_faults()
 
           SAMRAI::hier::Box pbox = v_rhs.getBox();
           SAMRAI::hier::Box gbox = v_rhs.getGhostBox();
-          for(int ix=0;ix<dim;++ix)
+          for(Gamra::Dir ix=0;ix<dim;++ix)
             {
               if(geom->getTouchesRegularBoundary(ix,0))
                 gbox.shorten(ix,-1);
@@ -437,7 +437,7 @@ void Elastic::FAC::add_faults()
 
               double fault[]={L,W};
 
-              for(int ix=0;ix<dim;++ix)
+              for(Gamra::Dir ix=0;ix<dim;++ix)
                 {
                   double offset[]={0.5,0.5,0.5};
                   offset[ix]=0;
@@ -504,7 +504,7 @@ void Elastic::FAC::add_faults()
             }
 
           /* Corrections to the rhs */
-          for(int ix=0;ix<dim;++ix)
+          for(Gamra::Dir ix=0;ix<dim;++ix)
             {
               SAMRAI::pdat::SideIterator
                 s_end(SAMRAI::pdat::SideGeometry::end(pbox,ix));
@@ -526,14 +526,16 @@ void Elastic::FAC::add_faults()
                      - dv_diagonal(c-unit[ix],ix)*(lambda_minus + 2*mu_minus))
                     /(dx[ix]*dx[ix]);
 
-                  for(int iy=(ix+1)%dim;iy!=ix;iy=(iy+1)%dim)
+                  for(Gamra::Dir iy=ix.next(dim);iy!=ix;
+                      iy=iy.next(dim))
                     {
-                      const int iz((ix+1)%dim!=iy ? (ix+1)%dim :
-                                   (ix+2)%dim);
+                      const Gamra::Dir
+                        iz(ix.next(dim)!=iy ? ix.next(dim) : ix.next(dim).next(dim));
                       mu_plus=edge_node_eval(edge_moduli,s+unit[iy],iz,1);
                       mu_minus=edge_node_eval(edge_moduli,s,iz,1);
 
-                      const int ix_iy(index_map(ix,iy,dim));
+                      const Gamra::Dir
+                        ix_iy(index_map(ix,iy,dim));
                       v_rhs(s)+=
                         (mu_plus*(dv_mixed(s,ix_iy)
                                   - dv_mixed(s+unit[iy],ix_iy+1))
@@ -546,7 +548,7 @@ void Elastic::FAC::add_faults()
                       lambda_minus=cell_moduli(c-unit[ix],0);
                       const SAMRAI::pdat::SideIndex
                         s_y(c,iy,SAMRAI::pdat::SideIndex::Lower);
-                      const int iy_ix(index_map(iy,ix,dim));
+                      const Gamra::Dir iy_ix(index_map(iy,ix,dim));
 
                       v_rhs(s)+=
                         (lambda_plus*dv_diagonal(c,iy)

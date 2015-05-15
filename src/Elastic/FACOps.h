@@ -446,7 +446,7 @@ namespace Elastic {
      double residual_tolerance = -1.0);
 
     void smooth_V_2D
-    (const int &axis,
+    (const Gamra::Dir &axis,
      const SAMRAI::hier::Box &pbox,
      const SAMRAI::pdat::CellIndex &cell,
      const SAMRAI::hier::Index &ip,
@@ -461,7 +461,7 @@ namespace Elastic {
      const double &theta_momentum);
 
     void smooth_V_3D
-    (const int &ix,
+    (const Gamra::Dir &ix,
      const SAMRAI::hier::Box &pbox,
      SAMRAI::pdat::SideData<double> &v,
      SAMRAI::pdat::SideData<double> &v_rhs,
