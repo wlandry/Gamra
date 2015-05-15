@@ -13,7 +13,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
     (patch.getPatchGeometry());
   const SAMRAI::tbox::Dimension Dim(patch.getDim());
-  const int dim(patch.getDim().getValue());
+  const Gamra::Dir dim(patch.getDim().getValue());
 
   const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(Dim));
   SAMRAI::hier::Index pp[]={zero,zero,zero};
@@ -59,7 +59,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
 
           bool dirichlet_boundary(false);
 
-          for(int ix=0;ix<dim;++ix)
+          for(Gamra::Dir ix=0;ix<dim;++ix)
             {
               if(center[ix]<pbox.lower(ix)
                  && geom->getTouchesRegularBoundary(ix,0))
@@ -107,7 +107,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
       SAMRAI::pdat::SideData<double> &v(*v_ptr);
 
       SAMRAI::hier::Box gbox=v.getGhostBox();
-      for(int ix=0; ix<dim; ++ix)
+      for(Gamra::Dir ix=0; ix<dim; ++ix)
         {
           SAMRAI::pdat::SideIterator
             send(SAMRAI::pdat::SideGeometry::end(gbox,ix));
@@ -149,7 +149,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                  and corners are incorrect for now.  */
               else
                 {
-                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                  for(Gamra::Dir iy=ix.next(dim); iy!=ix; iy=iy.next(dim))
                     {
                       if(x[iy]<pbox.lower(iy)
                          && geom->getTouchesRegularBoundary(iy,0))
@@ -185,7 +185,7 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
                      && geom->getTouchesRegularBoundary(ix,1)
                      && !upper_dirichlet[ix]))
                 {
-                  for(int iy=(ix+1)%dim; iy!=ix; iy=(iy+1)%dim)
+                  for(Gamra::Dir iy=ix.next(dim); iy!=ix; iy=iy.next(dim))
                     {
                       if(x[iy]<pbox.lower(iy) 
                          && geom->getTouchesRegularBoundary(iy,0))
@@ -204,7 +204,8 @@ void Stokes_set_boundary(const SAMRAI::hier::Patch& patch, const int &p_id,
              needed. */
           if(dim==3)
             {
-              const int iy((ix+1)%dim), iz((iy+1)%dim);
+              const Gamra::Dir iy(ix.next(dim));
+              const Gamra::Dir iz(iy.next(dim));
               SAMRAI::pdat::SideIterator
                 send(SAMRAI::pdat::SideGeometry::end(gbox,ix));
               for(SAMRAI::pdat::SideIterator

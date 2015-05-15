@@ -20,6 +20,7 @@
 #include "SAMRAI/hier/RefineOperator.h"
 #include "SAMRAI/pdat/SideVariable.h"
 #include "SAMRAI/geom/CartesianPatchGeometry.h"
+#include "Dir.h"
 
 #include <string>
 
@@ -126,7 +127,7 @@ namespace Stokes {
                 const int src_component,
                 const SAMRAI::hier::Box& fine_box,
                 const SAMRAI::hier::IntVector& ratio,
-                const int &axis) const;
+                const Gamra::Dir &axis) const;
 
   private:
     std::string d_name_id;
@@ -145,8 +146,8 @@ namespace Stokes {
      SAMRAI::pdat::SideData<double> &v_fine) const;
 
     void Update_V_3D
-    (const int &axis,
-     const int &boundary_direction,
+    (const Gamra::Dir &axis,
+     const Gamra::Dir &boundary_direction,
      const bool &boundary_positive,
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::hier::IntVector pp[],

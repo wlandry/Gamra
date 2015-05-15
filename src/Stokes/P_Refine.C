@@ -18,6 +18,7 @@
 #include "SAMRAI/pdat/CellData.h"
 #include "SAMRAI/pdat/CellVariable.h"
 #include "SAMRAI/tbox/Utilities.h"
+#include "Dir.h"
 
 void Stokes::P_Refine::refine(
    SAMRAI::hier::Patch& fine,
@@ -89,7 +90,7 @@ void Stokes::P_Refine::refine(
           simple differences here. */
 
        (*p_fine)(fine)=(*p)(center);
-       for(int d=0; d<dim.getValue(); ++d)
+       for(Gamra::Dir d=0; d<dim.getValue(); ++d)
          {
            SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dim));
            ip[d]=1;

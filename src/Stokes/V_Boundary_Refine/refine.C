@@ -28,7 +28,7 @@ void Stokes::V_Boundary_Refine::refine
 
    Stokes_set_boundary(coarse,invalid_id,src_component,true);
 
-   for(int axis=0; axis<fine.getDim().getValue(); ++axis)
+   for(Gamra::Dir axis=0; axis<fine.getDim().getValue(); ++axis)
      {
        const SAMRAI::hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer(axis);
        for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
@@ -46,10 +46,10 @@ void Stokes::V_Boundary_Refine::refine
  const int src_component,
  const SAMRAI::hier::Box& overlap_box,
  const SAMRAI::hier::IntVector&,
- const int &axis) const
+ const Gamra::Dir &axis) const
 {
   const SAMRAI::tbox::Dimension& dimension(fine.getDim());
-   const int dim(dimension.getValue());
+   const Gamra::Dir dim(dimension.getValue());
 
    boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
@@ -67,10 +67,11 @@ void Stokes::V_Boundary_Refine::refine
    SAMRAI::hier::Box fine_box=fine.getBox();
 
    /* We have to infer where the boundary is from the boxes */
-   int boundary_direction;
+   /// FIXME: A lambda would be nice here :(
+   Gamra::Dir boundary_direction(0);
    bool boundary_positive(false);
 
-   for(int d=0;d<dim;++d)
+   for(Gamra::Dir d=0;d<dim;++d)
      {
        if(std::abs(overlap_box.lower(d)-overlap_box.upper(d))==(axis==d ? 1 : 0))
          {

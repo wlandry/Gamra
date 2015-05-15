@@ -42,7 +42,7 @@ void Stokes::P_Boundary_Refine::refine
       int boundary_direction(-1);
       bool boundary_positive(true);
 
-      for(int d=0;d<dim;++d)
+      for(Gamra::Dir d=0;d<dim;++d)
         {
           if(overlap_box.lower(d)-overlap_box.upper(d)==0)
             {
@@ -58,7 +58,7 @@ void Stokes::P_Boundary_Refine::refine
         }
 
       SAMRAI::hier::Index p_min(dimension), p_max(dimension);
-      for(int d=0;d<dim;++d)
+      for(Gamra::Dir d=0;d<dim;++d)
         {
           p_min[d]=std::max(overlap_box.lower(d),gbox.lower(d));
           p_max[d]=std::min(overlap_box.upper(d),gbox.upper(d));

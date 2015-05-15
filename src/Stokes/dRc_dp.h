@@ -68,9 +68,10 @@ inline double Stokes_dRc_dp_3D(const SAMRAI::hier::Box &pbox,
                                const SAMRAI::hier::Index pp[3])
 {
   double result(0);
-  for(int ix=0;ix<3;++ix)
+  for(Gamra::Dir ix=0;ix<3;++ix)
     {
-      const int iy((ix+1)%3), iz((ix+2)%3);
+      const Gamra::Dir iy(ix.next(3));
+      const Gamra::Dir iz(iy.next(3));
       const SAMRAI::pdat::SideIndex x(center,ix,SAMRAI::pdat::SideIndex::Lower);
       const SAMRAI::pdat::EdgeIndex
         center_y(center,iy,SAMRAI::pdat::EdgeIndex::LowerLeft),

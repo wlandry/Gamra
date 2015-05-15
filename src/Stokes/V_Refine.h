@@ -19,6 +19,7 @@
 #include "SAMRAI/hier/Patch.h"
 #include "SAMRAI/hier/RefineOperator.h"
 #include "SAMRAI/pdat/SideVariable.h"
+#include "Dir.h"
 
 #include <string>
 
@@ -129,7 +130,7 @@ namespace Stokes {
                 const int src_component,
                 const SAMRAI::hier::Box& fine_box,
                 const SAMRAI::hier::IntVector& ratio,
-                const int &axis) const;
+                const Gamra::Dir &axis) const;
 
   private:
     std::string d_name_id;

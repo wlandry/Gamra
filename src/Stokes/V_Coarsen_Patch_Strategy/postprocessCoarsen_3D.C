@@ -44,11 +44,12 @@ Stokes::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
          Therefore, if location_index==3, then we need to set vy on
          the __lower__ side of that boundary box. */
          
-      int location_index=boundaries[mm].getLocationIndex();
-      int direction(location_index/2);
-      int side(location_index%2==0 ? SAMRAI::pdat::SideIndex::Upper
+      const int location_index=boundaries[mm].getLocationIndex();
+      const Gamra::Dir direction(Gamra::Dir::from_int(location_index/2));
+      const int side(location_index%2==0 ? SAMRAI::pdat::SideIndex::Upper
                : SAMRAI::pdat::SideIndex::Lower);
-      int dir2((direction+1)%3), dir3((direction+2)%3);
+      const Gamra::Dir dir2(direction.next(3));
+      const Gamra::Dir dir3(dir2.next(3));
       SAMRAI::hier::Index yp(ip), zp(ip);
       switch(direction)
         {
@@ -66,7 +67,7 @@ Stokes::V_Coarsen_Patch_Strategy::postprocessCoarsen_3D
           break;
         }      
 
-      SAMRAI::hier::Index
+      const SAMRAI::hier::Index
         lower=SAMRAI::hier::Index::coarsen(bbox.lower(),
                                            SAMRAI::hier::Index(2,2,2)),
         upper=SAMRAI::hier::Index::coarsen(bbox.upper(),

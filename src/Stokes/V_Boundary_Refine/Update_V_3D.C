@@ -4,8 +4,8 @@
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
 void Stokes::V_Boundary_Refine::Update_V_3D
-(const int &axis,
- const int &boundary_direction,
+(const Gamra::Dir &axis,
+ const Gamra::Dir &boundary_direction,
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::hier::IntVector pp[],

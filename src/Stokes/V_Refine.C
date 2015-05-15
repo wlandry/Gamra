@@ -21,18 +21,18 @@
 #include "SAMRAI/pdat/CellData.h"
 
 void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
-                                            const SAMRAI::hier::Patch& coarse,
-                                            const int dst_component,
-                                            const int src_component,
-                                            const SAMRAI::hier::BoxOverlap& fine_overlap,
-                                            const SAMRAI::hier::IntVector& ratio) const
+                              const SAMRAI::hier::Patch& coarse,
+                              const int dst_component,
+                              const int src_component,
+                              const SAMRAI::hier::BoxOverlap& fine_overlap,
+                              const SAMRAI::hier::IntVector& ratio) const
 {
   const SAMRAI::pdat::SideOverlap* t_overlap =
     dynamic_cast<const SAMRAI::pdat::SideOverlap *>(&fine_overlap);
 
   TBOX_ASSERT(t_overlap);
 
-  for(int axis=0; axis<fine.getDim().getValue(); ++axis)
+  for(Gamra::Dir axis=0; axis<fine.getDim().getValue(); ++axis)
     {
       const SAMRAI::hier::BoxContainer&
         boxes = t_overlap->getDestinationBoxContainer(axis);
@@ -45,15 +45,15 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
 }
 
 void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
-                                            const SAMRAI::hier::Patch& coarse,
-                                            const int dst_component,
-                                            const int src_component,
-                                            const SAMRAI::hier::Box& fine_box,
-                                            const SAMRAI::hier::IntVector&,
-                                            const int &axis) const
+                              const SAMRAI::hier::Patch& coarse,
+                              const int dst_component,
+                              const int src_component,
+                              const SAMRAI::hier::Box& fine_box,
+                              const SAMRAI::hier::IntVector&,
+                              const Gamra::Dir &axis) const
 {
   const SAMRAI::tbox::Dimension& dimension(fine.getDim());
-  const int dim(dimension.getValue());
+  const Gamra::Dir dim(dimension.getValue());
 
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
@@ -109,7 +109,7 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
 
           v_fine(fine)=v(center);
 
-          for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
+          for(Gamra::Dir d=axis.next(dim);d!=axis;d=d.next(dim))
             {
               if(center[d]==coarse_box.lower(d)
                  && geom->getTouchesRegularBoundary(d,0))
@@ -132,7 +132,7 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
         {
           v_fine(fine)=(v(center) + v(center+pp[axis]))/2;
 
-          for(int d=(axis+1)%dim;d!=axis;d=(d+1)%dim)
+          for(Gamra::Dir d=axis.next(dim);d!=axis;d=d.next(dim))
             {
               if(center[d]==coarse_box.lower(d)
                  && geom->getTouchesRegularBoundary(d,0))
