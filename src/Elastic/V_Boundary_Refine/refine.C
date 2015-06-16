@@ -129,9 +129,9 @@ void Elastic::V_Boundary_Refine::refine
          }
      }
 
-   SAMRAI::hier::Index unit[]={SAMRAI::hier::Index::getZeroIndex(dimension),
-                               SAMRAI::hier::Index::getZeroIndex(dimension),
-                               SAMRAI::hier::Index::getZeroIndex(dimension)};
+   SAMRAI::hier::IntVector unit[]={SAMRAI::hier::Index::getZeroIndex(dimension),
+                                   SAMRAI::hier::Index::getZeroIndex(dimension),
+                                   SAMRAI::hier::Index::getZeroIndex(dimension)};
    for(int d=0;d<dim;++d)
      unit[d][d]=1;
    SAMRAI::hier::Index ijk(dimension);

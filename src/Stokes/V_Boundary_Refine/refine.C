@@ -100,7 +100,8 @@ void Stokes::V_Boundary_Refine::refine
          }
      }
 
-   SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dimension)), jp(ip), kp(ip);
+   SAMRAI::hier::IntVector ip(SAMRAI::hier::Index::getZeroIndex(dimension)),
+     jp(ip), kp(ip);
    ip[0]=1;
    jp[1]=1;
    if(dim>2)
@@ -131,7 +132,7 @@ void Stokes::V_Boundary_Refine::refine
      }
    else
      {
-       SAMRAI::hier::Index pp[]={ip,jp,kp};
+       SAMRAI::hier::IntVector pp[]={ip,jp,kp};
        SAMRAI::hier::Index ijk(dimension);
        for(ijk[2]=p_min[2]; ijk[2]<=p_max[2]; ijk[2]=(ijk[2]/2)*2+2)
          for(ijk[1]=p_min[1]; ijk[1]<=p_max[1]; ijk[1]=(ijk[1]/2)*2+2)

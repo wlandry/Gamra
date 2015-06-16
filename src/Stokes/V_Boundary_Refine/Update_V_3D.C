@@ -9,7 +9,7 @@ void Stokes::V_Boundary_Refine::Update_V_3D
  const bool &boundary_positive,
  const SAMRAI::pdat::SideIndex &fine,
  const SAMRAI::hier::IntVector pp[],
- const SAMRAI::hier::IntVector &ijk,
+ const SAMRAI::hier::Index &ijk,
  const SAMRAI::hier::Index &p_min, const SAMRAI::hier::Index &p_max,
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const

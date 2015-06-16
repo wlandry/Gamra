@@ -194,7 +194,7 @@ namespace Elastic {
      const bool &boundary_positive,
      const SAMRAI::pdat::SideIndex &fine,
      const SAMRAI::hier::IntVector unit[],
-     const SAMRAI::hier::IntVector &ijk,
+     const SAMRAI::hier::Index &ijk,
      const SAMRAI::hier::Box &coarse_box,
      const SAMRAI::hier::Index &fine_min,
      const SAMRAI::hier::Index &fine_max,
