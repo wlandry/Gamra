@@ -5,11 +5,11 @@ Prerequisites:
   Boost
   muparser http://muparser.beltoforion.de/ (tested with v2.2.2)
 
-1) Build SAMRAI 3.9.1
+1) Build SAMRAI 3.10.0
 
-  mkdir SAMRAI-3.9.1
-  cd SAMRAI-3.9.1
-  tar -zxf SAMRAI-v3.9.1.tar.gz
+  mkdir SAMRAI-3.10.0
+  cd SAMRAI-3.10.0
+  tar -zxf SAMRAI-v3.10.0.tar.gz
   mkdir opt_objs
   cd opt_objs
   ../SAMRAI/configure --with-CC=mpicc --with-CXX=mpicxx --with-F77=mpif77 --with-boost=$BOOST_DIR --with-hdf5=$HDF5_DIR --disable-debug --enable-opt --prefix=$PWD/../opt
@@ -18,7 +18,6 @@ Prerequisites:
   cd ../..
 
 2) Build FTensor
-
 
   hg clone https://bitbucket.org/wlandry/ftensor FTensor
   cd FTensor
