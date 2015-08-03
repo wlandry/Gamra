@@ -37,7 +37,7 @@ Prerequisites:
 
   hg clone https://bitbucket.org/wlandry/gamra
   cd gamra
-  CXX=mpicxx ./waf configure --samrai-dir=$PWD/../SAMRAI-3.9.1/opt --hdf5-dir=$HDF5_DIR --muparser-dir=$MUPARSER_DIR
+  CXX=mpicxx ./waf configure --samrai-dir=$PWD/../SAMRAI-3.9.1/opt --hdf5-dir=$HDF5_DIR --muparser-dir=$MUPARSER_DIR --ftensor-dir=../FTensor --okada-dir=../libokada
   ./waf
 
 5) Simple test
