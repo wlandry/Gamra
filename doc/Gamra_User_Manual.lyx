@@ -1,5 +1,5 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
 \begin_document
 \begin_header
 \textclass article
@@ -12,13 +12,13 @@
 \font_roman default
 \font_sans default
 \font_typewriter default
+\font_math auto
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -28,15 +28,24 @@
 \use_hyperref false
 \papersize default
 \use_geometry false
-\use_amsmath 1
-\use_esint 1
-\use_mhchem 1
-\use_mathdots 1
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
 \cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
+\justification true
 \use_refstyle 1
 \index Index
 \shortcut idx
@@ -196,8 +205,11 @@ min_full_refinement_level
 \family typewriter
 lambda, mu
 \family default
-: There are two different methods for entering material properties.
- The simplest method is to use a mathematical expression (string) to define
+: There are three different methods for entering material properties.
+\end_layout
+
+\begin_layout Enumerate
+The simplest method is to use a mathematical expression (string) to define
  the Lame parameters.
  For example: 
 \begin_inset Newline newline
@@ -218,11 +230,9 @@ or
 
 \family typewriter
 lambda = "z<20 ? 30 : 50"
-\family default
+\end_layout
 
-\begin_inset Newline newline
-\end_inset
-
+\begin_layout Enumerate
 You can also set the Lame parameters using an array of values.
  The Lame parameter will be set by interpolating into this array.
  The characteristics of the array are set with 
@@ -265,11 +275,11 @@ _ijk
 \begin_layout Itemize
 
 \family typewriter
-_coord_min
+_x_lo
 \family default
 , 
 \family typewriter
-_coord_max
+_x_up
 \family default
 : Location of the bottom and top corners of the array.
  If a point is required outside of the defined area of the array, the location
@@ -278,8 +288,8 @@ _coord_max
 \begin_inset Formula 
 \[
 \begin{array}{ccc}
-\text{coord\_min} & = & 0,0,0\\
-\text{coord\_min} & = & 10,20,10
+\text{x\_lo} & = & 0,0,0\\
+\text{x\_up} & = & 10,20,10
 \end{array}
 \]
 
@@ -302,6 +312,99 @@ _data
 \end_layout
 
 \end_deeper
+\begin_layout Enumerate
+The third way is to create a set of patches.
+ Each patch is specified in a manner similar to the array of values.
+ The main difference is that you can have a set of patches, each with different
+ resolution.
+ The structure is
+\end_layout
+
+\begin_layout LyX-Code
+lambda_patches {
+\end_layout
+
+\begin_layout LyX-Code
+patch_1 {
+\end_layout
+
+\begin_layout LyX-Code
+    ijk=2,2
+\end_layout
+
+\begin_layout LyX-Code
+    x_lo=-1,-1
+\end_layout
+
+\begin_layout LyX-Code
+    x_up=2,0.5
+\end_layout
+
+\begin_layout LyX-Code
+    data=1,1, 1,1
+\end_layout
+
+\begin_layout LyX-Code
+  }
+\end_layout
+
+\begin_layout LyX-Code
+patch_2 {
+\end_layout
+
+\begin_layout LyX-Code
+    ijk=2,2
+\end_layout
+
+\begin_layout LyX-Code
+    x_lo=-1,0.5
+\end_layout
+
+\begin_layout LyX-Code
+    x_up=2,2
+\end_layout
+
+\begin_layout LyX-Code
+    data=2,2, 2,2
+\end_layout
+
+\begin_layout LyX-Code
+  }
+\end_layout
+
+\begin_layout LyX-Code
+}
+\end_layout
+
+\begin_layout Standard
+Here, I chose the names 
+\family typewriter
+patch_1
+\family default
+ and 
+\family typewriter
+patch_2
+\family default
+ for the two patches, but you can choose any name you prefer (e.g.
+ 
+\family typewriter
+top
+\family default
+, 
+\family typewriter
+bottom
+\family default
+).
+ The patches must completely cover all points, including ghost zones at
+ the boundaries.
+ You may find it convenient to have patches just for the boundaries.
+ There is an example of using these patches in 
+\family typewriter
+input/benchmarks/Elastic/multilayer_patch.input
+\family default
+.
+\end_layout
+
 \begin_layout Itemize
 
 \family typewriter
