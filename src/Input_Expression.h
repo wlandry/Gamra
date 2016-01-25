@@ -8,14 +8,14 @@
 #include <list>
 #include "SAMRAI/tbox/Array.h"
 #include "SAMRAI/tbox/Database.h"
-#include "Okada.hxx"
+#include <Okada.hxx>
+#include "Patch.h"
 
 class Input_Expression
 {
 public:
   mu::Parser equation;
-  std::vector<double> data, xyz_min, xyz_max;
-  std::vector<int> ijk;
+  std::vector<Patch> patches;
 
   int dim, slice;
   mutable double coord[3];
@@ -129,11 +129,30 @@ private:
       }
     else if(database->keyExists(name+"_data"))
       {
-        ijk=database->getIntegerVector(name+"_ijk");
-        xyz_min=database->getDoubleVector(name+"_coord_min");
-        xyz_max=database->getDoubleVector(name+"_coord_max");
-        data=database->getDoubleVector(name+"_data");
-        check_array_sizes(name,num_components);
+        patches.push_back(Patch(database,name,num_components,dim,slice));
+        use_equation=false;
+      }
+    else if(database->keyExists(name+"_patches"))
+      {
+        if(!database->isDatabase(name+"_patches"))
+          TBOX_ERROR("The entry for " + name + "_patches must be a struct.");
+
+        boost::shared_ptr<SAMRAI::tbox::Database>
+          patches_database(database->getDatabase(name+"_patches"));
+
+        /// There is no way to get an iterator.  You have to get all
+        /// of the keys and look up each one.
+        std::vector<std::string>
+          patch_names(database->getDatabase(name+"_patches")->getAllKeys());
+        for(std::vector<std::string>::iterator patch=patch_names.begin();
+            patch!=patch_names.end(); ++patch)
+          {
+            if(!patches_database->isDatabase(*patch))
+              TBOX_ERROR("The entry for " + *patch + " in " + name
+                         + "_patches must be a struct.");
+            patches.push_back(Patch(patches_database->getDatabase(*patch),
+                                    num_components,dim,slice));
+          }
         use_equation=false;
       }
     else
@@ -156,10 +175,7 @@ public:
     if(is_valid)
       {
         equation=e.equation;
-        data=e.data;
-        xyz_min=e.xyz_min;
-        xyz_max=e.xyz_max;
-        ijk=e.ijk;
+        patches=e.patches;
         use_equation=e.use_equation;
         dim=e.dim;
         slice=e.slice;
@@ -174,39 +190,12 @@ public:
     return *this;
   }
 
-  /* A little utility routine to validate the sizes of input arrays */
-  void check_array_sizes(const std::string &name, const int &num_components)
-  {
-    const size_t array_dim(slice==-1 ? dim : dim-1);
-    if(ijk.size()!=array_dim)
-      TBOX_ERROR("Bad number of elements in " << name << "_ijk.  Expected "
-                 << array_dim << " but got " << ijk.size());
-    if(xyz_min.size()!=array_dim)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_coord_min.  Expected "
-                 << array_dim << " but got " << xyz_min.size());
-    if(xyz_max.size()!=array_dim)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_coord_max.  Expected "
-                 << array_dim << " but got " << xyz_max.size());
-    size_t data_size(1);
-    for(int d=0; d<dim; ++d)
-      if(d!=slice)
-        data_size*=ijk[d];
-    
-    if(data.size()!=data_size*num_components)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "_data.  Expected "
-                 << data_size*num_components << " but got " << data.size());
-  }
-
   double eval(const double Coord[3]) const
   {
     if(!is_valid)
       TBOX_ERROR("INTERNAL ERROR: Tried to use an invalid Input_Expression");
 
     double result;
-
     if(use_equation)
       {
         for(int d=0; d<dim; ++d)
@@ -215,55 +204,36 @@ public:
       }
     else
       {
-        int d(0);
-        int ix[3], ixp[3];
-        double dx[3];
-        for(int dd=0; dd<dim; ++dd)
+        /// If there is only a single patch, then allow extrapolation
+        /// from the edge of the patch.
+        if (patches.size()==1)
           {
-            if(dd==slice)
-              continue;
-
-            /* Use max(1,ijk-1) rather than (ijk-1) to handle the case
-               when the array is only one element wide */
-            double delta=(xyz_max[d]-xyz_min[d])/std::max(1,ijk[d]-1);
-            ix[d]=static_cast<int>((Coord[dd]-xyz_min[d])/delta);
-            ix[d]=std::max(0,std::min(ijk[d]-2,ix[d]));
-            ixp[d]=std::max(0,std::min(ijk[d]-1,ix[d]+1));
-
-            if(ijk[d]==1)
-              {
-                dx[d]=0;
-              }
-            else
-              {
-                dx[d]=std::min(1.,std::max(0.,(Coord[dd]-xyz_min[d]-ix[d]*delta)
-                                           /delta));
-              }
-            ++d;
+            result=patches[0].eval(Coord);
           }
-        switch (d)
+        else
           {
-          case 1:
-            result=data[ix[0]]*(1-dx[0]) + data[ixp[0]]*dx[0];
-            break;
-          case 2:
-            result=data[ix[0] + ix[1]*ijk[0]]*(1-dx[0]-dx[1]+dx[0]*dx[1])
-              + data[ixp[0] + ix[1] *ijk[0]]*dx[0]*(1-dx[1])
-              + data[ix[0]  + ixp[1]*ijk[0]]*dx[1]*(1-dx[0])
-              + data[ixp[0] + ixp[1]*ijk[0]]*dx[0]*dx[1];
-            break;
-          case 3:
-            result=data[ix[0] + ijk[0]*(ix[1]+ ijk[1]*ix[2])] *(1-dx[0])*(1-dx[1])*(1-dx[2])
-              + data[ixp[0] + ijk[0]*(ix[1]  + ijk[1]*ix[2])] *dx[0]    *(1-dx[1])*(1-dx[2])
-              + data[ix[0]  + ijk[0]*(ixp[1] + ijk[1]*ix[2])] *(1-dx[0])*dx[1]    *(1-dx[2])
-              + data[ixp[0] + ijk[0]*(ixp[1] + ijk[1]*ix[2])] *dx[0]    *dx[1]    *(1-dx[2])
-              + data[ix[0]  + ijk[0]*(ix[1]  + ijk[1]*ixp[2])]*(1-dx[0])*(1-dx[1])*dx[2]
-              + data[ixp[0] + ijk[0]*(ix[1]  + ijk[1]*ixp[2])]*dx[0]    *(1-dx[1])*dx[2]
-              + data[ix[0]  + ijk[0]*(ixp[1] + ijk[1]*ixp[2])]*(1-dx[0])*dx[1]    *dx[2]
-              + data[ixp[0] + ijk[0]*(ixp[1] + ijk[1]*ixp[2])]*dx[0]    *dx[1]    *dx[2];
-            break;
-          default:
-            abort();
+            std::vector<Patch>::const_iterator patch=patches.begin();
+            for (; patch!=patches.end(); ++patch)
+              {
+                if (patch->contains(Coord))
+                  {
+                    result=patch->eval(Coord);
+                    break;
+                  }
+              }
+            if (patch==patches.end())
+              {
+                std::stringstream ss;
+                ss << "None of the patches contain the point ("
+                   << Coord[0];
+                for (int d=1; d<dim; ++d)
+                  ss << ", " << Coord[d];
+                ss << ")";
+                TBOX_ERROR(ss.str());
+                /// Add an abort() to remove the compiler warning
+                /// about using uninitialized variables.
+                abort();
+              }
           }
       }
     return result;
