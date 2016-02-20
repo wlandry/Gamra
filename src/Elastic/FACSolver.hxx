@@ -7,8 +7,7 @@
  * Description:   High-level solver (wrapper) for scalar Elastic equation. 
  *
  ************************************************************************/
-#ifndef GAMRA_ELASTIC_FACSolver_H
-#define GAMRA_ELASTIC_FACSolver_H
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -393,4 +392,4 @@ namespace Elastic {
 
 #include "Elastic/FACSolver.I"
 
-#endif  // included_solv_ElasticFACSolver
+

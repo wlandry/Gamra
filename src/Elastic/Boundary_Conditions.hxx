@@ -1,5 +1,4 @@
-#ifndef GAMRA_ELASTIC_BOUNDARY_CONDITIONS_H
-#define GAMRA_ELASTIC_BOUNDARY_CONDITIONS_H
+#pragma once
 
 #include <SAMRAI/tbox/Database.h>
 #include <SAMRAI/tbox/Dimension.h>
@@ -260,4 +259,4 @@ namespace Elastic {
   };
 }
 
-#endif
+

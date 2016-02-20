@@ -9,8 +9,7 @@
  *
  ************************************************************************/
 
-#ifndef GAMRA_ELASTIC_V_BOUNDARY_REFINE_H
-#define GAMRA_ELASTIC_V_BOUNDARY_REFINE_H
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -221,4 +220,4 @@ namespace Elastic {
   };
 
 }
-#endif
+

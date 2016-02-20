@@ -9,8 +9,7 @@
  *
  ************************************************************************/
 
-#ifndef GAMRA_STOKES_V_COARSEN_H
-#define GAMRA_STOKES_V_COARSEN_H
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -142,4 +141,4 @@ namespace Stokes {
   };
 
 }
-#endif
+

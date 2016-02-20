@@ -1,5 +1,4 @@
-#ifndef GAMR_STOKES_VISCOSITY_COARSEN_H
-#define GAMR_STOKES_VISCOSITY_COARSEN_H
+#pragma once
 
 /* This uses both the cell-centered and node-centered viscosities to
    coarsen the viscosity.  In 2D, if you rotate the grid 45 degrees,
@@ -75,4 +74,4 @@ inline double viscosity_coarsen_3D(const SAMRAI::pdat::CellData<double> &cell,
        + edge(fine_edge_z+ip+jp) + edge(fine_edge_z+ip+jp+kp))/8;
 }
 
-#endif
+

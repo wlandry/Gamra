@@ -7,8 +7,7 @@
  * Description:   Numerical routines for example FAC Elastic solver 
  *
  ************************************************************************/
-#ifndef GAMRA_ELASTIC_FAC_H
-#define GAMRA_ELASTIC_FAC_H
+#pragma once
 
 #include "Elastic/FACSolver.hxx"
 #include <SAMRAI/pdat/CellVariable.h>
@@ -565,4 +564,4 @@ void Elastic::FAC::add_faults()
     }
 }
 
-#endif  // included_FACElastic
+

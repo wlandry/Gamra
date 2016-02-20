@@ -7,8 +7,7 @@
  * Description:   Robin boundary condition support on cartesian grids. 
  *
  ************************************************************************/
-#ifndef GAMRA_ELASTIC_V_COARSEN_PATCH_STRATEGY_H
-#define GAMRA_ELASTIC_V_COARSEN_PATCH_STRATEGY_H
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -225,4 +224,4 @@ namespace Elastic {
   };
 
 }
-#endif  // included_solv_V_Coarsen_Patch_Strategy
+

@@ -1,5 +1,4 @@
-#ifndef GAMRA_QUAD_OFFSET_INTERPOLATE_H
-#define GAMRA_QUAD_OFFSET_INTERPOLATE_H
+#pragma once
 
 /* Interpolate up to quadratic order from three coarse points (C) to
    two fine points (f) with the setup
@@ -30,4 +29,4 @@ inline double quad_offset_interpolate(const double &plus, const double &center,
   return center + (5*d_plus - 3*d_minus)/32;
 }
 
-#endif
+

@@ -1,5 +1,4 @@
-#ifndef GAMRA_STOKES_STOKES_RESID_COARSEN_H
-#define GAMRA_STOKES_STOKES_RESID_COARSEN_H
+#pragma once
 
 #include <SAMRAI/pdat/CellVariable.h>
 #include <SAMRAI/hier/CoarsenOperator.h>
@@ -69,4 +68,4 @@ namespace Stokes {
   };
 
 }
-#endif
+

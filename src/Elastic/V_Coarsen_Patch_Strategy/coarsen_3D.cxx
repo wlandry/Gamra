@@ -9,9 +9,6 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_V_Coarsen_C
-#define included_geom_V_Coarsen_C
-
 #include "Elastic/V_Coarsen_Patch_Strategy.hxx"
 
 #include <float.h>
@@ -130,4 +127,4 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
         }
 }
 
-#endif
+

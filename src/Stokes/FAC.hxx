@@ -7,8 +7,7 @@
  * Description:   Numerical routines for example FAC Stokes solver 
  *
  ************************************************************************/
-#ifndef GAMRA_STOKES_FAC_H
-#define GAMRA_STOKES_FAC_H
+#pragma once
 
 #include "Stokes/FACSolver.hxx"
 #include <SAMRAI/pdat/CellVariable.h>
@@ -197,4 +196,4 @@ namespace Stokes {
   };
 }
 
-#endif
+

@@ -1,8 +1,7 @@
 /* Helper templates that make it easy to refer to node/edge data
    without having to duplicate code for 2D and 3D. */
 
-#ifndef GAMRA_EDGE_NODE_EVAL_H
-#define GAMRA_EDGE_NODE_EVAL_H
+#pragma once
 
 #include <SAMRAI/pdat/NodeData.h>
 #include <SAMRAI/pdat/EdgeData.h>
@@ -70,4 +69,4 @@ inline double edge_node_average(const SAMRAI::pdat::EdgeData<double> &edge,
           + edge(ez,depth) + edge(ez+pp[iz],depth))/4;
 }
 
-#endif
+

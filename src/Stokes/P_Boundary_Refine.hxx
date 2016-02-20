@@ -9,8 +9,7 @@
  *
  ************************************************************************/
 
-#ifndef GAMRA_STOKES_P_BOUNDARY_REFINE_H
-#define GAMRA_STOKES_P_BOUNDARY_REFINE_H
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -135,4 +134,4 @@ namespace Stokes {
   };
 
 }
-#endif
+

@@ -1,7 +1,6 @@
 /* Class to parse equations and interpolate arrays in input files. */
 
-#ifndef GAMRA_INPUT_EXPRESSION_H
-#define GAMRA_INPUT_EXPRESSION_H
+#pragma once
 
 #include <muParser.h>
 #include <string>
@@ -241,4 +240,4 @@ public:
 
 };
 
-#endif
+

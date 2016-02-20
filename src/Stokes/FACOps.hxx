@@ -7,8 +7,7 @@
  * Description:   Operator class for cell-centered scalar Stokes using FAC 
  *
  ************************************************************************/
-#ifndef GAMRA_STOKES_FACOPS_H
-#define GAMRA_STOKES_FACOPS_H
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -1072,4 +1071,4 @@ namespace Stokes {
 
 #include "Stokes/FACOps.I"
 
-#endif // included_solv_StokesFACOps
+

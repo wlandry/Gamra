@@ -1,5 +1,4 @@
-#ifndef GAMR_STOKES_DRC_DP_H
-#define GAMR_STOKES_DRC_DP_H
+#pragma once
 
 #include <SAMRAI/pdat/CellData.h>
 #include <SAMRAI/pdat/NodeData.h>
@@ -94,4 +93,4 @@ inline double Stokes_dRc_dp_3D(const SAMRAI::hier::Box &pbox,
     }
   return result;
 }
-#endif
+

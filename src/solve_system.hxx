@@ -1,5 +1,4 @@
-#ifndef GAMRA_SOLVE_SYSTEM_H
-#define GAMRA_SOLVE_SYSTEM_H
+#pragma once
 
 template<class T>
 bool solve_system
@@ -78,4 +77,4 @@ bool solve_system
   return converged;
 }
 
-#endif
+

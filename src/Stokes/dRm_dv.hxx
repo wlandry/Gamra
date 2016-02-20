@@ -1,5 +1,4 @@
-#ifndef GAMR_STOKES_DRM_DV_H
-#define GAMR_STOKES_DRM_DV_H
+#pragma once
 
 #include <SAMRAI/pdat/CellData.h>
 #include <SAMRAI/pdat/EdgeData.h>
@@ -41,4 +40,4 @@ inline double Stokes_dRm_dv_3D(SAMRAI::pdat::CellData<double> &cell_viscosity,
 
 
 
-#endif
+

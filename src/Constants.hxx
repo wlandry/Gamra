@@ -1,8 +1,7 @@
 /* Special values such as whether we are at a boundary, plus the
    function index_map */
 
-#ifndef GAMRA_CONSTANTS_H
-#define GAMRA_CONSTANTS_H
+#pragma once
 
 #include <limits>
 #include "Dir.hxx"
@@ -24,4 +23,4 @@ inline Gamra::Dir index_map(const Gamra::Dir &ix,
                  {0,2,max}};
   return index[ix][iy];
 }
-#endif
+

@@ -7,8 +7,7 @@
  * Description:   Robin boundary condition support on cartesian grids. 
  *
  ************************************************************************/
-#ifndef GAMRA_STOKES_V_COARSEN_PATCH_STRATEGY_H
-#define GAMRA_STOKES_V_COARSEN_PATCH_STRATEGY_H
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -405,4 +404,4 @@ namespace Stokes {
 
 }
 
-#endif  // included_solv_V_Coarsen_Patch_Strategy
+

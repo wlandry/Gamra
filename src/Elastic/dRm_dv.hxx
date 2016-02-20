@@ -1,5 +1,4 @@
-#ifndef GAMR_DRM_DV_H
-#define GAMR_DRM_DV_H
+#pragma once
 
 #include <SAMRAI/pdat/CellData.h>
 #include <SAMRAI/pdat/EdgeData.h>
@@ -39,4 +38,4 @@ inline double dRm_dv_3D(SAMRAI::pdat::CellData<double> &cell_moduli,
 		      - (edge_moduli(up_z,1) + edge_moduli(center_z,1))/(dz*dz);
 }
 
-#endif
+

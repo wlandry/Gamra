@@ -9,8 +9,7 @@
  *
  ************************************************************************/
 
-#ifndef included_geom_V_Boundary_Refine
-#define included_geom_V_Boundary_Refine
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -159,4 +158,4 @@ namespace Stokes {
   };
 
 }
-#endif
+

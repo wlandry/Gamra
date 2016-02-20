@@ -7,8 +7,7 @@
  * Description:   Hypre solver interface for diffusion-like elliptic problems. 
  *
  ************************************************************************/
-#ifndef GAMRA_STOKES_HYPRESOLVER_H
-#define GAMRA_STOKES_HYPRESOLVER_H
+#pragma once
 
 #include <SAMRAI/SAMRAI_config.h>
 
@@ -24,6 +23,8 @@
 #ifdef F77_FUNC_
 #undef F77_FUNC_
 #endif
+/// FIXME: I do not think this actually works, and we do not use it
+/// anyway.
 #include "HYPRE_struct_ls.hxx"
 #define GAMRA_STOKES_HYPRE_STRUCT_LS
 #endif
@@ -601,7 +602,5 @@ namespace Stokes {
 }
 
 #include "Stokes/HypreSolver.I"
-
-#endif
 
 #endif
