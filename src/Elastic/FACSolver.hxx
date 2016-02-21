@@ -6,7 +6,8 @@
 #include "FACOps.hxx"
 #include "Boundary_Conditions.hxx"
 
-namespace Elastic {
+namespace Elastic
+{
   class FACSolver
   {
   public:
@@ -109,7 +110,6 @@ namespace Elastic {
     }
     static void initializeStatics();
   };
-
 }
 
 
