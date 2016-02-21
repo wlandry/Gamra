@@ -34,7 +34,7 @@ void Elastic::FACSolver::initializeSolverState
     d_hierarchy->getPatchLevel(ln)->allocatePatchData
       (s_weight_id[d_dim.getValue() - 1]);
 
-  d_fac_ops->computeVectorWeights(d_hierarchy,
+  d_fac_ops->computeVectorWeights(*d_hierarchy,
                                   s_weight_id[d_dim.getValue() - 1],
                                   d_ln_min,
                                   d_ln_max);

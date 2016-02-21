@@ -56,11 +56,10 @@ namespace Elastic
       return level_set_id!=invalid_id;
     }
 
-    void computeVectorWeights
-    (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &hierarchy,
-     int weight_id,
-     int coarsest_ln = -1,
-     int finest_ln = -1) const;
+    void computeVectorWeights(const SAMRAI::hier::PatchHierarchy &hierarchy,
+                              int weight_id,
+                              int coarsest_ln = -1,
+                              int finest_ln = -1) const;
 
     void setPreconditioner(const SAMRAI::solv::FACPreconditioner*
                            preconditioner);
