@@ -101,7 +101,11 @@ namespace Elastic {
 
     void getFromInput(boost::shared_ptr<SAMRAI::tbox::Database> database);
     void createVectorWrappers(int v, int v_rhs);
-    void destroyVectorWrappers();
+    void destroyVectorWrappers()
+    {
+      d_uv.reset();
+      d_fv.reset();
+    }
     static void initializeStatics();
   };
 

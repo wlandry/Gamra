@@ -196,8 +196,6 @@ def build(bld):
                         'src/Elastic/FACSolver/FACSolver_Destructor.cxx',
                         'src/Elastic/FACSolver/createVectorWrappers.cxx',
                         'src/Elastic/FACSolver/deallocateSolverState.cxx',
-                        'src/Elastic/FACSolver/destroyVectorWrappers.cxx',
-                        'src/Elastic/FACSolver/enableLogging.cxx',
                         'src/Elastic/FACSolver/getFromInput.cxx',
                         'src/Elastic/FACSolver/initializeSolverState.cxx',
                         'src/Elastic/FACSolver/initializeStatics.cxx',
