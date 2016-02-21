@@ -770,16 +770,6 @@ namespace Stokes {
 
     //@}
 
-    //! @brief Return the patch data index for cell scratch data.
-    int
-    registerCellScratch() const;
-    //! @brief Return the patch data index for flux scratch data.
-    int
-    registerFluxScratch() const;
-    //! @brief Return the patch data index for outerflux scratch data.
-    int
-    registerOfluxScratch() const;
-
     //! @brief Free static variables at shutdown time.
     static void
     finalizeCallback();
