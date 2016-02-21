@@ -45,10 +45,10 @@ void Elastic::FACOps::prolongErrorAndCorrect
 {
   t_prolong->start();
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> fine_level =
-    s.getPatchHierarchy()->getPatchLevel(dest_ln);
+  SAMRAI::hier::PatchLevel &fine_level =
+    *(s.getPatchHierarchy()->getPatchLevel(dest_ln));
 
-  fine_level->allocatePatchData(d_side_scratch_id);
+  fine_level.allocatePatchData(d_side_scratch_id);
 
   v_refine_patch_strategy.data_id=d_side_scratch_id;
   v_refine_patch_strategy.is_residual=true;
@@ -64,7 +64,7 @@ void Elastic::FACOps::prolongErrorAndCorrect
     const int v_dst = d.getComponentDescriptorIndex(0);
     hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);
   }
-  fine_level->deallocatePatchData(d_side_scratch_id);
+  fine_level.deallocatePatchData(d_side_scratch_id);
 
   t_prolong->stop();
 }
