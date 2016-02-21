@@ -199,7 +199,6 @@ def build(bld):
                         'src/Elastic/FACSolver/getFromInput.cxx',
                         'src/Elastic/FACSolver/initializeSolverState.cxx',
                         'src/Elastic/FACSolver/initializeStatics.cxx',
-                        'src/Elastic/FACSolver/solveSystem.cxx',
                         'src/Stokes/FAC/FAC.cxx',
                         'src/Stokes/FAC/fix_viscosity.cxx',
                         'src/Stokes/FAC/applyGradientDetector.cxx',

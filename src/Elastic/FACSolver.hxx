@@ -22,7 +22,11 @@ namespace Elastic {
       d_enable_logging = logging;
       d_fac_ops->enableLogging(d_enable_logging);
     }
-    bool solveSystem(const int v, const int v_rhs);
+    bool solveSystem(const int v, const int v_rhs)
+    {
+      createVectorWrappers(v, v_rhs);
+      return d_fac_precond.solveSystem(*d_uv, *d_fv);
+    }
     void setCoarsestLevelSolverTolerance(double tol)
     {
       d_fac_ops->setCoarsestLevelSolverTolerance(tol);
