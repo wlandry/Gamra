@@ -94,7 +94,7 @@ namespace Elastic {
     static int s_weight_id[SAMRAI::MAX_DIM_VAL];
     static int s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
-    void getFromInput(boost::shared_ptr<SAMRAI::tbox::Database> database);
+    void getFromInput(SAMRAI::tbox::Database &database);
     void createVectorWrappers(int v, int v_rhs);
     void destroyVectorWrappers()
     {
