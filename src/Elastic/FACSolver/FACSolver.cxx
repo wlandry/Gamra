@@ -31,6 +31,7 @@ Elastic::FACSolver::FACSolver
   if (!s_initialized)
     initializeStatics();
 
+  /// FIXME: Does this do anything?
   setCoarseFineDiscretization("Ewing");
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);
