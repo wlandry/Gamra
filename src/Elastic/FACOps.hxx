@@ -389,9 +389,6 @@ namespace Elastic
     const SAMRAI::solv::FACPreconditioner* d_preconditioner;
     const Boundary_Conditions &d_boundary_conditions;
         
-    boost::shared_ptr<SAMRAI::math::HierarchySideDataOpsReal<double> >
-    d_hopsside;
-
     boost::shared_ptr<SAMRAI::tbox::Timer> t_restrict_solution;
     boost::shared_ptr<SAMRAI::tbox::Timer> t_restrict_residual;
     boost::shared_ptr<SAMRAI::tbox::Timer> t_prolong;

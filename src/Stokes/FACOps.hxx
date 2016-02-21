@@ -1033,16 +1033,6 @@ namespace Stokes {
     const SAMRAI::solv::FACPreconditioner* d_preconditioner;
 
     /*!
-     * @brief Hierarchy cell operator used in debugging.
-     */
-    boost::shared_ptr<SAMRAI::math::HierarchyCellDataOpsReal<double> > d_hopscell;
-
-    /*!
-     * @brief Hierarchy side operator used in debugging.
-     */
-    boost::shared_ptr<SAMRAI::math::HierarchySideDataOpsReal<double> > d_hopsside;
-
-    /*!
      * @brief Timers for performance measurement.
      */
     boost::shared_ptr<SAMRAI::tbox::Timer> t_restrict_solution;

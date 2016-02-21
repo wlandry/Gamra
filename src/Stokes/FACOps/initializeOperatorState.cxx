@@ -31,10 +31,6 @@ void Stokes::FACOps::initializeOperatorState
   d_hierarchy = solution.getPatchHierarchy();
   d_ln_min = solution.getCoarsestLevelNumber();
   d_ln_max = solution.getFinestLevelNumber();
-  d_hopscell = boost::make_shared<SAMRAI::math::HierarchyCellDataOpsReal<double> >
-    (d_hierarchy,d_ln_min,d_ln_max);
-  d_hopsside = boost::make_shared<SAMRAI::math::HierarchySideDataOpsReal<double> >
-    (d_hierarchy,d_ln_min,d_ln_max);
 
 #ifdef DEBUG_CHECK_ASSERTIONS
 

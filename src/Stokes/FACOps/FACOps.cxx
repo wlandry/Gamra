@@ -90,9 +90,7 @@ Stokes::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   v_refine_patch_strategy(d_object_name + "::refine patch strategy"),
   v_coarsen_patch_strategy(d_object_name + "::coarsen patch strategy"),
   d_enable_logging(false),
-  d_preconditioner(),
-  d_hopscell(),
-  d_hopsside()
+  d_preconditioner()
 {
 
   t_restrict_solution = SAMRAI::tbox::TimerManager::getManager()->
