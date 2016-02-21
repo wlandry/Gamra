@@ -3,7 +3,7 @@
 
 #include "Elastic/FACSolver.hxx"
 
-bool Elastic::FACSolver::s_initialized = 0;
+bool Elastic::FACSolver::s_initialized = false;
 int Elastic::FACSolver::s_weight_id[SAMRAI::MAX_DIM_VAL];
 int Elastic::FACSolver::s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
@@ -28,7 +28,6 @@ Elastic::FACSolver::FACSolver
   d_solver_is_initialized(false),
   d_enable_logging(false)
 {
-
   if (!s_initialized)
     initializeStatics();
 
