@@ -79,6 +79,8 @@ namespace Elastic {
     const SAMRAI::tbox::Dimension d_dim;
     std::string d_object_name;
     Boundary_Conditions &d_boundary_conditions;
+    /// The FACOps has to be a shared_ptr so that we can pass it to
+    /// FACPreconditioner's constructor.
     boost::shared_ptr<FACOps> d_fac_ops;
     SAMRAI::solv::FACPreconditioner d_fac_precond;
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
