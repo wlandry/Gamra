@@ -25,14 +25,26 @@ namespace Elastic {
 
     void enableLogging(bool logging);
     bool solveSystem(const int v, const int v_rhs);
-    void setCoarsestLevelSolverTolerance(double tol);
-    void setCoarsestLevelSolverMaxIterations(int max_iterations);
+    void setCoarsestLevelSolverTolerance(double tol)
+    {
+      d_fac_ops->setCoarsestLevelSolverTolerance(tol);
+    }
+    void setCoarsestLevelSolverMaxIterations(int max_iterations)
+    {
+      d_fac_ops->setCoarsestLevelSolverMaxIterations(max_iterations);
+    }
 
     /// These functions pass std::string's to
     /// xfer::Geometry::lookupRefineOperator() to get refinement and
     /// coarsening operators
-    void setCoarseFineDiscretization(const std::string& coarsefine_method);
-    void set_V_ProlongationMethod(const std::string& prolongation_method);
+    void setCoarseFineDiscretization(const std::string& coarsefine_method)
+    {
+      d_fac_ops->setCoarseFineDiscretization(coarsefine_method);
+    }
+    void set_V_ProlongationMethod(const std::string& v_prolongation_method)
+    {
+      d_fac_ops->set_V_ProlongationMethod(v_prolongation_method);
+    }
     void initializeSolverState
     (const int cell_moduli_id,
      const int edge_moduli_id,
@@ -46,9 +58,18 @@ namespace Elastic {
      const int fine_level = -1);
 
     void deallocateSolverState();
-    int getNumberOfIterations() const;
-    void getConvergenceFactors(double& avg_factor, double& final_factor) const;
-    double getResidualNorm() const;
+    int getNumberOfIterations() const
+    {
+      return d_fac_precond.getNumberOfIterations();
+    }
+    void getConvergenceFactors(double& avg_factor, double& final_factor) const
+    {
+      d_fac_precond.getConvergenceFactors(avg_factor, final_factor);
+    }
+    double getResidualNorm() const
+    {
+      return d_fac_precond.getResidualNorm();
+    }
 
     void set_boundaries(const int &v_id,
                         boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
@@ -82,7 +103,5 @@ namespace Elastic {
   };
 
 }
-
-#include "Elastic/FACSolver.I"
 
 
