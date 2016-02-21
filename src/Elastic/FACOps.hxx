@@ -1,233 +1,33 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Operator class for cell-centered scalar Elastic using FAC 
- *
- ************************************************************************/
 #pragma once
 
-#include <SAMRAI/SAMRAI_config.h>
+/// Copyright: (c) 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright: (c) 2013-2016 California Institute of Technology
 
-#include <SAMRAI/solv/FACPreconditioner.h>
 #include <SAMRAI/solv/FACOperatorStrategy.h>
-#include <SAMRAI/solv/SAMRAIVectorReal.h>
-#include <SAMRAI/math/HierarchyCellDataOpsReal.h>
-#include <SAMRAI/math/HierarchySideDataOpsReal.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/pdat/CellVariable.h>
-#include <SAMRAI/pdat/CellDoubleConstantRefine.h>
-#include <SAMRAI/pdat/OutersideData.h>
-#include <SAMRAI/pdat/OutersideVariable.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/SideVariable.h>
-#include <SAMRAI/xfer/CoarsenSchedule.h>
+#include <SAMRAI/solv/FACPreconditioner.h>
 #include <SAMRAI/xfer/RefineSchedule.h>
-#include <SAMRAI/xfer/CoarsenAlgorithm.h>
-#include <SAMRAI/xfer/RefineAlgorithm.h>
-#include <SAMRAI/hier/CoarseFineBoundary.h>
-#include <SAMRAI/hier/Patch.h>
-#include <SAMRAI/hier/PatchHierarchy.h>
-#include <SAMRAI/hier/PatchLevel.h>
-#include <SAMRAI/hier/IntVector.h>
-#include <SAMRAI/hier/Box.h>
-#include <SAMRAI/hier/VariableContext.h>
-#include <SAMRAI/tbox/Database.h>
-#include <SAMRAI/tbox/Timer.h>
+#include <SAMRAI/xfer/CoarsenSchedule.h>
+
 #include "Elastic/V_Refine_Patch_Strategy.hxx"
 #include "Elastic/V_Coarsen_Patch_Strategy.hxx"
 #include "Elastic/V_Boundary_Refine.hxx"
 #include "Elastic/V_Refine.hxx"
 
-#include <string>
-
-namespace Elastic {
-
-  /*!
-   * @brief FAC operator class to solve Elastic's equation on a SAMR grid,
-   * using cell-centered, second-order finite-volume method, with Robin
-   * boundary conditions.
-   *
-   * This class provides operators that are used by the FAC
-   * preconditioner FACPreconditioner.
-   * It is used to solve the scalar Elastic's equation using a cell-centered
-   * second-order finite-volume discretization.
-   * It is designed to provide all operations specific to
-   * the scalar Elastic's equation,
-   * @f[ \nabla \cdot D \nabla u + C u = f @f]
-   * (see Elastic::Specifications) where
-   * - C, D and f are indpendent of u
-   * - C is a cell-centered scalar field
-   * - D is the @em diffusion @em coefficients, stored on faces
-   * - f is a cell-centered scalar function
-   *
-   * You are left to provide the source function, initial guess, etc.,
-   * by specifying them in specific forms.
-   *
-   * This class provides:
-   * -# 5-point (second order), cell-centered stencil operations
-   *    for the discrete Laplacian.
-   * -# Red-black Gauss-Seidel smoothing.
-   * -# Provisions for working Robin boundary conditions
-   *    (see RobinBcCoefStrategy).
-   *
-   * This class is meant to provide the Elastic-specific operator
-   * used by the FAC preconditioner, FACPreconditioner.
-   * To use the preconditioner with this class, you will have to provide:
-   * -# The solution vector SAMRAIVectorReal,
-   *    with appropriate norm weighting for the cell-centered AMR mesh.
-   *    This class provides the function computeVectorWeights()
-   *    to help with computing the appropriate weights.
-   *    Since this is for a scalar equation, only the first depth
-   *    of the first component of the vectors are used.
-   *    All other parts are ignored.
-   * -# The source vector SAMRAIVectorReal for f.
-   * -# A Elastic::Specifications objects to specify
-   *    the cell-centered scalar field C and the side-centered
-   *    diffusion coefficients D
-   * -# The boundary condition specifications in terms of the coefficients
-   *    @f$ \alpha @f$, @f$ \beta @f$ and @f$ \gamma @f$ in the
-   *    Robin formula @f$  \alpha u + \beta u_n = \gamma @f$ applied on the
-   *    boundary faces.  See RobinBcCoefStrategy.
-   *
-   * This class allocates and deallocates only its own scratch data.
-   * Other data that it manipuates are passed in as function arguments.
-   * Hence, it owns none of the solution vectors, error vectors,
-   * diffusion coefficient data, or any such things.
-   *
-   * Input Examples
-   * @verbatim
-   * coarse_solver_choice = "hypre"    // see setCoarsestLevelSolverChoice()
-   * coarse_solver_tolerance = 1e-14   // see setCoarsestLevelSolverTolerance()
-   * coarse_solver_max_iterations = 10 // see setCoarsestLevelSolverMaxIterations()
-   * cf_discretization = "Ewing"       // see setCoarseFineDiscretization()
-   * prolongation_method = "P_REFINE" // see setProlongationMethod()
-   * hypre_solver = { ... }            // tbox::Database for initializing Hypre solver
-   * @endverbatim
-   */
-  class FACOps:
-    public SAMRAI::solv::FACOperatorStrategy
+namespace Elastic
+{
+  class FACOps: public SAMRAI::solv::FACOperatorStrategy
   {
-
   public:
-    /*!
-     * @brief Constructor.
-     *
-     * If you want standard output and logging,
-     * pass in valid pointers for those streams.
-     * @param object_name Ojbect name
-     * @param database Input database
-     */
     FACOps(const SAMRAI::tbox::Dimension& dim,
            const std::string& object_name,
            const boost::shared_ptr<SAMRAI::tbox::Database> &database,
            const Boundary_Conditions &bc);
+    void enableLogging(bool enable_logging);
+    void setCoarsestLevelSolverTolerance(double tol);
+    void setCoarsestLevelSolverMaxIterations(int max_iterations);
+    void setCoarseFineDiscretization(const std::string& coarsefine_method);
+    void set_V_ProlongationMethod(const std::string& prolongation_method);
 
-    /*!
-     * @brief Destructor.
-     *
-     * Deallocate internal data.
-     */
-    ~FACOps(void) {}
-
-    /*!
-     * @brief Enable logging.
-     *
-     * By default, logging is disabled.  The logging flag is
-     * propagated to the major components used by this class.
-     */
-    void
-    enableLogging(bool enable_logging);
-
-    //@{
-    /*!
-     * @name Functions for setting solver mathematic algorithm controls
-     */
-
-    /*!
-     * @brief Set tolerance for coarse level solve.
-     *
-     * If the coarse level solver requires a tolerance (currently, they all do),
-     * the specified value is used.
-     */
-    void
-    setCoarsestLevelSolverTolerance(double tol);
-
-    /*!
-     * @brief Set max iterations for coarse level solve.
-     *
-     * If the coarse level solver requires a max iteration limit
-     * (currently, they all do), the specified value is used.
-     */
-    void
-    setCoarsestLevelSolverMaxIterations(int max_iterations);
-
-    /*!
-     * @brief Set the coarse-fine boundary discretization method.
-     *
-     * Specify the @c op_name std::string which will be passed to
-     * xfer::Geometry::lookupRefineOperator() to get the operator
-     * for setting fine grid ghost cells from the coarse grid.
-     * Note that chosing this operator implicitly choses the
-     * discretization method at the coarse-fine boundary.
-     *
-     * There is one important instance where this std::string is
-     * @em not passed to xfer::Geometry::lookupRefineOperator.
-     * If this variable is set to "Ewing", Ewing's coarse-fine
-     * discretization is used (a constant refinement is performed,
-     * and the flux is later corrected to result in Ewing's scheme).
-     * For a reference to Ewing's discretization method, see
-     * "Local Refinement Techniques for Elliptic Problems on Cell-Centered
-     * Grids, I. Error Analysis", Mathematics of Computation, Vol. 56, No. 194,
-     * April 1991, pp. 437-461.
-     *
-     * @param coarsefine_method String selecting the coarse-fine discretization method.
-     */
-    void
-    setCoarseFineDiscretization(const std::string& coarsefine_method);
-
-    /*!
-     * @brief Set the name of the prolongation method.
-     *
-     * Specify the @c op_name std::string which will be passed to
-     * xfer::Geometry::lookupRefineOperator() to get the operator
-     * for prolonging the coarse-grid correction.
-     *
-     * By default, "CONSTANT_REFINE" is used.  "LINEAR_REFINE" seems to
-     * to lead to faster convergence, but it does NOT satisfy the Galerkin
-     * condition.
-     *
-     * Prolonging using linear refinement requires a Robin bc
-     * coefficient implementation that is capable of delivering
-     * coefficients for non-hierarchy data, because linear refinement
-     * requires boundary conditions to be set on temporary levels.
-     *
-     * @param prolongation_method String selecting the coarse-fine
-     *        discretization method.
-     */
-    void
-    set_V_ProlongationMethod(const std::string& prolongation_method);
-
-    //@}
-
-    //@{
-    /*!
-     * @name Functions for setting patch data indices and coefficients
-     */
-
-    /*!
-     * @brief Set the scratch patch data index for the flux.
-     *
-     * The use of this function is optional.
-     * The patch data index should be a pdat::SideData<DIM> type of variable.
-     * If the flux id is -1 (the default initial value), scratch space
-     * for the flux is allocated as needed and immediately deallocated
-     * afterward, level by level.  If you have space preallocated for
-     * flux and you would like that to be used, set flux id to the
-     * patch data index of that space.
-     */
     void set_extra_ids(const int &Cell_moduli_id, const int &Edge_moduli_id,
                        const int &Dv_diagonal_id, const int &Dv_mixed_id,
                        const int &Level_set_id)
@@ -256,98 +56,39 @@ namespace Elastic {
       return level_set_id!=invalid_id;
     }
 
-    //@}
+    void computeVectorWeights
+    (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &hierarchy,
+     int weight_id,
+     int coarsest_ln = -1,
+     int finest_ln = -1) const;
 
-    /*!
-     * @brief Provide an implementation for getting the
-     * physical bc coefficients
-     *
-     * If your solution is fixed at the physical boundary
-     * ghost cell centers AND those cells have the correct
-     * values before entering solveSystem(), you may use a
-     * GhostCellRobinBcCoefs object.
-     *
-     * If your solution is @b not fixed at the ghost cell centers,
-     * the ghost cell values will change as the interior
-     * cell values change.  In those cases, the flexible
-     * Robin boundary conditions are applied.  You must
-     * call this function to provide the implementation for
-     * determining the boundary condition coefficients.
-     *
-     * @param physical_bc_coef boost::shared_ptr to an object that can
-     *        set the Robin bc coefficients.
-     */
-    // void
-    // setPhysicalBcCoefObject(
-    //    const RobinBcCoefStrategy* physical_bc_coef);
+    void setPreconditioner(const SAMRAI::solv::FACPreconditioner*
+                           preconditioner);
 
-    /*!
-     * @brief Set weight appropriate for computing vector norms.
-     *
-     * If you this function to set the weights used when you
-     * SAMRAIVectorReal::addComponent, you can use the
-     * vector norm functions of SAMRAIVectorReal, and
-     * the weights will be used to blank out coarse grid
-     * regions under fine grids.
-     *
-     * The weights computed are specific to the cell-centered
-     * discretization used by this class.  The weight is equal
-     * to the cell volume if the cell has not been refined,
-     * and zero if it has.
-     *
-     * This function is state-independent.  All inputs are in
-     * the argument list.
-     *
-     * @param hierarchy Hierarchy configuration to compute weights for
-     * @param weight_id hier::Patch data index of the weight
-     * @param coarsest_ln Coarsest level number.  Must be included
-     *        in hierarchy.  Must not be greater than @c finest_ln.
-     *        Default to 0.
-     * @param finest_ln Finest level number.  Must be included
-     *        in hierarchy.  Must not be less than @c coarsest_ln.
-     *        Default to finest level in @c hierarchy.
-     */
-    void
-    computeVectorWeights(boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
-                         int weight_id,
-                         int coarsest_ln = -1,
-                         int finest_ln = -1) const;
+    virtual void restrictSolution
+    (const SAMRAI::solv::SAMRAIVectorReal<double>& source,
+     SAMRAI::solv::SAMRAIVectorReal<double>& dest,
+     int dest_ln);
+    virtual void restrictResidual
+    (const SAMRAI::solv::SAMRAIVectorReal<double>& source,
+     SAMRAI::solv::SAMRAIVectorReal<double>& dest,
+     int dest_ln);
 
-    /*!
-     * @brief Set the FAC preconditioner that will be using this object.
-     *
-     * The FAC preconditioner is accessed to get convergence data during
-     * the cycle postprocessing step.  It is optional.
-     */
-    void
-    setPreconditioner(const SAMRAI::solv::FACPreconditioner* preconditioner);
+    virtual void prolongErrorAndCorrect
+    (const SAMRAI::solv::SAMRAIVectorReal<double>& source,
+     SAMRAI::solv::SAMRAIVectorReal<double>& dest,
+     int dest_ln);
 
-    //@{ @name FACOperatorStrategy virtuals
-
-    virtual void
-    restrictSolution(const SAMRAI::solv::SAMRAIVectorReal<double>& source,
-                     SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-                     int dest_ln);
-    virtual void
-    restrictResidual(const SAMRAI::solv::SAMRAIVectorReal<double>& source,
-                     SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-                     int dest_ln);
-
-    virtual void
-    prolongErrorAndCorrect(const SAMRAI::solv::SAMRAIVectorReal<double>& source,
-                           SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-                           int dest_ln);
-
-    virtual void
-    smoothError(SAMRAI::solv::SAMRAIVectorReal<double>& error,
-                const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                int ln,
-                int num_sweeps);
-
-    virtual int
-    solveCoarsestLevel(SAMRAI::solv::SAMRAIVectorReal<double>& error,
-                       const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                       int coarsest_ln);
+    virtual void smoothError
+    (SAMRAI::solv::SAMRAIVectorReal<double>& error,
+     const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+     int ln,
+     int num_sweeps);
+    
+    virtual int solveCoarsestLevel
+    (SAMRAI::solv::SAMRAIVectorReal<double>& error,
+     const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+     int coarsest_ln);
 
     virtual void
     computeCompositeResidualOnLevel
@@ -410,67 +151,41 @@ namespace Elastic {
     void set_boundaries(const int &v_id, 
                         boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
                         const bool &rhs);
-
-    //@}
-
   private:
-    //@{
-    /*!
-     * @name Private workhorse functions.
-     */
-
-    /*!
-     * @brief Red-black Gauss-Seidel error smoothing on a level.
-     *
-     * Smoothes on the residual equation @f$ Ae=r @f$ on a level.
-     *
-     * @param error error vector
-     * @param residual residual vector
-     * @param ln level number
-     * @param num_sweeps number of sweeps
-     * @param residual_tolerance the maximum residual considered to be
-     *        converged
-     */
     void smooth_2D(SAMRAI::solv::SAMRAIVectorReal<double>& error,
                    const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                   int ln,
-                   int num_sweeps,
+                   int ln, int num_sweeps, double residual_tolerance = -1.0);
+
+    void smooth_3D(SAMRAI::solv::SAMRAIVectorReal<double>& solution,
+                   const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+                   int ln, int num_sweeps,
                    double residual_tolerance = -1.0);
 
-    void smooth_3D
-    (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
-     const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-     int ln,
-     int num_sweeps,
-     double residual_tolerance = -1.0);
+    void smooth_V_2D(const Gamra::Dir &axis,
+                     const SAMRAI::hier::Box &pbox,
+                     const SAMRAI::pdat::CellIndex &cell,
+                     const SAMRAI::hier::Index &ip,
+                     const SAMRAI::hier::Index &jp,
+                     SAMRAI::pdat::SideData<double> &v,
+                     SAMRAI::pdat::SideData<double> &v_rhs,
+                     double &maxres,
+                     const double &dx,
+                     const double &dy,
+                     SAMRAI::pdat::CellData<double> &cell_moduli,
+                     SAMRAI::pdat::NodeData<double> &edge_moduli,
+                     const double &theta_momentum);
 
-    void smooth_V_2D
-    (const Gamra::Dir &axis,
-     const SAMRAI::hier::Box &pbox,
-     const SAMRAI::pdat::CellIndex &cell,
-     const SAMRAI::hier::Index &ip,
-     const SAMRAI::hier::Index &jp,
-     SAMRAI::pdat::SideData<double> &v,
-     SAMRAI::pdat::SideData<double> &v_rhs,
-     double &maxres,
-     const double &dx,
-     const double &dy,
-     SAMRAI::pdat::CellData<double> &cell_moduli,
-     SAMRAI::pdat::NodeData<double> &edge_moduli,
-     const double &theta_momentum);
-
-    void smooth_V_3D
-    (const Gamra::Dir &ix,
-     const SAMRAI::hier::Box &pbox,
-     SAMRAI::pdat::SideData<double> &v,
-     SAMRAI::pdat::SideData<double> &v_rhs,
-     SAMRAI::pdat::CellData<double> &cell_moduli,
-     SAMRAI::pdat::EdgeData<double> &edge_moduli,
-     const SAMRAI::pdat::CellIndex &cell,
-     const double Dx[3],
-     const double &theta_momentum,
-     const SAMRAI::hier::Index pp[3],
-     double &maxres);
+    void smooth_V_3D(const Gamra::Dir &ix,
+                     const SAMRAI::hier::Box &pbox,
+                     SAMRAI::pdat::SideData<double> &v,
+                     SAMRAI::pdat::SideData<double> &v_rhs,
+                     SAMRAI::pdat::CellData<double> &cell_moduli,
+                     SAMRAI::pdat::EdgeData<double> &edge_moduli,
+                     const SAMRAI::pdat::CellIndex &cell,
+                     const double Dx[3],
+                     const double &theta_momentum,
+                     const SAMRAI::hier::Index pp[3],
+                     double &maxres);
 
     /* The mixed derivative of the stress.  We have to use a template
        because 2D uses Node's for the edge moduli, while 3D uses
@@ -577,37 +292,6 @@ namespace Elastic {
         +shear_noncell(v,edge_moduli,x,y,edge_z,ip,jp,dx,dy)
         +shear_noncell(v,edge_moduli,x,z,edge_y,ip,kp,dx,dz);
     }
-
-    /*!
-     * @brief Solve the coarsest level using HYPRE
-     */
-    int
-    solveCoarsestLevel_HYPRE(SAMRAI::solv::SAMRAIVectorReal<double>& error,
-                             const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                             int ln);
-
-    /*!
-     * @brief AMR-unaware function to red or black smoothing on a single patch,
-     * for variable diffusion coefficient and variable scalar field.
-     *
-     * @param patch patch
-     * @param flux_data side-centered flux data
-     * @param rhs_data cell-centered rhs data
-     * @param scalar_field_data
-     *        cell-centered scalar field data
-     * @param soln_data cell-centered solution data
-     * @param red_or_black red-black switch.  Set to 'r' or 'b'.
-     * @param p_maxres max residual output.  Set to NULL to avoid computing.
-     */
-    void
-    redOrBlackSmoothingOnPatch(const SAMRAI::hier::Patch& patch,
-                               const SAMRAI::pdat::SideData<double>& flux_data,
-                               const SAMRAI::pdat::CellData<double>& rhs_data,
-                               SAMRAI::pdat::CellData<double>& soln_data,
-                               char red_or_black,
-                               double* p_maxres = NULL) const;
-
-    //@}
 
     //@{ @name For executing, caching and resetting communication schedules.
 

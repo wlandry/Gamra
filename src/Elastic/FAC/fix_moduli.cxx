@@ -1,6 +1,8 @@
-#include "Elastic/FAC.hxx"
+#include <SAMRAI/xfer/CoarsenAlgorithm.h>
 #include <SAMRAI/geom/CartesianGridGeometry.h>
 #include <SAMRAI/pdat/NodeGeometry.h>
+
+#include "Elastic/FAC.hxx"
 
 /* Fix the moduli on the coarse grids by coarsening from the finer
    grids geometrically averaging the cell moduli to get the edge

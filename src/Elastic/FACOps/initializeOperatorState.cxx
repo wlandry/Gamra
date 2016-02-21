@@ -1,24 +1,11 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Operator class for staggered scalar Elastic using FAC 
- *
- ************************************************************************/
-#include "Elastic/FACOps.hxx"
+/// Copyright: (c) 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright: (c) 2013-2016 California Institute of Technology
 
+#include <SAMRAI/xfer/CoarsenAlgorithm.h>
 #include <SAMRAI/geom/CartesianGridGeometry.h>
 #include <SAMRAI/xfer/PatchLevelFullFillPattern.h>
-/*
-************************************************************************
-* FACOperatorStrategy virtual initializeOperatorState function.  *
-*                                                                      *
-* Set internal variables to correspond to the solution passed in.      *
-* Look up transfer operators.                                          *
-************************************************************************
-*/
+
+#include "Elastic/FACOps.hxx"
 
 void Elastic::FACOps::initializeOperatorState
 (const SAMRAI::solv::SAMRAIVectorReal<double>& solution,

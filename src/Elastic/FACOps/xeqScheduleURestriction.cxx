@@ -1,18 +1,12 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Operator class for cell-centered scalar Elastic using FAC 
- *
- ************************************************************************/
+/// Copyright: (c) 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright: (c) 2013-2016 California Institute of Technology
+
+#include <SAMRAI/xfer/CoarsenAlgorithm.h>
 #include "Elastic/FACOps.hxx"
 
 void Elastic::FACOps::xeqScheduleURestriction(int v_dst, int v_src,
                                               int dest_ln)
 {
-  /* v */
   if (!v_urestriction_coarsen_schedules[dest_ln]) {
     TBOX_ERROR("Expected schedule not found.");
   }
