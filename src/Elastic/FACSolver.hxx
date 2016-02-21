@@ -51,7 +51,7 @@ namespace Elastic {
      const int level_set_id,
      const int v_id,
      const int v_rhs_id,
-     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
+     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &hierarchy,
      const int coarse_level = -1,
      const int fine_level = -1);
 
