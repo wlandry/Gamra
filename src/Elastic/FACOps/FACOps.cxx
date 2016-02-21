@@ -63,8 +63,7 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   v_coarsen_patch_strategy(d_object_name + "::coarsen patch strategy",bc),
   d_enable_logging(false),
   d_preconditioner(),
-  d_boundary_conditions(bc),
-  d_hopsside()
+  d_boundary_conditions(bc)
 {
 
   t_restrict_solution = SAMRAI::tbox::TimerManager::getManager()->

@@ -21,9 +21,6 @@ void Elastic::FACOps::initializeOperatorState
 
   d_ln_min = solution.getCoarsestLevelNumber();
   d_ln_max = solution.getFinestLevelNumber();
-  d_hopsside = boost::make_shared<SAMRAI::math::HierarchySideDataOpsReal<double> >
-    (hierarchy, d_ln_min, d_ln_max);
-
   const int v_id(solution.getComponentDescriptorIndex(0)),
     v_rhs_id(rhs.getComponentDescriptorIndex(0));
 
