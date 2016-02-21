@@ -20,16 +20,9 @@ void Elastic::FACOps::smooth_2D
   const int v_id(solution.getComponentDescriptorIndex(0)),
     v_rhs_id(residual.getComponentDescriptorIndex(0));
 
-#ifdef DEBUG_CHECK_ASSERTIONS
-  if (solution.getPatchHierarchy() != d_hierarchy
-      || residual.getPatchHierarchy() != d_hierarchy)
-    {
-      TBOX_ERROR(d_object_name << ": Vector hierarchy does not match\n"
-                 "internal hierarchy.");
-    }
-#endif
+  const SAMRAI::hier::PatchHierarchy &hierarchy=*residual.getPatchHierarchy();
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
-    level = d_hierarchy->getPatchLevel(ln);
+    level = hierarchy.getPatchLevel(ln);
 
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=true;
@@ -181,7 +174,7 @@ void Elastic::FACOps::smooth_2D
            * whether to continue smoothing.
            */
           converged = max_residual < residual_tolerance;
-          const SAMRAI::tbox::SAMRAI_MPI& mpi(d_hierarchy->getMPI());
+          const SAMRAI::tbox::SAMRAI_MPI& mpi(hierarchy.getMPI());
           int tmp= converged ? 1 : 0;
           if (mpi.getSize() > 1)
             {

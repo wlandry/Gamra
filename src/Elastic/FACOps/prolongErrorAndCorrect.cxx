@@ -45,10 +45,8 @@ void Elastic::FACOps::prolongErrorAndCorrect
 {
   t_prolong->start();
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> coarse_level =
-    d_hierarchy->getPatchLevel(dest_ln - 1);
   boost::shared_ptr<SAMRAI::hier::PatchLevel> fine_level =
-    d_hierarchy->getPatchLevel(dest_ln);
+    s.getPatchHierarchy()->getPatchLevel(dest_ln);
 
   fine_level->allocatePatchData(d_side_scratch_id);
 
@@ -62,7 +60,7 @@ void Elastic::FACOps::prolongErrorAndCorrect
 
   {
     SAMRAI::math::HierarchySideDataOpsReal<double>
-      hierarchy_math_ops(d_hierarchy, dest_ln, dest_ln);
+      hierarchy_math_ops(s.getPatchHierarchy(), dest_ln, dest_ln);
     const int v_dst = d.getComponentDescriptorIndex(0);
     hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);
   }

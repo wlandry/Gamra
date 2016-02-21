@@ -47,16 +47,17 @@
 
 void Elastic::FACOps::deallocateOperatorState()
 {
-  if (d_hierarchy) {
-    d_cf_boundary.clear();
-    d_hierarchy.reset();
-    d_ln_min = -1;
-    d_ln_max = -1;
+  if (initialized)
+    {
+      d_cf_boundary.clear();
+      d_ln_min = -1;
+      d_ln_max = -1;
 
-    v_prolongation_refine_schedules.setNull();
-    v_urestriction_coarsen_schedules.setNull();
-    v_rrestriction_coarsen_schedules.setNull();
-    v_ghostfill_refine_schedules.setNull();
-    v_nocoarse_refine_schedules.setNull();
-  }
+      v_prolongation_refine_schedules.setNull();
+      v_urestriction_coarsen_schedules.setNull();
+      v_rrestriction_coarsen_schedules.setNull();
+      v_ghostfill_refine_schedules.setNull();
+      v_nocoarse_refine_schedules.setNull();
+    }
+  initialized=false;
 }

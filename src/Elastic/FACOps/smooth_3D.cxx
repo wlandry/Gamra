@@ -18,15 +18,9 @@ void Elastic::FACOps::smooth_3D
   const int v_id(solution.getComponentDescriptorIndex(0)),
     v_rhs_id(residual.getComponentDescriptorIndex(0));
 
-#ifdef DEBUG_CHECK_ASSERTIONS
-  if (solution.getPatchHierarchy() != d_hierarchy
-      || residual.getPatchHierarchy() != d_hierarchy)
-    {
-      TBOX_ERROR(d_object_name << ": Vector hierarchy does not match\n"
-                 "internal hierarchy.");
-    }
-#endif
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
+  const SAMRAI::hier::PatchHierarchy &hierarchy=*residual.getPatchHierarchy();
+  boost::shared_ptr<SAMRAI::hier::PatchLevel>
+    level = hierarchy.getPatchLevel(ln);
 
   /* Only need to sync the rhs once. This sync is needed because
      calculating a new pressure update requires computing in the ghost
@@ -126,7 +120,7 @@ void Elastic::FACOps::smooth_3D
          * non negative value for residual tolerance).
          */
         converged = maxres < residual_tolerance;
-        const SAMRAI::tbox::SAMRAI_MPI& mpi(d_hierarchy->getMPI());
+        const SAMRAI::tbox::SAMRAI_MPI& mpi(hierarchy.getMPI());
         int tmp= converged ? 1 : 0;
         if (mpi.getSize() > 1)
           {

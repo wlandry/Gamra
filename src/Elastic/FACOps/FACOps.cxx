@@ -33,7 +33,7 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
                         const Boundary_Conditions &bc):
   d_dim(dim),
   d_object_name(object_name),
-  d_hierarchy(),
+  initialized(false),
   d_ln_min(-1),
   d_ln_max(-1),
   d_cf_boundary(),

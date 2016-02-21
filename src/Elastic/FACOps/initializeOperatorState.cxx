@@ -13,142 +13,30 @@ void Elastic::FACOps::initializeOperatorState
  const SAMRAI::solv::SAMRAIVectorReal<double>& rhs)
 {
   deallocateOperatorState();
+  boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy
+    = solution.getPatchHierarchy();
   int ln;
   SAMRAI::hier::VariableDatabase*
     vdb = SAMRAI::hier::VariableDatabase::getDatabase();
 
-  d_hierarchy = solution.getPatchHierarchy();
   d_ln_min = solution.getCoarsestLevelNumber();
   d_ln_max = solution.getFinestLevelNumber();
   d_hopsside = boost::make_shared<SAMRAI::math::HierarchySideDataOpsReal<double> >
-    (d_hierarchy, d_ln_min, d_ln_max);
+    (hierarchy, d_ln_min, d_ln_max);
 
   const int v_id(solution.getComponentDescriptorIndex(0)),
     v_rhs_id(rhs.getComponentDescriptorIndex(0));
-
-#ifdef DEBUG_CHECK_ASSERTIONS
-
-  {
-    /*
-     * Make sure that solution and rhs data
-     *   are of correct type
-     *   are allocated
-     *   has sufficient ghost width
-     */
-
-    if (solution.getNumberOfComponents() != 1)
-      TBOX_WARNING(d_object_name
-                   << ": Solution vector has multiple components.\n"
-                   << "Solver is for component 0 only.\n");
-    if (rhs.getNumberOfComponents() != 1)
-      TBOX_WARNING(d_object_name
-                   << ": RHS vector has multiple components.\n"
-                   << "Solver is for component 0 only.\n");
-
-    boost::shared_ptr<SAMRAI::hier::Variable> var;
-    {
-      vdb->mapIndexToVariable(v_rhs_id,var);
-      if (!var) {
-        TBOX_ERROR(d_object_name << ": RHS component does not\n"
-                   << "correspond to a variable.\n");
-      }
-      boost::shared_ptr<SAMRAI::pdat::SideVariable<double> > side_var =
-        boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >
-        (var);
-      if (!side_var) {
-        TBOX_ERROR(d_object_name
-                   << ": RHS variable is not side-centered double\n");
-      }
-    }
-    {
-      vdb->mapIndexToVariable(v_id,var);
-      if (!var) {
-        TBOX_ERROR(d_object_name << ": Solution component does not\n"
-                   << "correspond to a variable.\n");
-      }
-      boost::shared_ptr<SAMRAI::pdat::SideVariable<double> > side_var =
-        boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >
-        (var);
-      if (!side_var) {
-        TBOX_ERROR(d_object_name
-                   << ": Solution variable is not side-centered double\n");
-      }
-    }
-    for (ln = d_ln_min; ln <= d_ln_max; ++ln)
-      {
-        boost::shared_ptr<SAMRAI::hier::PatchLevel> level_ptr =
-          d_hierarchy->getPatchLevel(ln);
-        SAMRAI::hier::PatchLevel& level = *level_ptr;
-        for (SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
-             pi!=level.end(); ++pi)
-          {
-            SAMRAI::hier::Patch& patch = **pi;
-            boost::shared_ptr<SAMRAI::hier::PatchData> fd=
-              patch.getPatchData(v_rhs_id);
-        
-            if (fd)
-              {
-                /*
-                 * Some data checks can only be done if the data already exists.
-                 */
-                boost::shared_ptr<SAMRAI::pdat::SideData<double> > cd =
-                  boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                  (fd);
-                if (!cd)
-                  TBOX_ERROR(d_object_name
-                             << ": RHS data is not side-centered double\n");
-                if (cd->getDepth() > 1)
-                  TBOX_WARNING(d_object_name
-                               << ": RHS data has multiple depths.\n"
-                               << "Solver is for depth 0 only.\n");
-              }
-            boost::shared_ptr<SAMRAI::hier::PatchData> ud =
-              patch.getPatchData(v_id);
-            if (ud)
-              {
-                /*
-                 * Some data checks can only be done if the data already exists.
-                 */
-                boost::shared_ptr<SAMRAI::pdat::SideData<double> > cd =
-                  boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                  (ud);
-                if (!cd)
-                  TBOX_ERROR(d_object_name
-                             << ": Solution data is not side-centered double\n");
-                if (cd->getDepth() > 1)
-                  TBOX_WARNING(d_object_name
-                               << ": Solution data has multiple depths.\n"
-                               << "Solver is for depth 0 only.\n");
-                if (cd->getGhostCellWidth()
-                    < SAMRAI::hier::IntVector::getOne(d_dim))
-                  TBOX_ERROR(d_object_name << ": Solution data has "
-                             "insufficient ghost width\n");
-              }
-          }
-      }
-
-    /*
-     * Solution and rhs must have some similar properties.
-     */
-    if (rhs.getPatchHierarchy() != d_hierarchy
-        || rhs.getCoarsestLevelNumber() != d_ln_min
-        || rhs.getFinestLevelNumber() != d_ln_max) {
-      TBOX_ERROR(d_object_name << ": solution and rhs do not have\n"
-                 << "the same set of patch levels.\n");
-    }
-  }
-#endif
 
   /*
    * Initialize the coarse-fine boundary description for the
    * hierarchy.
    */
-  d_cf_boundary.resize(d_hierarchy->getNumberOfLevels());
+  d_cf_boundary.resize(hierarchy->getNumberOfLevels());
 
   SAMRAI::hier::IntVector max_gcw(d_dim, 1);
   for (ln = d_ln_min; ln <= d_ln_max; ++ln)
     d_cf_boundary[ln] = boost::make_shared<SAMRAI::hier::CoarseFineBoundary >
-      (*d_hierarchy, ln, max_gcw);
+      (*hierarchy, ln, max_gcw);
 
   v_coarsen_patch_strategy.coarse_fine=d_cf_boundary;
   /*
@@ -156,7 +44,7 @@ void Elastic::FACOps::initializeOperatorState
    */
   boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry> geometry =
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianGridGeometry>
-    (d_hierarchy->getGridGeometry());
+    (hierarchy->getGridGeometry());
   boost::shared_ptr<SAMRAI::hier::Variable> variable;
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
@@ -251,17 +139,17 @@ void Elastic::FACOps::initializeOperatorState
         fill_pattern(new SAMRAI::xfer::PatchLevelFullFillPattern());
       v_prolongation_refine_schedules[dest_ln] =
         v_prolongation_refine_algorithm.
-        createSchedule(fill_pattern,d_hierarchy->getPatchLevel(dest_ln),
+        createSchedule(fill_pattern,hierarchy->getPatchLevel(dest_ln),
                        boost::shared_ptr<SAMRAI::hier::PatchLevel>(),
-                       dest_ln - 1,d_hierarchy);
+                       dest_ln - 1,hierarchy);
                        
     if (!v_prolongation_refine_schedules[dest_ln])
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for v prolongation!\n");
     v_ghostfill_refine_schedules[dest_ln] =
       v_ghostfill_refine_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     dest_ln - 1,d_hierarchy,
+      createSchedule(hierarchy->getPatchLevel(dest_ln),
+                     dest_ln - 1,hierarchy,
                      &v_refine_patch_strategy);
     if (!v_ghostfill_refine_schedules[dest_ln])
       TBOX_ERROR(d_object_name
@@ -269,7 +157,7 @@ void Elastic::FACOps::initializeOperatorState
 
     v_nocoarse_refine_schedules[dest_ln] =
       v_nocoarse_refine_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln));
+      createSchedule(hierarchy->getPatchLevel(dest_ln));
     if (!v_nocoarse_refine_schedules[dest_ln])
       TBOX_ERROR(d_object_name << ": Cannot create a refine schedule for "
                  "ghost filling on bottom level!\n");
@@ -280,8 +168,8 @@ void Elastic::FACOps::initializeOperatorState
     {
       v_urestriction_coarsen_schedules[dest_ln] =
         v_urestriction_coarsen_algorithm.
-        createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                       d_hierarchy->getPatchLevel(dest_ln + 1),
+        createSchedule(hierarchy->getPatchLevel(dest_ln),
+                       hierarchy->getPatchLevel(dest_ln + 1),
                        &v_coarsen_patch_strategy);
       if (!v_urestriction_coarsen_schedules[dest_ln])
         TBOX_ERROR(d_object_name << ": Cannot create a coarsen schedule for "
@@ -289,8 +177,8 @@ void Elastic::FACOps::initializeOperatorState
 
       v_rrestriction_coarsen_schedules[dest_ln] =
         v_rrestriction_coarsen_algorithm.
-        createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                       d_hierarchy->getPatchLevel(dest_ln + 1),
+        createSchedule(hierarchy->getPatchLevel(dest_ln),
+                       hierarchy->getPatchLevel(dest_ln + 1),
                        &v_coarsen_patch_strategy);
       if (!v_rrestriction_coarsen_schedules[dest_ln])
         TBOX_ERROR(d_object_name << ": Cannot create a coarsen schedule for "
@@ -300,8 +188,9 @@ void Elastic::FACOps::initializeOperatorState
   /* Ordinary ghost fill operator on the coarsest level */
   v_nocoarse_refine_schedules[d_ln_min] =
     v_nocoarse_refine_algorithm.
-    createSchedule(d_hierarchy->getPatchLevel(d_ln_min));
+    createSchedule(hierarchy->getPatchLevel(d_ln_min));
   if (!v_nocoarse_refine_schedules[d_ln_min])
     TBOX_ERROR(d_object_name << ": Cannot create a refine schedule for v "
                "ghost filling on bottom level!\n");
+  initialized=true;
 }

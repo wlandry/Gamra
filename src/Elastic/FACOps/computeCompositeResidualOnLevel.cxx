@@ -18,9 +18,10 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
       || rhs.getPatchHierarchy() != solution.getPatchHierarchy())
     TBOX_ERROR(d_object_name << ": residual, solution, and rhs hierarchies "
                << "are not consistent.");
+  const SAMRAI::hier::PatchHierarchy &hierarchy=*residual.getPatchHierarchy();
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
-    level = solution.getPatchHierarchy()->getPatchLevel(ln);
+    level = hierarchy.getPatchLevel(ln);
 
   const int v_id = solution.getComponentDescriptorIndex(0);
   v_refine_patch_strategy.data_id=v_id;
@@ -32,7 +33,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
   else
     xeqScheduleGhostFillNoCoarse(v_id, ln);
 
-  set_boundaries(v_id,ln,error_equation_indicator);
+  set_boundaries(v_id,hierarchy,ln,error_equation_indicator);
 
   for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
        pi!=level->end(); ++pi)

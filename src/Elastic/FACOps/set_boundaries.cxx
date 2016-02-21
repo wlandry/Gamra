@@ -43,7 +43,7 @@
 
 void Elastic::FACOps::set_boundaries
 (const int &v_id,
- boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
+ const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
 {
   for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
        pi!=level->end(); ++pi)

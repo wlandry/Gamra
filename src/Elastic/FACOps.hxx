@@ -39,7 +39,7 @@ namespace Elastic
     }
     void setCoarseFineDiscretization(const std::string& coarsefine_method)
     {
-      if (d_hierarchy)
+      if (initialized)
         TBOX_ERROR(d_object_name << ": Cannot change coarse-fine\n"
                    << "discretization method while operator state\n"
                    << "is initialized because that causes a\n"
@@ -48,7 +48,7 @@ namespace Elastic
     }
     void set_V_ProlongationMethod(const std::string& prolongation_method)
     {
-      if (d_hierarchy)
+      if (initialized)
         TBOX_ERROR(d_object_name << ": Cannot change v prolongation method\n"
                    << "while operator state is initialized because that\n"
                    << "causes a corruption in the state.\n");
@@ -148,9 +148,9 @@ namespace Elastic
                         int fine_ln,
                         int coarse_ln);
 
-    virtual void
-    initializeOperatorState(const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
-                            const SAMRAI::solv::SAMRAIVectorReal<double>& rhs);
+    virtual void initializeOperatorState
+    (const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
+     const SAMRAI::solv::SAMRAIVectorReal<double>& rhs);
 
     virtual void
     deallocateOperatorState();
@@ -160,23 +160,25 @@ namespace Elastic
                         const SAMRAI::solv::SAMRAIVectorReal<double>& current_soln,
                         const SAMRAI::solv::SAMRAIVectorReal<double>& residual);
 
-    void set_boundaries(const int &v_id, const int &l)
+    void set_boundaries(const int &v_id,
+                        const SAMRAI::hier::PatchHierarchy &hierarchy,
+                        const int &l)
     {
-      set_boundaries(v_id,l,true);
-    }
-    void set_boundaries(const int &v_id, const int &l, const bool &rhs)
-    {
-      boost::shared_ptr<SAMRAI::hier::PatchLevel> level =
-        d_hierarchy->getPatchLevel(l);
-      set_boundaries(v_id,level,rhs);
+      set_boundaries(v_id,hierarchy,l,true);
     }
     void set_boundaries(const int &v_id,
-                        boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
+                        const SAMRAI::hier::PatchHierarchy &hierarchy,
+                        const int &l, const bool &rhs)
+    {
+      set_boundaries(v_id,hierarchy.getPatchLevel(l),rhs);
+    }
+    void set_boundaries(const int &v_id,
+                        const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
     {
       set_boundaries(v_id,level,true);
     }
     void set_boundaries(const int &v_id, 
-                        boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
+                        const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
                         const bool &rhs);
   private:
     void smooth_2D(SAMRAI::solv::SAMRAIVectorReal<double>& error,
@@ -332,17 +334,9 @@ namespace Elastic
     const SAMRAI::tbox::Dimension d_dim;
     std::string d_object_name;
 
-    /*!
-     * @brief Reference hierarchy
-     *
-     * This variable is non-null between the initializeOperatorState()
-     * and deallocateOperatorState() calls.  It is not truly needed,
-     * because the hierarchy is obtainable through variables in most
-     * function argument lists.  We use it to enforce working on one
-     * hierarchy at a time.
-     */
-    boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
-
+    // FIXME: We should not need this variable, becaus it should
+    // always be initialized.
+    bool initialized;
     int d_ln_min;
     int d_ln_max;
 

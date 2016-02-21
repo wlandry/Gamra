@@ -64,17 +64,16 @@ void Elastic::FACOps::restrictSolution
   xeqScheduleURestriction(v_dst,v_src,dest_ln);
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
-    level = d_hierarchy->getPatchLevel(dest_ln);
+    level = s.getPatchHierarchy()->getPatchLevel(dest_ln);
   v_refine_patch_strategy.is_residual=false;
   v_refine_patch_strategy.data_id=d.getComponentDescriptorIndex(0);
   V_Boundary_Refine::is_residual=false;
 
   /// FIXME: Is this necessary?
-  if (dest_ln == d_ln_min) {
+  if (dest_ln == d_ln_min)
     xeqScheduleGhostFillNoCoarse(v_dst,dest_ln);
-  } else {
+  else
     xeqScheduleGhostFill(v_dst,dest_ln);
-  }
 
   t_restrict_solution->stop();
 }
