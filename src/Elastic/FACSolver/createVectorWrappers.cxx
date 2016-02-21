@@ -1,67 +1,37 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   High-level solver (wrapper) for scalar Elastic equation. 
- *
- ************************************************************************/
-#include <SAMRAI/pdat/CellVariable.h>
+/// Copyright: (c) 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright: (c) 2013-2016 California Institute of Technology
+
 #include "Elastic/FACSolver.hxx"
-#include <SAMRAI/tbox/PIO.h>
-#include <SAMRAI/tbox/Utilities.h>
-#include <SAMRAI/tbox/StartupShutdownManager.h>
 
-#include IOMANIP_HEADER_FILE
-
-void Elastic::FACSolver::createVectorWrappers(int v, int v_rhs) {
-
+void Elastic::FACSolver::createVectorWrappers(int v, int v_rhs)
+{
   SAMRAI::hier::VariableDatabase&
     vdb(*SAMRAI::hier::VariableDatabase::getDatabase());
   boost::shared_ptr<SAMRAI::hier::Variable> variable;
 
-  if (!d_uv || d_uv->getComponentDescriptorIndex(0) != v) {
-    d_uv.reset();
-    d_uv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
-      (d_object_name + "::uv", d_hierarchy, d_ln_min, d_ln_max);
-    /* Add v */
-    vdb.mapIndexToVariable(v, variable);
-#ifdef DEBUG_CHECK_ASSERTIONS
-    if (!variable) {
-      TBOX_ERROR(d_object_name << ": No variable for patch data index "
-                 << v << "\n");
+  if (!d_uv || d_uv->getComponentDescriptorIndex(0) != v)
+    {
+      d_uv.reset();
+      d_uv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
+        (d_object_name + "::uv", d_hierarchy, d_ln_min, d_ln_max);
+      /// Add v
+      vdb.mapIndexToVariable(v, variable);
+      if (!variable)
+        TBOX_ERROR(d_object_name << ": No variable for patch data index "
+                   << v << "\n");
+      d_uv->addComponent(variable, v);
     }
-    boost::shared_ptr<SAMRAI::pdat::SideVariable<double> > side_variable =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >
-      (variable);
-    if (!side_variable) {
-      TBOX_ERROR(d_object_name << ": SAMRAI::hier::Patch data index " << v
-                 << " is not a side-double variable.\n");
-    }
-#endif
-    d_uv->addComponent(variable, v);
-  }
 
-  if (!d_fv || d_fv->getComponentDescriptorIndex(0) != v_rhs) {
-    d_fv.reset();
-    d_fv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
-      (d_object_name + "::fv", d_hierarchy, d_ln_min, d_ln_max);
-    /* Add v_rhs */
-    vdb.mapIndexToVariable(v_rhs, variable);    
-#ifdef DEBUG_CHECK_ASSERTIONS
-    if (!variable) {
-      TBOX_ERROR(d_object_name << ": No variable for patch data index "
-                 << v_rhs << "\n");
+  if (!d_fv || d_fv->getComponentDescriptorIndex(0) != v_rhs)
+    {
+      d_fv.reset();
+      d_fv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
+        (d_object_name + "::fv", d_hierarchy, d_ln_min, d_ln_max);
+      /// Add v_rhs
+      vdb.mapIndexToVariable(v_rhs, variable);    
+      if (!variable)
+        TBOX_ERROR(d_object_name << ": No variable for patch data index "
+                   << v_rhs << "\n");
+      d_fv->addComponent(variable, v_rhs);
     }
-    boost::shared_ptr<SAMRAI::pdat::SideVariable<double> > side_variable =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >
-      (variable);
-    if (!side_variable) {
-      TBOX_ERROR(d_object_name << ": SAMRAI::hier::Patch data index " << v_rhs
-                 << " is not a cell-double variable.\n");
-    }
-#endif
-    d_fv->addComponent(variable, v_rhs);
-  }
 }
