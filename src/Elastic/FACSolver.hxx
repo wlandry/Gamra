@@ -14,7 +14,6 @@
 namespace Elastic {
   class FACSolver
   {
-
   public:
     FACSolver(const SAMRAI::tbox::Dimension& dim,
               const std::string& object_name,
@@ -23,7 +22,11 @@ namespace Elastic {
 
     ~FACSolver(void);
 
-    void enableLogging(bool logging);
+    void enableLogging(bool logging)
+    {
+      d_enable_logging = logging;
+      d_fac_ops->enableLogging(d_enable_logging);
+    }
     bool solveSystem(const int v, const int v_rhs);
     void setCoarsestLevelSolverTolerance(double tol)
     {
