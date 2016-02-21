@@ -3,13 +3,8 @@
 /// Copyright: (c) 1997-2010 Lawrence Livermore National Security, LLC
 /// Copyright: (c) 2013-2016 California Institute of Technology
 
-#include <SAMRAI/SAMRAI_config.h>
-#include <SAMRAI/solv/FACPreconditioner.h>
-#include <SAMRAI/solv/SimpleCellRobinBcCoefs.h>
-#include <SAMRAI/tbox/Database.h>
-
-#include "Elastic/FACOps.hxx"
-#include "Elastic/Boundary_Conditions.hxx"
+#include "FACOps.hxx"
+#include "Boundary_Conditions.hxx"
 
 namespace Elastic {
   class FACSolver
