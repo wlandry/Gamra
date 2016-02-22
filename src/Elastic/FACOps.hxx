@@ -389,8 +389,7 @@ namespace Elastic
     boost::shared_ptr<SAMRAI::tbox::Timer> t_compute_composite_residual;
     boost::shared_ptr<SAMRAI::tbox::Timer> t_compute_residual_norm;
 
-    static SAMRAI::tbox::StartupShutdownManager::Handler
-    s_finalize_handler;
+    static SAMRAI::tbox::StartupShutdownManager::Handler s_finalize_handler;
   };
 
 }
