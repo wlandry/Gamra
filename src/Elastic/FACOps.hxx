@@ -159,16 +159,18 @@ namespace Elastic
                                  const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
                                  const bool &rhs);
   private:
-    void smooth_2D(SAMRAI::solv::SAMRAIVectorReal<double>& error,
-                   const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                   int ln, int num_sweeps, double residual_tolerance = -1.0);
+    void Gauss_Seidel_red_black_2D
+    (SAMRAI::solv::SAMRAIVectorReal<double>& error,
+     const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+     int ln, int num_sweeps, double residual_tolerance = -1.0);
 
-    void smooth_3D(SAMRAI::solv::SAMRAIVectorReal<double>& solution,
-                   const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                   int ln, int num_sweeps,
-                   double residual_tolerance = -1.0);
+    void Gauss_Seidel_red_black_3D
+    (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
+     const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+     int ln, int num_sweeps,
+     double residual_tolerance = -1.0);
 
-    void smooth_V_2D(const Gamra::Dir &axis,
+    void update_V_2D(const Gamra::Dir &axis,
                      const SAMRAI::hier::Box &pbox,
                      const SAMRAI::pdat::CellIndex &cell,
                      const SAMRAI::hier::Index &ip,
@@ -182,7 +184,7 @@ namespace Elastic
                      SAMRAI::pdat::NodeData<double> &edge_moduli,
                      const double &theta_momentum);
 
-    void smooth_V_3D(const Gamra::Dir &ix,
+    void update_V_3D(const Gamra::Dir &ix,
                      const SAMRAI::hier::Box &pbox,
                      SAMRAI::pdat::SideData<double> &v,
                      SAMRAI::pdat::SideData<double> &v_rhs,

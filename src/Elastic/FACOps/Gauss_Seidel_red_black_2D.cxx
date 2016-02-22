@@ -1,16 +1,12 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FACOps.hxx"
 #include "Elastic/V_Boundary_Refine.hxx"
 #include "Constants.hxx"
 #include "Elastic/dRm_dv.hxx"
 
-/*
-********************************************************************
-* Workhorse function to smooth error using red-black               *
-* Gauss-Seidel iterations.                                         *
-********************************************************************
-*/
-
-void Elastic::FACOps::smooth_2D
+void Elastic::FACOps::Gauss_Seidel_red_black_2D
 (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int ln,
@@ -34,11 +30,6 @@ void Elastic::FACOps::smooth_2D
   }
 
   double theta_momentum=1.0;
-
-  /*
-   * Smooth the number of sweeps specified or until the convergence is
-   * satisfactory.
-   */
 
   const SAMRAI::hier::Index unit[]={SAMRAI::hier::Index(1,0),SAMRAI::hier::Index(0,1)};
   bool converged = false;
@@ -110,7 +101,7 @@ void Elastic::FACOps::smooth_2D
                                 y(center,iy,SAMRAI::pdat::SideIndex::Lower);
                               if(level_set(x)>1)
                                 {
-                                  smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
+                                  update_V_2D(ix,pbox,center,unit[ix],unit[iy],
                                               v,v_rhs,max_residual,dx,dy,
                                               cell_moduli,edge_moduli,
                                               theta_momentum);
@@ -150,7 +141,7 @@ void Elastic::FACOps::smooth_2D
                             {
                               SAMRAI::pdat::CellIndex
                                 center(SAMRAI::hier::Index(i,j));
-                              smooth_V_2D(ix,pbox,center,unit[ix],unit[iy],
+                              update_V_2D(ix,pbox,center,unit[ix],unit[iy],
                                           v,v_rhs,max_residual,dx,dy,cell_moduli,
                                           edge_moduli,theta_momentum);
                             }

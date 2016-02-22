@@ -1,13 +1,11 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FACOps.hxx"
 #include "Constants.hxx"
 #include "Elastic/dRm_dv.hxx"
-/*
-********************************************************************
-* Updates one component of the velocity during a red-black *
-* Gauss-Seidel iteration.  *
-********************************************************************
-*/
-void Elastic::FACOps::smooth_V_2D
+
+void Elastic::FACOps::update_V_2D
 (const Gamra::Dir &axis,
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::pdat::CellIndex &cell,
@@ -28,7 +26,7 @@ void Elastic::FACOps::smooth_V_2D
     y(cell,off_axis,SAMRAI::pdat::SideIndex::Lower);
   const SAMRAI::pdat::NodeIndex edge(cell,SAMRAI::pdat::NodeIndex::LowerLeft);
 
-  /* If at a Dirichlet 'x' boundary, leave vx as is */
+  /// If at a Dirichlet 'x' boundary, leave vx as is
   if(!((cell[axis]==pbox.lower(axis) && v(x-ip)==boundary_value)
        || (cell[axis]==pbox.upper(axis)+1 && v(x+ip)==boundary_value)))
     {

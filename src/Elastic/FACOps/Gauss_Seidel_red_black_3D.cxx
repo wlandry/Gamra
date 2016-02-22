@@ -1,14 +1,11 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FACOps.hxx"
 #include "Elastic/V_Boundary_Refine.hxx"
 #include "Constants.hxx"
-/*
-********************************************************************
-* Workhorse function to smooth error using red-black               *
-* Gauss-Seidel iterations.                                         *
-********************************************************************
-*/
 
-void Elastic::FACOps::smooth_3D
+void Elastic::FACOps::Gauss_Seidel_red_black_3D
 (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int ln,
@@ -105,7 +102,7 @@ void Elastic::FACOps::smooth_3D
                             center(SAMRAI::hier::Index(i,j,k));
 
                           /* Update v */
-                          smooth_V_3D(ix,pbox,v,v_rhs,cell_moduli,
+                          update_V_3D(ix,pbox,v,v_rhs,cell_moduli,
                                       edge_moduli,center,
                                       Dx,theta_momentum,pp,maxres);
                         }

@@ -1,13 +1,11 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FACOps.hxx"
 #include "Constants.hxx"
 #include "Elastic/dRm_dv.hxx"
-/*
-********************************************************************
-* Updates one component of the velocity during a red-black *
-* Gauss-Seidel iteration.  *
-********************************************************************
-*/
-void Elastic::FACOps::smooth_V_3D
+
+void Elastic::FACOps::update_V_3D
 (const Gamra::Dir &ix,
  const SAMRAI::hier::Box &pbox,
  SAMRAI::pdat::SideData<double> &v,
@@ -29,7 +27,7 @@ void Elastic::FACOps::smooth_V_3D
     edge_y(cell,iy,SAMRAI::pdat::EdgeIndex::LowerLeft),
     edge_z(cell,iz,SAMRAI::pdat::EdgeIndex::LowerLeft);
     
-  /* If at a Dirichlet 'x' boundary, leave vx as is */
+  /// If at a Dirichlet 'x' boundary, leave vx as is
   if(!((cell[ix]==pbox.lower(ix) && v(x-unit[ix])==boundary_value)
        || (cell[ix]==pbox.upper(ix)+1 && v(x+unit[ix])==boundary_value)))
     {
@@ -41,9 +39,7 @@ void Elastic::FACOps::smooth_V_3D
         - v_operator_3D(v,cell_moduli,edge_moduli,cell,edge_y,edge_z,
                         x,y,z,unit[ix],unit[iy],unit[iz],Dx[ix],Dx[iy],Dx[iz]);
 
-      /* No scaling here, though there should be. */
       maxres=std::max(maxres,std::fabs(delta_Rx));
-
       v(x)+=delta_Rx*theta_momentum/C_vx;
     }
 }
