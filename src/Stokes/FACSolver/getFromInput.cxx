@@ -37,10 +37,6 @@ void Stokes::FACSolver::getFromInput(boost::shared_ptr<SAMRAI::tbox::Database> d
       bool logging = database->getBool("enable_logging");
       enableLogging(logging);
     }
-    if (database->isString("coarse_fine_discretization")) {
-      std::string s = database->getString("coarse_fine_discretization");
-      setCoarseFineDiscretization(s);
-    }
     if (database->isString("p_prolongation_method")) {
       std::string s = database->getString("p_prolongation_method");
       set_P_ProlongationMethod(s);

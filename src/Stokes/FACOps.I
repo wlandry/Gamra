@@ -140,28 +140,6 @@ namespace Stokes {
 
   /*
 ********************************************************************
-* Set the coarse-fine discretization method.                       *
-********************************************************************
-*/
-
-  inline
-  void FACOps::setCoarseFineDiscretization(
-                                           const std::string& coarsefine_method) {
-#ifdef DEBUG_CHECK_ASSERTIONS
-    if (d_hierarchy) {
-      TBOX_ERROR(
-                 d_object_name << ": Cannot change coarse-fine\n"
-                 <<
-                 "discretization method while operator state\n"
-                 << "is initialized because that causes a\n"
-                 << "corruption in the state.\n");
-    }
-#endif
-    d_cf_discretization = coarsefine_method;
-  }
-
-  /*
-********************************************************************
 * Set the prolongation method                                      *
 ********************************************************************
 */

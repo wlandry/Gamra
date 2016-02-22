@@ -46,7 +46,6 @@ Stokes::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
 #endif
 
                          ),
-  d_cf_discretization("Ewing"),
   p_prolongation_method("P_REFINE"),
   v_prolongation_method("V_REFINE"),
   p_rrestriction_method("CONSERVATIVE_COARSEN"),
@@ -152,26 +151,17 @@ Stokes::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
     d_smoothing_choice =
       database->getStringWithDefault("smoothing_choice",
                                      d_smoothing_choice);
-
-    d_cf_discretization =
-      database->getStringWithDefault("cf_discretization",
-                                     d_cf_discretization);
-
     p_prolongation_method =
       database->getStringWithDefault("p_prolongation_method",
                                      p_prolongation_method);
-
     v_prolongation_method =
       database->getStringWithDefault("v_prolongation_method",
                                      v_prolongation_method);
-
     p_rrestriction_method =
       database->getStringWithDefault("p_rrestriction_method",
                                      p_rrestriction_method);
-
     d_enable_logging =
       database->getBoolWithDefault("enable_logging",
                                    d_enable_logging);
-
   }
 }

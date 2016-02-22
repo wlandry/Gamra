@@ -44,13 +44,6 @@ namespace Stokes {
     d_fac_ops->setCoarsestLevelSolverMaxIterations(max_iterations);
   }
 
-  inline
-  void FACSolver::setCoarseFineDiscretization(
-                                              const std::string& coarsefine_method)
-  {
-    d_fac_ops->setCoarseFineDiscretization(coarsefine_method);
-  }
-
 #ifdef HAVE_HYPRE
   inline
   void FACSolver::setUseSMG(

@@ -50,7 +50,6 @@ Stokes::FACSolver::FACSolver(const SAMRAI::tbox::Dimension& dim,
   d_solver_is_initialized(false),
   d_enable_logging(false)
 {
-  setCoarseFineDiscretization("Ewing");
   // #ifdef HAVE_HYPRE
   //       setCoarsestLevelSolverChoice("hypre");
   //       setCoarsestLevelSolverTolerance(1e-10);

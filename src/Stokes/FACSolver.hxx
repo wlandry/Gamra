@@ -379,30 +379,6 @@ namespace Stokes {
 #endif
 
     /*!
-     * @brief Set the coarse-fine boundary discretization method.
-     *
-     * Specify the @c op_name std::string which will be passed to
-     * SAMRAI::xfer::Geometry::lookupRefineOperator() to get the operator
-     * for setting fine grid ghost cells from the coarse grid.
-     * Note that chosing this operator implicitly choses the
-     * discretization method at the coarse-fine boundary.
-     *
-     * There is one important instance where this std::string is
-     * @em not passed to SAMRAI::xfer::Geometry::lookupRefineOperator().
-     * If this variable is set to "Ewing", a constant refinement
-     * method is used along with Ewing's correction.
-     * For a reference to the correction method, see
-     * "Local Refinement Techniques for Elliptic Problems on Cell-Centered
-     * Grids, I. Error Analysis", Mathematics of Computation, Vol. 56, No. 194,
-     * April 1991, pp. 437-461.
-     *
-     * @param coarsefine_method String selecting the coarse-fine discretization method.
-     */
-    void
-    setCoarseFineDiscretization(
-                                const std::string& coarsefine_method);
-
-    /*!
      * @brief Set the name of the prolongation method.
      *
      * Specify the @c op_name std::string which will be passed to

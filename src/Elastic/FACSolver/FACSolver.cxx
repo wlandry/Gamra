@@ -25,8 +25,6 @@ Elastic::FACSolver::FACSolver
   d_solver_is_initialized(false),
   d_enable_logging(false)
 {
-  /// FIXME: Does this do anything?
-  setCoarseFineDiscretization("Ewing");
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);
 

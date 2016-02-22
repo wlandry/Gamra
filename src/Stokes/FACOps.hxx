@@ -815,12 +815,6 @@ namespace Stokes {
 
     /*!
      * @brief Coarse-fine discretization method.
-     * @see setCoarseFineDiscretization().
-     */
-    std::string d_cf_discretization;
-
-    /*!
-     * @brief Coarse-fine discretization method.
      *
      * The name of the refinement operator used to prolong the
      * coarse grid correction.

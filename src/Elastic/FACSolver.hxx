@@ -38,13 +38,6 @@ namespace Elastic
       d_fac_ops->setCoarsestLevelSolverMaxIterations(max_iterations);
     }
 
-    /// These functions pass std::string's to
-    /// xfer::Geometry::lookupRefineOperator() to get refinement and
-    /// coarsening operators
-    void setCoarseFineDiscretization(const std::string& coarsefine_method)
-    {
-      d_fac_ops->setCoarseFineDiscretization(coarsefine_method);
-    }
     void set_V_ProlongationMethod(const std::string& v_prolongation_method)
     {
       d_fac_ops->set_V_ProlongationMethod(v_prolongation_method);
