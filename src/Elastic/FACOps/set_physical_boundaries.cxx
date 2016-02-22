@@ -4,8 +4,6 @@
 
 #include "Elastic/FACOps.hxx"
 
-/// Set physical boundaries
-
 void Elastic::FACOps::set_physical_boundaries
 (const int &v_id,
  const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
