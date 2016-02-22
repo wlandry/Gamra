@@ -39,8 +39,6 @@ FACStokes {
         coarse_solver_choice = "Tackley"
         coarse_solver_max_iterations = 10000
         coarse_solver_tolerance = 1e-8
-        p_prolongation_method = "P_MDPI_REFINE"
-        // p_prolongation_method = "P_REFINE"
     }
     bc_coefs {
         boundary_0 = "value", "0"

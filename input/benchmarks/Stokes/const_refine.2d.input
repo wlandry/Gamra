@@ -38,15 +38,6 @@ FACStokes {
     num_post_sweeps = 5     // Number of postsmoothing sweeps to use
     coarse_solver_max_iterations = 1000
     coarse_solver_tolerance = 1e-10
-    p_prolongation_method = "P_REFINE" // Type of refinement
-      					  // used in prolongation.
-                                          // Suggested values are
-                                          // "LINEAR_REFINE"
-                                          // "CONSTANT_REFINE"
-      					  // used in prolongation.
-                                          // Suggested values are
-                                          // "LINEAR_REFINE"
-                                          // "CONSTANT_REFINE"
     use_smg = TRUE	// Whether to use HYPRE's SMG instead of PFMG.
   }
   bc_coefs {

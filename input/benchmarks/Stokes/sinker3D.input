@@ -976,12 +976,8 @@ Stokes {
         num_post_sweeps = 16     // Number of postsmoothing sweeps to use
         smoothing_choice = "Tackley"
         coarse_solver_choice = "Tackley"
-        // smoothing_choice = "Gerya"
-        // coarse_solver_choice = "Gerya"
         coarse_solver_max_iterations = 32
         coarse_solver_tolerance = 1e-12
-        // p_prolongation_method = "P_MDPI_REFINE"
-        p_prolongation_method = "P_REFINE"
         p_rrestriction_method = "RESID_COARSEN"
     }
     bc_coefs {
