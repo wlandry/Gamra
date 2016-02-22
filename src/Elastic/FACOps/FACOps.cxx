@@ -1,16 +1,8 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Operator class for cell-centered scalar Elastic using FAC 
- *
- ************************************************************************/
-#include "Elastic/FACOps.hxx"
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
-boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-Elastic::FACOps::s_cell_scratch_var[SAMRAI::MAX_DIM_VAL];
+#include "Elastic/FACOps.hxx"
 
 boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
 Elastic::FACOps::s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
@@ -86,18 +78,14 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
     TBOX_ERROR("Elastic::FACOps : DIM == 1 or > 3 not implemented yet.\n");
   }
 
-  if (!s_cell_scratch_var[dim.getValue() - 1]) {
-    std::ostringstream ss;
-    ss << "Elastic::FACOps::private_cell_scratch" << dim.getValue();
-    s_cell_scratch_var[dim.getValue() - 1] =
-      boost::make_shared<SAMRAI::pdat::CellVariable<double> >(dim, ss.str());
-      
-    ss.str("");
-    ss << "Elastic::FACOps::private_side_scratch" << dim.getValue();
-    s_side_scratch_var[dim.getValue() - 1] =
-      boost::make_shared<SAMRAI::pdat::SideVariable<double> >
-      (dim, ss.str(),SAMRAI::hier::IntVector::getOne(d_dim));
-  }
+  if (!s_side_scratch_var[dim.getValue() - 1])
+    {
+      std::ostringstream ss;
+      ss << "Elastic::FACOps::private_side_scratch" << dim.getValue();
+      s_side_scratch_var[dim.getValue() - 1] =
+        boost::make_shared<SAMRAI::pdat::SideVariable<double> >
+        (dim, ss.str(),SAMRAI::hier::IntVector::getOne(d_dim));
+    }
 
   SAMRAI::hier::VariableDatabase*
     vdb = SAMRAI::hier::VariableDatabase::getDatabase();
@@ -106,28 +94,25 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
                                d_context,
                                SAMRAI::hier::IntVector::getOne(d_dim));
 
-  /*
-   * Some variables initialized by default are overriden by input.
-   */
+  if (database)
+    {
+      d_coarse_solver_tolerance =
+        database->getDoubleWithDefault("coarse_solver_tolerance",
+                                       d_coarse_solver_tolerance);
+      d_coarse_solver_max_iterations =
+        database->getIntegerWithDefault("coarse_solver_max_iterations",
+                                        d_coarse_solver_max_iterations);
+      d_cf_discretization =
+        database->getStringWithDefault("cf_discretization",
+                                       d_cf_discretization);
 
-  if (database) {
-    d_coarse_solver_tolerance =
-      database->getDoubleWithDefault("coarse_solver_tolerance",
-                                     d_coarse_solver_tolerance);
-    d_coarse_solver_max_iterations =
-      database->getIntegerWithDefault("coarse_solver_max_iterations",
-                                      d_coarse_solver_max_iterations);
-    d_cf_discretization =
-      database->getStringWithDefault("cf_discretization",
-                                     d_cf_discretization);
+      v_prolongation_method =
+        database->getStringWithDefault("v_prolongation_method",
+                                       v_prolongation_method);
 
-    v_prolongation_method =
-      database->getStringWithDefault("v_prolongation_method",
-                                     v_prolongation_method);
+      d_enable_logging =
+        database->getBoolWithDefault("enable_logging",
+                                     d_enable_logging);
 
-    d_enable_logging =
-      database->getBoolWithDefault("enable_logging",
-                                   d_enable_logging);
-
-  }
+    }
 }

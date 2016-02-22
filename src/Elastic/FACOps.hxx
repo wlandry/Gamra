@@ -345,9 +345,6 @@ namespace Elastic
     int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id,
       level_set_id;
 
-    static boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    s_cell_scratch_var[SAMRAI::MAX_DIM_VAL];
-
     static boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
