@@ -93,7 +93,7 @@ bool Elastic::FAC::solve()
                 }
             }
         }
-    d_elastic_fac_solver.set_boundaries(v_id,level,false);
+    d_elastic_fac_solver.set_physical_boundaries(v_id,level,false);
   }
 
   d_elastic_fac_solver.initializeSolverState

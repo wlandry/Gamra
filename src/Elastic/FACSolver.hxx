@@ -64,11 +64,11 @@ namespace Elastic
       return d_fac_precond.getResidualNorm();
     }
 
-    void set_boundaries(const int &v_id,
-                        boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
-                        const bool &homogeneous)
+    void set_physical_boundaries(const int &v_id,
+                                 boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
+                                 const bool &homogeneous)
     {
-      d_fac_ops->set_boundaries(v_id,level,homogeneous);
+      d_fac_ops->set_physical_boundaries(v_id,level,homogeneous);
     }
   private:
     const SAMRAI::tbox::Dimension d_dim;

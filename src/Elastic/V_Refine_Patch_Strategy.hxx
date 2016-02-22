@@ -56,7 +56,7 @@ public:
   {
     /* Do not apply normal stress bc's, since those external points
        are not used anyway. */
-    d_boundary_conditions.set_boundary(patch,data_id,is_residual,false);
+    d_boundary_conditions.set_physical_boundary(patch,data_id,is_residual,false);
   }
   SAMRAI::hier::IntVector
   getRefineOpStencilWidth(const SAMRAI::tbox::Dimension& dim) const
@@ -71,7 +71,7 @@ public:
   {
     /* Do not apply normal stress bc's, since those external points
        are not used anyway. */
-    d_boundary_conditions.set_boundary(coarse,data_id,is_residual,false);
+    d_boundary_conditions.set_physical_boundary(coarse,data_id,is_residual,false);
   }
 
   virtual void

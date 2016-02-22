@@ -407,24 +407,24 @@ namespace Stokes {
                         const SAMRAI::solv::SAMRAIVectorReal<double>& current_soln,
                         const SAMRAI::solv::SAMRAIVectorReal<double>& residual);
 
-    void set_boundaries(const int &p_id, const int &v_id, const int &l)
+    void set_physical_boundaries(const int &p_id, const int &v_id, const int &l)
     {
-      set_boundaries(p_id,v_id,l,true);
+      set_physical_boundaries(p_id,v_id,l,true);
     }
-    void set_boundaries(const int &p_id, const int &v_id, const int &l,
-                        const bool &rhs)
+    void set_physical_boundaries(const int &p_id, const int &v_id, const int &l,
+                                 const bool &rhs)
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(l);
-      set_boundaries(p_id,v_id,level,rhs);
+      set_physical_boundaries(p_id,v_id,level,rhs);
     }
-    void set_boundaries(const int &p_id, const int &v_id,
-                        boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
+    void set_physical_boundaries(const int &p_id, const int &v_id,
+                                 boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
     {
-      set_boundaries(p_id,v_id,level,true);
+      set_physical_boundaries(p_id,v_id,level,true);
     }
-    void set_boundaries(const int &p_id, const int &v_id, 
-                        boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
-                        const bool &rhs);
+    void set_physical_boundaries(const int &p_id, const int &v_id, 
+                                 boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
+                                 const bool &rhs);
 
     //@}
 

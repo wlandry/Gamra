@@ -52,7 +52,7 @@ void Stokes::FACOps::computeCompositeResidualOnLevel
 
   /* S1. Fill solution ghost data. */
 
-  set_boundaries(p_id,v_id,ln,error_equation_indicator);
+  set_physical_boundaries(p_id,v_id,ln,error_equation_indicator);
   if (ln > d_ln_min) {
     /* Fill from current, next coarser level and physical boundary */
     xeqScheduleGhostFill(p_id, v_id, ln);

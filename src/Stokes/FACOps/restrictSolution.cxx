@@ -65,7 +65,7 @@ void Stokes::FACOps::restrictSolution
   xeqScheduleURestriction(p_dst,p_src,v_dst,v_src,dest_ln);
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(dest_ln);
-  set_boundaries(p_dst,v_dst,level,false);
+  set_physical_boundaries(p_dst,v_dst,level,false);
   // v_refine_patch_strategy.setHomogeneousBc(false);
   p_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));
   v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(1));

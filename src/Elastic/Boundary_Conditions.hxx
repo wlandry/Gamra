@@ -21,14 +21,14 @@ namespace Elastic {
     Boundary_Conditions(const SAMRAI::tbox::Dimension& dim,
                         const std::string& object_name,
                         boost::shared_ptr<SAMRAI::tbox::Database> database);
-    void set_boundary(const SAMRAI::hier::Patch& patch,
-                      const int &v_id, const bool &homogeneous) const
+    void set_physical_boundary(const SAMRAI::hier::Patch& patch,
+                               const int &v_id, const bool &homogeneous) const
     {
-      set_boundary(patch,v_id,homogeneous,true);
+      set_physical_boundary(patch,v_id,homogeneous,true);
     }
-    void set_boundary(const SAMRAI::hier::Patch& patch,
-                      const int &v_id, const bool &homogeneous,
-                      const bool &apply_normal_stress)  const;
+    void set_physical_boundary(const SAMRAI::hier::Patch& patch,
+                               const int &v_id, const bool &homogeneous,
+                               const bool &apply_normal_stress)  const;
     void set_regular_boundary(const SAMRAI::hier::Patch& patch,
                               const int &v_id, const bool &homogeneous,
                               const bool &apply_normal_stress)  const;

@@ -34,7 +34,7 @@ void Stokes::FACOps::smooth_Tackley_3D
      calculating a new pressure update requires computing in the ghost
      region so that the update for the velocity inside the box will be
      correct. */
-  set_boundaries(p_id,v_id,level,true);
+  set_physical_boundaries(p_id,v_id,level,true);
   xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
 
   p_refine_patch_strategy.setTargetDataId(p_id);
@@ -128,7 +128,7 @@ void Stokes::FACOps::smooth_Tackley_3D
                         }
                     }
               }
-            set_boundaries(invalid_id,v_id,level,true);
+            set_physical_boundaries(invalid_id,v_id,level,true);
           }
 
       /* p sweep
@@ -201,7 +201,7 @@ void Stokes::FACOps::smooth_Tackley_3D
               p(center)+=dp(center);
             }
         }
-      set_boundaries(p_id,invalid_id,level,true);
+      set_physical_boundaries(p_id,invalid_id,level,true);
 
       /* fix v sweep */
       xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
@@ -272,7 +272,7 @@ void Stokes::FACOps::smooth_Tackley_3D
         }
       /* This is probably not necessary, since everyone always makes
          sure that everything is set before use. */
-      set_boundaries(invalid_id,v_id,level,true);
+      set_physical_boundaries(invalid_id,v_id,level,true);
 
       // if (residual_tolerance >= 0.0) {
       /*

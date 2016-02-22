@@ -60,7 +60,7 @@ void Elastic::FACOps::smooth_3D
               {
                 xeqScheduleGhostFill(v_id, ln);
               }
-            set_boundaries(v_id,level,true);
+            set_physical_boundaries(v_id,level,true);
 
             for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
                  pi!=level->end(); ++pi)
@@ -139,6 +139,6 @@ void Elastic::FACOps::smooth_3D
     {
       xeqScheduleGhostFill(v_id, ln);
     }
-  set_boundaries(v_id,level,true);
+  set_physical_boundaries(v_id,level,true);
 }
 

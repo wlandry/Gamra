@@ -33,7 +33,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
   else
     xeqScheduleGhostFillNoCoarse(v_id, ln);
 
-  set_boundaries(v_id,hierarchy,ln,error_equation_indicator);
+  set_physical_boundaries(v_id,hierarchy,ln,error_equation_indicator);
 
   for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
        pi!=level->end(); ++pi)

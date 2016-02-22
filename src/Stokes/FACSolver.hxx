@@ -488,11 +488,11 @@ namespace Stokes {
     double
     getResidualNorm() const;
 
-    void set_boundaries(const int &p_id, const int &v_id,
+    void set_physical_boundaries(const int &p_id, const int &v_id,
                         boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
                         const bool &homogeneous)
     {
-      d_fac_ops->set_boundaries(p_id,v_id,level,homogeneous);
+      d_fac_ops->set_physical_boundaries(p_id,v_id,level,homogeneous);
     }
 
 

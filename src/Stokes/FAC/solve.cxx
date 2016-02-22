@@ -138,7 +138,7 @@ bool Stokes::FAC::solve()
         (patch->getPatchData(v_id));
       v->fill(0.0);
     }
-    d_stokes_fac_solver.set_boundaries(p_id,v_id,level,false);
+    d_stokes_fac_solver.set_physical_boundaries(p_id,v_id,level,false);
   }
 
   fix_viscosity();

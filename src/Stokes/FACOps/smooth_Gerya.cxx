@@ -37,7 +37,7 @@ void Stokes::FACOps::smooth_Gerya
      correct. */
   p_refine_patch_strategy.setTargetDataId(p_id);
   v_refine_patch_strategy.setTargetDataId(v_id);
-  set_boundaries(p_id,v_id,level,true);
+  set_physical_boundaries(p_id,v_id,level,true);
   xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
 
   if (ln > d_ln_min) {
@@ -165,7 +165,7 @@ void Stokes::FACOps::smooth_Gerya
                     }
                 }
             }
-          set_boundaries(p_id,v_id,level,true);
+          set_physical_boundaries(p_id,v_id,level,true);
         }
       // if (residual_tolerance >= 0.0) {
         /*

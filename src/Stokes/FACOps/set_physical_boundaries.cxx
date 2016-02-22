@@ -4,10 +4,10 @@
  * information, see COPYRIGHT and COPYING.LESSER. 
  *
  * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Operator class for cell-centered scalar Elastic using FAC 
+ * Description:   Operator class for cell-centered scalar Stokes using FAC 
  *
  ************************************************************************/
-#include "Elastic/FACOps.hxx"
+#include "Stokes/FACOps.hxx"
 
 #include IOMANIP_HEADER_FILE
 
@@ -24,6 +24,7 @@
 #include <SAMRAI/hier/PatchData.h>
 #include <SAMRAI/pdat/SideVariable.h>
 #include <SAMRAI/solv/FACPreconditioner.h>
+#include "Stokes/HypreSolver.hxx"
 #include <SAMRAI/tbox/Array.h>
 #include <SAMRAI/tbox/MathUtilities.h>
 #include <SAMRAI/tbox/StartupShutdownManager.h>
@@ -38,17 +39,18 @@
 #include <SAMRAI/xfer/PatchLevelFullFillPattern.h>
 
 #include "Constants.hxx"
+#include "Stokes/set_boundary.hxx"
 
 /* Set the physical boundaries for the velocity. */
 
-void Elastic::FACOps::set_boundaries
-(const int &v_id,
- const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
+void Stokes::FACOps::set_physical_boundaries
+(const int &p_id, const int &v_id,
+ boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
 {
   for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
        pi!=level->end(); ++pi)
     {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
-      d_boundary_conditions.set_boundary(*patch,v_id,rhs);
+      Stokes_set_boundary(*patch,p_id,v_id,rhs);
     }
 }

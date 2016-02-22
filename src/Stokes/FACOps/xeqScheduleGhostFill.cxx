@@ -28,7 +28,7 @@ void Stokes::FACOps::xeqScheduleGhostFill(int p_id, int v_id,
     if (!v_ghostfill_refine_schedules[dest_ln]) {
       TBOX_ERROR("Expected schedule not found.");
     }
-    set_boundaries(invalid_id,v_id,dest_ln-1);
+    set_physical_boundaries(invalid_id,v_id,dest_ln-1);
     SAMRAI::xfer::RefineAlgorithm refiner;
     refiner.registerRefine(v_id,v_id,v_id,v_ghostfill_refine_operator);
     refiner.resetSchedule(v_ghostfill_refine_schedules[dest_ln]);

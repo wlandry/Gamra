@@ -138,26 +138,26 @@ namespace Elastic
                         const SAMRAI::solv::SAMRAIVectorReal<double> &,
                         const SAMRAI::solv::SAMRAIVectorReal<double> &);
 
-    void set_boundaries(const int &v_id,
+    void set_physical_boundaries(const int &v_id,
                         const SAMRAI::hier::PatchHierarchy &hierarchy,
                         const int &l)
     {
-      set_boundaries(v_id,hierarchy,l,true);
+      set_physical_boundaries(v_id,hierarchy,l,true);
     }
-    void set_boundaries(const int &v_id,
-                        const SAMRAI::hier::PatchHierarchy &hierarchy,
-                        const int &l, const bool &rhs)
+    void set_physical_boundaries(const int &v_id,
+                                 const SAMRAI::hier::PatchHierarchy &hierarchy,
+                                 const int &l, const bool &rhs)
     {
-      set_boundaries(v_id,hierarchy.getPatchLevel(l),rhs);
+      set_physical_boundaries(v_id,hierarchy.getPatchLevel(l),rhs);
     }
-    void set_boundaries(const int &v_id,
-                        const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
+    void set_physical_boundaries(const int &v_id,
+                                 const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
     {
-      set_boundaries(v_id,level,true);
+      set_physical_boundaries(v_id,level,true);
     }
-    void set_boundaries(const int &v_id, 
-                        const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
-                        const bool &rhs);
+    void set_physical_boundaries(const int &v_id, 
+                                 const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
+                                 const bool &rhs);
   private:
     void smooth_2D(SAMRAI::solv::SAMRAIVectorReal<double>& error,
                    const SAMRAI::solv::SAMRAIVectorReal<double>& residual,

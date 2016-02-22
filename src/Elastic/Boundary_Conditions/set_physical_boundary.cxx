@@ -4,7 +4,7 @@
 #include <SAMRAI/geom/CartesianPatchGeometry.h>
 #include "Elastic/Boundary_Conditions.hxx"
 
-void Elastic::Boundary_Conditions::set_boundary
+void Elastic::Boundary_Conditions::set_physical_boundary
 (const SAMRAI::hier::Patch& patch, const int &v_id, const bool &homogeneous,
  const bool &apply_normal_stress) const
 {
