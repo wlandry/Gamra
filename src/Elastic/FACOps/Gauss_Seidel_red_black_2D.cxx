@@ -89,7 +89,7 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
                       SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
                       for(int j=pbox.lower(1); j<=pbox.upper(1)+unit[ix][1]; ++j)
                         {
-                          /* Do the red-black skip */
+                          /// Do the red-black skip
                           int i_min=pbox.lower(0)
                             + (abs(pbox.lower(0) + j + rb))%2;
                           for(int i=i_min; i<=pbox.upper(0)+unit[ix][0]; i+=2)
@@ -134,7 +134,7 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
                     {
                       for(int j=pbox.lower(1); j<=pbox.upper(1)+unit[ix][1]; ++j)
                         {
-                          /* Do the red-black skip */
+                          /// Do the red-black skip
                           int i_min=pbox.lower(0)
                             + (abs(pbox.lower(0) + j + rb))%2;
                           for(int i=i_min; i<=pbox.upper(0)+unit[ix][0]; i+=2)
@@ -153,17 +153,6 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
 
       if (residual_tolerance >= 0.0)
         {
-          /*
-           * Check for early end of sweeps due to convergence
-           * only if it is numerically possible (user gave a
-           * non negative value for residual tolerance).
-           */
-          /*
-           * Instead of checking residual convergence globally, we check the
-           * converged flag.  This avoids possible round-off errors affecting
-           * different processes differently, leading to disagreement on
-           * whether to continue smoothing.
-           */
           converged = max_residual < residual_tolerance;
           const SAMRAI::tbox::SAMRAI_MPI& mpi(hierarchy.getMPI());
           int tmp= converged ? 1 : 0;
@@ -173,9 +162,6 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
             }
           converged=(tmp==1);
         }
-
-      // SAMRAI::tbox::plog
-      //   << "smooth_2D  " << ln << " " << sweep << " : " << max_residual << "\n";
     }
 
   xeqScheduleGhostFillNoCoarse(v_id,ln);
