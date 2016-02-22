@@ -8,17 +8,9 @@ boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
 Elastic::FACOps::s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
 SAMRAI::tbox::StartupShutdownManager::Handler Elastic::FACOps::s_finalize_handler
-(0,
- 0,
- 0,
- Elastic::FACOps::finalizeCallback,
+(0, 0, 0, Elastic::FACOps::finalizeCallback,
  SAMRAI::tbox::StartupShutdownManager::priorityVariables);
 
-/*
-********************************************************************
-* Constructor.                                                     *
-********************************************************************
-*/
 Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
                         const std::string& object_name,
                         const boost::shared_ptr<SAMRAI::tbox::Database> &database,
@@ -28,7 +20,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   initialized(false),
   d_ln_min(-1),
   d_ln_max(-1),
-  d_cf_boundary(),
   d_coarse_solver_tolerance(1.e-8),
   d_coarse_solver_max_iterations(10),
   d_residual_tolerance_during_smoothing(-1.0),
@@ -40,19 +31,9 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   d_context(SAMRAI::hier::VariableDatabase::getDatabase()
             ->getContext(object_name + "::PRIVATE_CONTEXT")),
   d_side_scratch_id(invalid_id),
-  v_prolongation_refine_operator(),
-  v_prolongation_refine_schedules(),
-  v_urestriction_coarsen_operator(),
-  v_urestriction_coarsen_schedules(),
-  v_rrestriction_coarsen_operator(),
-  v_rrestriction_coarsen_schedules(),
-  v_ghostfill_refine_operator(),
-  v_ghostfill_refine_schedules(),
-  v_nocoarse_refine_schedules(),
   v_refine_patch_strategy(d_object_name + "::refine patch strategy",bc),
   v_coarsen_patch_strategy(d_object_name + "::coarsen patch strategy",bc),
   d_enable_logging(false),
-  d_preconditioner(),
   d_boundary_conditions(bc)
 {
   t_restrict_solution = SAMRAI::tbox::TimerManager::getManager()->
