@@ -65,9 +65,7 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
         (dim, ss.str(),SAMRAI::hier::IntVector::getOne(d_dim));
     }
 
-  SAMRAI::hier::VariableDatabase*
-    vdb = SAMRAI::hier::VariableDatabase::getDatabase();
-  d_side_scratch_id = vdb->
+  d_side_scratch_id = SAMRAI::hier::VariableDatabase::getDatabase()->
     registerVariableAndContext(s_side_scratch_var[dim.getValue() - 1],
                                d_context,
                                SAMRAI::hier::IntVector::getOne(d_dim));
