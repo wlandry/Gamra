@@ -200,7 +200,7 @@ void Stokes::FACOps::initializeOperatorState
   vdb->mapIndexToVariable(d_cell_scratch_id, variable);
   p_prolongation_refine_operator =
     geometry->lookupRefineOperator(variable,
-                                   p_prolongation_method);
+                                   "P_REFINE");
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_prolongation_refine_operator =

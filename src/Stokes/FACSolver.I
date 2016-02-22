@@ -8,14 +8,6 @@
  *
  ************************************************************************/
 namespace Stokes {
-
-  inline
-  void FACSolver::set_P_ProlongationMethod(
-                                           const std::string& p_prolongation_method)
-  {
-    d_fac_ops->set_P_ProlongationMethod(p_prolongation_method);
-  }
-
   inline
   void FACSolver::setCoarsestLevelSolverChoice(
                                                const std::string& choice)

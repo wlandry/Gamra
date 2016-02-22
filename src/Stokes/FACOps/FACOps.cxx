@@ -46,7 +46,6 @@ Stokes::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
 #endif
 
                          ),
-  p_prolongation_method("P_REFINE"),
   p_rrestriction_method("CONSERVATIVE_COARSEN"),
   d_coarse_solver_tolerance(1.e-8),
   d_coarse_solver_max_iterations(10),
@@ -150,9 +149,6 @@ Stokes::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
     d_smoothing_choice =
       database->getStringWithDefault("smoothing_choice",
                                      d_smoothing_choice);
-    p_prolongation_method =
-      database->getStringWithDefault("p_prolongation_method",
-                                     p_prolongation_method);
     p_rrestriction_method =
       database->getStringWithDefault("p_rrestriction_method",
                                      p_rrestriction_method);

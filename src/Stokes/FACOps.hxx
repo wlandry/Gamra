@@ -817,7 +817,6 @@ namespace Stokes {
      *
      * @see setProlongationMethod()
      */
-    std::string p_prolongation_method;
     std::string p_rrestriction_method;
 
     /*!
