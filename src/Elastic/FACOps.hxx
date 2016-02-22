@@ -334,25 +334,25 @@ namespace Elastic
     int d_side_scratch_id;
     boost::shared_ptr<SAMRAI::hier::RefineOperator>
     v_prolongation_refine_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_prolongation_refine_schedules;
 
     boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
     v_urestriction_coarsen_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     v_urestriction_coarsen_schedules;
 
     boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
     v_rrestriction_coarsen_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     v_rrestriction_coarsen_schedules;
 
     boost::shared_ptr<SAMRAI::hier::RefineOperator>
     v_ghostfill_refine_operator;
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_ghostfill_refine_schedules;
 
-    SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
+    std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     v_nocoarse_refine_schedules;
 
     V_Refine_Patch_Strategy v_refine_patch_strategy;
