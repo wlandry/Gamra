@@ -31,14 +31,6 @@ void Elastic::FACSolver::initializeSolverState
     TBOX_ERROR(d_object_name << ": Bad range of levels in\n"
                << "inititialization.\n");
 
-  for (int ln = d_ln_min; ln <= d_ln_max; ++ln)
-    d_hierarchy->getPatchLevel(ln)->allocatePatchData
-      (s_weight_id[d_dim.getValue() - 1]);
-
-  d_fac_ops->computeVectorWeights(*d_hierarchy,
-                                  s_weight_id[d_dim.getValue() - 1],
-                                  d_ln_min,
-                                  d_ln_max);
   d_fac_ops->set_extra_ids(cell_moduli_id,edge_moduli_id,dv_diagonal_id,
                            dv_mixed_id,level_set_id);
   createVectorWrappers(v_id, v_rhs_id);

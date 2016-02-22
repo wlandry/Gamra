@@ -15,12 +15,11 @@
 
 #include IOMANIP_HEADER_FILE
 
-void Stokes::FACSolver::initializeStatics() {
-
-  for (int d = 0; d < SAMRAI::MAX_DIM_VAL; ++d) {
-    s_weight_id[d] = -1;
-    s_instance_counter[d] = -1;
-  }
-
+void Stokes::FACSolver::initializeStatics()
+{
+  for (int d = 0; d < SAMRAI::MAX_DIM_VAL; ++d)
+    {
+      s_instance_counter[d] = -1;
+    }
   s_initialized = 1;
 }

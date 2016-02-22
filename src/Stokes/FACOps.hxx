@@ -318,39 +318,6 @@ namespace Stokes {
     //    const RobinBcCoefStrategy* physical_bc_coef);
 
     /*!
-     * @brief Set weight appropriate for computing vector norms.
-     *
-     * If you this function to set the weights used when you
-     * SAMRAI::solv::SAMRAIVectorReal::addComponent, you can use the
-     * vector norm functions of SAMRAI::solv::SAMRAIVectorReal, and
-     * the weights will be used to blank out coarse grid
-     * regions under fine grids.
-     *
-     * The weights computed are specific to the cell-centered
-     * discretization used by this class.  The weight is equal
-     * to the cell volume if the cell has not been refined,
-     * and zero if it has.
-     *
-     * This function is state-independent.  All inputs are in
-     * the argument list.
-     *
-     * @param hierarchy Hierarchy configuration to compute weights for
-     * @param weight_id SAMRAI::hier::Patch data index of the weight
-     * @param coarsest_ln Coarsest level number.  Must be included
-     *        in hierarchy.  Must not be greater than @c finest_ln.
-     *        Default to 0.
-     * @param finest_ln Finest level number.  Must be included
-     *        in hierarchy.  Must not be less than @c coarsest_ln.
-     *        Default to finest level in @c hierarchy.
-     */
-    void
-    computeVectorWeights(
-                         boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
-                         int weight_id,
-                         int coarsest_ln = -1,
-                         int finest_ln = -1) const;
-
-    /*!
      * @brief Set the FAC preconditioner that will be using this object.
      *
      * The FAC preconditioner is accessed to get convergence data during

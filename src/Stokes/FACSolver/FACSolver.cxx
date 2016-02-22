@@ -24,7 +24,6 @@
 */
 
 bool Stokes::FACSolver::s_initialized = 0;
-int Stokes::FACSolver::s_weight_id[SAMRAI::MAX_DIM_VAL];
 int Stokes::FACSolver::s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
 /*
@@ -78,52 +77,6 @@ Stokes::FACSolver::FACSolver(const SAMRAI::tbox::Dimension& dim,
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);
   // #endif
-
-  /*
-   * Construct integer tag variables and add to variable database.  Note that
-   * variables and patch data indices are shared among all instances.
-   * The VariableDatabase holds the variables, once contructed and
-   * registered via the VariableDatabase::registerInternalSAMRAIVariable()
-   * function call.  Note that variables are registered and patch data indices
-   * are made only for the first time through the constructor.
-   */
-  SAMRAI::hier::VariableDatabase* var_db = SAMRAI::hier::VariableDatabase::getDatabase();
-
-  {
-    static std::string cell_weight_name("Stokes::FACSolver_cell_weight");
-
-    boost::shared_ptr<SAMRAI::pdat::CellVariable<double> > weight =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::CellVariable<double> >
-      (var_db->getVariable(cell_weight_name));
-    if (!weight) {
-      weight = boost::make_shared<SAMRAI::pdat::CellVariable<double> >
-        (d_dim, cell_weight_name, 1);
-    }
-
-    if (s_weight_id[d_dim.getValue() - 1] < 0) {
-      s_weight_id[d_dim.getValue() - 1] =
-        var_db->registerInternalSAMRAIVariable
-        (weight,SAMRAI::hier::IntVector::getZero(d_dim));
-    }
-  }
-
-  {
-    static std::string side_weight_name("Stokes::FACSolver_side_weight");
-
-    boost::shared_ptr<SAMRAI::pdat::SideVariable<double> > weight =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >
-      (var_db->getVariable(side_weight_name));
-    if (!weight) {
-      weight = boost::make_shared<SAMRAI::pdat::SideVariable<double> >
-        (d_dim, side_weight_name,SAMRAI::hier::IntVector::getOne(d_dim),1);
-    }
-
-    if (s_weight_id[d_dim.getValue() - 2] < 0) {
-      s_weight_id[d_dim.getValue() - 2] =
-        var_db->registerInternalSAMRAIVariable
-        (weight,SAMRAI::hier::IntVector::getZero(d_dim));
-    }
-  }
 
   // /*
   //  * The default RobinBcCoefStrategy used,

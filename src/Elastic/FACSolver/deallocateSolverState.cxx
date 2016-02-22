@@ -9,10 +9,6 @@ void Elastic::FACSolver::deallocateSolverState()
   if (d_hierarchy)
     {
       d_fac_precond.deallocateSolverState();
-      for (int ln = d_ln_min; ln <= d_ln_max; ++ln)
-        d_hierarchy->getPatchLevel(ln)->deallocatePatchData
-          (s_weight_id[d_dim.getValue() - 1]);
-
       d_hierarchy.reset();
       d_ln_min = -1;
       d_ln_max = -1;

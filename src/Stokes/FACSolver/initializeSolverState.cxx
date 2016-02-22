@@ -81,16 +81,6 @@ void Stokes::FACSolver::initializeSolverState
   }
 #endif
 
-  int ln;
-  for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-    d_hierarchy->getPatchLevel(ln)->allocatePatchData(s_weight_id[d_dim.getValue() - 1]);
-  }
-
-  d_fac_ops->computeVectorWeights(d_hierarchy,
-                                 s_weight_id[d_dim.getValue() - 1],
-                                 d_ln_min,
-                                 d_ln_max);
-
   if (d_bc_object == &d_simple_bc) {
     d_simple_bc.setHierarchy(d_hierarchy,
                              d_ln_min,

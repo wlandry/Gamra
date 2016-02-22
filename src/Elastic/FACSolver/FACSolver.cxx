@@ -5,7 +5,6 @@
 #include "Elastic/FACSolver.hxx"
 
 bool Elastic::FACSolver::s_initialized = false;
-int Elastic::FACSolver::s_weight_id[SAMRAI::MAX_DIM_VAL];
 int Elastic::FACSolver::s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
 Elastic::FACSolver::FACSolver
@@ -36,39 +35,6 @@ Elastic::FACSolver::FACSolver
   setCoarseFineDiscretization("Ewing");
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);
-
-  SAMRAI::hier::VariableDatabase*
-    var_db = SAMRAI::hier::VariableDatabase::getDatabase();
-
-  {
-    static std::string cell_weight_name("Elastic::FACSolver_cell_weight");
-
-    boost::shared_ptr<SAMRAI::pdat::CellVariable<double> > weight =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::CellVariable<double> >
-      (var_db->getVariable(cell_weight_name));
-    if (!weight)
-      weight = boost::make_shared<SAMRAI::pdat::CellVariable<double> >
-        (d_dim, cell_weight_name, 1);
-
-    if (s_weight_id[d_dim.getValue() - 1] < 0)
-      s_weight_id[d_dim.getValue() - 1] = var_db->registerInternalSAMRAIVariable
-        (weight,SAMRAI::hier::IntVector::getZero(d_dim));
-  }
-
-  {
-    static std::string side_weight_name("Elastic::FACSolver_side_weight");
-
-    boost::shared_ptr<SAMRAI::pdat::SideVariable<double> > weight =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >
-      (var_db->getVariable(side_weight_name));
-    if (!weight)
-      weight = boost::make_shared<SAMRAI::pdat::SideVariable<double> >
-        (d_dim,side_weight_name,SAMRAI::hier::IntVector::getOne(d_dim),1);
-
-    if (s_weight_id[d_dim.getValue() - 2] < 0)
-      s_weight_id[d_dim.getValue() - 2] = var_db->registerInternalSAMRAIVariable
-        (weight,SAMRAI::hier::IntVector::getZero(d_dim));
-  }
 
   d_fac_ops->setPreconditioner(&d_fac_precond);
   if (database)

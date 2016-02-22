@@ -17,25 +17,13 @@
 
 void Stokes::FACSolver::deallocateSolverState()
 {
-  if (d_hierarchy) {
-
-    d_fac_precond.deallocateSolverState();
-
-    /*
-     * Delete internally managed data.
-     */
-    int ln;
-    for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-      d_hierarchy->getPatchLevel(ln)->deallocatePatchData(s_weight_id[d_dim.getValue()
-                                                                      - 1]);
+  if (d_hierarchy)
+    {
+      d_fac_precond.deallocateSolverState();
+      d_hierarchy.reset();
+      d_ln_min = -1;
+      d_ln_max = -1;
+      d_solver_is_initialized = false;
+      destroyVectorWrappers();
     }
-
-    d_hierarchy.reset();
-    d_ln_min = -1;
-    d_ln_max = -1;
-    d_solver_is_initialized = false;
-
-    destroyVectorWrappers();
-
-  }
 }
