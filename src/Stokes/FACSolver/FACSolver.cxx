@@ -18,16 +18,6 @@
 /*
 *************************************************************************
 *                                                                       *
-* Initialize the static data members.                                   *
-*                                                                       *
-*************************************************************************
-*/
-
-bool Stokes::FACSolver::s_initialized = 0;
-
-/*
-*************************************************************************
-*                                                                       *
 * Constructor sets uninitialized solver state.                          *
 * Set default iteration and convergence parameters.                     *
 *                                                                       *
@@ -60,11 +50,6 @@ Stokes::FACSolver::FACSolver(const SAMRAI::tbox::Dimension& dim,
   d_solver_is_initialized(false),
   d_enable_logging(false)
 {
-
-  if (!s_initialized) {
-    initializeStatics();
-  }
-
   setCoarseFineDiscretization("Ewing");
   // #ifdef HAVE_HYPRE
   //       setCoarsestLevelSolverChoice("hypre");

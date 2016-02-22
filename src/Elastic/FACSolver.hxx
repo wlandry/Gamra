@@ -98,8 +98,6 @@ namespace Elastic
     bool d_solver_is_initialized;
     bool d_enable_logging;
 
-    static bool s_initialized;
-
     void getFromInput(SAMRAI::tbox::Database &database);
     void createVectorWrappers(int v, int v_rhs);
     void destroyVectorWrappers()

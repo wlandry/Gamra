@@ -606,8 +606,6 @@ namespace Stokes {
 
     bool d_solver_is_initialized;
     bool d_enable_logging;
-
-    static bool s_initialized;
   };
 
 }

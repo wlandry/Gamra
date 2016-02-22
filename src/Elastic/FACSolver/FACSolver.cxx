@@ -4,8 +4,6 @@
 
 #include "Elastic/FACSolver.hxx"
 
-bool Elastic::FACSolver::s_initialized = false;
-
 Elastic::FACSolver::FACSolver
 (const SAMRAI::tbox::Dimension& dim,
  const std::string& object_name,
@@ -27,9 +25,6 @@ Elastic::FACSolver::FACSolver
   d_solver_is_initialized(false),
   d_enable_logging(false)
 {
-  if (!s_initialized)
-    initializeStatics();
-
   /// FIXME: Does this do anything?
   setCoarseFineDiscretization("Ewing");
   setCoarsestLevelSolverTolerance(1e-8);
