@@ -176,5 +176,4 @@ void Elastic::FACOps::initializeOperatorState
   if (!v_nocoarse_refine_schedules[d_ln_min])
     TBOX_ERROR(d_object_name << ": Cannot create a refine schedule for v "
                "ghost filling on bottom level!\n");
-  initialized=true;
 }

@@ -17,7 +17,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
                         const Boundary_Conditions &bc):
   d_dim(dim),
   d_object_name(object_name),
-  initialized(false),
   d_ln_min(-1),
   d_ln_max(-1),
   d_coarse_solver_tolerance(1.e-8),

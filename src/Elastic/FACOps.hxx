@@ -312,9 +312,6 @@ namespace Elastic
     const SAMRAI::tbox::Dimension d_dim;
     std::string d_object_name;
 
-    // FIXME: We should not need this variable, because it should
-    // always be initialized.
-    bool initialized;
     int d_ln_min;
     int d_ln_max;
 
