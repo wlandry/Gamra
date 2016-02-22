@@ -40,7 +40,6 @@
 void
 Elastic::FACOps::finalizeCallback()
 {
-  for (int d = 0; d < SAMRAI::MAX_DIM_VAL; ++d) {
+  for (int d = 0; d < SAMRAI::MAX_DIM_VAL; ++d)
     s_side_scratch_var[d].reset();
-  }
 }
