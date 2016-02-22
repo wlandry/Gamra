@@ -1,3 +1,6 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FACOps.hxx"
 #include "Constants.hxx"
 
@@ -90,7 +93,6 @@ void Elastic::FACOps::residual_2D
 
               if(cell[iy]!=pbox.upper(iy))
                 {
-                  /* If x==0 */
                   if((cell[ix]==pbox.lower(ix) && v(x-ip)==boundary_value)
                      || (cell[ix]==pbox.upper(ix) && v(x+ip)==boundary_value))
                     {
