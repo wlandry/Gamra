@@ -6,9 +6,5 @@
 
 void Elastic::FACSolver::initializeStatics()
 {
-  for (int d = 0; d < SAMRAI::MAX_DIM_VAL; ++d)
-    {
-      s_instance_counter[d] = -1;
-    }
   s_initialized = true;
 }

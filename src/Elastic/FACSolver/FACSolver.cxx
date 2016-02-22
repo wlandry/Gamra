@@ -5,7 +5,6 @@
 #include "Elastic/FACSolver.hxx"
 
 bool Elastic::FACSolver::s_initialized = false;
-int Elastic::FACSolver::s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
 Elastic::FACSolver::FACSolver
 (const SAMRAI::tbox::Dimension& dim,
@@ -40,5 +39,4 @@ Elastic::FACSolver::FACSolver
   if (database)
     getFromInput(*database);
 
-  s_instance_counter[d_dim.getValue() - 1]++;
 }

@@ -24,7 +24,6 @@
 */
 
 bool Stokes::FACSolver::s_initialized = 0;
-int Stokes::FACSolver::s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
 /*
 *************************************************************************
@@ -96,6 +95,4 @@ Stokes::FACSolver::FACSolver(const SAMRAI::tbox::Dimension& dim,
   if (database) {
     getFromInput(database);
   }
-
-  s_instance_counter[d_dim.getValue() - 1]++;
 }

@@ -99,7 +99,6 @@ namespace Elastic
     bool d_enable_logging;
 
     static bool s_initialized;
-    static int s_instance_counter[SAMRAI::MAX_DIM_VAL];
 
     void getFromInput(SAMRAI::tbox::Database &database);
     void createVectorWrappers(int v, int v_rhs);

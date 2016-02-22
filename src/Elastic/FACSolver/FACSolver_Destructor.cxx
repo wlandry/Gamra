@@ -6,6 +6,5 @@
 
 Elastic::FACSolver::~FACSolver()
 {
-  s_instance_counter[d_dim.getValue() - 1]--;
   deallocateSolverState();
 }
