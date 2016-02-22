@@ -57,7 +57,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   d_preconditioner(),
   d_boundary_conditions(bc)
 {
-
   t_restrict_solution = SAMRAI::tbox::TimerManager::getManager()->
     getTimer("solv::Elastic::FACOps::restrictSolution()");
   t_restrict_residual = SAMRAI::tbox::TimerManager::getManager()->
