@@ -46,7 +46,7 @@ void Elastic::FACOps::initializeOperatorState
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_prolongation_refine_operator =
-    geometry->lookupRefineOperator(variable,v_prolongation_method);
+    geometry->lookupRefineOperator(variable,"V_REFINE");
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   v_ghostfill_refine_operator =

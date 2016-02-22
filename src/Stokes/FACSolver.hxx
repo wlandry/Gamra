@@ -399,9 +399,6 @@ namespace Stokes {
     void
     set_P_ProlongationMethod(const std::string& prolongation_method);
 
-    void
-    set_V_ProlongationMethod(const std::string& prolongation_method);
-
     //@}
 
     /*!

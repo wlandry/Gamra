@@ -29,7 +29,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   d_ln_min(-1),
   d_ln_max(-1),
   d_cf_boundary(),
-  v_prolongation_method("V_REFINE"),
   d_coarse_solver_tolerance(1.e-8),
   d_coarse_solver_max_iterations(10),
   d_residual_tolerance_during_smoothing(-1.0),
@@ -100,9 +99,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
       d_coarse_solver_max_iterations =
         database->getIntegerWithDefault("coarse_solver_max_iterations",
                                         d_coarse_solver_max_iterations);
-      v_prolongation_method =
-        database->getStringWithDefault("v_prolongation_method",
-                                       v_prolongation_method);
       d_enable_logging =
         database->getBoolWithDefault("enable_logging",
                                      d_enable_logging);

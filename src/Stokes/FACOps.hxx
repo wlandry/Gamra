@@ -240,10 +240,6 @@ namespace Stokes {
     set_P_ProlongationMethod(
                              const std::string& prolongation_method);
 
-    void
-    set_V_ProlongationMethod(
-                             const std::string& prolongation_method);
-
 #ifdef HAVE_HYPRE
     /*!
      * @brief Set whether to use Hypre's PFMG algorithm instead of the
@@ -822,7 +818,6 @@ namespace Stokes {
      * @see setProlongationMethod()
      */
     std::string p_prolongation_method;
-    std::string v_prolongation_method;
     std::string p_rrestriction_method;
 
     /*!

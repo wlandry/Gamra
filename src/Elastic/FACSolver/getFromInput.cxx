@@ -14,8 +14,6 @@ void Elastic::FACSolver::getFromInput (SAMRAI::tbox::Database &database)
 {
   if (database.isBool("enable_logging"))
     enableLogging(database.getBool("enable_logging"));
-  if (database.isString("v_prolongation_method"))
-    set_V_ProlongationMethod(database.getString("v_prolongation_method"));
   if (database.isDouble("coarse_solver_tolerance"))
     setCoarsestLevelSolverTolerance(database.getDouble
                                     ("coarse_solver_tolerance"));

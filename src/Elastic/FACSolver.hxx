@@ -38,10 +38,6 @@ namespace Elastic
       d_fac_ops->setCoarsestLevelSolverMaxIterations(max_iterations);
     }
 
-    void set_V_ProlongationMethod(const std::string& v_prolongation_method)
-    {
-      d_fac_ops->set_V_ProlongationMethod(v_prolongation_method);
-    }
     void initializeSolverState
     (const int cell_moduli_id,
      const int edge_moduli_id,

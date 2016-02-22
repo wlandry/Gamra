@@ -37,14 +37,6 @@ namespace Elastic
         TBOX_ERROR(d_object_name << ": Invalid number of max iterations\n");
       d_coarse_solver_max_iterations = max_iterations;
     }
-    void set_V_ProlongationMethod(const std::string& prolongation_method)
-    {
-      if (initialized)
-        TBOX_ERROR(d_object_name << ": Cannot change v prolongation method\n"
-                   << "while operator state is initialized because that\n"
-                   << "causes a corruption in the state.\n");
-      v_prolongation_method = prolongation_method;
-    }
 
     void set_extra_ids(const int &Cell_moduli_id, const int &Edge_moduli_id,
                        const int &Dv_diagonal_id, const int &Dv_mixed_id,
@@ -328,7 +320,6 @@ namespace Elastic
 
     std::vector<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
     d_cf_boundary;
-    std::string v_prolongation_method;
     double d_coarse_solver_tolerance;
     int d_coarse_solver_max_iterations;
     double d_residual_tolerance_during_smoothing;

@@ -41,10 +41,6 @@ void Stokes::FACSolver::getFromInput(boost::shared_ptr<SAMRAI::tbox::Database> d
       std::string s = database->getString("p_prolongation_method");
       set_P_ProlongationMethod(s);
     }
-    if (database->isString("v_prolongation_method")) {
-      std::string s = database->getString("v_prolongation_method");
-      set_V_ProlongationMethod(s);
-    }
     if (database->isString("coarse_solver_choice")) {
       std::string s = database->getString("coarse_solver_choice");
       setCoarsestLevelSolverChoice(s);

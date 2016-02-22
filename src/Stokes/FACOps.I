@@ -158,20 +158,4 @@ namespace Stokes {
 #endif
     p_prolongation_method = prolongation_method;
   }
-
-  inline
-  void FACOps::set_V_ProlongationMethod(
-                                        const std::string& prolongation_method) {
-#ifdef DEBUG_CHECK_ASSERTIONS
-    if (d_hierarchy) {
-      TBOX_ERROR(
-                 d_object_name << ": Cannot change v prolongation method\n"
-                 <<
-                 "while operator state is initialized because that\n"
-                 << "causes a corruption in the state.\n");
-    }
-#endif
-    v_prolongation_method = prolongation_method;
-  }
-
 }
