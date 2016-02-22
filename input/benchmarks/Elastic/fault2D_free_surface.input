@@ -29,7 +29,6 @@ Elastic {
         num_post_sweeps = 2
         coarse_solver_max_iterations = 32
         coarse_solver_tolerance = 1e-5
-        v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
         vx_x_upper="0"

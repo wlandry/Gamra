@@ -465,7 +465,6 @@ Elastic {
         num_post_sweeps =  4     // Number of postsmoothing sweeps to use
         coarse_solver_max_iterations =  32
         coarse_solver_tolerance = 1e-12
-        v_prolongation_method = "V_REFINE"
     }
     boundary_conditions {
         vx_x_upper="0"

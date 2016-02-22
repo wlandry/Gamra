@@ -117,7 +117,6 @@ Stokes {
         coarse_solver_tolerance = 1e-5
         // p_prolongation_method = "P_MDPI_REFINE"
         p_prolongation_method = "P_REFINE"
-        v_prolongation_method = "V_REFINE"
         p_rrestriction_method = "RESID_COARSEN"
     }
     bc_coefs {

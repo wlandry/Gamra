@@ -43,7 +43,6 @@ FACStokes {
                                           // Suggested values are
                                           // "LINEAR_REFINE"
                                           // "CONSTANT_REFINE"
-    v_prolongation_method = "V_REFINE" // Type of refinement
       					  // used in prolongation.
                                           // Suggested values are
                                           // "LINEAR_REFINE"
