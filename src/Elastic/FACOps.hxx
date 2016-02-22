@@ -135,8 +135,8 @@ namespace Elastic
 
     virtual void
     postprocessOneCycle(int fac_cycle_num,
-                        const SAMRAI::solv::SAMRAIVectorReal<double>& current_soln,
-                        const SAMRAI::solv::SAMRAIVectorReal<double>& residual);
+                        const SAMRAI::solv::SAMRAIVectorReal<double> &,
+                        const SAMRAI::solv::SAMRAIVectorReal<double> &);
 
     void set_boundaries(const int &v_id,
                         const SAMRAI::hier::PatchHierarchy &hierarchy,
