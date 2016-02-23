@@ -190,7 +190,7 @@ def build(bld):
                         'src/Elastic/FACOps/ghostfill_nocoarse.cxx',
                         'src/Elastic/FACOps/refine.cxx',
                         'src/Elastic/FACOps/coarsen_resid.cxx',
-                        'src/Elastic/FACOps/coarsen_u.cxx',
+                        'src/Elastic/FACOps/coarsen_solution.cxx',
                         'src/Elastic/FACSolver/FACSolver.cxx',
                         'src/Elastic/FACSolver/FACSolver_Destructor.cxx',
                         'src/Elastic/FACSolver/createVectorWrappers.cxx',

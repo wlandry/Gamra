@@ -301,7 +301,7 @@ namespace Elastic
     }
 
     void refine(int v_dst, int v_src, int v_scr, int dest_ln);
-    void coarsen_u(int v_dst, int v_src, int dest_ln);
+    void coarsen_solution(int v_dst, int v_src, int dest_ln);
     void coarsen_resid(int v_dst, int v_src, int dest_ln);
     void ghostfill(int v_id, int dest_ln);
     void ghostfill_nocoarse(int v_id, int dest_ln);
@@ -328,23 +328,19 @@ namespace Elastic
     boost::shared_ptr<SAMRAI::hier::VariableContext> d_context;
 
     int d_side_scratch_id;
-    boost::shared_ptr<SAMRAI::hier::RefineOperator>
-    refine_operator;
+    boost::shared_ptr<SAMRAI::hier::RefineOperator> refine_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     refine_schedules;
 
-    boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
-    coarsen_u_operator;
+    boost::shared_ptr<SAMRAI::hier::CoarsenOperator> coarsen_solution_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
-    coarsen_u_schedules;
+    coarsen_solution_schedules;
 
-    boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
-    coarsen_resid_operator;
+    boost::shared_ptr<SAMRAI::hier::CoarsenOperator> coarsen_resid_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
     coarsen_resid_schedules;
 
-    boost::shared_ptr<SAMRAI::hier::RefineOperator>
-    ghostfill_operator;
+    boost::shared_ptr<SAMRAI::hier::RefineOperator> ghostfill_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     ghostfill_schedules;
 

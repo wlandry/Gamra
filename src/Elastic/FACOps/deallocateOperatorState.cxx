@@ -11,7 +11,7 @@ void Elastic::FACOps::deallocateOperatorState()
   d_ln_max = -1;
 
   refine_schedules.clear();
-  coarsen_u_schedules.clear();
+  coarsen_solution_schedules.clear();
   coarsen_resid_schedules.clear();
   ghostfill_schedules.clear();
   ghostfill_nocoarse_schedules.clear();

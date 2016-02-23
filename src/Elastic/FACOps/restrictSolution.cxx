@@ -19,7 +19,7 @@ void Elastic::FACOps::restrictSolution
   v_coarsen_patch_strategy.data_id=v_src;
   v_coarsen_patch_strategy.is_residual=false;
   ghostfill_nocoarse(v_src,dest_ln+1);
-  coarsen_u(v_dst,v_src,dest_ln);
+  coarsen_solution(v_dst,v_src,dest_ln);
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
     level = s.getPatchHierarchy()->getPatchLevel(dest_ln);

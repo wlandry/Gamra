@@ -59,13 +59,13 @@ void Elastic::FACOps::initializeOperatorState
   refine_schedules.resize(d_ln_max + 1);
   ghostfill_schedules.resize(d_ln_max + 1);
   ghostfill_nocoarse_schedules.resize(d_ln_max + 1);
-  coarsen_u_schedules.resize(d_ln_max + 1);
+  coarsen_solution_schedules.resize(d_ln_max + 1);
   coarsen_resid_schedules.resize(d_ln_max + 1);
 
   SAMRAI::xfer::RefineAlgorithm refine_algorithm,
     ghostfill_algorithm, ghostfill_nocoarse_algorithm;
     
-  SAMRAI::xfer::CoarsenAlgorithm coarsen_u_algorithm(d_dim),
+  SAMRAI::xfer::CoarsenAlgorithm coarsen_solution_algorithm(d_dim),
     coarsen_resid_algorithm(d_dim);
 
   /// This is a little confusing.  The only real purpose here is to
@@ -77,7 +77,8 @@ void Elastic::FACOps::initializeOperatorState
 
   refine_algorithm.registerRefine(d_side_scratch_id,v_id,d_side_scratch_id,
                                   refine_operator);
-  coarsen_u_algorithm.registerCoarsen(v_id,v_id,coarsen_u_operator);
+  coarsen_solution_algorithm.registerCoarsen(v_id,v_id,
+                                             coarsen_solution_operator);
   coarsen_resid_algorithm.registerCoarsen(v_rhs_id,v_rhs_id,
                                           coarsen_resid_operator);
   ghostfill_algorithm.registerRefine(v_id,v_id,v_id,ghostfill_operator);
@@ -101,7 +102,7 @@ void Elastic::FACOps::initializeOperatorState
       refine_algorithm.
         registerRefine(level_set_id,level_set_id,level_set_id,
                        boost::shared_ptr<SAMRAI::hier::RefineOperator>());
-      coarsen_u_algorithm.
+      coarsen_solution_algorithm.
         registerCoarsen(level_set_id,level_set_id,
                         boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
       coarsen_resid_algorithm.
@@ -147,12 +148,12 @@ void Elastic::FACOps::initializeOperatorState
   /// Coarsening operators
   for (int dest_ln = d_ln_min; dest_ln < d_ln_max; ++dest_ln)
     {
-      coarsen_u_schedules[dest_ln] =
-        coarsen_u_algorithm.
+      coarsen_solution_schedules[dest_ln] =
+        coarsen_solution_algorithm.
         createSchedule(hierarchy->getPatchLevel(dest_ln),
                        hierarchy->getPatchLevel(dest_ln + 1),
                        &v_coarsen_patch_strategy);
-      if (!coarsen_u_schedules[dest_ln])
+      if (!coarsen_solution_schedules[dest_ln])
         TBOX_ERROR(d_object_name << ": Cannot create a coarsen schedule for "
                    "U v restriction!\n");
 

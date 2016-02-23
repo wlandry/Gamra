@@ -5,19 +5,19 @@
 #include <SAMRAI/xfer/CoarsenAlgorithm.h>
 #include "Elastic/FACOps.hxx"
 
-void Elastic::FACOps::coarsen_u(int v_dst, int v_src, int dest_ln)
+void Elastic::FACOps::coarsen_solution(int v_dst, int v_src, int dest_ln)
 {
-  if (!coarsen_u_schedules[dest_ln])
+  if (!coarsen_solution_schedules[dest_ln])
     TBOX_ERROR("Expected schedule not found.");
 
   SAMRAI::xfer::CoarsenAlgorithm coarsener(d_dim);
-  coarsener.registerCoarsen(v_dst, v_src, coarsen_u_operator);
+  coarsener.registerCoarsen(v_dst, v_src, coarsen_solution_operator);
   if(have_embedded_boundary())
     {
       coarsener.registerCoarsen
         (level_set_id,level_set_id,
          boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
     }
-  coarsener.resetSchedule(coarsen_u_schedules[dest_ln]);
-  coarsen_u_schedules[dest_ln]->coarsenData();
+  coarsener.resetSchedule(coarsen_solution_schedules[dest_ln]);
+  coarsen_solution_schedules[dest_ln]->coarsenData();
 }
