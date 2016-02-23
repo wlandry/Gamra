@@ -169,7 +169,7 @@ void Elastic::FACOps::initializeOperatorState
                    "R v restriction!\n");
     }
 
-  /* Ordinary ghost fill operator on the coarsest level */
+  /// Ordinary ghost fill operator on the coarsest level
   v_nocoarse_refine_schedules[d_ln_min] =
     v_nocoarse_refine_algorithm.
     createSchedule(hierarchy->getPatchLevel(d_ln_min));
