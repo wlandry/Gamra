@@ -5,8 +5,7 @@
 #include <SAMRAI/xfer/CoarsenAlgorithm.h>
 #include "Elastic/FACOps.hxx"
 
-void Elastic::FACOps::xeqScheduleURestriction(int v_dst, int v_src,
-                                              int dest_ln)
+void Elastic::FACOps::coarsen_u(int v_dst, int v_src, int dest_ln)
 {
   if (!coarsen_u_schedules[dest_ln])
     TBOX_ERROR("Expected schedule not found.");

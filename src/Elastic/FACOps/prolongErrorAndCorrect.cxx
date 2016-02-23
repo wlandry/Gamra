@@ -21,11 +21,8 @@ void Elastic::FACOps::prolongErrorAndCorrect
   v_refine_patch_strategy.is_residual=true;
   /// FIXME: Get rid of this global variable
   V_Boundary_Refine::is_residual=true;
-  xeqScheduleProlongation(d_side_scratch_id,
-                          s.getComponentDescriptorIndex(0),
-                          d_side_scratch_id,
-                          dest_ln);
-
+  refine(d_side_scratch_id, s.getComponentDescriptorIndex(0),
+         d_side_scratch_id, dest_ln);
   {
     SAMRAI::math::HierarchySideDataOpsReal<double>
       hierarchy_math_ops(s.getPatchHierarchy(), dest_ln, dest_ln);

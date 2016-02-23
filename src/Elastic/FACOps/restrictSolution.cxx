@@ -18,9 +18,8 @@ void Elastic::FACOps::restrictSolution
   /// Need to do a sync because the coarsening for v uses ghost zones.
   v_coarsen_patch_strategy.data_id=v_src;
   v_coarsen_patch_strategy.is_residual=false;
-  xeqScheduleGhostFillNoCoarse(v_src,dest_ln+1);
-
-  xeqScheduleURestriction(v_dst,v_src,dest_ln);
+  ghostfill_nocoarse(v_src,dest_ln+1);
+  coarsen_u(v_dst,v_src,dest_ln);
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
     level = s.getPatchHierarchy()->getPatchLevel(dest_ln);
@@ -31,9 +30,9 @@ void Elastic::FACOps::restrictSolution
   /// FIXME: Is this sync necessary?  The style is to sync before use,
   /// not after something is set.
   if (dest_ln == d_ln_min)
-    xeqScheduleGhostFillNoCoarse(v_dst,dest_ln);
+    ghostfill_nocoarse(v_dst,dest_ln);
   else
-    xeqScheduleGhostFill(v_dst,dest_ln);
+    ghostfill(v_dst,dest_ln);
 
   t_restrict_solution->stop();
 }

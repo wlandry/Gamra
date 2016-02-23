@@ -302,12 +302,11 @@ namespace Elastic
         +shear_noncell(v,edge_moduli,x,z,edge_y,ip,kp,dx,dz);
     }
 
-    void xeqScheduleProlongation(int v_dst, int v_src, int v_scr, int dest_ln);
-    void xeqScheduleURestriction(int v_dst, int v_src, int dest_ln);
-    void xeqScheduleRRestriction(int v_dst, int v_src, int dest_ln);
-    void xeqScheduleFluxCoarsen(int dst_id, int src_id, int dest_ln);
-    void xeqScheduleGhostFill(int v_id, int dest_ln);
-    void xeqScheduleGhostFillNoCoarse(int v_id, int dest_ln);
+    void refine(int v_dst, int v_src, int v_scr, int dest_ln);
+    void coarsen_u(int v_dst, int v_src, int dest_ln);
+    void coarsen_resid(int v_dst, int v_src, int dest_ln);
+    void ghostfill(int v_id, int dest_ln);
+    void ghostfill_nocoarse(int v_id, int dest_ln);
 
     static void finalizeCallback();
 

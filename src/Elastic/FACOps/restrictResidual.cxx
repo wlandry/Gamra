@@ -17,9 +17,9 @@ void Elastic::FACOps::restrictResidual
   /// Need to do a sync because the coarsening for v uses ghost zones
   v_coarsen_patch_strategy.data_id=v_src;
   v_coarsen_patch_strategy.is_residual=true;
-  xeqScheduleGhostFillNoCoarse(v_src,dest_ln+1);
+  ghostfill_nocoarse(v_src,dest_ln+1);
 
-  xeqScheduleRRestriction(v_dst,v_src,dest_ln);
+  coarsen_resid(v_dst,v_src,dest_ln);
 
   t_restrict_residual->stop();
 }

@@ -23,10 +23,10 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=true;
   V_Boundary_Refine::is_residual=true;
-  xeqScheduleGhostFillNoCoarse(v_rhs_id,ln);
+  ghostfill_nocoarse(v_rhs_id,ln);
 
   if (ln > d_ln_min) {
-    xeqScheduleGhostFill(v_id, ln);
+    ghostfill(v_id, ln);
   }
 
   double theta_momentum=1.0;
@@ -44,10 +44,10 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
           const SAMRAI::hier::Index ip(unit[ix]), jp(unit[iy]);
           for(int rb=0;rb<2;++rb)
             {
-              xeqScheduleGhostFillNoCoarse(v_id,ln);
+              ghostfill_nocoarse(v_id,ln);
               if (ln > d_ln_min)
                 {
-                  xeqScheduleGhostFill(v_id, ln);
+                  ghostfill(v_id, ln);
                 }
               set_physical_boundaries(v_id,level,true);
               for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
@@ -164,11 +164,9 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
         }
     }
 
-  xeqScheduleGhostFillNoCoarse(v_id,ln);
+  ghostfill_nocoarse(v_id,ln);
   if (ln > d_ln_min)
-    {
-      xeqScheduleGhostFill(v_id, ln);
-    }
+    ghostfill(v_id, ln);
   set_physical_boundaries(v_id,level,true);
 }
 

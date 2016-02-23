@@ -29,9 +29,9 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
   V_Boundary_Refine::is_residual=error_equation_indicator;
 
   if (ln > d_ln_min)
-    xeqScheduleGhostFill(v_id, ln);
+    ghostfill(v_id, ln);
   else
-    xeqScheduleGhostFillNoCoarse(v_id, ln);
+    ghostfill_nocoarse(v_id, ln);
 
   set_physical_boundaries(v_id,hierarchy,ln,error_equation_indicator);
 

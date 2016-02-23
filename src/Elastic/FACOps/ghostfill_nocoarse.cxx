@@ -4,7 +4,7 @@
 
 #include "Elastic/FACOps.hxx"
 
-void Elastic::FACOps::xeqScheduleGhostFillNoCoarse(int v_id, int dest_ln)
+void Elastic::FACOps::ghostfill_nocoarse(int v_id, int dest_ln)
 {
   if (!ghostfill_nocoarse_schedules[dest_ln])
     TBOX_ERROR("Expected side schedule not found.");

@@ -4,8 +4,7 @@
 
 #include "Elastic/FACOps.hxx"
 
-void Elastic::FACOps::xeqScheduleProlongation (int v_dst, int v_src, int v_scr,
-                                               int dest_ln)
+void Elastic::FACOps::refine (int v_dst, int v_src, int v_scr, int dest_ln)
 {
   if (!refine_schedules[dest_ln])
     TBOX_ERROR("Expected schedule not found.");

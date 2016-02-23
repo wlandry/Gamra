@@ -4,7 +4,7 @@
 
 #include "Elastic/FACOps.hxx"
 
-void Elastic::FACOps::xeqScheduleGhostFill(int v_id, int dest_ln)
+void Elastic::FACOps::ghostfill(int v_id, int dest_ln)
 {
   if (!ghostfill_schedules[dest_ln])
     TBOX_ERROR("Expected schedule not found.");

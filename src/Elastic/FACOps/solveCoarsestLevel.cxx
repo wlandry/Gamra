@@ -14,8 +14,7 @@ int Elastic::FACOps::solveCoarsestLevel
   d_residual_tolerance_during_smoothing = d_coarse_solver_tolerance;
   smoothError(data, residual, coarsest_ln, d_coarse_solver_max_iterations);
   d_residual_tolerance_during_smoothing = -1.0;
-  xeqScheduleGhostFillNoCoarse(data.getComponentDescriptorIndex(0),
-                               coarsest_ln);
+  ghostfill_nocoarse(data.getComponentDescriptorIndex(0), coarsest_ln);
   t_solve_coarsest->stop();
   return 0;
 }
