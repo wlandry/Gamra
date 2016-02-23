@@ -3,7 +3,7 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/FACOps.hxx"
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 
 void Elastic::FACOps::computeCompositeResidualOnLevel
 (SAMRAI::solv::SAMRAIVectorReal<double>& residual,
@@ -26,7 +26,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
   const int v_id = solution.getComponentDescriptorIndex(0);
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=error_equation_indicator;
-  V_Boundary_Refine::is_residual=error_equation_indicator;
+  Coarse_Fine_Boundary_Refine::is_residual=error_equation_indicator;
 
   if (ln > d_ln_min)
     ghostfill(v_id, ln);

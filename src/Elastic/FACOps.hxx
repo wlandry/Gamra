@@ -11,7 +11,7 @@
 
 #include "Elastic/V_Refine_Patch_Strategy.hxx"
 #include "Elastic/V_Coarsen_Patch_Strategy.hxx"
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 #include "Elastic/V_Refine.hxx"
 
 namespace Elastic
@@ -44,9 +44,9 @@ namespace Elastic
       dv_mixed_id=Dv_mixed_id;
       level_set_id=Level_set_id;
 
-      Elastic::V_Boundary_Refine::dv_diagonal_id=dv_diagonal_id;
-      Elastic::V_Boundary_Refine::dv_mixed_id=dv_mixed_id;
-      Elastic::V_Boundary_Refine::level_set_id=level_set_id;
+      Elastic::Coarse_Fine_Boundary_Refine::dv_diagonal_id=dv_diagonal_id;
+      Elastic::Coarse_Fine_Boundary_Refine::dv_mixed_id=dv_mixed_id;
+      Elastic::Coarse_Fine_Boundary_Refine::level_set_id=level_set_id;
       Elastic::V_Refine::level_set_id=level_set_id;
       v_coarsen_patch_strategy.set_extra_ids(dv_diagonal_id,dv_mixed_id,
                                              level_set_id);

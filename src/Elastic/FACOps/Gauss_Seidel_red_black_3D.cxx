@@ -2,7 +2,7 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/FACOps.hxx"
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 #include "Constants.hxx"
 
 void Elastic::FACOps::Gauss_Seidel_red_black_3D
@@ -21,7 +21,7 @@ void Elastic::FACOps::Gauss_Seidel_red_black_3D
 
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=true;
-  V_Boundary_Refine::is_residual=true;
+  Coarse_Fine_Boundary_Refine::is_residual=true;
   ghostfill_nocoarse(v_rhs_id,ln);
 
   double theta_momentum=1.0;

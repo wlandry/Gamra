@@ -1,29 +1,16 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Linear refine operator for side-centered double data on
- *                a Cartesian mesh. 
- *
- ************************************************************************/
-
 #pragma once
 
-#include <SAMRAI/SAMRAI_config.h>
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
-#include <SAMRAI/hier/Box.h>
-#include <SAMRAI/hier/IntVector.h>
-#include <SAMRAI/hier/Patch.h>
 #include <SAMRAI/hier/RefineOperator.h>
 #include <SAMRAI/pdat/SideVariable.h>
 #include <SAMRAI/pdat/CellData.h>
 #include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include "Boundary_Conditions.hxx"
-#include "quad_offset_interpolate.hxx"
 
-#include <string>
+#include "quad_offset_interpolate.hxx"
+#include "Constants.hxx"
 
 namespace Elastic {
 
@@ -37,17 +24,13 @@ namespace Elastic {
    * @see hier::RefineOperator
    */
 
-  class V_Boundary_Refine:
-    public SAMRAI::hier::RefineOperator
+  class Coarse_Fine_Boundary_Refine: public SAMRAI::hier::RefineOperator
   {
   public:
 
     static bool is_residual;
     static int dv_diagonal_id, dv_mixed_id, level_set_id;
-    /**
-     * Uninteresting default constructor.
-     */
-    explicit V_Boundary_Refine():
+    explicit Coarse_Fine_Boundary_Refine():
       SAMRAI::hier::RefineOperator("V_BOUNDARY_REFINE")
     {
       d_name_id = "V_BOUNDARY_REFINE";
@@ -62,30 +45,16 @@ namespace Elastic {
     {
       return level_set_id!=invalid_id;
     }
-    /**
-     * Uninteresting virtual destructor.
-     */
-    virtual ~V_Boundary_Refine(){}
+    virtual ~Coarse_Fine_Boundary_Refine(){}
 
-    /**
-     * Return true if the variable and name std::string match side-centered
-     * double linear interpolation; otherwise, return false.
-     */
     bool findRefineOperator
     (const boost::shared_ptr<SAMRAI::hier::Variable>& var,
      const std::string& op_name) const
     {
       const boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
         cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >(var));
-      if (cast_var && (op_name == d_name_id)) {
-        return true;
-      } else {
-        return false;
-      }
+      return (cast_var && (op_name == d_name_id));
     }
-    /**
-     * Return name std::string identifier of this refinement operator.
-     */
     const std::string& getOperatorName() const
     {
       return d_name_id;

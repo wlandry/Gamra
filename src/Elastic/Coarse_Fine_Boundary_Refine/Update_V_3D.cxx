@@ -1,10 +1,10 @@
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 #include "quad_offset_interpolate.hxx"
 #include "Constants.hxx"
 
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
-void Elastic::V_Boundary_Refine::Update_V_3D
+void Elastic::Coarse_Fine_Boundary_Refine::Update_V_3D
 (const Gamra::Dir &ix,
  const Gamra::Dir &boundary_direction,
  const bool &boundary_positive,

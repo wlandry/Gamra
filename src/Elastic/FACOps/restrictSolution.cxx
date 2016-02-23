@@ -3,7 +3,7 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/FACOps.hxx"
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 
 void Elastic::FACOps::restrictSolution
 (const SAMRAI::solv::SAMRAIVectorReal<double>& s,
@@ -25,7 +25,7 @@ void Elastic::FACOps::restrictSolution
     level = s.getPatchHierarchy()->getPatchLevel(dest_ln);
   v_refine_patch_strategy.is_residual=false;
   v_refine_patch_strategy.data_id=d.getComponentDescriptorIndex(0);
-  V_Boundary_Refine::is_residual=false;
+  Coarse_Fine_Boundary_Refine::is_residual=false;
 
   /// FIXME: Is this sync necessary?  The style is to sync before use,
   /// not after something is set.

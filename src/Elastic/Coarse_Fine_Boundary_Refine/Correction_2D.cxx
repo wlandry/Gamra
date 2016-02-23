@@ -1,4 +1,4 @@
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 #include "quad_offset_interpolate.hxx"
 #include "Constants.hxx"
 
@@ -101,7 +101,7 @@ namespace {
 
 /* This is written from the perspective of axis==x.  For axis==y, we
    switch i and j and everything works out. */
-void Elastic::V_Boundary_Refine::Correction_2D
+void Elastic::Coarse_Fine_Boundary_Refine::Correction_2D
 (const int &axis,
  const int &boundary_direction,
  const bool &boundary_positive,

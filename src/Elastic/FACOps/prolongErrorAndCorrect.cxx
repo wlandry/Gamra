@@ -3,7 +3,7 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/FACOps.hxx"
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 
 void Elastic::FACOps::prolongErrorAndCorrect
 (const SAMRAI::solv::SAMRAIVectorReal<double>& s,
@@ -20,7 +20,7 @@ void Elastic::FACOps::prolongErrorAndCorrect
   v_refine_patch_strategy.data_id=d_side_scratch_id;
   v_refine_patch_strategy.is_residual=true;
   /// FIXME: Get rid of this global variable
-  V_Boundary_Refine::is_residual=true;
+  Coarse_Fine_Boundary_Refine::is_residual=true;
   refine(d_side_scratch_id, s.getComponentDescriptorIndex(0),
          d_side_scratch_id, dest_ln);
   {

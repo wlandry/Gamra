@@ -9,10 +9,10 @@
  *
  ************************************************************************/
 
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 #include "Constants.hxx"
 
-void Elastic::V_Boundary_Refine::refine
+void Elastic::Coarse_Fine_Boundary_Refine::refine
 (SAMRAI::hier::Patch& fine_patch,
  const SAMRAI::hier::Patch& coarse,
  const int dst_component,
@@ -41,7 +41,7 @@ void Elastic::V_Boundary_Refine::refine
      }
 }
 
-void Elastic::V_Boundary_Refine::refine
+void Elastic::Coarse_Fine_Boundary_Refine::refine
 (SAMRAI::hier::Patch &fine_patch,
  const SAMRAI::hier::Patch &coarse_patch,
  const int dst_component,

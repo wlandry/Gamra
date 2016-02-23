@@ -24,7 +24,7 @@
 #include "Stokes/V_Coarsen.hxx"
 #include "Stokes/Resid_Coarsen.hxx"
 #include "Elastic/V_Refine.hxx"
-#include "Elastic/V_Boundary_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 #include <SAMRAI/geom/CartesianCellDoubleWeightedAverage.h>
 
 #include "Stokes/FAC.hxx"
@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::SideVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
-           (new Elastic::V_Boundary_Refine()));
+           (new Elastic::Coarse_Fine_Boundary_Refine()));
         grid_geometry->addCoarsenOperator
           (typeid(SAMRAI::pdat::CellVariable<double>).name(),
            boost::make_shared<SAMRAI::geom::CartesianCellDoubleWeightedAverage>
