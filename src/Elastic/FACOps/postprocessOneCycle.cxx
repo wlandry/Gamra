@@ -9,19 +9,16 @@ void Elastic::FACOps::postprocessOneCycle
  const SAMRAI::solv::SAMRAIVectorReal<double> &,
  const SAMRAI::solv::SAMRAIVectorReal<double> &)
 {
-  if (d_enable_logging)
+  if (logging && d_preconditioner)
     {
-      if (d_preconditioner)
-        {
-          double avg_factor, final_factor;
-          d_preconditioner->getConvergenceFactors(avg_factor, final_factor);
-          SAMRAI::tbox::plog
-            << "iter=" << std::setw(4) << fac_cycle_num
-            << " resid=" << d_preconditioner->getResidualNorm()
-            << " net conv=" << d_preconditioner->getNetConvergenceFactor()
-            << " final conv=" << d_preconditioner->getNetConvergenceFactor()
-            << " avg conv=" << d_preconditioner->getAvgConvergenceFactor()
-            << std::endl;
-        }
+      double avg_factor, final_factor;
+      d_preconditioner->getConvergenceFactors(avg_factor, final_factor);
+      SAMRAI::tbox::plog
+        << "iter=" << std::setw(4) << fac_cycle_num
+        << " resid=" << d_preconditioner->getResidualNorm()
+        << " net conv=" << d_preconditioner->getNetConvergenceFactor()
+        << " final conv=" << d_preconditioner->getNetConvergenceFactor()
+        << " avg conv=" << d_preconditioner->getAvgConvergenceFactor()
+        << std::endl;
     }
 }

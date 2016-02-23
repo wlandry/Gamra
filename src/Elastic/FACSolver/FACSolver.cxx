@@ -15,15 +15,11 @@ Elastic::FACSolver::FACSolver
   d_fac_ops(boost::make_shared<FACOps>(d_dim, object_name + "::fac_ops",
                                        database,bc)),
   d_fac_precond(object_name + "::fac_precond",d_fac_ops,database),
-  d_hierarchy(),
   d_ln_min(-1),
   d_ln_max(-1),
   d_context(SAMRAI::hier::VariableDatabase::getDatabase()
             ->getContext(object_name + "::CONTEXT")),
-  d_uv(),
-  d_fv(),
-  d_solver_is_initialized(false),
-  d_enable_logging(false)
+  d_solver_is_initialized(false)
 {
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);

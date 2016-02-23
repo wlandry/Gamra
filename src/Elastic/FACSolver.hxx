@@ -19,11 +19,6 @@ namespace Elastic
 
     ~FACSolver(void);
 
-    void enableLogging(bool logging)
-    {
-      d_enable_logging = logging;
-      d_fac_ops->enableLogging(d_enable_logging);
-    }
     bool solveSystem(const int v, const int v_rhs)
     {
       createVectorWrappers(v, v_rhs);
@@ -85,7 +80,6 @@ namespace Elastic
     boost::shared_ptr<SAMRAI::solv::SAMRAIVectorReal<double> > d_uv;
     boost::shared_ptr<SAMRAI::solv::SAMRAIVectorReal<double> > d_fv;
     bool d_solver_is_initialized;
-    bool d_enable_logging;
 
     void getFromInput(SAMRAI::tbox::Database &database);
     void createVectorWrappers(int v, int v_rhs);

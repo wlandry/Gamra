@@ -23,10 +23,6 @@ namespace Elastic
            const std::string& object_name,
            const boost::shared_ptr<SAMRAI::tbox::Database> &database,
            const Boundary_Conditions &bc);
-    void enableLogging(bool enable_logging)
-    {
-      d_enable_logging = enable_logging;
-    }
     void setCoarsestLevelSolverTolerance(double tol)
     {
       d_coarse_solver_tolerance = tol;
@@ -139,8 +135,8 @@ namespace Elastic
                         const SAMRAI::solv::SAMRAIVectorReal<double> &);
 
     void set_physical_boundaries(const int &v_id,
-                        const SAMRAI::hier::PatchHierarchy &hierarchy,
-                        const int &l)
+                                 const SAMRAI::hier::PatchHierarchy &hierarchy,
+                                 const int &l)
     {
       set_physical_boundaries(v_id,hierarchy,l,true);
     }
@@ -150,14 +146,16 @@ namespace Elastic
     {
       set_physical_boundaries(v_id,hierarchy.getPatchLevel(l),rhs);
     }
-    void set_physical_boundaries(const int &v_id,
-                                 const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
+    void set_physical_boundaries
+    (const int &v_id,
+     const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
     {
       set_physical_boundaries(v_id,level,true);
     }
-    void set_physical_boundaries(const int &v_id, 
-                                 const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
-                                 const bool &rhs);
+    void set_physical_boundaries
+    (const int &v_id, 
+     const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
+     const bool &rhs);
   private:
     void Gauss_Seidel_red_black_2D
     (SAMRAI::solv::SAMRAIVectorReal<double>& error,
@@ -356,7 +354,9 @@ namespace Elastic
     V_Refine_Patch_Strategy v_refine_patch_strategy;
     V_Coarsen_Patch_Strategy v_coarsen_patch_strategy;
 
-    bool d_enable_logging;
+  public:
+    bool logging;
+  private:
     const SAMRAI::solv::FACPreconditioner* d_preconditioner;
     const Boundary_Conditions &d_boundary_conditions;
         

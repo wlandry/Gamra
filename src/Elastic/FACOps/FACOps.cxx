@@ -32,7 +32,7 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
   d_side_scratch_id(invalid_id),
   v_refine_patch_strategy(d_object_name + "::refine patch strategy",bc),
   v_coarsen_patch_strategy(d_object_name + "::coarsen patch strategy",bc),
-  d_enable_logging(false),
+  logging(false),
   d_boundary_conditions(bc)
 {
   t_restrict_solution = SAMRAI::tbox::TimerManager::getManager()->
@@ -77,8 +77,6 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
       d_coarse_solver_max_iterations =
         database->getIntegerWithDefault("coarse_solver_max_iterations",
                                         d_coarse_solver_max_iterations);
-      d_enable_logging =
-        database->getBoolWithDefault("enable_logging",
-                                     d_enable_logging);
+      logging = database->getBoolWithDefault("enable_logging", logging);
     }
 }
