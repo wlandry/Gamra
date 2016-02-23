@@ -46,8 +46,8 @@ void Elastic::FACOps::initializeOperatorState
                << ": Cannot find v prolongation refine operator");
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
-  ghostfill_operator = geometry->lookupRefineOperator(variable,
-                                                      "V_BOUNDARY_REFINE");
+  ghostfill_operator = 
+    geometry->lookupRefineOperator(variable, "COARSE_FINE_BOUNDARY_REFINE");
   if (!ghostfill_operator)
     TBOX_ERROR(d_object_name
                << ": Cannot find ghost filling refinement operator");

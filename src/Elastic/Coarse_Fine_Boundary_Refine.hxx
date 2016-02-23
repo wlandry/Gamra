@@ -13,17 +13,6 @@
 #include "Constants.hxx"
 
 namespace Elastic {
-
-  /**
-   * Class V_Boundary_Refine implements the special interpolation needed
-   * for the boundary elements on the coarse-fine interface.
-   *
-   * The findRefineOperator() operator function returns true if the input
-   * variable is side-centered double, and the std::string is "V_BOUNDARY_REFINE".
-   *
-   * @see hier::RefineOperator
-   */
-
   class Coarse_Fine_Boundary_Refine: public SAMRAI::hier::RefineOperator
   {
   public:
@@ -31,10 +20,7 @@ namespace Elastic {
     static bool is_residual;
     static int dv_diagonal_id, dv_mixed_id, level_set_id;
     explicit Coarse_Fine_Boundary_Refine():
-      SAMRAI::hier::RefineOperator("V_BOUNDARY_REFINE")
-    {
-      d_name_id = "V_BOUNDARY_REFINE";
-    }
+      SAMRAI::hier::RefineOperator("COARSE_FINE_BOUNDARY_REFINE") { }
 
     bool have_faults() const
     {
@@ -47,72 +33,36 @@ namespace Elastic {
     }
     virtual ~Coarse_Fine_Boundary_Refine(){}
 
-    bool findRefineOperator
-    (const boost::shared_ptr<SAMRAI::hier::Variable>& var,
-     const std::string& op_name) const
-    {
-      const boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-        cast_var(boost::dynamic_pointer_cast<SAMRAI::pdat::SideVariable<double> >(var));
-      return (cast_var && (op_name == d_name_id));
-    }
-    const std::string& getOperatorName() const
-    {
-      return d_name_id;
-    }
-
-    /**
-     * The priority of side-centered double linear interpolation is 0.
-     * It will be performed before any user-defined interpolation operations.
-     */
-    int getOperatorPriority() const
+    virtual int getOperatorPriority() const
     {
       return 0;
     }
 
-    /**
-     * The stencil width of the linear interpolation operator is the vector
-     * of ones.  That is, its stencil extends one side outside the fine box.
-     */
-    SAMRAI::hier::IntVector getStencilWidth(const SAMRAI::tbox::Dimension &dim) const
+    virtual SAMRAI::hier::IntVector getStencilWidth
+    (const SAMRAI::tbox::Dimension &dim) const
     {
       return SAMRAI::hier::IntVector::getOne(dim);
     }
 
-    /**
-     * Refine the source component on the coarse patch to the destination
-     * component on the fine patch using the side-centered double linear
-     * interpolation operator.  Interpolation is performed on the intersection
-     * of the destination patch and the boxes contained in fine_overlap
-     * It is assumed that the coarse patch contains sufficient data for the
-     * stencil width of the refinement operator.
-     */
-    void refine(SAMRAI::hier::Patch &fine_patch,
-                const SAMRAI::hier::Patch &coarse_patch,
-                const int dst_component,
-                const int src_component,
-                const SAMRAI::hier::BoxOverlap &fine_overlap,
-                const SAMRAI::hier::IntVector &ratio) const;
+    /// It is assumed that the coarse patch contains sufficient data
+    /// for the stencil width of the refinement operator.
 
-    /**
-     * Refine the source component on the coarse patch to the destination
-     * component on the fine patch using the side-centered double linear
-     * interpolation operator.  Interpolation is performed on the intersection
-     * of the destination patch and the fine box.   It is assumed that the
-     * coarse patch contains sufficient data for the stencil width of the
-     * refinement operator.  This differs from the above refine() method
-     * only in that it operates on a single fine box instead of a BoxOverlap.
-     */
-    void refine(SAMRAI::hier::Patch &fine_patch,
-                const SAMRAI::hier::Patch &coarse_patch,
-                const int dst_component,
-                const int src_component,
-                const SAMRAI::hier::Box &fine_box,
-                const SAMRAI::hier::IntVector &ratio,
-                const Gamra::Dir &axis) const;
+    virtual void refine(SAMRAI::hier::Patch &fine_patch,
+                        const SAMRAI::hier::Patch &coarse_patch,
+                        const int dst_component,
+                        const int src_component,
+                        const SAMRAI::hier::BoxOverlap &fine_overlap,
+                        const SAMRAI::hier::IntVector &ratio) const;
+
+    void refine_box(SAMRAI::hier::Patch &fine_patch,
+                    const SAMRAI::hier::Patch &coarse_patch,
+                    const int dst_component,
+                    const int src_component,
+                    const SAMRAI::hier::Box &fine_box,
+                    const SAMRAI::hier::IntVector &ratio,
+                    const Gamra::Dir &axis) const;
 
   private:
-    std::string d_name_id;
-
     void Update_V_embedded_2D
     (const int &axis,
      const int &boundary_direction,

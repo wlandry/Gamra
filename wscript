@@ -151,6 +151,7 @@ def build(bld):
                         'src/Elastic/V_Refine/refine_along_line.cxx',
                         'src/Elastic/Coarse_Fine_Boundary_Refine/Coarse_Fine_Boundary_Refine.cxx',
                         'src/Elastic/Coarse_Fine_Boundary_Refine/refine.cxx',
+                        'src/Elastic/Coarse_Fine_Boundary_Refine/refine_box.cxx',
                         'src/Elastic/Coarse_Fine_Boundary_Refine/Update_V_2D.cxx',
                         'src/Elastic/Coarse_Fine_Boundary_Refine/Update_V_embedded_2D.cxx',
                         'src/Elastic/Coarse_Fine_Boundary_Refine/Correction_2D.cxx',
