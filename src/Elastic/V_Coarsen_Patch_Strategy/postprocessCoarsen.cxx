@@ -1,5 +1,8 @@
 #include "Elastic/V_Coarsen_Patch_Strategy.hxx"
 
+// FIXME: It is confusing to coarsen in the patch strategy and not in
+// a coarsening operator.
+
 void
 Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
 (SAMRAI::hier::Patch &coarse_patch,
