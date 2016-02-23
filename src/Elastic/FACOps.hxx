@@ -332,27 +332,27 @@ namespace Elastic
 
     int d_side_scratch_id;
     boost::shared_ptr<SAMRAI::hier::RefineOperator>
-    v_prolongation_refine_operator;
+    refine_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
-    v_prolongation_refine_schedules;
+    refine_schedules;
 
     boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
-    v_urestriction_coarsen_operator;
+    coarsen_u_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
-    v_urestriction_coarsen_schedules;
+    coarsen_u_schedules;
 
     boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
-    v_rrestriction_coarsen_operator;
+    coarsen_resid_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
-    v_rrestriction_coarsen_schedules;
+    coarsen_resid_schedules;
 
     boost::shared_ptr<SAMRAI::hier::RefineOperator>
-    v_ghostfill_refine_operator;
+    ghostfill_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
-    v_ghostfill_refine_schedules;
+    ghostfill_schedules;
 
     std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
-    v_nocoarse_refine_schedules;
+    ghostfill_nocoarse_schedules;
 
     V_Refine_Patch_Strategy v_refine_patch_strategy;
     V_Coarsen_Patch_Strategy v_coarsen_patch_strategy;

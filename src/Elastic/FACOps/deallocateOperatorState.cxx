@@ -10,9 +10,9 @@ void Elastic::FACOps::deallocateOperatorState()
   d_ln_min = -1;
   d_ln_max = -1;
 
-  v_prolongation_refine_schedules.clear();
-  v_urestriction_coarsen_schedules.clear();
-  v_rrestriction_coarsen_schedules.clear();
-  v_ghostfill_refine_schedules.clear();
-  v_nocoarse_refine_schedules.clear();
+  refine_schedules.clear();
+  coarsen_u_schedules.clear();
+  coarsen_resid_schedules.clear();
+  ghostfill_schedules.clear();
+  ghostfill_nocoarse_schedules.clear();
 }

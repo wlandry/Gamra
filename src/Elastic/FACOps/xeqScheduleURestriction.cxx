@@ -8,17 +8,17 @@
 void Elastic::FACOps::xeqScheduleURestriction(int v_dst, int v_src,
                                               int dest_ln)
 {
-  if (!v_urestriction_coarsen_schedules[dest_ln])
+  if (!coarsen_u_schedules[dest_ln])
     TBOX_ERROR("Expected schedule not found.");
 
   SAMRAI::xfer::CoarsenAlgorithm coarsener(d_dim);
-  coarsener.registerCoarsen(v_dst, v_src, v_urestriction_coarsen_operator);
+  coarsener.registerCoarsen(v_dst, v_src, coarsen_u_operator);
   if(have_embedded_boundary())
     {
       coarsener.registerCoarsen
         (level_set_id,level_set_id,
          boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
     }
-  coarsener.resetSchedule(v_urestriction_coarsen_schedules[dest_ln]);
-  v_urestriction_coarsen_schedules[dest_ln]->coarsenData();
+  coarsener.resetSchedule(coarsen_u_schedules[dest_ln]);
+  coarsen_u_schedules[dest_ln]->coarsenData();
 }
