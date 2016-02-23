@@ -1,45 +1,19 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Robin boundary condition support on cartesian grids. 
- *
- ************************************************************************/
 #pragma once
 
-#include <SAMRAI/SAMRAI_config.h>
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
 #include <SAMRAI/xfer/CoarsenPatchStrategy.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
 #include <SAMRAI/hier/CoarseFineBoundary.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/pdat/CellIndex.h>
-#include "Constants.hxx"
+
 #include "Boundary_Conditions.hxx"
 
-namespace Elastic {
-
-  /*!
-   * @brief Helper utility for setting boundary conditions on V.
-   *
-   * This class inherits and implements virtual functions from
-   * xfer::CoarsenPatchStrategy so it may be used to help create
-   * communication schedules if desired.
-   */
-  class V_Coarsen_Patch_Strategy:
-    public SAMRAI::xfer::CoarsenPatchStrategy
+namespace Elastic
+{
+  class V_Coarsen_Patch_Strategy: public SAMRAI::xfer::CoarsenPatchStrategy
   {
-
   public:
-    /*!
-     * @brief Constructor using.
-     *
-     * @param object_name Name of the object, for general referencing.
-     * @param coef_strategy Coefficients strategy being helped.
-     */
     V_Coarsen_Patch_Strategy(std::string object_name,
                              const Boundary_Conditions &bc):
       SAMRAI::xfer::CoarsenPatchStrategy(),
@@ -49,40 +23,32 @@ namespace Elastic {
       level_set_id(invalid_id),
       d_boundary_conditions(bc){}
 
-    /*!
-     * @brief Destructor.
-     */
-    virtual ~V_Coarsen_Patch_Strategy(void) {}
-
-    //@{ @name SAMRAI::xfer::CoarsenPatchStrategy virtuals
+    virtual ~V_Coarsen_Patch_Strategy() {}
 
     virtual SAMRAI::hier::IntVector
     getCoarsenOpStencilWidth(const SAMRAI::tbox::Dimension &dim) const
-    { return SAMRAI::hier::IntVector::getOne(dim); }
+    {
+      return SAMRAI::hier::IntVector::getOne(dim);
+    }
 
-    virtual void
-    preprocessCoarsen(SAMRAI::hier::Patch& ,
-                      const SAMRAI::hier::Patch& ,
-                      const SAMRAI::hier::Box& ,
-                      const SAMRAI::hier::IntVector& ) {}
-    virtual void
-    postprocessCoarsen(SAMRAI::hier::Patch& coarse,
-                       const SAMRAI::hier::Patch& fine,
-                       const SAMRAI::hier::Box& coarse_box,
-                       const SAMRAI::hier::IntVector& ratio);
+    virtual void preprocessCoarsen(SAMRAI::hier::Patch& ,
+                                   const SAMRAI::hier::Patch& ,
+                                   const SAMRAI::hier::Box& ,
+                                   const SAMRAI::hier::IntVector& ) {}
+    virtual void postprocessCoarsen(SAMRAI::hier::Patch& coarse,
+                                    const SAMRAI::hier::Patch& fine,
+                                    const SAMRAI::hier::Box& coarse_box,
+                                    const SAMRAI::hier::IntVector& ratio);
 
-    void
-    postprocessCoarsen_2D(SAMRAI::hier::Patch& coarse,
-                          const SAMRAI::hier::Patch& fine,
-                          const SAMRAI::hier::Box& coarse_box,
-                          const SAMRAI::hier::IntVector& ratio);
+    void postprocessCoarsen_2D(SAMRAI::hier::Patch& coarse,
+                               const SAMRAI::hier::Patch& fine,
+                               const SAMRAI::hier::Box& coarse_box,
+                               const SAMRAI::hier::IntVector& ratio);
 
-    void
-    postprocessCoarsen_3D(SAMRAI::hier::Patch& coarse,
-                          const SAMRAI::hier::Patch& fine,
-                          const SAMRAI::hier::Box& coarse_box,
-                          const SAMRAI::hier::IntVector& ratio);
-
+    void postprocessCoarsen_3D(SAMRAI::hier::Patch& coarse,
+                               const SAMRAI::hier::Patch& fine,
+                               const SAMRAI::hier::Box& coarse_box,
+                               const SAMRAI::hier::IntVector& ratio);
 
     void
     coarsen_2D
@@ -141,14 +107,15 @@ namespace Elastic {
       return 0;
     }
 
-    double coarsen_point_3D(const SAMRAI::pdat::SideData<double>& v_fine,
-                            const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
-                            const boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal,
-                            const SAMRAI::pdat::SideIndex& fine,
-                            const int& axis,
-                            const SAMRAI::hier::Index& ip,
-                            const SAMRAI::hier::Index& jp,
-                            const SAMRAI::hier::Index& kp) const
+    double coarsen_point_3D
+    (const SAMRAI::pdat::SideData<double>& v_fine,
+     const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
+     const boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal,
+     const SAMRAI::pdat::SideIndex& fine,
+     const int& axis,
+     const SAMRAI::hier::Index& ip,
+     const SAMRAI::hier::Index& jp,
+     const SAMRAI::hier::Index& kp) const
     {
       double result=coarsen_plane(v_fine,fine,jp,kp)/2
         + (coarsen_plane(v_fine,fine+ip,jp,kp)
@@ -166,20 +133,6 @@ namespace Elastic {
         }
       return result;
     }
-
-
-    //@}
-
-    //@{
-    /*!
-     * @brief Set the data id that should be filled when setting
-     * physical boundary conditions.
-     *
-     * When setPhysicalBoundaryConditions is called, the data
-     * specified will be set.  This information is required because
-     * the it is not passed in through the argument list of
-     * setPhysicalBounaryConditions.
-     */
 
     int data_id;
     bool is_residual;
@@ -208,19 +161,8 @@ namespace Elastic {
   private:
 
     std::string d_object_name;
-
-    /*!
-     * @brief SAMRAI::hier::Index of target patch data when filling ghosts.
-     */
     int dv_diagonal_id, dv_mixed_id, level_set_id;
-
     const Boundary_Conditions& d_boundary_conditions;
-
-    /*!
-     * @brief Timers for performance measurement.
-     */
-    // boost::shared_ptr<tbox::Timer> t_set_boundary_values_in_cells;
-    // boost::shared_ptr<tbox::Timer> t_use_set_bc_coefs;
   };
 
 }
