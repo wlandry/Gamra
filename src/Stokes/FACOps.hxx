@@ -688,21 +688,6 @@ namespace Stokes {
                             int dest_ln);
 
     /*!
-     * @brief Execute schedule for coarsening flux to the specified
-     * level or reregister an existing one.
-     *
-     * See general notes for xeqScheduleProlongation().
-     *
-     * @return coarsening schedule for setting composite grid flux at
-     * coarse-fine boundaries.
-     */
-    void
-    xeqScheduleFluxCoarsen(
-                           int dst_id,
-                           int src_id,
-                           int dest_ln);
-
-    /*!
      * @brief Execute schedule for filling ghosts on the specified
      * level or reregister an existing one.
      *
