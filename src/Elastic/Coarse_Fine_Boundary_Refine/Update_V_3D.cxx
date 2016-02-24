@@ -2,8 +2,8 @@
 #include "quad_offset_interpolate.hxx"
 #include "Constants.hxx"
 
-/* This is written from the perspective of axis==x.  For axis==y, we
-   switch i and j and everything works out. */
+/// This is written from the perspective of axis==x.  For axis==y, we
+/// switch i and j and everything works out.
 void Elastic::Coarse_Fine_Boundary_Refine::Update_V_3D
 (const Gamra::Dir &ix,
  const Gamra::Dir &boundary_direction,
@@ -22,56 +22,54 @@ void Elastic::Coarse_Fine_Boundary_Refine::Update_V_3D
  const SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
-  /* Quadratic interpolation involving both coarse and fine grids for
-     the normal direction
+  /// Quadratic interpolation involving both coarse and fine grids for
+  ///    the normal direction
 
-      i-1      i      i+1
+  ///     i-1      i      i+1
 
-        ------- -------
-       |   f   f   F   |
-   j-1 C       C       C
-       |   f   f   F   |
-        ------- -------
-       |   f   f   F   |
-   j   C       C       C
-       |   f   f   F   |
-        ------- -------
-       |   f   f   F   |
-   j+1 C       C       C
-       |   f   f   F   |
-        ------- -------
-               |
-               |
-               |
-        Coarse-Fine Boundary
+  ///       ------- -------
+  ///      |   f   f   F   |
+  ///  j-1 C       C       C
+  ///      |   f   f   F   |
+  ///       ------- -------
+  ///      |   f   f   F   |
+  ///  j   C       C       C
+  ///      |   f   f   F   |
+  ///       ------- -------
+  ///      |   f   f   F   |
+  ///  j+1 C       C       C
+  ///      |   f   f   F   |
+  ///       ------- -------
+  ///              |
+  ///              |
+  ///              |
+  ///       Coarse-Fine Boundary
 
-      Interpolate to F.
+  ///     Interpolate to F.
 
-      Note that F is offset out of the plane
+  ///     Note that F is offset out of the plane
 
-           --------------------
-          /                   /|
-         /                   / |
-        /                   /  |
-       /            C      /   |
-      /      F     /      /    |
-      -------------------      |
-     |     /     /       |     |
-     |    f     /  f     |     |
-     |         /         |     |
-     |        C          |    /
-     |                   |   /
-     |                   |  /
-     |    f        f     | /
-     |                   |/
-     -------------------
+  ///          --------------------
+  ///         /                   /|
+  ///        /                   / |
+  ///       /                   /  |
+  ///      /            C      /   |
+  ///     /      F     /      /    |
+  ///     -------------------      |
+  ///    |     /     /       |     |
+  ///    |    f     /  f     |     |
+  ///    |         /         |     |
+  ///    |        C          |    /
+  ///    |                   |   /
+  ///    |                   |  /
+  ///    |    f        f     | /
+  ///    |                   |/
+  ///    -------------------
 
 
-     So need to do a diagonal interpolation of coarse values on the
-     face and then an interpolation using coarse and fine values to
-     get inside the cube.
-
-  */
+  ///    So need to do a diagonal interpolation of coarse values on the
+  ///    face and then an interpolation using coarse and fine values to
+  ///    get inside the cube.
 
   if(boundary_direction==ix)
     {
@@ -139,10 +137,10 @@ void Elastic::Coarse_Fine_Boundary_Refine::Update_V_3D
             }
         }
           
-      /* We need to check when interpolating whether the stencil goes
-         off a boundary.  Fault corrections are not defined outside
-         the boundary.  Also, boundary values are not defined at the
-         outside corner.  So we use a simpler interpolation there. */
+      /// We need to check when interpolating whether the stencil goes
+      /// off a boundary.  Fault corrections are not defined outside
+      /// the boundary.  Also, boundary values are not defined at the
+      /// outside corner.  So we use a simpler interpolation there.
       double v_coarse;
       if((coarse[iy]==lower_y
           && coarse_geom.getTouchesRegularBoundary(iy,ijk_mod_y))
@@ -203,34 +201,33 @@ void Elastic::Coarse_Fine_Boundary_Refine::Update_V_3D
             }
         }
     }
-  /* Set the value for the tangential direction.
+  /// Set the value for the tangential direction.
 
-     If we look at a slice in the i=constant plane.
+  ///    If we look at a slice in the i=constant plane.
 
-          j-1      j      j+1
+  ///         j-1      j      j+1
 
-        ------- -------
-       | f   f | F     |
-   k-1 |   C   |   C   |   C
-       | f   f | F     |
-        ------- -------
-       | f   f | F     |
-   k   |   C   |   C   |   C
-       | f   f | F     |
-        ------- -------
-       | f   f | F     |
-   k+1 |   C   |   C   |   C
-       | f   f | F     |
-        ------- -------
-               |
-               |
-               |
-        Coarse-Fine Boundary
+  ///       ------- -------
+  ///      | f   f | F     |
+  ///  k-1 |   C   |   C   |   C
+  ///      | f   f | F     |
+  ///       ------- -------
+  ///      | f   f | F     |
+  ///  k   |   C   |   C   |   C
+  ///      | f   f | F     |
+  ///       ------- -------
+  ///      | f   f | F     |
+  ///  k+1 |   C   |   C   |   C
+  ///      | f   f | F     |
+  ///       ------- -------
+  ///              |
+  ///              |
+  ///              |
+  ///       Coarse-Fine Boundary
 
-  where C are the coarse velocities, f are the fine velocities, and we
-  interpolate to the F velocities.
+  /// where C are the coarse velocities, f are the fine velocities, and we
+  /// interpolate to the F velocities.
 
- */
   else
     {
       const Gamra::Dir iz(ix.next(3) != boundary_direction
@@ -281,17 +278,17 @@ void Elastic::Coarse_Fine_Boundary_Refine::Update_V_3D
             + v_m_correction;
         }
 
-      /* Numbering determined by Elastic::FAC::compute_intersections_3D */
+      /// Numbering determined by Elastic::FAC::compute_intersections_3D
 
       int directions[2][2][2]={{{4,5},{7,6}},{{4,7},{5,6}}};
       int direction=directions[boundary_direction==(ix+1)%dim ? 0 : 1]
         [boundary_positive ? 0 : 1][ijk[iz]%2];
 
-      /* Be careful about using the right interpolation if the fine
-       * points are not aligned with the coarse points.  There is some
-       * double calls to quad_offset_interpolate going on, but fixing
-       * that would require mucking with the iteration order in an
-       * annoying way. */
+      /// Be careful about using the right interpolation if the fine
+      /// points are not aligned with the coarse points.  There is
+      /// some double calls to quad_offset_interpolate going on, but
+      /// fixing that would require mucking with the iteration order
+      /// in an annoying way.
 
       if(ijk[ix]%2==0)
         {

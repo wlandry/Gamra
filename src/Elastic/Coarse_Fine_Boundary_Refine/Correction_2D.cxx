@@ -99,8 +99,8 @@ namespace {
   }
 }
 
-/* This is written from the perspective of axis==x.  For axis==y, we
-   switch i and j and everything works out. */
+// This is written from the perspective of axis==x.  For axis==y, we
+// switch i and j and everything works out. */
 void Elastic::Coarse_Fine_Boundary_Refine::Correction_2D
 (const int &axis,
  const int &boundary_direction,
@@ -118,31 +118,30 @@ void Elastic::Coarse_Fine_Boundary_Refine::Correction_2D
  const SAMRAI::pdat::SideData<double> &dv_mixed_fine,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
-  /* Quadratic interpolation involving both coarse and fine grids for
-     the normal direction
+  /// Quadratic interpolation involving both coarse and fine grids for
+  ///    the normal direction
 
-      i-1      i      i+1
+  ///     i-1      i      i+1
 
-        ------- -------
-       |   f   f   F   |
-   j-1 C       C       C
-       |   f   f   F   |
-        ------- -------
-       |   f   f   F   |
-   j   C       C       C
-       |   f   f   F   |
-        ------- -------
-       |   f   f   F   |
-   j+1 C       C       C
-       |   f   f   F   |
-        ------- -------
-               |
-               |
-               |
-        Coarse-Fine Boundary
+  ///       ------- -------
+  ///      |   f   f   F   |
+  ///  j-1 C       C       C
+  ///      |   f   f   F   |
+  ///       ------- -------
+  ///      |   f   f   F   |
+  ///  j   C       C       C
+  ///      |   f   f   F   |
+  ///       ------- -------
+  ///      |   f   f   F   |
+  ///  j+1 C       C       C
+  ///      |   f   f   F   |
+  ///       ------- -------
+  ///              |
+  ///              |
+  ///              |
+  ///       Coarse-Fine Boundary
 
-      Interpolate to F.
-  */
+  ///     Interpolate to F.
 
   if(boundary_direction==axis)
     {
@@ -168,28 +167,27 @@ void Elastic::Coarse_Fine_Boundary_Refine::Correction_2D
       v_fine(fine)+=complete_correction(boundary_positive,axis,fine,ip_s,
                                         coarse_correction,dv_diagonal_fine);
     }
-  /* Quadratic interpolation involving both coarse and fine grids for
-     the tangential direction
+  /// Quadratic interpolation involving both coarse and fine grids for
+  ///    the tangential direction
 
-      i-1      i      i+1
+  ///     i-1      i      i+1
 
-        ------- -------
-       |       |       |
-   j-1 C       C       C
-       F   F   F   F   F
-        ------- -------    --- Coarse-Fine Boundary
-       f   f   f   f   f
-   j   C       C       C
-       f   f   f   f   f
-        ------- -------
-       f   f   f   f   f
-   j+1 C       C       C
-       f   f   f   f   f
-        ------- -------
+  ///       ------- -------
+  ///      |       |       |
+  ///  j-1 C       C       C
+  ///      F   F   F   F   F
+  ///       ------- -------    --- Coarse-Fine Boundary
+  ///      f   f   f   f   f
+  ///  j   C       C       C
+  ///      f   f   f   f   f
+  ///       ------- -------
+  ///      f   f   f   f   f
+  ///  j+1 C       C       C
+  ///      f   f   f   f   f
+  ///       ------- -------
 
-    C are the coarse velocities, f are the interior fine velocities,
-    and F are the boundary fine velocities that we need to set.
- */
+  ///   C are the coarse velocities, f are the interior fine velocities,
+  ///   and F are the boundary fine velocities that we need to set.
 
 
   else
