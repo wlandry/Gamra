@@ -1,8 +1,6 @@
-#include "Constants.hxx"
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/pdat/EdgeData.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/Boundary_Conditions.hxx"
 
 void Elastic::Boundary_Conditions::set_dirichlet
@@ -51,10 +49,10 @@ void Elastic::Boundary_Conditions::set_dirichlet
                       std::vector<double> coord(dim);
                       coord[iy]=geom->getXLower()[iy];
                       for(int d=(iy+1)%dim;d!=iy;d=(d+1)%dim)
-                        coord[d]=geom->getXLower()[d]
-                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                        { coord[d]=geom->getXLower()[d]
+                            + dx[d]*(x[d]-pbox.lower()[d]+offset[d]); }
                       if(have_faults())
-                        v(x)+= -(*dv_mixed_ptr)(x+unit[iy],ix_iy+1);
+                        { v(x)+= -(*dv_mixed_ptr)(x+unit[iy],ix_iy+1); }
                       v(x)+=2*expression[ix][iy][0].eval(coord.data());
                     }
                 }
@@ -77,10 +75,10 @@ void Elastic::Boundary_Conditions::set_dirichlet
                       std::vector<double> coord(dim);
                       coord[iy]=geom->getXUpper()[iy];
                       for(int d=(iy+1)%dim;d!=iy;d=(d+1)%dim)
-                        coord[d]=geom->getXLower()[d]
-                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                        { coord[d]=geom->getXLower()[d]
+                            + dx[d]*(x[d]-pbox.lower()[d]+offset[d]); }
                       if(have_faults())
-                        v(x)+= -(*dv_mixed_ptr)(x-unit[iy],ix_iy);
+                        { v(x)+= -(*dv_mixed_ptr)(x-unit[iy],ix_iy); }
                       v(x)+=2*expression[ix][iy][1].eval(coord.data());
                     }
                 }
@@ -101,7 +99,9 @@ void Elastic::Boundary_Conditions::set_dirichlet
             {
               const SAMRAI::pdat::SideIndex &x(*si);
               if(x[ix]<pbox.lower(ix))
-                v(x)=boundary_value;
+                {
+                  v(x)=boundary_value;
+                }
               else
                 {
                   if(homogeneous)
@@ -112,8 +112,8 @@ void Elastic::Boundary_Conditions::set_dirichlet
                     {
                       std::vector<double> coord(dim);
                       for(int d=0;d<dim;++d)
-                        coord[d]=geom->getXLower()[d]
-                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                        { coord[d]=geom->getXLower()[d]
+                            + dx[d]*(x[d]-pbox.lower()[d]+offset[d]); }
                       v(x)=expression[ix][ix][0].eval(coord.data());
                     }
                 }
@@ -131,7 +131,9 @@ void Elastic::Boundary_Conditions::set_dirichlet
             {
               const SAMRAI::pdat::SideIndex &x(*si);
               if(x[ix]>pbox.upper(ix)+1)
-                v(x)=boundary_value;
+                {
+                  v(x)=boundary_value;
+                }
               else
                 {
                   if(homogeneous)
@@ -142,8 +144,8 @@ void Elastic::Boundary_Conditions::set_dirichlet
                     {
                       std::vector<double> coord(dim);
                       for(int d=0;d<dim;++d)
-                        coord[d]=geom->getXLower()[d]
-                          + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                        { coord[d]=geom->getXLower()[d]
+                            + dx[d]*(x[d]-pbox.lower()[d]+offset[d]); }
                       v(x)=expression[ix][ix][1].eval(coord.data());
                     }
                 }

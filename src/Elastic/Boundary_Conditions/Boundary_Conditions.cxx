@@ -1,10 +1,7 @@
-#include <SAMRAI/tbox/Dimension.h>
-#include <SAMRAI/tbox/Database.h>
-#include "Elastic/Boundary_Conditions.hxx"
-#include "Constants.hxx"
-#include <string>
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
-#include <SAMRAI/tbox/PIO.h>
+#include "Elastic/Boundary_Conditions.hxx"
 
 Elastic::Boundary_Conditions::Boundary_Conditions
 (const SAMRAI::tbox::Dimension& dimension,

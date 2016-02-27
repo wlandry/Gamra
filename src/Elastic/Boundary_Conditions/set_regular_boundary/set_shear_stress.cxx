@@ -1,4 +1,6 @@
-#include "Constants.hxx"
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/Boundary_Conditions.hxx"
 
 void Elastic::Boundary_Conditions::set_shear_stress
@@ -39,12 +41,12 @@ void Elastic::Boundary_Conditions::set_shear_stress
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   if(dim==3 && at_corner(geom,pbox,x,ix,iz))
-                    continue;
+                    { continue; }
 
                   double coord[3];
                   for(int d=0;d<dim;++d)
-                    coord[d]=geom->getXLower()[d]
-                      + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                    { coord[d]=geom->getXLower()[d]
+                        + dx[d]*(x[d]-pbox.lower()[d]+offset[d]); }
                   coord[iy]=geom->getXLower()[iy];
 
                   SAMRAI::pdat::SideIndex
@@ -54,10 +56,10 @@ void Elastic::Boundary_Conditions::set_shear_stress
                   if(!homogeneous)
                     {
                       if(have_faults())
-                        v(x)+=((*dv_mixed_ptr)(y,iy_ix+1)
-                               - (*dv_mixed_ptr)(y-unit[ix],iy_ix))
-                          *dx[iy]/dx[ix]
-                          + (*dv_mixed_ptr)(x+unit[iy],ix_iy+1);
+                        { v(x)+=((*dv_mixed_ptr)(y,iy_ix+1)
+                                 - (*dv_mixed_ptr)(y-unit[ix],iy_ix))
+                            *dx[iy]/dx[ix]
+                            + (*dv_mixed_ptr)(x+unit[iy],ix_iy+1); }
                       v(x)-=expression[ix][iy][0].eval(coord)*dx[iy];
                     }
                 }
@@ -73,12 +75,12 @@ void Elastic::Boundary_Conditions::set_shear_stress
                 {
                   const SAMRAI::pdat::SideIndex &x(*si);
                   if(dim==3 && at_corner(geom,pbox,x,ix,iz))
-                    continue;
+                    { continue; }
 
                   double coord[3];
                   for(int d=0;d<dim;++d)
-                    coord[d]=geom->getXLower()[d]
-                      + dx[d]*(x[d]-pbox.lower()[d]+offset[d]);
+                    { coord[d]=geom->getXLower()[d]
+                        + dx[d]*(x[d]-pbox.lower()[d]+offset[d]); }
                   coord[iy]=geom->getXUpper()[iy];
 
                   SAMRAI::pdat::SideIndex
@@ -89,10 +91,10 @@ void Elastic::Boundary_Conditions::set_shear_stress
                   if(!homogeneous)
                     {
                       if(have_faults())
-                        v(x)-=((*dv_mixed_ptr)(y,iy_ix+1)
-                               - (*dv_mixed_ptr)(y-unit[ix],iy_ix))
-                          *dx[iy]/dx[ix]
-                          - (*dv_mixed_ptr)(x-unit[iy],ix_iy);
+                        { v(x)-=((*dv_mixed_ptr)(y,iy_ix+1)
+                                 - (*dv_mixed_ptr)(y-unit[ix],iy_ix))
+                            *dx[iy]/dx[ix]
+                            - (*dv_mixed_ptr)(x-unit[iy],ix_iy); }
                       v(x)+=expression[ix][iy][1].eval(coord)*dx[iy];
                     }
                 }

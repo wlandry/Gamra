@@ -1,7 +1,6 @@
-#include "Constants.hxx"
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/Boundary_Conditions.hxx"
 
 namespace {
@@ -42,10 +41,10 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
     (patch.getPatchGeometry());
 
-  /* Corners are not synced, so we set the level set to a generic
-   * negative value and dv_mixed to zero.  Setting dv_mixed to zero
-   * implies that we do not care about faults that intersect that
-   * corner (nor should we). */
+  /// Corners are not synced, so we set the level set to a generic
+  /// negative value and dv_mixed to zero.  Setting dv_mixed to zero
+  /// implies that we do not care about faults that intersect that
+  /// corner (nor should we).
   for(Gamra::Dir ix=0; ix<dim; ++ix)
     {
       const Gamra::Dir iy(ix.next(dim));
@@ -87,12 +86,14 @@ void Elastic::Boundary_Conditions::set_embedded_boundary
             {
               for(std::vector<int>::iterator j=corners[iy].begin();
                   j!=corners[iy].end();++j)
-                for(int kk=gbox.lower(iz); kk<=gbox.upper(iz); ++kk)
-                  {
-                    x[iy]=*j;
-                    x[iz]=kk;
-                    set_embedded_values(x,dim,level_set,dv_mixed_ptr);
-                  }
+                {
+                  for(int kk=gbox.lower(iz); kk<=gbox.upper(iz); ++kk)
+                    {
+                      x[iy]=*j;
+                      x[iz]=kk;
+                      set_embedded_values(x,dim,level_set,dv_mixed_ptr);
+                    }
+                }
               for(std::vector<int>::iterator k=corners[iz].begin();
                   k!=corners[iz].end();++k)
                 {

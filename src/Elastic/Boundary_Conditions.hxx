@@ -1,15 +1,14 @@
 #pragma once
 
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include <SAMRAI/tbox/Database.h>
 #include <SAMRAI/tbox/Dimension.h>
 #include <SAMRAI/hier/Patch.h>
-#include <SAMRAI/pdat/NodeData.h>
-#include <SAMRAI/pdat/EdgeData.h>
 #include <SAMRAI/pdat/SideData.h>
 #include <SAMRAI/pdat/CellData.h>
 #include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <string>
-#include <vector>
 #include "Input_Expression.hxx"
 #include "edge_node_eval.hxx"
 #include "Constants.hxx"
@@ -157,10 +156,10 @@ namespace Elastic {
                             /(2*dx[iy]);
                           if(have_faults() && !homogeneous)
                             {
-                              /* We only have to correct for one
-                                 of the derivatives because the
-                                 other half is outside the domain
-                                 and defined to be regular. */
+                              /// We only have to correct for one of
+                              /// the derivatives because the other
+                              /// half is outside the domain and
+                              /// defined to be regular.
                               SAMRAI::pdat::CellIndex c(y+unit[ix]);
                               duyy-=(*dv_diagonal_ptr)(c,iy)/(2*dx[iy]);
                             }
@@ -224,10 +223,10 @@ namespace Elastic {
                             /(2*dx[iy]);
                           if(have_faults() && !homogeneous)
                             {
-                              /* We only have to correct for one
-                                 of the derivatives because the
-                                 other half is outside the domain
-                                 and defined to regular. */
+                              /// We only have to correct for one of
+                              /// the derivatives because the other
+                              /// half is outside the domain and
+                              /// defined to regular.
                               SAMRAI::pdat::CellIndex c(y-unit[ix]);
                               duyy-=(*dv_diagonal_ptr)(c,iy)/(2*dx[iy]);
                             }

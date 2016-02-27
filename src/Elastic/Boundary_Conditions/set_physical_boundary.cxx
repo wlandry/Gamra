@@ -1,7 +1,6 @@
-#include "Constants.hxx"
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/Boundary_Conditions.hxx"
 
 void Elastic::Boundary_Conditions::set_physical_boundary
