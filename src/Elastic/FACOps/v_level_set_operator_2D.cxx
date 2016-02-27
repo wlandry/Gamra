@@ -61,9 +61,7 @@ double Elastic::FACOps::v_level_set_operator_2D
     (edge_moduli(edge+jp,1)*dvy_xp
      - edge_moduli(edge,1)*dvy_x)/(dx*dy);
 
-  /* FIXME: This needs to be
-   * interpolated to the dirichlet
-   * conditions */
+  // FIXME: This needs to be interpolated to the dirichlet conditions
   double vy_pp(level_set(y+jp)<0 ? 0 : v(y+jp)),
     vy_pm(level_set(y)<0 ? 0 : v(y)),
     vy_mp(level_set(y+jp-ip)<0 ? 0 : v(y+jp-ip)),
