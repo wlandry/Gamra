@@ -26,6 +26,5 @@ Elastic::FACSolver::FACSolver
 
   d_fac_ops->setPreconditioner(&d_fac_precond);
   if (database)
-    getFromInput(*database);
-
+    { getFromInput(*database); }
 }

@@ -13,11 +13,11 @@
 void Elastic::FACSolver::getFromInput (SAMRAI::tbox::Database &database)
 {
   if (database.isBool("enable_logging"))
-    d_fac_ops->logging=database.getBool("enable_logging");
+    { d_fac_ops->logging=database.getBool("enable_logging"); }
   if (database.isDouble("coarse_solver_tolerance"))
-    setCoarsestLevelSolverTolerance(database.getDouble
-                                    ("coarse_solver_tolerance"));
+    { setCoarsestLevelSolverTolerance(database.getDouble
+                                      ("coarse_solver_tolerance")); }
   if (database.isInteger("coarse_solver_max_iterations"))
-    setCoarsestLevelSolverMaxIterations(database.getInteger
-                                        ("coarse_solver_max_iterations"));
+    { setCoarsestLevelSolverMaxIterations(database.getInteger
+                                          ("coarse_solver_max_iterations")); }
 }

@@ -194,9 +194,9 @@ namespace Elastic
                      const SAMRAI::hier::Index pp[3],
                      double &maxres);
 
-    /* The mixed derivative of the stress.  We have to use a template
-       because 2D uses Node's for the edge moduli, while 3D uses
-       Edge's.  Written as if it is dtau_xy_dy. */
+    /// The mixed derivative of the stress.  We have to use a template
+    /// because 2D uses Node's for the edge moduli, while 3D uses
+    /// Edge's.  Written as if it is dtau_xy_dy.
 
     template<class E_data, class E_index>
     double shear_noncell(const SAMRAI::pdat::SideData<double> &v,
