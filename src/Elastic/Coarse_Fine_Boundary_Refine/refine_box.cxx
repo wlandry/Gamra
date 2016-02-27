@@ -68,11 +68,11 @@ void Elastic::Coarse_Fine_Boundary_Refine::refine_box
          {
            boundary_direction=d;
            if(fine_box.upper(d)<=overlap_box.lower(d))
-             boundary_positive=true;
+             { boundary_positive=true; }
            else if(fine_box.lower(d)>=overlap_box.upper(d))
-             boundary_positive=false;
+             { boundary_positive=false; }
            else
-             abort();
+             { abort(); }
            break;
          }
      }
@@ -113,11 +113,11 @@ void Elastic::Coarse_Fine_Boundary_Refine::refine_box
                  Update_V_2D(ix,boundary_direction,boundary_positive,fine_index,
                              unit[ix],unit[iy],ijk[ix],ijk[iy],v,v_fine);
                  if(have_faults() && !is_residual)
-                   Correction_2D(ix,boundary_direction,boundary_positive,
-                                 fine_index,unit[ix],unit[iy],ijk[ix],ijk[iy],
-                                 fine_min[ix],fine_max[ix],
-                                 *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
-                                 *dv_mixed_fine,v_fine);
+                   { Correction_2D(ix,boundary_direction,boundary_positive,
+                                   fine_index,unit[ix],unit[iy],ijk[ix],ijk[iy],
+                                   fine_min[ix],fine_max[ix],
+                                   *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
+                                   *dv_mixed_fine,v_fine); }
                }
          }
        else
@@ -138,11 +138,12 @@ void Elastic::Coarse_Fine_Boundary_Refine::refine_box
                                           fine_index,unit[ix],unit[iy],ijk[ix],
                                           ijk[iy],level_set,level_set_fine,v,v_fine);
                      if(have_faults() && !is_residual)
-                       Correction_2D(ix,boundary_direction,boundary_positive,
-                                     fine_index,unit[ix],unit[iy],ijk[ix],ijk[iy],
-                                     fine_min[ix],fine_max[ix],
-                                     *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
-                                     *dv_mixed_fine,v_fine);
+                       { Correction_2D(ix,boundary_direction,boundary_positive,
+                                       fine_index,unit[ix],unit[iy],
+                                       ijk[ix],ijk[iy],
+                                       fine_min[ix],fine_max[ix],
+                                       *dv_diagonal,*dv_diagonal_fine,*dv_mixed,
+                                       *dv_mixed_fine,v_fine); }
                    }
                }
          }

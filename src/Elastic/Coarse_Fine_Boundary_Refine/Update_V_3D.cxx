@@ -293,8 +293,7 @@ void Elastic::Coarse_Fine_Boundary_Refine::Update_V_3D
       if(ijk[ix]%2==0)
         {
           if(have_faults() && !is_residual)
-            v_coarse+= -(*dv_mixed_fine)(fine,direction);
-
+            { v_coarse+= -(*dv_mixed_fine)(fine,direction); }
           v_fine(fine)=(8*v_coarse + 10*v_m - 3*v_mm)/15;
         }
       else
@@ -308,28 +307,24 @@ void Elastic::Coarse_Fine_Boundary_Refine::Update_V_3D
 
               double coarse_to_fine[]={0,0};
               if(fine_min(ix)!=fine(ix))
-                {
-                  coarse_to_fine[0]=-(*dv_mixed_fine)(fine-ip,direction)
-                    + (*dv_diagonal_fine)(cell-ip,ix);
-                }
+                { coarse_to_fine[0]=-(*dv_mixed_fine)(fine-ip,direction)
+                    + (*dv_diagonal_fine)(cell-ip,ix); }
 
               if(fine_max(ix)!=fine(ix))
-                {
-                  coarse_to_fine[1]=-(*dv_mixed_fine)(fine+ip,direction)
-                    - (*dv_diagonal_fine)(cell,ix);
-                }
+                { coarse_to_fine[1]=-(*dv_mixed_fine)(fine+ip,direction)
+                    - (*dv_diagonal_fine)(cell,ix); }
 
               /// If the fine mesh does not cover the sides where the
               /// coarse points are, then we use the correction from
               /// the other coarse point and then correct with
               /// dv_diagonal.
               if(fine_min(ix)==fine(ix))
-                coarse_to_fine[0]=coarse_to_fine[1]
-                  + (*dv_diagonal)(coarse_cell,ix);
+                { coarse_to_fine[0]=coarse_to_fine[1]
+                    + (*dv_diagonal)(coarse_cell,ix); }
 
               if(fine_max(ix)==fine(ix))
-                coarse_to_fine[1]=coarse_to_fine[0]
-                  - (*dv_diagonal)(coarse_cell,ix);
+                { coarse_to_fine[1]=coarse_to_fine[0]
+                    - (*dv_diagonal)(coarse_cell,ix); }
 
               v_coarse+=coarse_to_fine[0];
                 

@@ -5,8 +5,8 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include <SAMRAI/hier/RefineOperator.h>
-#include <SAMRAI/pdat/SideVariable.h>
 #include <SAMRAI/pdat/CellData.h>
+#include <SAMRAI/pdat/SideData.h>
 #include <SAMRAI/geom/CartesianPatchGeometry.h>
 
 #include "quad_offset_interpolate.hxx"
