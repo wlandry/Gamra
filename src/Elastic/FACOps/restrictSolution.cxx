@@ -30,9 +30,9 @@ void Elastic::FACOps::restrictSolution
   /// FIXME: Is this sync necessary?  The style is to sync before use,
   /// not after something is set.
   if (dest_ln == d_ln_min)
-    ghostfill_nocoarse(v_dst,dest_ln);
+    { ghostfill_nocoarse(v_dst,dest_ln); }
   else
-    ghostfill(v_dst,dest_ln);
+    { ghostfill(v_dst,dest_ln); }
 
   t_restrict_solution->stop();
 }

@@ -37,8 +37,7 @@ void Elastic::FACOps::Gauss_Seidel_red_black_3D
           {
             ghostfill_nocoarse(v_id,ln);
             if (ln > d_ln_min)
-              ghostfill(v_id, ln);
-
+              { ghostfill(v_id, ln); }
             set_physical_boundaries(v_id,level,true);
 
             for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
@@ -68,7 +67,8 @@ void Elastic::FACOps::Gauss_Seidel_red_black_3D
 
                 SAMRAI::hier::Box pbox=patch->getBox();
                 boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
-                  boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+                  boost::dynamic_pointer_cast
+                  <SAMRAI::geom::CartesianPatchGeometry>
                   (patch->getPatchGeometry());
                 const double *Dx = geom->getDx();
 
@@ -96,16 +96,14 @@ void Elastic::FACOps::Gauss_Seidel_red_black_3D
           const SAMRAI::tbox::SAMRAI_MPI& mpi(hierarchy.getMPI());
           int tmp= converged ? 1 : 0;
           if (mpi.getSize() > 1)
-            {
-              mpi.AllReduce(&tmp, 1, MPI_MIN);
-            }
+            { mpi.AllReduce(&tmp, 1, MPI_MIN); }
           converged=(tmp==1);
         }
     }
 
   ghostfill_nocoarse(v_id,ln);
   if (ln > d_ln_min)
-    ghostfill(v_id, ln);
+    { ghostfill(v_id, ln); }
   set_physical_boundaries(v_id,level,true);
 }
 

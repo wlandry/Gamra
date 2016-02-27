@@ -7,7 +7,7 @@
 void Elastic::FACOps::refine (int v_dst, int v_src, int v_scr, int dest_ln)
 {
   if (!refine_schedules[dest_ln])
-    TBOX_ERROR("Expected schedule not found.");
+    { TBOX_ERROR("Expected schedule not found."); }
   SAMRAI::xfer::RefineAlgorithm refiner;
   refiner.registerRefine(v_dst, v_src, v_scr, refine_operator);
   if(have_embedded_boundary())

@@ -216,9 +216,9 @@ namespace Elastic
         -edge_moduli(edge   ,1)*(v(y   )-v(y-ip   ))/(dx*dy);
     }
 
-    /* The action of the velocity operator. It is written from the
-       perspective of vx, but pass in different values for cell_x
-       etc. to get vy. */
+    /// The action of the velocity operator. It is written from the
+    /// perspective of vx, but pass in different values for cell_x
+    /// etc. to get vy.
 
     double aligned_terms(const SAMRAI::pdat::SideData<double> &v,
                          const SAMRAI::pdat::CellData<double> &cell_moduli,

@@ -25,13 +25,13 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
   Coarse_Fine_Boundary_Refine::is_residual=true;
   ghostfill_nocoarse(v_rhs_id,ln);
 
-  if (ln > d_ln_min) {
-    ghostfill(v_id, ln);
-  }
+  if (ln > d_ln_min)
+    { ghostfill(v_id, ln); }
 
   double theta_momentum=1.0;
 
-  const SAMRAI::hier::Index unit[]={SAMRAI::hier::Index(1,0),SAMRAI::hier::Index(0,1)};
+  const SAMRAI::hier::Index
+    unit[]={SAMRAI::hier::Index(1,0),SAMRAI::hier::Index(0,1)};
   bool converged = false;
   for (int sweep=0; sweep < num_sweeps && !converged; ++sweep)
     {
@@ -46,9 +46,7 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
             {
               ghostfill_nocoarse(v_id,ln);
               if (ln > d_ln_min)
-                {
-                  ghostfill(v_id, ln);
-                }
+                { ghostfill(v_id, ln); }
               set_physical_boundaries(v_id,level,true);
               for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
                    pi!=level->end(); ++pi)
@@ -64,18 +62,21 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
                     (patch->getPatchData(v_rhs_id));
                   SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
-                  boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr=
+                  boost::shared_ptr<SAMRAI::pdat::CellData<double> >
+                    cell_moduli_ptr=
                     boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
                     (patch->getPatchData(cell_moduli_id));
                   SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
-                  boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr=
+                  boost::shared_ptr<SAMRAI::pdat::NodeData<double> >
+                    edge_moduli_ptr=
                     boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
                     (patch->getPatchData(edge_moduli_id));
                   SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
                   SAMRAI::hier::Box pbox=patch->getBox();
                   boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
-                    boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+                    boost::dynamic_pointer_cast
+                    <SAMRAI::geom::CartesianPatchGeometry>
                     (patch->getPatchGeometry());
                   double dx = geom->getDx()[ix];
                   double dy = geom->getDx()[iy];
@@ -157,16 +158,14 @@ void Elastic::FACOps::Gauss_Seidel_red_black_2D
           const SAMRAI::tbox::SAMRAI_MPI& mpi(hierarchy.getMPI());
           int tmp= converged ? 1 : 0;
           if (mpi.getSize() > 1)
-            {
-              mpi.AllReduce(&tmp, 1, MPI_MIN);
-            }
+            { mpi.AllReduce(&tmp, 1, MPI_MIN); }
           converged=(tmp==1);
         }
     }
 
   ghostfill_nocoarse(v_id,ln);
   if (ln > d_ln_min)
-    ghostfill(v_id, ln);
+    { ghostfill(v_id, ln); }
   set_physical_boundaries(v_id,level,true);
 }
 

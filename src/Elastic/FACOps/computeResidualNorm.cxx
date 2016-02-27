@@ -11,9 +11,9 @@ double Elastic::FACOps::computeResidualNorm
 {
   if (coarse_ln != residual.getCoarsestLevelNumber() ||
       fine_ln != residual.getFinestLevelNumber())
-    TBOX_ERROR("Elastic::FACOps::computeResidualNorm() is not\n"
-               << "set up to compute residual except on the range of\n"
-               << "levels defining the vector.\n");
+    { TBOX_ERROR("Elastic::FACOps::computeResidualNorm() is not\n"
+                 << "set up to compute residual except on the range of\n"
+                 << "levels defining the vector.\n"); }
 
   t_compute_residual_norm->start();
   /// We use maxNorm because it is a definite upper bound on the error.

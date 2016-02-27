@@ -16,8 +16,8 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
 
   if (residual.getPatchHierarchy() != solution.getPatchHierarchy()
       || rhs.getPatchHierarchy() != solution.getPatchHierarchy())
-    TBOX_ERROR(d_object_name << ": residual, solution, and rhs hierarchies "
-               << "are not consistent.");
+    { TBOX_ERROR(d_object_name << ": residual, solution, and rhs hierarchies "
+                 << "are not consistent."); }
   const SAMRAI::hier::PatchHierarchy &hierarchy=*residual.getPatchHierarchy();
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
@@ -29,9 +29,9 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
   Coarse_Fine_Boundary_Refine::is_residual=error_equation_indicator;
 
   if (ln > d_ln_min)
-    ghostfill(v_id, ln);
+    { ghostfill(v_id, ln); }
   else
-    ghostfill_nocoarse(v_id, ln);
+    { ghostfill_nocoarse(v_id, ln); }
 
   set_physical_boundaries(v_id,hierarchy,ln,error_equation_indicator);
 

@@ -9,7 +9,7 @@
 void Elastic::FACOps::coarsen_resid(int v_dst, int v_src, int dest_ln)
 {
   if (!coarsen_resid_schedules[dest_ln])
-    TBOX_ERROR("Expected schedule not found.");
+    { TBOX_ERROR("Expected schedule not found."); }
 
   SAMRAI::xfer::CoarsenAlgorithm coarsener(d_dim);
   coarsener.registerCoarsen(v_dst,v_src,coarsen_resid_operator);

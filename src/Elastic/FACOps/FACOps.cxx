@@ -7,14 +7,16 @@
 boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
 Elastic::FACOps::s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
-SAMRAI::tbox::StartupShutdownManager::Handler Elastic::FACOps::s_finalize_handler
+SAMRAI::tbox::StartupShutdownManager::Handler
+Elastic::FACOps::s_finalize_handler
 (0, 0, 0, Elastic::FACOps::finalizeCallback,
  SAMRAI::tbox::StartupShutdownManager::priorityVariables);
 
-Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
-                        const std::string& object_name,
-                        const boost::shared_ptr<SAMRAI::tbox::Database> &database,
-                        const Boundary_Conditions &bc):
+Elastic::FACOps::FACOps
+(const SAMRAI::tbox::Dimension& dim,
+ const std::string& object_name,
+ const boost::shared_ptr<SAMRAI::tbox::Database> &database,
+ const Boundary_Conditions &bc):
   d_dim(dim),
   d_object_name(object_name),
   d_ln_min(-1),
@@ -51,9 +53,8 @@ Elastic::FACOps::FACOps(const SAMRAI::tbox::Dimension& dim,
     getTimer("solv::Elastic::FACOps::computeResidualNorm()");
 
   if (d_dim == SAMRAI::tbox::Dimension(1)
-      || d_dim > SAMRAI::tbox::Dimension(3)) {
-    TBOX_ERROR("Elastic::FACOps : DIM == 1 or > 3 not implemented yet.\n");
-  }
+      || d_dim > SAMRAI::tbox::Dimension(3))
+    { TBOX_ERROR("Elastic::FACOps : DIM == 1 or > 3 not implemented yet.\n"); }
 
   if (!s_side_scratch_var[dim.getValue() - 1])
     {
