@@ -1,5 +1,12 @@
 #pragma once
 
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
+#include <vector>
+#include <SAMRAI/tbox/Database.h>
+
+
 class Patch
 {
 public:
@@ -39,32 +46,32 @@ public:
   }
 
   
-  /* A little utility routine to validate the sizes of input arrays */
+  /// A little utility routine to validate the sizes of input arrays
   void check_array_sizes(const std::string &name, const int &num_components)
   {
     const size_t array_dim(slice==-1 ? dim : dim-1);
     if(ijk.size()!=array_dim)
-      TBOX_ERROR("Bad number of elements in " << name << "ijk.  Expected "
-                 << array_dim << " but got " << ijk.size());
+      { TBOX_ERROR("Bad number of elements in " << name << "ijk.  Expected "
+                   << array_dim << " but got " << ijk.size()); }
     if(xyz_min.size()!=array_dim)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "coord_min or "
-                 << name << "x_lo.  Expected "
-                 << array_dim << " but got " << xyz_min.size());
+      { TBOX_ERROR("Bad number of elements in "
+                   << name << "coord_min or "
+                   << name << "x_lo.  Expected "
+                   << array_dim << " but got " << xyz_min.size()); }
     if(xyz_max.size()!=array_dim)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "coord_max or "
-                 << name << "x_up.  Expected "
-                 << array_dim << " but got " << xyz_max.size());
+      { TBOX_ERROR("Bad number of elements in "
+                   << name << "coord_max or "
+                   << name << "x_up.  Expected "
+                   << array_dim << " but got " << xyz_max.size()); }
     size_t data_size(1);
     for(int d=0; d<dim; ++d)
-      if(d!=slice)
-        data_size*=ijk[d];
+      { if(d!=slice)
+          { data_size*=ijk[d]; } }
     
     if(data.size()!=data_size*num_components)
-      TBOX_ERROR("Bad number of elements in "
-                 << name << "data.  Expected "
-                 << data_size*num_components << " but got " << data.size());
+      { TBOX_ERROR("Bad number of elements in "
+                   << name << "data.  Expected "
+                   << data_size*num_components << " but got " << data.size()); }
   }
 
   bool contains(const double Coord[3]) const
@@ -90,7 +97,7 @@ public:
     for(int dd=0; dd<dim; ++dd)
       {
         if(dd==slice)
-          continue;
+          { continue; }
 
         /* Use max(1,ijk-1) rather than (ijk-1) to handle the case
            when the array is only one element wide */
@@ -100,14 +107,10 @@ public:
         ixp[d]=std::max(0,std::min(ijk[d]-1,ix[d]+1));
 
         if(ijk[d]==1)
-          {
-            dx[d]=0;
-          }
+          { dx[d]=0; }
         else
-          {
-            dx[d]=std::min(1.,std::max(0.,(Coord[dd]-xyz_min[d]-ix[d]*delta)
-                                       /delta));
-          }
+          { dx[d]=std::min(1.,std::max(0.,(Coord[dd]-xyz_min[d]-ix[d]*delta)
+                                       /delta)); }
         ++d;
       }
     double result;
