@@ -15,6 +15,8 @@ void Elastic::FACOps::prolongErrorAndCorrect
   SAMRAI::hier::PatchLevel &fine_level =
     *(s.getPatchHierarchy()->getPatchLevel(dest_ln));
 
+  // FIXME: Is there a way to do this without having to allocate a
+  // scratch space?
   fine_level.allocatePatchData(d_side_scratch_id);
 
   v_refine_patch_strategy.data_id=d_side_scratch_id;
