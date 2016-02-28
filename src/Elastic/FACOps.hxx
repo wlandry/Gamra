@@ -125,8 +125,7 @@ namespace Elastic
     (const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
      const SAMRAI::solv::SAMRAIVectorReal<double>& rhs);
 
-    virtual void
-    deallocateOperatorState();
+    virtual void deallocateOperatorState();
 
     virtual void
     postprocessOneCycle(int fac_cycle_num,
@@ -363,8 +362,4 @@ namespace Elastic
 
     static SAMRAI::tbox::StartupShutdownManager::Handler s_finalize_handler;
   };
-
 }
-
-
-
