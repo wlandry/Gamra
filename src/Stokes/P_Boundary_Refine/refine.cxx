@@ -1,3 +1,6 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Stokes/P_Boundary_Refine.hxx"
 #include "Stokes/set_boundary.hxx"
 #include "Constants.hxx"
@@ -12,13 +15,15 @@ void Stokes::P_Boundary_Refine::refine
 {
   const SAMRAI::pdat::CellOverlap* t_overlap =
     dynamic_cast<const SAMRAI::pdat::CellOverlap *>(&overlap);
-  const SAMRAI::hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
+  const SAMRAI::hier::BoxContainer& boxes
+    = t_overlap->getDestinationBoxContainer();
   const SAMRAI::tbox::Dimension& dimension(fine.getDim());
   const int dim(dimension.getValue());
 
   Stokes_set_boundary(coarse,src_component,invalid_id,true);
 
-  for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin()); b!=boxes.end(); ++b)
+  for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
+       b!=boxes.end(); ++b)
     {
       const SAMRAI::hier::Box &overlap_box=*b;
 
@@ -38,7 +43,7 @@ void Stokes::P_Boundary_Refine::refine
       SAMRAI::hier::Box fine_box=fine.getBox();
       SAMRAI::hier::Box gbox=p_fine->getGhostBox();
 
-      /* We have to infer where the boundary is from the boxes */
+      /// We have to infer where the boundary is from the boxes
       int boundary_direction(-1);
       bool boundary_positive(true);
 
@@ -64,7 +69,8 @@ void Stokes::P_Boundary_Refine::refine
           p_max[d]=std::min(overlap_box.upper(d),gbox.upper(d));
         }
 
-      SAMRAI::hier::IntVector ip(SAMRAI::hier::IntVector::getZero(dimension)), jp(ip), kp(ip);
+      SAMRAI::hier::IntVector ip(SAMRAI::hier::IntVector::getZero(dimension)),
+        jp(ip), kp(ip);
       ip[0]=1;
       jp[1]=1;
       if(dim>2)
@@ -72,12 +78,12 @@ void Stokes::P_Boundary_Refine::refine
 
       if(dim==2)
         {
-          /* This odd stride is because we handle all of the fine
-           * boundary cells in a coarse cell at once.  However,
-           * sometimes there is only one fine cell in a coarse cell,
-           * so the starting point does not align with the coarse
-           * cell.  The stride ensures that, if we start not aligned,
-           * the next step will be aligned. */
+          /// This odd stride is because we handle all of the fine
+          /// boundary cells in a coarse cell at once.  However,
+          /// sometimes there is only one fine cell in a coarse cell,
+          /// so the starting point does not align with the coarse
+          /// cell.  The stride ensures that, if we start not aligned,
+          /// the next step will be aligned.
 
           for(int j=p_min[1]; j<=p_max[1]; j=(j/2)*2+2)
             for(int i=p_min[0]; i<=p_max[0]; i=(i/2)*2+2)
