@@ -1,52 +1,38 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Linear refine operator for cell-centered double data on
- *                a Cartesian mesh. 
- *
- ************************************************************************/
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
 #include "P_Refine.hxx"
 
-#include <float.h>
-#include <math.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <SAMRAI/hier/Index.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/pdat/CellVariable.h>
-#include <SAMRAI/tbox/Utilities.h>
 #include "Dir.hxx"
 
-void Stokes::P_Refine::refine(
-   SAMRAI::hier::Patch& fine,
-   const SAMRAI::hier::Patch& coarse,
-   const int dst_component,
-   const int src_component,
-   const SAMRAI::hier::BoxOverlap& fine_overlap,
-   const SAMRAI::hier::IntVector& ratio) const
+void Stokes::P_Refine::refine
+(SAMRAI::hier::Patch& fine,
+ const SAMRAI::hier::Patch& coarse,
+ const int dst_component,
+ const int src_component,
+ const SAMRAI::hier::BoxOverlap& fine_overlap,
+ const SAMRAI::hier::IntVector& ratio) const
 {
   const SAMRAI::pdat::CellOverlap* t_overlap =
     dynamic_cast<const SAMRAI::pdat::CellOverlap *>(&fine_overlap);
 
    TBOX_ASSERT(t_overlap);
 
-   const SAMRAI::hier::BoxContainer& boxes = t_overlap->getDestinationBoxContainer();
+   const SAMRAI::hier::BoxContainer& boxes
+     = t_overlap->getDestinationBoxContainer();
    for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
-        b!=boxes.end(); ++b) {
-      refine(fine,coarse,dst_component,src_component,*b,ratio);
-   }
+        b!=boxes.end(); ++b)
+     { refine_box(fine,coarse,dst_component,src_component,*b,ratio); }
 }
 
-void Stokes::P_Refine::refine(
-   SAMRAI::hier::Patch& fine_patch,
-   const SAMRAI::hier::Patch& coarse_patch,
-   const int dst_component,
-   const int src_component,
-   const SAMRAI::hier::Box& fine_box,
-   const SAMRAI::hier::IntVector&) const
+void Stokes::P_Refine::refine_box
+(SAMRAI::hier::Patch& fine_patch,
+ const SAMRAI::hier::Patch& coarse_patch,
+ const int dst_component,
+ const int src_component,
+ const SAMRAI::hier::Box& fine_box,
+ const SAMRAI::hier::IntVector&) const
 {
   const SAMRAI::tbox::Dimension& dim(fine_patch.getDim());
 
@@ -74,20 +60,20 @@ void Stokes::P_Refine::refine(
        const SAMRAI::pdat::CellIndex &fine(*ci);
 
        SAMRAI::pdat::CellIndex
-         center(SAMRAI::hier::Index::coarsen(fine,SAMRAI::hier::Index::getOneIndex(dim)*2));
+         center(SAMRAI::hier::Index::coarsen
+                (fine,SAMRAI::hier::Index::getOneIndex(dim)*2));
 
-       /* Pressure is cell-centered, so prolongation is a
-          linear interpolation from nearby cells. */
+       /// Pressure is cell-centered, so prolongation is a linear
+       /// interpolation from nearby cells.
 
-       /* This assumes that the levels are always properly nested,
-          so that we always have an extra grid space for
-          interpolation.  So we only have to have a special case for
-          physical boundaries, where we do not have an extra grid
-          space. */
+       /// This assumes that the levels are always properly nested, so
+       /// that we always have an extra grid space for interpolation.
+       /// So we only have to have a special case for physical
+       /// boundaries, where we do not have an extra grid space.
 
-       /* We could, in theory, use a refine_patch_strategy to fill
-          in the ghost zones with extrapolations, and then use
-          simple differences here. */
+       /// We could, in theory, use a refine_patch_strategy to fill in
+       /// the ghost zones with extrapolations, and then use simple
+       /// differences here.
 
        (*p_fine)(fine)=(*p)(center);
        for(Gamra::Dir d=0; d<dim.getValue(); ++d)
