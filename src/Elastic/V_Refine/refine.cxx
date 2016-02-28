@@ -1,27 +1,10 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Linear refine operator for side-centered double data on
- *                a Cartesian mesh. 
- *
- ************************************************************************/
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
+#include <SAMRAI/pdat/CellIterator.h>
 
 #include "Elastic/V_Refine.hxx"
-
-#include <float.h>
-#include <math.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <SAMRAI/hier/Index.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/SideVariable.h>
-#include <SAMRAI/tbox/Utilities.h>
-#include <SAMRAI/pdat/CellData.h>
-
-#include <FTensor.hpp>
-#include "Elastic/Boundary_Conditions.hxx"
 
 void Elastic::V_Refine::refine(SAMRAI::hier::Patch& fine,
                                const SAMRAI::hier::Patch& coarse,
@@ -42,12 +25,12 @@ void Elastic::V_Refine::refine(SAMRAI::hier::Patch& fine,
        for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
             b!=boxes.end(); ++b)
          {
-           refine(fine,coarse,dst_component,src_component,*b,ratio,ix);
+           refine_box(fine,coarse,dst_component,src_component,*b,ratio,ix);
          }
      }
 }
 
-void Elastic::V_Refine::refine
+void Elastic::V_Refine::refine_box
 (SAMRAI::hier::Patch &fine_patch,
  const SAMRAI::hier::Patch &coarse_patch,
  const int dst_component,
