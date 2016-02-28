@@ -148,6 +148,7 @@ def build(bld):
                         'src/Elastic/FAC/solve.cxx',
                         'src/Elastic/V_Refine/V_Refine.cxx',
                         'src/Elastic/V_Refine/refine.cxx',
+                        'src/Elastic/V_Refine/refine_box.cxx',
                         'src/Elastic/V_Refine/refine_along_line.cxx',
                         'src/Elastic/Coarse_Fine_Boundary_Refine/Coarse_Fine_Boundary_Refine.cxx',
                         'src/Elastic/Coarse_Fine_Boundary_Refine/refine.cxx',
