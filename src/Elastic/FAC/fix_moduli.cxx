@@ -1,12 +1,15 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include <SAMRAI/xfer/CoarsenAlgorithm.h>
 #include <SAMRAI/geom/CartesianGridGeometry.h>
 #include <SAMRAI/pdat/NodeGeometry.h>
 
 #include "Elastic/FAC.hxx"
 
-/* Fix the moduli on the coarse grids by coarsening from the finer
-   grids geometrically averaging the cell moduli to get the edge
-   moduli. */
+/// Fix the moduli on the coarse grids by coarsening from the finer
+/// grids geometrically averaging the cell moduli to get the edge
+/// moduli.
 
 void Elastic::FAC::fix_moduli()
 {
@@ -16,8 +19,8 @@ void Elastic::FAC::fix_moduli()
     cell_moduli_coarsen_operator;
   boost::shared_ptr<SAMRAI::xfer::CoarsenAlgorithm>
     cell_moduli_coarsen_algorithm;
-  SAMRAI::tbox::Array<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
-    cell_moduli_coarsen_schedules;
+  std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
+    cell_moduli_coarsen_schedules (ln_max + 1);
 
   SAMRAI::hier::VariableDatabase*
     vdb = SAMRAI::hier::VariableDatabase::getDatabase();
@@ -29,12 +32,10 @@ void Elastic::FAC::fix_moduli()
   cell_moduli_coarsen_operator =
     geometry->lookupCoarsenOperator(variable,"CONSERVATIVE_COARSEN");
 
-  if (!cell_moduli_coarsen_operator) {
-    TBOX_ERROR(d_object_name
-               << ": Cannot find cell moduli coarsening operator");
-  }
+  if (!cell_moduli_coarsen_operator)
+    { TBOX_ERROR(d_object_name
+                 << ": Cannot find cell moduli coarsening operator"); }
 
-  cell_moduli_coarsen_schedules.resizeArray(ln_max + 1);
   cell_moduli_coarsen_algorithm =
     boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(d_dim);
   cell_moduli_coarsen_algorithm->
@@ -45,16 +46,17 @@ void Elastic::FAC::fix_moduli()
       registerCoarsen(level_set_id,level_set_id,
                       boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
 
-  for (int dest_ln = 0; dest_ln < ln_max; ++dest_ln) {
-    cell_moduli_coarsen_schedules[dest_ln] =
-      cell_moduli_coarsen_algorithm->
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1));
-    if (!cell_moduli_coarsen_schedules[dest_ln]) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot create a coarsen schedule for cell moduli restriction!\n");
+  for (int dest_ln = 0; dest_ln < ln_max; ++dest_ln)
+    {
+      cell_moduli_coarsen_schedules[dest_ln] =
+        cell_moduli_coarsen_algorithm->
+        createSchedule(d_hierarchy->getPatchLevel(dest_ln),
+                       d_hierarchy->getPatchLevel(dest_ln + 1));
+      if (!cell_moduli_coarsen_schedules[dest_ln])
+        { TBOX_ERROR(d_object_name
+                     << ": Cannot create a coarsen schedule for cell moduli "
+                     "restriction!\n"); }
     }
-  }
 
   for(int dest_ln=ln_max-1; dest_ln>=0; --dest_ln)
     {
@@ -64,9 +66,8 @@ void Elastic::FAC::fix_moduli()
     }
 
   cell_moduli_coarsen_algorithm.reset();
-  cell_moduli_coarsen_schedules.setNull();
 
-  /* Compute edge_moduli by averaging the cell moduli. */
+  /// Compute edge_moduli by averaging the cell moduli.
 
   SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(d_dim)),
     jp(ip), kp(ip);
@@ -124,9 +125,9 @@ void Elastic::FAC::fix_moduli()
                 {
                   const int axis2((axis+1)%3), axis3((axis+2)%3);
                   SAMRAI::hier::Box pbox=patch->getBox();
-                  /* Grow in axis direction only, because the
-                     cell_moduli neighbors are not available on the
-                     corners */
+                  /// Grow in axis direction only, because the
+                  /// cell_moduli neighbors are not available on the
+                  /// corners
                   pbox.grow(axis,edge_moduli.getGhostCellWidth()[axis]);
 
                   SAMRAI::pdat::EdgeIterator
@@ -149,7 +150,7 @@ void Elastic::FAC::fix_moduli()
             }
         }
 
-      /* Ghost fill */
+      /// Ghost fill
       SAMRAI::xfer::RefineAlgorithm refiner;
       refiner.registerRefine(edge_moduli_id,edge_moduli_id,
                              edge_moduli_id,
