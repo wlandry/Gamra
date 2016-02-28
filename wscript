@@ -216,6 +216,7 @@ def build(bld):
                         'src/Stokes/P_Boundary_Refine/Update_P_2D.cxx',
                         'src/Stokes/P_Boundary_Refine/Update_P_3D.cxx',
                         'src/Stokes/V_Boundary_Refine/refine.cxx',
+                        'src/Stokes/V_Boundary_Refine/refine_box.cxx',
                         'src/Stokes/V_Boundary_Refine/Update_V_2D.cxx',
                         'src/Stokes/V_Boundary_Refine/Update_V_3D.cxx',
                         'src/Stokes/V_Coarsen_Patch_Strategy/postprocessCoarsen_2D.cxx',

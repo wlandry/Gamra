@@ -1,8 +1,11 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Stokes/V_Boundary_Refine.hxx"
 #include "Constants.hxx"
 
-/* This is written from the perspective of axis==x.  For axis==y, we
-   switch i and j and everything works out. */
+/// This is written from the perspective of axis==x.  For axis==y, we
+/// switch i and j and everything works out.
 void Stokes::V_Boundary_Refine::Update_V_3D
 (const Gamra::Dir &axis,
  const Gamra::Dir &boundary_direction,
@@ -14,54 +17,54 @@ void Stokes::V_Boundary_Refine::Update_V_3D
  SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::SideData<double> &v_fine) const
 {
-  /* Set the derivative for the normal direction.
+  /// Set the derivative for the normal direction.
 
-     We set the derivative on the i=constant plane.  If we look at a
-     slice in that plane.
+  ///    We set the derivative on the i=constant plane.  If we look at a
+  ///    slice in that plane.
 
-         k-1      k       k+1
+  ///        k-1      k       k+1
 
-        ------- -------
-       |       |       |
-   j-1 |   D   |   D   |   D
-       |       |       |
-        ------- -------
-       |       |d-- d+-|
-   j   |   D   |   D   |   D
-       |       |d-+ d++|
-        ------- -------
-       |       |       |
-   j+1 |   D   |   D   |   D
-       |       |       |
-        ------- -------
-               |
-               |
-               |
-        Coarse-Fine Boundary
+  ///       ------- -------
+  ///      |       |       |
+  ///  j-1 |   D   |   D   |   D
+  ///      |       |       |
+  ///       ------- -------
+  ///      |       |d-- d+-|
+  ///  j   |   D   |   D   |   D
+  ///      |       |d-+ d++|
+  ///       ------- -------
+  ///      |       |       |
+  ///  j+1 |   D   |   D   |   D
+  ///      |       |       |
+  ///       ------- -------
+  ///              |
+  ///              |
+  ///              |
+  ///       Coarse-Fine Boundary
 
-  where D are the coarse derivatives, and d are the fine derivatives.
-  This picture is the same as what is seen in P_Boundary_Refine in 2D.
-  So we can use the formula there to compute d--.
+  /// where D are the coarse derivatives, and d are the fine derivatives.
+  /// This picture is the same as what is seen in P_Boundary_Refine in 2D.
+  /// So we can use the formula there to compute d--.
 
-   d(-,-) = a - b/4 + c/16 - d/4 + e/16 + f/16
-          = D(-,-)/16 + (15/16)*D(0,0)
-            + (3/32)*(-D(+,0) - D(0,+) + D(-,0) + D(0,-))
+  ///  d(-,-) = a - b/4 + c/16 - d/4 + e/16 + f/16
+  ///         = D(-,-)/16 + (15/16)*D(0,0)
+  ///           + (3/32)*(-D(+,0) - D(0,+) + D(-,0) + D(0,-))
 
-  */
 
   if(boundary_direction==axis)
     {
-      /* Return early if we are at j==j_max, because that is a corner
-         that we do not care about.  We also skip if j==j_min as long
-         as we do not have to do j_min+1. We have to skip these even
-         though they are not used because otherwise we could end up
-         reading past the end of the array.  */
+      /// Return early if we are at j==j_max, because that is a corner
+      /// that we do not care about.  We also skip if j==j_min as long
+      /// as we do not have to do j_min+1. We have to skip these even
+      /// though they are not used because otherwise we could end up
+      /// reading past the end of the array.
       const int axis2((axis+1)%3), axis3((axis+2)%3);
-      if(ijk[axis2]==p_max[axis2] || (ijk[axis2]==p_min[axis2] && ijk[axis2]%2!=0)
+      if(ijk[axis2]==p_max[axis2]
+         || (ijk[axis2]==p_min[axis2] && ijk[axis2]%2!=0)
          || ijk[axis3]==p_max[axis3] 
          || (ijk[axis3]==p_min[axis3] && ijk[axis3]%2!=0))
         return;
-      /* Compute the derivative at all of the interpolation points.  */
+      /// Compute the derivative at all of the interpolation points.
 
       const SAMRAI::hier::IntVector ip(boundary_positive ? pp[axis] : -pp[axis]),
         jp(pp[(axis+1)%3]), kp(pp[(axis+2)%3]);
@@ -95,25 +98,25 @@ void Stokes::V_Boundary_Refine::Update_V_3D
 
       SAMRAI::hier::Index offset(ip*2);
 
-      /* Be careful about using the right interpolation if the fine
-       * points are not aligned with the coarse points. */
+      /// Be careful about using the right interpolation if the fine
+      /// points are not aligned with the coarse points.
       if(ijk[axis2]%2==0)
         {
           if(ijk[axis3]%2==0)
             {
               v_fine(fine)=v_fine(fine-offset) + dv_fine_mm/2;
               if(ijk[axis2]<p_max[axis2])
-                v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pm/2;
+                { v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pm/2; }
               if(ijk[axis3]<p_max[axis3])
-                v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_mp/2;
+                { v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_mp/2; }
               if(ijk[axis2]<p_max[axis2] && ijk[axis3]<p_max[axis3])
-                v_fine(fine+jp+kp)=v_fine(fine-offset+jp+kp) + dv_fine_pp/2;
+                { v_fine(fine+jp+kp)=v_fine(fine-offset+jp+kp) + dv_fine_pp/2; }
             }
           else
             {
               v_fine(fine)=v_fine(fine-offset) + dv_fine_mp/2;
               if(ijk[axis2]<p_max[axis2])
-                v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pp/2;
+                { v_fine(fine+jp)=v_fine(fine-offset+jp) + dv_fine_pp/2; }
             }
         }
       else
@@ -122,7 +125,7 @@ void Stokes::V_Boundary_Refine::Update_V_3D
             {
               v_fine(fine)=v_fine(fine-offset) + dv_fine_pm/2;
               if(ijk[axis3]<p_max[axis3])
-                v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_pp/2;
+                { v_fine(fine+kp)=v_fine(fine-offset+kp) + dv_fine_pp/2; }
             }
           else
             {
@@ -130,41 +133,41 @@ void Stokes::V_Boundary_Refine::Update_V_3D
             }
         }          
     }
-  /* Set the value for the tangential direction.
+  /// Set the value for the tangential direction.
 
-     Again, if we look at a slice in the i=constant plane.
+  ///    Again, if we look at a slice in the i=constant plane.
 
-          j-1      j      j+1
+  ///         j-1      j      j+1
 
-        ------- -------
-       |       |       |
-   k-1 |   V   |   V   |   V
-       |       |       |
-        ------- -------
-       |       |v--    |
-   k   |   V   |   V   |   V
-       |       |v-+    |
-        ------- -------
-       |       |       |
-   k+1 |   V   |   V   |   V
-       |       |       |
-        ------- -------
-               |
-               |
-               |
-        Coarse-Fine Boundary
+  ///       ------- -------
+  ///      |       |       |
+  ///  k-1 |   V   |   V   |   V
+  ///      |       |       |
+  ///       ------- -------
+  ///      |       |v--    |
+  ///  k   |   V   |   V   |   V
+  ///      |       |v-+    |
+  ///       ------- -------
+  ///      |       |       |
+  ///  k+1 |   V   |   V   |   V
+  ///      |       |       |
+  ///       ------- -------
+  ///              |
+  ///              |
+  ///              |
+  ///       Coarse-Fine Boundary
 
-  where V are the coarse velocities, and v are the fine velocities.
-  This picture is the same as what is seen in P_Boundary_Refine in 2D.
-  So we can use the formula there to compute v--.
+  /// where V are the coarse velocities, and v are the fine velocities.
+  /// This picture is the same as what is seen in P_Boundary_Refine in 2D.
+  /// So we can use the formula there to compute v--.
 
-   v(-,-) = V(-,-)/16 + (15/16)*V(0,0)
-            + (3/32)*(-V(+,0) - V(0,+) + V(-,0) + V(0,-))
+  ///  v(-,-) = V(-,-)/16 + (15/16)*V(0,0)
+  ///           + (3/32)*(-V(+,0) - V(0,+) + V(-,0) + V(0,-))
 
- */
   else
     {
-      const int axis3((axis+1)%3 != boundary_direction ? (axis+1)%3 : (axis+2)%3);
+      const int axis3((axis+1)%3 != boundary_direction ? (axis+1)%3
+                      : (axis+2)%3);
       const SAMRAI::hier::Index ip(pp[axis]),
         jp(boundary_positive ? pp[boundary_direction] : -pp[boundary_direction]),
         kp(pp[axis3]);
@@ -179,15 +182,15 @@ void Stokes::V_Boundary_Refine::Update_V_3D
         + (3.0/32)*(-v(center+jp) - v(center-kp) + v(center-jp) + v(center+kp));
 
 
-      /* Be careful about using the right interpolation if the fine
-       * points are not aligned with the coarse points. */
+      /// Be careful about using the right interpolation if the fine
+      /// points are not aligned with the coarse points.
       if(ijk[axis]%2==0)
         {
           if(ijk[axis3]%2==0)
             {
               v_fine(fine)=v_minus;
               if(ijk[axis3]<p_max[axis3])
-                v_fine(fine+kp)=v_plus;
+                { v_fine(fine+kp)=v_plus; }
               if(ijk[axis]<p_max[axis])
                 {
                   double v_minus_off=v(center-jp-kp+ip)/16
@@ -202,7 +205,7 @@ void Stokes::V_Boundary_Refine::Update_V_3D
 
                   v_fine(fine+ip)=(v_minus+v_minus_off)/2;
                   if(ijk[axis3]<p_max[axis3])
-                    v_fine(fine+ip+kp)=(v_plus+v_plus_off)/2;
+                    { v_fine(fine+ip+kp)=(v_plus+v_plus_off)/2; }
                 }
             }
           else
@@ -235,7 +238,7 @@ void Stokes::V_Boundary_Refine::Update_V_3D
 
               v_fine(fine)=(v_minus+v_minus_off)/2;
               if(ijk[axis3]<p_max[axis3])
-                v_fine(fine+kp)=(v_plus+v_plus_off)/2;
+                { v_fine(fine+kp)=(v_plus+v_plus_off)/2; }
             }
           else
             {
