@@ -1,24 +1,10 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Linear refine operator for side-centered double data on
- *                a Cartesian mesh. 
- *
- ************************************************************************/
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
+#include <SAMRAI/pdat/CellIterator.h>
 
 #include "V_Refine.hxx"
-
-#include <float.h>
-#include <math.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <SAMRAI/hier/Index.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/SideVariable.h>
-#include <SAMRAI/tbox/Utilities.h>
-#include <SAMRAI/pdat/CellData.h>
 
 void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
                               const SAMRAI::hier::Patch& coarse,
@@ -37,20 +23,21 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
       const SAMRAI::hier::BoxContainer&
         boxes = t_overlap->getDestinationBoxContainer(axis);
       SAMRAI::hier::BoxContainer::const_iterator bend(boxes.end());
-      for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin()); b!=bend; ++b)
+      for (SAMRAI::hier::BoxContainer::const_iterator b(boxes.begin());
+           b!=bend; ++b)
         {
-          refine(fine,coarse,dst_component,src_component,*b,ratio,axis);
+          refine_box(fine,coarse,dst_component,src_component,*b,ratio,axis);
         }
     }
 }
 
-void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
-                              const SAMRAI::hier::Patch& coarse,
-                              const int dst_component,
-                              const int src_component,
-                              const SAMRAI::hier::Box& fine_box,
-                              const SAMRAI::hier::IntVector&,
-                              const Gamra::Dir &axis) const
+void Stokes::V_Refine::refine_box(SAMRAI::hier::Patch& fine,
+                                  const SAMRAI::hier::Patch& coarse,
+                                  const int dst_component,
+                                  const int src_component,
+                                  const SAMRAI::hier::Box& fine_box,
+                                  const SAMRAI::hier::IntVector&,
+                                  const Gamra::Dir &axis) const
 {
   const SAMRAI::tbox::Dimension& dimension(fine.getDim());
   const Gamra::Dir dim(dimension.getValue());
@@ -92,20 +79,20 @@ void Stokes::V_Refine::refine(SAMRAI::hier::Patch& fine,
       SAMRAI::pdat::SideIndex center(fine);
       center.coarsen(SAMRAI::hier::Index::getOneIndex(dimension)*2);
 
-      /* This assumes that the levels are always properly nested, so
-         that we always have an extra grid space for interpolation.
-         So we only have to have a special case for physical
-         boundaries, where we do not have an extra grid space. */
+      /// This assumes that the levels are always properly nested, so
+      /// that we always have an extra grid space for interpolation.
+      /// So we only have to have a special case for physical
+      /// boundaries, where we do not have an extra grid space.
 
       double dvx_dy;
 
       if(fine[axis]%2==0)
         {
-          /* Maybe this has to be fixed when dvx/dy != 0 on the
-             outer boundary because the approximation to the
-             derivative is not accurate enough? */
+          /// Maybe this has to be fixed when dvx/dy != 0 on the outer
+          /// boundary because the approximation to the derivative is
+          /// not accurate enough?
 
-          /* Maybe in 3D we should include cross derivatives? */
+          /// Maybe in 3D we should include cross derivatives?
 
           v_fine(fine)=v(center);
 
