@@ -12,7 +12,6 @@
 #include <SAMRAI/geom/CartesianPatchGeometry.h>
 
 #include <FTensor.hpp>
-#include <string>
 
 #include "Constants.hxx"
 
