@@ -1,15 +1,15 @@
 #include "Elastic/V_Refine.hxx"
 
-/* This assumes that the levels are always properly nested, so that we
-   always have an extra grid space for interpolation.  So we only have
-   to have a special case for physical boundaries, where we do not
-   have an extra grid space. */
+/// This assumes that the levels are always properly nested, so that
+/// we always have an extra grid space for interpolation.  So we only
+/// have to have a special case for physical boundaries, where we do
+/// not have an extra grid space.
 
-/* Maybe this has to be fixed when dvx/dy != 0 on the outer boundary
-   because the approximation to the derivative is not accurate
-   enough? */
+/// Maybe this has to be fixed when dvx/dy != 0 on the outer boundary
+/// because the approximation to the derivative is not accurate
+/// enough?
 
-/* Maybe in 3D we should include cross derivatives? */
+/// Maybe in 3D we should include cross derivatives?
 
 double Elastic::V_Refine::refine_along_line
 (SAMRAI::pdat::SideData<double> &v,
@@ -47,7 +47,7 @@ double Elastic::V_Refine::refine_along_line
   return result;
 }
 
-/* Version for embedded boundaries */
+/// Version for embedded boundaries
 
 double Elastic::V_Refine::refine_along_line
 (SAMRAI::pdat::SideData<double> &v,
@@ -60,9 +60,9 @@ double Elastic::V_Refine::refine_along_line
 {
   if(level_set_coarse(coarse)<0)
     {
-      /* FIXME: This should calculate the Dirichlet or Neumann
-       * conditions properly as well as the proper weights.  For now,
-       * hard code v=0 bc's. */
+      // FIXME: This should calculate the Dirichlet or Neumann
+      // conditions properly as well as the proper weights.  For now,
+      // hard code v=0 bc's.
       double result(0);
       // double result(std::numeric_limits<double>::max());
       for(int d=(ix+1)%dim;d!=ix;d=(d+1)%dim)
@@ -85,9 +85,10 @@ double Elastic::V_Refine::refine_along_line
     {
       const int sgn(fine[d]%2==0 ? -1 : 1);
 
-      /* FIXME: This should calculate the Dirichlet or Neumann
-       * conditions properly as well as the proper weights.  For now,
-       * hard code d/dx=0 bc's. */
+      // FIXME: This should calculate the Dirichlet or Neumann
+      // conditions properly as well as the proper weights.  For now,
+      // hard code d/dx=0 bc's.
+
       // double v_plus(v(coarse)), v_minus(v(coarse));
       double dvx_dy;
       if(level_set_coarse(coarse+unit[d])<0)
