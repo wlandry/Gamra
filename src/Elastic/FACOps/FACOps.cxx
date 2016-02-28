@@ -14,11 +14,9 @@ Elastic::FACOps::s_finalize_handler
 
 Elastic::FACOps::FACOps
 (const SAMRAI::tbox::Dimension& dim,
- const std::string& object_name,
  const boost::shared_ptr<SAMRAI::tbox::Database> &database,
  const Boundary_Conditions &bc):
   d_dim(dim),
-  d_object_name(object_name),
   d_ln_min(-1),
   d_ln_max(-1),
   d_coarse_solver_tolerance(1.e-8),
@@ -30,10 +28,10 @@ Elastic::FACOps::FACOps
   dv_mixed_id(invalid_id),
   level_set_id(invalid_id),
   d_context(SAMRAI::hier::VariableDatabase::getDatabase()
-            ->getContext(object_name + "::PRIVATE_CONTEXT")),
+            ->getContext("PRIVATE_CONTEXT")),
   d_side_scratch_id(invalid_id),
-  v_refine_patch_strategy(d_object_name + "::refine patch strategy",bc),
-  v_coarsen_patch_strategy(d_object_name + "::coarsen patch strategy",bc),
+  v_refine_patch_strategy("refine patch strategy",bc),
+  v_coarsen_patch_strategy("coarsen patch strategy",bc),
   logging(false),
   d_boundary_conditions(bc)
 {

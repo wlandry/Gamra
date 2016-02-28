@@ -42,14 +42,14 @@ void Elastic::FACOps::initializeOperatorState
   refine_operator =
     geometry->lookupRefineOperator(variable,"V_REFINE");
   if (!refine_operator)
-    { TBOX_ERROR(d_object_name
+    { TBOX_ERROR(__FILE__
                  << ": Cannot find v prolongation refine operator"); }
 
   vdb->mapIndexToVariable(d_side_scratch_id, variable);
   ghostfill_operator = 
     geometry->lookupRefineOperator(variable, "COARSE_FINE_BOUNDARY_REFINE");
   if (!ghostfill_operator)
-    { TBOX_ERROR(d_object_name
+    { TBOX_ERROR(__FILE__
                  << ": Cannot find ghost filling refinement operator"); }
 
   /// Make space for saving communication schedules. There is no need
@@ -127,7 +127,7 @@ void Elastic::FACOps::initializeOperatorState
                        boost::shared_ptr<SAMRAI::hier::PatchLevel>(),
                        dest_ln - 1,hierarchy);
       if (!refine_schedules[dest_ln])
-        { TBOX_ERROR(d_object_name
+        { TBOX_ERROR(__FILE__
                      << ": Cannot create a refine schedule for refining!\n"); }
 
       ghostfill_schedules[dest_ln] = ghostfill_algorithm.
@@ -135,14 +135,14 @@ void Elastic::FACOps::initializeOperatorState
                        dest_ln - 1,hierarchy,
                        &v_refine_patch_strategy);
       if (!ghostfill_schedules[dest_ln])
-        { TBOX_ERROR(d_object_name
+        { TBOX_ERROR(__FILE__
                      << ": Cannot create a refine schedule for "
                      "ghost filling!\n"); }
 
       ghostfill_nocoarse_schedules[dest_ln] = ghostfill_nocoarse_algorithm.
         createSchedule(hierarchy->getPatchLevel(dest_ln));
       if (!ghostfill_nocoarse_schedules[dest_ln])
-        { TBOX_ERROR(d_object_name << ": Cannot create a refine schedule for "
+        { TBOX_ERROR(__FILE__ << ": Cannot create a refine schedule for "
                      "ghost filling on bottom level!\n"); }
     }
 
@@ -155,7 +155,7 @@ void Elastic::FACOps::initializeOperatorState
                        hierarchy->getPatchLevel(dest_ln + 1),
                        &v_coarsen_patch_strategy);
       if (!coarsen_solution_schedules[dest_ln])
-        TBOX_ERROR(d_object_name << ": Cannot create a coarsen schedule for "
+        TBOX_ERROR(__FILE__ << ": Cannot create a coarsen schedule for "
                    "U v restriction!\n");
 
       coarsen_resid_schedules[dest_ln] =
@@ -164,7 +164,7 @@ void Elastic::FACOps::initializeOperatorState
                        hierarchy->getPatchLevel(dest_ln + 1),
                        &v_coarsen_patch_strategy);
       if (!coarsen_resid_schedules[dest_ln])
-        TBOX_ERROR(d_object_name << ": Cannot create a coarsen schedule for "
+        TBOX_ERROR(__FILE__ << ": Cannot create a coarsen schedule for "
                    "R v restriction!\n");
     }
 
@@ -173,6 +173,6 @@ void Elastic::FACOps::initializeOperatorState
     ghostfill_nocoarse_algorithm.
     createSchedule(hierarchy->getPatchLevel(d_ln_min));
   if (!ghostfill_nocoarse_schedules[d_ln_min])
-    { TBOX_ERROR(d_object_name << ": Cannot create a refine schedule for v "
+    { TBOX_ERROR(__FILE__ << ": Cannot create a refine schedule for v "
                  "ghost filling on bottom level!\n"); }
 }

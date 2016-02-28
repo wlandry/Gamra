@@ -16,7 +16,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
 
   if (residual.getPatchHierarchy() != solution.getPatchHierarchy()
       || rhs.getPatchHierarchy() != solution.getPatchHierarchy())
-    { TBOX_ERROR(d_object_name << ": residual, solution, and rhs hierarchies "
+    { TBOX_ERROR(__FILE__ << ": residual, solution, and rhs hierarchies "
                  << "are not consistent."); }
   const SAMRAI::hier::PatchHierarchy &hierarchy=*residual.getPatchHierarchy();
 

@@ -20,7 +20,6 @@ namespace Elastic
   {
   public:
     FACOps(const SAMRAI::tbox::Dimension& dim,
-           const std::string& object_name,
            const boost::shared_ptr<SAMRAI::tbox::Database> &database,
            const Boundary_Conditions &bc);
     void setCoarsestLevelSolverTolerance(double tol)
@@ -30,7 +29,7 @@ namespace Elastic
     void setCoarsestLevelSolverMaxIterations(int max_iterations)
     {
       if (max_iterations < 0)
-        TBOX_ERROR(d_object_name << ": Invalid number of max iterations\n");
+        { TBOX_ERROR(__FILE__ << "Invalid number of max iterations"); }
       d_coarse_solver_max_iterations = max_iterations;
     }
 
@@ -309,8 +308,6 @@ namespace Elastic
     static void finalizeCallback();
 
     const SAMRAI::tbox::Dimension d_dim;
-    std::string d_object_name;
-
     int d_ln_min;
     int d_ln_max;
 
