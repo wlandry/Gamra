@@ -33,8 +33,7 @@ void Elastic::FAC::fix_moduli()
     geometry->lookupCoarsenOperator(variable,"CONSERVATIVE_COARSEN");
 
   if (!cell_moduli_coarsen_operator)
-    { TBOX_ERROR(d_object_name
-                 << ": Cannot find cell moduli coarsening operator"); }
+    { TBOX_ERROR("Elastic::FAC: Cannot find cell moduli coarsening operator"); }
 
   cell_moduli_coarsen_algorithm =
     boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(d_dim);
@@ -53,9 +52,8 @@ void Elastic::FAC::fix_moduli()
         createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                        d_hierarchy->getPatchLevel(dest_ln + 1));
       if (!cell_moduli_coarsen_schedules[dest_ln])
-        { TBOX_ERROR(d_object_name
-                     << ": Cannot create a coarsen schedule for cell moduli "
-                     "restriction!\n"); }
+        { TBOX_ERROR("Elastic::FAC: Cannot create a coarsen schedule for cell "
+                     "moduli restriction!\n"); }
     }
 
   for(int dest_ln=ln_max-1; dest_ln>=0; --dest_ln)

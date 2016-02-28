@@ -53,10 +53,8 @@ void Stokes::FAC::initializeLevelData
   for (; pi!=level->end(); ++pi) {
 
     boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
-    if (!patch) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot find patch.  Null patch pointer.");
-    }
+    if (!patch)
+      { TBOX_ERROR("Stokes::FAC: Cannot find patch.  Null patch pointer."); }
     boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
       boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>(patch->getPatchGeometry());
     const double *dx=geom->getDx();

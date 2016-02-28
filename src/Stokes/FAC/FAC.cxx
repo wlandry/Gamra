@@ -55,19 +55,17 @@ namespace Stokes {
 * all its internal variables with the variable database.                *
 *************************************************************************
 */
-Stokes::FAC::FAC(const std::string& object_name,
-                 const SAMRAI::tbox::Dimension& dimension,
+Stokes::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                  boost::shared_ptr<SAMRAI::tbox::Database> database):
-  d_object_name(object_name),
   d_dim(dimension),
   d_stokes_fac_solver((d_dim),
-                      object_name + "::stokes_hypre",
+                      "Stokes::FAC::stokes_hypre",
                       (database &&
                        database->isDatabase("fac_solver")) ?
                       database->getDatabase("fac_solver"):
                       boost::shared_ptr<SAMRAI::tbox::Database>()),
   d_bc_coefs(d_dim,
-             object_name + "::bc_coefs",
+             "Stokes::FAC::bc_coefs",
              (database &&
               database->isDatabase("bc_coefs")) ?
              database->getDatabase("bc_coefs"):
@@ -81,7 +79,7 @@ Stokes::FAC::FAC(const std::string& object_name,
   /*
    * Get a unique context for variables owned by this object.
    */
-  d_context = vdb->getContext(d_object_name + ":Context");
+  d_context = vdb->getContext("Stokes::FAC:Context");
 
   /*
    * Register variables with SAMRAI::hier::VariableDatabase
@@ -89,28 +87,25 @@ Stokes::FAC::FAC(const std::string& object_name,
    */
 
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    p_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim, object_name + ":p", 1));
+    p_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim, "Stokes::FAC:p", 1));
   p_id = vdb->registerVariableAndContext(p_ptr, d_context,
                                          SAMRAI::hier::IntVector::getOne(d_dim)
                                          /* ghost cell width is 1 for
                                             stencil widths */);
 
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    cell_viscosity_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim,
-                                                      object_name
-                                                      + ":cell_viscosity"));
-  cell_viscosity_id = vdb->registerVariableAndContext(cell_viscosity_ptr,
-                                                      d_context,
-                                                      SAMRAI::hier::IntVector::getOne(d_dim)
+    cell_viscosity_ptr(new SAMRAI::pdat::CellVariable<double>
+                       (d_dim, "Stokes::FAC:cell_viscosity"));
+  cell_viscosity_id = vdb->registerVariableAndContext
+    (cell_viscosity_ptr, d_context, SAMRAI::hier::IntVector::getOne(d_dim)
                                                       /* ghost cell width is
                                                          1 in case needed */);
 
   if(dim==2)
     {
       boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
-        edge_viscosity_ptr(new SAMRAI::pdat::NodeVariable<double>(d_dim,
-                                                          object_name
-                                                          + ":edge_viscosity"));
+        edge_viscosity_ptr(new SAMRAI::pdat::NodeVariable<double>
+                           (d_dim, "Stokes::FAC:edge_viscosity"));
       edge_viscosity_id =
         vdb->registerVariableAndContext(edge_viscosity_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1)
@@ -120,9 +115,8 @@ Stokes::FAC::FAC(const std::string& object_name,
   else if(dim==3)
     {
       boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
-        edge_viscosity_ptr(new SAMRAI::pdat::EdgeVariable<double>(d_dim,
-                                                          object_name
-                                                          + ":edge_viscosity"));
+        edge_viscosity_ptr(new SAMRAI::pdat::EdgeVariable<double>
+                           (d_dim, "Stokes::FAC:edge_viscosity"));
       edge_viscosity_id =
         vdb->registerVariableAndContext(edge_viscosity_ptr,d_context,
                                         SAMRAI::hier::IntVector(d_dim,1)
@@ -131,28 +125,29 @@ Stokes::FAC::FAC(const std::string& object_name,
     }
 
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    dp_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim, object_name + ":dp"));
+    dp_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim, "Stokes::FAC:dp"));
   dp_id = vdb->registerVariableAndContext(dp_ptr,d_context,
                                           SAMRAI::hier::IntVector::getOne(d_dim)
                                           /* ghost cell width is
                                              1 in case needed */);
 
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    p_exact_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim, object_name + ":p exact"));
+    p_exact_ptr(new SAMRAI::pdat::CellVariable<double>
+                (d_dim, "Stokes::FAC:p exact"));
   p_exact_id = vdb->registerVariableAndContext(p_exact_ptr,d_context,
                                                SAMRAI::hier::IntVector::getOne(d_dim)
                                                /* ghost cell width is
                                                   1 in case needed */);
 
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
-    p_rhs_ptr(new SAMRAI::pdat::CellVariable<double>(d_dim,object_name
-                                             + ":p right hand side"));
+    p_rhs_ptr(new SAMRAI::pdat::CellVariable<double>
+              (d_dim,"Stokes::FAC:p right hand side"));
   p_rhs_id = vdb->registerVariableAndContext(p_rhs_ptr,d_context,
                                              SAMRAI::hier::IntVector::getOne(d_dim));
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_ptr(new SAMRAI::pdat::SideVariable<double>
-          (d_dim, object_name + ":v",SAMRAI::hier::IntVector::getOne(d_dim),1));
+          (d_dim, "Stokes::FAC:v",SAMRAI::hier::IntVector::getOne(d_dim),1));
   v_id = vdb->registerVariableAndContext(v_ptr, d_context,
                                          SAMRAI::hier::IntVector::getOne(d_dim)
                                          /* ghost cell width is 1 for
@@ -160,7 +155,7 @@ Stokes::FAC::FAC(const std::string& object_name,
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_rhs_ptr(new SAMRAI::pdat::SideVariable<double>
-              (d_dim,object_name + ":v right hand side",
+              (d_dim,"Stokes::FAC:v right hand side",
                SAMRAI::hier::IntVector::getOne(d_dim)));
   v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,
                                              SAMRAI::hier::IntVector::getOne(d_dim)

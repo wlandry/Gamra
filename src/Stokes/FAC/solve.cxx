@@ -29,11 +29,8 @@
 */
 bool Stokes::FAC::solve()
 {
-
-  if (!d_hierarchy) {
-    TBOX_ERROR(d_object_name
-               << "Cannot solve using an uninitialized object.\n");
-  }
+  if (!d_hierarchy)
+    { TBOX_ERROR("Stokes::FAC: Cannot solve using an uninitialized object.\n"); }
 
   int ln;
   /*

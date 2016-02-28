@@ -27,10 +27,9 @@
 bool Elastic::FAC::solve()
 {
 
-  if (!d_hierarchy) {
-    TBOX_ERROR(d_object_name
-               << "Cannot solve using an uninitialized object.\n");
-  }
+  if (!d_hierarchy)
+    { TBOX_ERROR("Elastic::FAC: Cannot solve using an uninitialized "
+                 "object.\n"); }
 
   d_boundary_conditions.set_extra_ids(edge_moduli_id,dv_diagonal_id,
                                       dv_mixed_id,level_set_id);

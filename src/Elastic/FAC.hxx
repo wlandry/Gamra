@@ -5,37 +5,19 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include <SAMRAI/mesh/StandardTagAndInitStrategy.h>
-#include <SAMRAI/hier/Box.h>
-#include <SAMRAI/hier/PatchHierarchy.h>
-#include <SAMRAI/hier/PatchLevel.h>
-#include <SAMRAI/hier/VariableContext.h>
 #include <SAMRAI/appu/VisDerivedDataStrategy.h>
 #include <SAMRAI/appu/VisItDataWriter.h>
 
 #include "Elastic/FACSolver.hxx"
 #include <FTensor.hpp>
 
-namespace Elastic {
-  /*!
-   * @brief Class to solve a sample Elastic equation on a SAMR grid.
-   */
-  class FAC:
-    public SAMRAI::mesh::StandardTagAndInitStrategy,
-    public SAMRAI::appu::VisDerivedDataStrategy
+namespace Elastic
+{
+  class FAC: public SAMRAI::mesh::StandardTagAndInitStrategy,
+             public SAMRAI::appu::VisDerivedDataStrategy
   {
-
   public:
-    /*!
-     * @brief Constructor.
-     *
-     * If you want standard output and logging,
-     * pass in valid pointers for those streams.
-     *
-     * @param object_name Ojbect name
-     * @param database Input database (may be NULL)
-     */
-    FAC(const std::string& object_name,
-        const SAMRAI::tbox::Dimension& dim,
+    FAC(const SAMRAI::tbox::Dimension& dim,
         boost::shared_ptr<SAMRAI::tbox::Database> database =
         boost::shared_ptr<SAMRAI::tbox::Database>());
 
@@ -167,8 +149,6 @@ namespace Elastic {
 
   private:
     void fix_moduli();
-    std::string d_object_name;
-
     const SAMRAI::tbox::Dimension d_dim;
 
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;

@@ -29,7 +29,7 @@
 */
 void Stokes::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const {
   if (!d_hierarchy) {
-    TBOX_ERROR(d_object_name << ": No hierarchy in\n"
+    TBOX_ERROR("Stokes::FAC: No hierarchy in\n"
                << " Stokes::FAC::setupPlotter\n"
                << "The hierarchy must be set before calling\n"
                << "this function.\n");

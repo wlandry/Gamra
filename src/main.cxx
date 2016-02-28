@@ -121,8 +121,7 @@ int main(int argc, char* argv[])
 
     if(input_db->isDatabase("Stokes"))
       {
-        Stokes::FAC fac_stokes(base_name + "::Stokes::FAC", dim,
-                               input_db->getDatabase("Stokes"));
+        Stokes::FAC fac_stokes(dim, input_db->getDatabase("Stokes"));
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::CellVariable<double>).name(),
            boost::shared_ptr<SAMRAI::hier::RefineOperator>
@@ -154,8 +153,7 @@ int main(int argc, char* argv[])
       }
     else
       {
-        Elastic::FAC fac_elastic(base_name + "::Elastic::FAC", dim,
-                                 input_db->getDatabase("Elastic"));
+        Elastic::FAC fac_elastic(dim, input_db->getDatabase("Elastic"));
 
         grid_geometry->addRefineOperator
           (typeid(SAMRAI::pdat::SideVariable<double>).name(),

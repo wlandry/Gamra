@@ -42,8 +42,7 @@ namespace Stokes {
      * @param object_name Ojbect name
      * @param database Input database (may be NULL)
      */
-    FAC(const std::string& object_name,
-        const SAMRAI::tbox::Dimension& dim,
+    FAC(const SAMRAI::tbox::Dimension& dim,
         boost::shared_ptr<SAMRAI::tbox::Database> database =
         boost::shared_ptr<SAMRAI::tbox::Database>());
 
@@ -137,8 +136,6 @@ namespace Stokes {
 
   private:
     void fix_viscosity();
-    std::string d_object_name;
-
     const SAMRAI::tbox::Dimension d_dim;
 
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;

@@ -27,10 +27,9 @@ void Stokes::FAC::fix_viscosity()
       geometry->lookupCoarsenOperator(variable,
                                       "CONSERVATIVE_COARSEN");
 
-    if (!cell_viscosity_coarsen_operator) {
-      TBOX_ERROR(d_object_name
-                 << ": Cannot find cell viscosity coarsening operator");
-    }
+    if (!cell_viscosity_coarsen_operator)
+      { TBOX_ERROR("Stokes::FAC: Cannot find cell viscosity coarsening "
+                   "operator"); }
 
     cell_viscosity_coarsen_schedules.resize(ln_max + 1);
     cell_viscosity_coarsen_algorithm->
@@ -42,10 +41,9 @@ void Stokes::FAC::fix_viscosity()
         cell_viscosity_coarsen_algorithm->
         createSchedule(d_hierarchy->getPatchLevel(dest_ln),
                        d_hierarchy->getPatchLevel(dest_ln + 1));
-      if (!cell_viscosity_coarsen_schedules[dest_ln]) {
-        TBOX_ERROR(d_object_name
-                   << ": Cannot create a coarsen schedule for cell viscosity restriction!\n");
-      }
+      if (!cell_viscosity_coarsen_schedules[dest_ln])
+        { TBOX_ERROR("Stokes::FAC: Cannot create a coarsen schedule for "
+                     "cell viscosity restriction!\n"); }
     }
 
     for(int dest_ln=ln_max-1; dest_ln>=0; --dest_ln)

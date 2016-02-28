@@ -21,16 +21,14 @@
 #include <SAMRAI/hier/VariableDatabase.h>
 
 
-Elastic::FAC::FAC(const std::string& object_name,
-                  const SAMRAI::tbox::Dimension& dimension,
+Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                   boost::shared_ptr<SAMRAI::tbox::Database> database):
-  d_object_name(object_name),
   d_dim(dimension),
   d_hierarchy(),
-  d_boundary_conditions(dimension,d_object_name + "::boundary conditions",
+  d_boundary_conditions(dimension,"Elastic::FAC::boundary conditions",
                         database->getDatabase("boundary_conditions")),
   d_elastic_fac_solver((d_dim),
-                       object_name + "::fac_solver",
+                       "Elastic::FAC::fac_solver",
                        (database &&
                         database->isDatabase("fac_solver")) ?
                        database->getDatabase("fac_solver"):
@@ -65,7 +63,7 @@ Elastic::FAC::FAC(const std::string& object_name,
     SAMRAI::hier::VariableDatabase::getDatabase();
 
   /// Get a unique context for variables owned by this object.
-  d_context = vdb->getContext(d_object_name + ":Context");
+  d_context = vdb->getContext("Elastic::FAC:Context");
 
   /// Register variables with SAMRAI::hier::VariableDatabase and get
   /// the descriptor indices for those variables.  Ghost cells width
@@ -74,7 +72,7 @@ Elastic::FAC::FAC(const std::string& object_name,
   int depth=2;
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
     cell_moduli_ptr(new SAMRAI::pdat::CellVariable<double>
-                    (d_dim,object_name + ":cell_moduli",depth));
+                    (d_dim,"Elastic::FAC:cell_moduli",depth));
   cell_moduli_id =
     vdb->registerVariableAndContext(cell_moduli_ptr, d_context,
                                     SAMRAI::hier::IntVector::getOne(d_dim));
@@ -91,14 +89,14 @@ Elastic::FAC::FAC(const std::string& object_name,
     {
       boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
         dv_diagonal_ptr(new SAMRAI::pdat::CellVariable<double>
-                        (d_dim,object_name + ":dv_diagonal",dim));
+                        (d_dim,"Elastic::FAC:dv_diagonal",dim));
       dv_diagonal_id =
         vdb->registerVariableAndContext(dv_diagonal_ptr, d_context,
                                         SAMRAI::hier::IntVector::getOne(d_dim));
 
       boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
         dv_mixed_ptr(new SAMRAI::pdat::SideVariable<double>
-                     (d_dim,object_name + ":dv_mixed",
+                     (d_dim,"Elastic::FAC:dv_mixed",
                       SAMRAI::hier::IntVector::getOne(d_dim),dim==2 ? 2 : 8));
       dv_mixed_id =
         vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
@@ -115,7 +113,7 @@ Elastic::FAC::FAC(const std::string& object_name,
     {
       boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
         level_set_ptr(new SAMRAI::pdat::SideVariable<double>
-                      (d_dim,object_name + ":level_set",
+                      (d_dim,"Elastic::FAC:level_set",
                        SAMRAI::hier::IntVector::getOne(d_dim),depth));
       level_set_id =
         vdb->registerVariableAndContext(level_set_ptr,d_context,
@@ -126,7 +124,7 @@ Elastic::FAC::FAC(const std::string& object_name,
     {
       boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
         edge_moduli_ptr(new SAMRAI::pdat::NodeVariable<double>
-                        (d_dim,object_name + ":edge_moduli",depth));
+                        (d_dim,"Elastic::FAC:edge_moduli",depth));
       edge_moduli_id =
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                         SAMRAI::hier::IntVector::getOne(d_dim));
@@ -135,21 +133,22 @@ Elastic::FAC::FAC(const std::string& object_name,
     {
       boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
         edge_moduli_ptr(new SAMRAI::pdat::EdgeVariable<double>
-                        (d_dim,object_name+ ":edge_moduli",depth));
+                        (d_dim,"Elastic::FAC:edge_moduli",depth));
       edge_moduli_id =
         vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
                                         SAMRAI::hier::IntVector::getOne(d_dim));
     }
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-    v_ptr(new SAMRAI::pdat::SideVariable<double>(d_dim, object_name + ":v",
-                                                 SAMRAI::hier::IntVector::getOne(d_dim), 1));
+    v_ptr(new SAMRAI::pdat::SideVariable<double>
+          (d_dim, "Elastic::FAC:v",
+           SAMRAI::hier::IntVector::getOne(d_dim), 1));
   v_id = vdb->registerVariableAndContext(v_ptr, d_context,
                                          SAMRAI::hier::IntVector::getOne(d_dim));
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_rhs_ptr(new SAMRAI::pdat::SideVariable<double>
-              (d_dim,object_name + ":v right hand side",
+              (d_dim,"Elastic::FAC:v right hand side",
                SAMRAI::hier::IntVector::getOne(d_dim)));
   v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,
                                              SAMRAI::hier::IntVector::getOne(d_dim));
