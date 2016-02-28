@@ -28,7 +28,7 @@ Elastic::FACOps::FACOps
   dv_mixed_id(invalid_id),
   level_set_id(invalid_id),
   d_context(SAMRAI::hier::VariableDatabase::getDatabase()
-            ->getContext("PRIVATE_CONTEXT")),
+            ->getContext("Elastic::FACOps::PRIVATE_CONTEXT")),
   d_side_scratch_id(invalid_id),
   v_refine_patch_strategy("refine patch strategy",bc),
   v_coarsen_patch_strategy("coarsen patch strategy",bc),
