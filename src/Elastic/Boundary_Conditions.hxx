@@ -3,7 +3,6 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include <SAMRAI/tbox/Database.h>
 #include <SAMRAI/tbox/Dimension.h>
 #include <SAMRAI/hier/Patch.h>
 #include <SAMRAI/pdat/SideData.h>

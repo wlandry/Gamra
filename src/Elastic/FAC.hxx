@@ -1,29 +1,18 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Numerical routines for example FAC Elastic solver 
- *
- ************************************************************************/
 #pragma once
 
-#include "Elastic/FACSolver.hxx"
-#include <SAMRAI/pdat/CellVariable.h>
-#include <SAMRAI/tbox/Database.h>
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
+#include <SAMRAI/mesh/StandardTagAndInitStrategy.h>
 #include <SAMRAI/hier/Box.h>
-#include <SAMRAI/solv/LocationIndexRobinBcCoefs.h>
-#include <SAMRAI/hier/Patch.h>
 #include <SAMRAI/hier/PatchHierarchy.h>
 #include <SAMRAI/hier/PatchLevel.h>
-#include <SAMRAI/pdat/SideVariable.h>
-#include <SAMRAI/mesh/StandardTagAndInitStrategy.h>
 #include <SAMRAI/hier/VariableContext.h>
 #include <SAMRAI/appu/VisDerivedDataStrategy.h>
 #include <SAMRAI/appu/VisItDataWriter.h>
-#include "Elastic/Boundary_Conditions.hxx"
-#include "Input_Expression.hxx"
+
+#include "Elastic/FACSolver.hxx"
 #include <FTensor.hpp>
 
 namespace Elastic {
