@@ -20,7 +20,7 @@ void Elastic::FACSolver::initializeSolverState
   TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(d_dim, *hierarchy);
 
   if (v_id < 0 || v_rhs_id < 0)
-    { TBOX_ERROR(d_object_name << ": Bad patch data id.\n"); }
+    { TBOX_ERROR(__FILE__ << ": Bad patch data id.\n"); }
   d_hierarchy = hierarchy;
 
   d_ln_min = (coarse_level == -1 ? 0 : coarse_level);
@@ -28,7 +28,7 @@ void Elastic::FACSolver::initializeSolverState
               : fine_level);
 
   if (d_ln_min < 0 || d_ln_max < 0 || d_ln_min > d_ln_max)
-    { TBOX_ERROR(d_object_name << ": Bad range of levels in\n"
+    { TBOX_ERROR(__FILE__ << ": Bad range of levels in\n"
                  << "inititialization.\n"); }
 
   d_fac_ops->set_extra_ids(cell_moduli_id,edge_moduli_id,dv_diagonal_id,
