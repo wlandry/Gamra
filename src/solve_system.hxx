@@ -1,5 +1,13 @@
 #pragma once
 
+#include <SAMRAI/tbox/Database.h>
+#include <SAMRAI/tbox/InputDatabase.h>
+#include <SAMRAI/hier/PatchHierarchy.h>
+#include <SAMRAI/mesh/StandardTagAndInitialize.h>
+#include <SAMRAI/mesh/BergerRigoutsos.h>
+#include <SAMRAI/mesh/TreeLoadBalancer.h>
+#include <SAMRAI/mesh/GriddingAlgorithm.h>
+
 template<class T>
 bool solve_system
 (T &fac,
