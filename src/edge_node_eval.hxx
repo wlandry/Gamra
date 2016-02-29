@@ -1,12 +1,14 @@
-/* Helper templates that make it easy to refer to node/edge data
-   without having to duplicate code for 2D and 3D. */
-
 #pragma once
+
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
+/// Helper templates that make it easy to refer to node/edge data
+/// without having to duplicate code for 2D and 3D.
 
 #include <SAMRAI/pdat/NodeData.h>
 #include <SAMRAI/pdat/EdgeData.h>
 #include <SAMRAI/pdat/SideIndex.h>
-
 
 inline double &edge_node_eval(SAMRAI::pdat::EdgeData<double> &edge,
                               const SAMRAI::pdat::SideIndex &s,

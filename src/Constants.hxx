@@ -1,5 +1,8 @@
-/* Special values such as whether we are at a boundary, plus the
-   function index_map */
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
+/// Special values such as whether we are at a boundary, plus the
+/// function index_map
 
 #pragma once
 

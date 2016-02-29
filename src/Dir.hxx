@@ -1,5 +1,8 @@
 #pragma once
 
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 /// A really simple class to make it easy to get the next direction
 /// modulo the dimension.
 
