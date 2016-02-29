@@ -56,19 +56,17 @@ namespace Stokes {
 *************************************************************************
 */
 Stokes::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
-                 boost::shared_ptr<SAMRAI::tbox::Database> database):
+                 SAMRAI::tbox::Database &database):
   d_dim(dimension),
   d_stokes_fac_solver((d_dim),
                       "Stokes::FAC::stokes_hypre",
-                      (database &&
-                       database->isDatabase("fac_solver")) ?
-                      database->getDatabase("fac_solver"):
+                      (database.isDatabase("fac_solver")) ?
+                      database.getDatabase("fac_solver"):
                       boost::shared_ptr<SAMRAI::tbox::Database>()),
   d_bc_coefs(d_dim,
              "Stokes::FAC::bc_coefs",
-             (database &&
-              database->isDatabase("bc_coefs")) ?
-             database->getDatabase("bc_coefs"):
+             (database.isDatabase("bc_coefs")) ?
+             database.getDatabase("bc_coefs"):
              boost::shared_ptr<SAMRAI::tbox::Database>())
 {
   const unsigned dim(d_dim.getValue());
@@ -162,37 +160,37 @@ Stokes::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                                                 1 for coarsening
                                                 operator */);
 
-  d_adaption_threshold=database->getDoubleWithDefault("adaption_threshold",
+  d_adaption_threshold=database.getDoubleWithDefault("adaption_threshold",
                                                       1.0e-15);
   min_full_refinement_level
-    =database->getIntegerWithDefault("min_full_refinement_level",0);
+    =database.getIntegerWithDefault("min_full_refinement_level",0);
 
-  if(database->keyExists("viscosity_data"))
+  if(database.keyExists("viscosity_data"))
     {
-      viscosity_ijk=database->getIntegerVector("viscosity_ijk");
-      viscosity_xyz_min=database->getDoubleVector("viscosity_coord_min");
-      viscosity_xyz_max=database->getDoubleVector("viscosity_coord_max");
-      viscosity=database->getDoubleVector("viscosity_data");
+      viscosity_ijk=database.getIntegerVector("viscosity_ijk");
+      viscosity_xyz_min=database.getDoubleVector("viscosity_coord_min");
+      viscosity_xyz_max=database.getDoubleVector("viscosity_coord_max");
+      viscosity=database.getDoubleVector("viscosity_data");
       check_array_sizes(viscosity_ijk,viscosity_xyz_min,viscosity_xyz_max,
                         viscosity,dim,"viscosity");
     }
 
-  if(database->keyExists("v_rhs_data"))
+  if(database.keyExists("v_rhs_data"))
     {
-      v_rhs_ijk=database->getIntegerVector("v_rhs_ijk");
-      v_rhs_xyz_min=database->getDoubleVector("v_rhs_coord_min");
-      v_rhs_xyz_max=database->getDoubleVector("v_rhs_coord_max");
-      v_rhs=database->getDoubleVector("v_rhs_data");
+      v_rhs_ijk=database.getIntegerVector("v_rhs_ijk");
+      v_rhs_xyz_min=database.getDoubleVector("v_rhs_coord_min");
+      v_rhs_xyz_max=database.getDoubleVector("v_rhs_coord_max");
+      v_rhs=database.getDoubleVector("v_rhs_data");
       check_array_sizes(v_rhs_ijk,v_rhs_xyz_min,v_rhs_xyz_max,
                         v_rhs,dim,"v_rhs",dim);
     }
 
-  if(database->keyExists("p_initial_data"))
+  if(database.keyExists("p_initial_data"))
     {
-      p_initial_ijk=database->getIntegerVector("p_initial_ijk");
-      p_initial_xyz_min=database->getDoubleVector("p_initial_coord_min");
-      p_initial_xyz_max=database->getDoubleVector("p_initial_coord_max");
-      p_initial=database->getDoubleVector("p_initial_data");
+      p_initial_ijk=database.getIntegerVector("p_initial_ijk");
+      p_initial_xyz_min=database.getDoubleVector("p_initial_coord_min");
+      p_initial_xyz_max=database.getDoubleVector("p_initial_coord_max");
+      p_initial=database.getDoubleVector("p_initial_data");
       check_array_sizes(p_initial_ijk,p_initial_xyz_min,p_initial_xyz_max,
                         p_initial,dim,"p_initial");
     }

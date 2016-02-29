@@ -30,10 +30,7 @@ namespace Stokes
     public SAMRAI::appu::VisDerivedDataStrategy
   {
   public:
-    FAC(const SAMRAI::tbox::Dimension& dim,
-        boost::shared_ptr<SAMRAI::tbox::Database> database =
-        boost::shared_ptr<SAMRAI::tbox::Database>());
-
+    FAC(const SAMRAI::tbox::Dimension& dim, SAMRAI::tbox::Database &database);
     virtual ~FAC() {}
 
     //@{ @name mesh::StandardTagAndInitStrategy virtuals

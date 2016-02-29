@@ -22,15 +22,14 @@
 
 
 Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
-                  boost::shared_ptr<SAMRAI::tbox::Database> database):
+                  SAMRAI::tbox::Database &database):
   d_dim(dimension),
   d_boundary_conditions(dimension,"Elastic::FAC::boundary conditions",
-                        database->getDatabase("boundary_conditions")),
+                        *database.getDatabase("boundary_conditions")),
   d_elastic_fac_solver((d_dim),
                        "Elastic::FAC::fac_solver",
-                       (database &&
-                        database->isDatabase("fac_solver")) ?
-                       database->getDatabase("fac_solver"):
+                       (database.isDatabase("fac_solver")) ?
+                       database.getDatabase("fac_solver"):
                        boost::shared_ptr<SAMRAI::tbox::Database>(),
                        d_boundary_conditions),
   cell_moduli_id(invalid_id),
@@ -43,7 +42,7 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
   lambda("lambda",database,dimension),
   mu("mu",database,dimension),
   level_set("level_set",database,dimension),
-  offset_vector_on_output(database->getBoolWithDefault
+  offset_vector_on_output(database.getBoolWithDefault
                           ("offset_vector_on_output",false))
 {
   const int dim(d_dim.getValue());
@@ -75,9 +74,9 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
     vdb->registerVariableAndContext(cell_moduli_ptr, d_context,
                                     SAMRAI::hier::IntVector::getOne(d_dim));
 
-  if(database->keyExists("faults"))
+  if(database.keyExists("faults"))
     {
-      faults=database->getDoubleVector("faults");
+      faults=database.getDoubleVector("faults");
     }
   if(faults.size()%9!=0)
     TBOX_ERROR("The number of points in faults must be "
@@ -100,8 +99,8 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
         vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
                                         SAMRAI::hier::IntVector::getOne(d_dim));
     }
-  if(database->keyExists("refinement_points"))
-    refinement_points=database->getDoubleVector("refinement_points");
+  if(database.keyExists("refinement_points"))
+    refinement_points=database.getDoubleVector("refinement_points");
   if(refinement_points.size()%3!=0)
     TBOX_ERROR("The number of points in refinement_points must be "
                "divisible by 3.  Read "
@@ -151,8 +150,8 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
   v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,
                                              SAMRAI::hier::IntVector::getOne(d_dim));
 
-  d_adaption_threshold=database->getDoubleWithDefault("adaption_threshold",
+  d_adaption_threshold=database.getDoubleWithDefault("adaption_threshold",
                                                       1.0e-15);
   min_full_refinement_level
-    =database->getIntegerWithDefault("min_full_refinement_level",0);
+    =database.getIntegerWithDefault("min_full_refinement_level",0);
 }

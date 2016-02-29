@@ -6,7 +6,7 @@
 Elastic::Boundary_Conditions::Boundary_Conditions
 (const SAMRAI::tbox::Dimension& dimension,
  const std::string& object_name,
- boost::shared_ptr<SAMRAI::tbox::Database> database):
+ SAMRAI::tbox::Database &database):
   d_object_name(object_name), edge_moduli_id(invalid_id),
   dv_diagonal_id(invalid_id), dv_mixed_id(invalid_id),
   level_set_id(invalid_id)
@@ -25,6 +25,6 @@ Elastic::Boundary_Conditions::Boundary_Conditions
           expression[vxyz][direction][upper_lower]=
             Input_Expression(bc_name,database,dimension,1,direction);
           is_dirichlet[vxyz][direction][upper_lower]=
-            database->getBool(bc_name + "_is_dirichlet");
+            database.getBool(bc_name + "_is_dirichlet");
         }
 }

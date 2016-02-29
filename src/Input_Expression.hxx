@@ -87,7 +87,7 @@ public:
   Input_Expression(): is_valid(false) {}
 
   Input_Expression(const std::string &name,
-                   boost::shared_ptr<SAMRAI::tbox::Database> database,
+                   SAMRAI::tbox::Database &database,
                    const SAMRAI::tbox::Dimension& dimension,
                    const bool &error_if_missing,
                    const int num_components=1,
@@ -98,7 +98,7 @@ public:
   }
 
   Input_Expression(const std::string &name,
-                   boost::shared_ptr<SAMRAI::tbox::Database> database,
+                   SAMRAI::tbox::Database &database,
                    const SAMRAI::tbox::Dimension& dimension,
                    const int num_components=1,
                    const int Slice=-1):
@@ -111,12 +111,12 @@ public:
   /// set dim or slice.
 private:
   void Init(const std::string &name,
-            boost::shared_ptr<SAMRAI::tbox::Database> database,
+            SAMRAI::tbox::Database &database,
             const int num_components,
             const bool &error_if_missing)
   {
     is_valid=true;
-    if(database->keyExists(name))
+    if(database.keyExists(name))
       {
         equation.DefineVar("x",&coord[0]);
         equation.DefineVar("y",&coord[1]);
@@ -124,33 +124,33 @@ private:
         equation.DefineFun("okada",okada);
         equation.DefineFun("d_okada",d_okada);
         equation.SetVarFactory(variable_factory, NULL);
-        equation.SetExpr(database->getString(name));
+        equation.SetExpr(database.getString(name));
         use_equation=true;
       }
-    else if(database->keyExists(name+"_data"))
+    else if(database.keyExists(name+"_data"))
       {
         patches.push_back(Patch(database,name,num_components,dim,slice));
         use_equation=false;
       }
-    else if(database->keyExists(name+"_patches"))
+    else if(database.keyExists(name+"_patches"))
       {
-        if(!database->isDatabase(name+"_patches"))
+        if(!database.isDatabase(name+"_patches"))
           { TBOX_ERROR("The entry for " + name + "_patches must be a struct."); }
 
         boost::shared_ptr<SAMRAI::tbox::Database>
-          patches_database(database->getDatabase(name+"_patches"));
+          patches_database(database.getDatabase(name+"_patches"));
 
         /// There is no way to get an iterator.  You have to get all
         /// of the keys and look up each one.
         std::vector<std::string>
-          patch_names(database->getDatabase(name+"_patches")->getAllKeys());
+          patch_names(database.getDatabase(name+"_patches")->getAllKeys());
         for(std::vector<std::string>::iterator patch=patch_names.begin();
             patch!=patch_names.end(); ++patch)
           {
             if(!patches_database->isDatabase(*patch))
               { TBOX_ERROR("The entry for " + *patch + " in " + name
                            + "_patches must be a struct."); }
-            patches.push_back(Patch(patches_database->getDatabase(*patch),
+            patches.push_back(Patch(*patches_database->getDatabase(*patch),
                                     num_components,dim,slice));
           }
         use_equation=false;

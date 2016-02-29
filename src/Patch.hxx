@@ -14,33 +14,33 @@ public:
   std::vector<int> ijk;
   int dim, slice;
   
-  Patch(const boost::shared_ptr<SAMRAI::tbox::Database> &database,
+  Patch(SAMRAI::tbox::Database &database,
         const int &num_components, const int &Dim, const int &Slice) :
-    data(database->getDoubleVector("data")),
-    xyz_min(database->getDoubleVector("x_lo")),
-    xyz_max(database->getDoubleVector("x_up")),
-    ijk(database->getIntegerVector("ijk")),
+    data(database.getDoubleVector("data")),
+    xyz_min(database.getDoubleVector("x_lo")),
+    xyz_max(database.getDoubleVector("x_up")),
+    ijk(database.getIntegerVector("ijk")),
     dim(Dim), slice(Slice)
   {
-    check_array_sizes(database->getName() + "::",num_components);
+    check_array_sizes(database.getName() + "::",num_components);
   }
 
-  Patch(const boost::shared_ptr<SAMRAI::tbox::Database> &database,
+  Patch(SAMRAI::tbox::Database &database,
         const std::string &name, const int &num_components,
         const int &Dim, const int &Slice) :
-    data(database->getDoubleVector(name+"_data")),
-    ijk(database->getIntegerVector(name+"_ijk")),
+    data(database.getDoubleVector(name+"_data")),
+    ijk(database.getIntegerVector(name+"_ijk")),
     dim(Dim), slice(Slice)
   {
-    if(database->keyExists(name+"_coord_min"))
+    if(database.keyExists(name+"_coord_min"))
       {
-        xyz_min=database->getDoubleVector(name+"_coord_min");
-        xyz_max=database->getDoubleVector(name+"_coord_max");
+        xyz_min=database.getDoubleVector(name+"_coord_min");
+        xyz_max=database.getDoubleVector(name+"_coord_max");
       }
     else
       {
-        xyz_min=database->getDoubleVector(name+"_x_lo");
-        xyz_max=database->getDoubleVector(name+"_x_up");
+        xyz_min=database.getDoubleVector(name+"_x_lo");
+        xyz_max=database.getDoubleVector(name+"_x_up");
       }
     check_array_sizes(name+"_",num_components);
   }

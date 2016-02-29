@@ -18,7 +18,7 @@ namespace Elastic {
   public:
     Boundary_Conditions(const SAMRAI::tbox::Dimension& dim,
                         const std::string& object_name,
-                        boost::shared_ptr<SAMRAI::tbox::Database> database);
+                        SAMRAI::tbox::Database &database);
     void set_physical_boundary(const SAMRAI::hier::Patch& patch,
                                const int &v_id, const bool &homogeneous) const
     {
