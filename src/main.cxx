@@ -27,9 +27,9 @@ int main(int argc, char* argv[])
   SAMRAI::tbox::SAMRAIManager::startup();
 
   bool converged;
-  /// Create block to force pointer deallocation.  If this is not done
-  /// then there will be memory leaks reported.
-  // FIXME: Really???
+  /// The original example from SAMAI said that we have to create a
+  /// block in order to force pointer deallocation and prevent leaks.
+  /// Not sure about this, but it is easy enough to add.
   {
     std::string input_filename;
     if (argc != 2)
