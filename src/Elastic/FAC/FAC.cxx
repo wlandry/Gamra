@@ -24,7 +24,6 @@
 Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                   boost::shared_ptr<SAMRAI::tbox::Database> database):
   d_dim(dimension),
-  d_hierarchy(),
   d_boundary_conditions(dimension,"Elastic::FAC::boundary conditions",
                         database->getDatabase("boundary_conditions")),
   d_elastic_fac_solver((d_dim),
@@ -34,7 +33,6 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                        database->getDatabase("fac_solver"):
                        boost::shared_ptr<SAMRAI::tbox::Database>(),
                        d_boundary_conditions),
-  d_context(),
   cell_moduli_id(invalid_id),
   edge_moduli_id(invalid_id),
   v_id(invalid_id),
@@ -45,8 +43,8 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
   lambda("lambda",database,dimension),
   mu("mu",database,dimension),
   level_set("level_set",database,dimension),
-  offset_vector_on_output
-  (database->getBoolWithDefault("offset_vector_on_output",false))
+  offset_vector_on_output(database->getBoolWithDefault
+                          ("offset_vector_on_output",false))
 {
   const int dim(d_dim.getValue());
 
