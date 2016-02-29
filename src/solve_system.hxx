@@ -23,15 +23,14 @@ bool solve_system
                    boost::shared_ptr<SAMRAI::tbox::Database>()));
   load_balancer->setSAMRAI_MPI(SAMRAI::tbox::SAMRAI_MPI::getSAMRAIWorld());
 
-  boost::shared_ptr<SAMRAI::mesh::GriddingAlgorithm>
-    gridding_algorithm(new SAMRAI::mesh::GriddingAlgorithm
-                       (patch_hierarchy,
-                        "Gridding Algorithm",
-                        input_db->getDatabase("GriddingAlgorithm"),
-                        tag_and_initializer,
-                        box_generator,
-                        load_balancer));
-  gridding_algorithm->makeCoarsestLevel(0.0);
+  SAMRAI::mesh::GriddingAlgorithm
+    gridding_algorithm(patch_hierarchy,
+                       "Gridding Algorithm",
+                       input_db->getDatabase("GriddingAlgorithm"),
+                       tag_and_initializer,
+                       box_generator,
+                       load_balancer);
+  gridding_algorithm.makeCoarsestLevel(0.0);
 
   bool use_visit=true;
   if (main_db->keyExists("vis_writer"))
@@ -65,7 +64,7 @@ bool solve_system
       if (use_visit && intermediate_output)
         visit_writer->writePlotData(patch_hierarchy, lnum);
       std::vector<int> tag_buffer(patch_hierarchy->getMaxNumberOfLevels(),1);
-      gridding_algorithm->regridAllFinerLevels(0,tag_buffer,0,0.0);
+      gridding_algorithm.regridAllFinerLevels(0,tag_buffer,0,0.0);
       SAMRAI::tbox::plog << "Newly adapted hierarchy\n";
 
       converged=fac.solve();
