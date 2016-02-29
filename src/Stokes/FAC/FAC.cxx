@@ -69,8 +69,7 @@ Stokes::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
              (database &&
               database->isDatabase("bc_coefs")) ?
              database->getDatabase("bc_coefs"):
-             boost::shared_ptr<SAMRAI::tbox::Database>()),
-  d_context()
+             boost::shared_ptr<SAMRAI::tbox::Database>())
 {
   const unsigned dim(d_dim.getValue());
   SAMRAI::hier::VariableDatabase* vdb =
