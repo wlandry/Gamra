@@ -45,11 +45,26 @@ void Stokes::Resid_Coarsen::coarsen(SAMRAI::hier::Patch& coarse,
       double temp(0), viscosity_sum(0);
 
       const int dim(dimension.getValue());
-      for(int i=0;i<(2 << dim); ++i)
+      switch(dim)
         {
-          SAMRAI::hier::Index j(i%2, (i/2)%2, i/4);
-          temp+=r_fine(fine+j)*cell_viscosity_fine(fine+j);
-          viscosity_sum+=cell_viscosity_fine(fine+j);
+        case 2:
+          for(int i=0;i<4; ++i)
+            {
+              SAMRAI::hier::Index j(i%2, (i/2)%2);
+              temp+=r_fine(fine+j)*cell_viscosity_fine(fine+j);
+              viscosity_sum+=cell_viscosity_fine(fine+j);
+            }
+          break;
+        case 3:
+          for(int i=0;i<8; ++i)
+            {
+              SAMRAI::hier::Index j(i%2, (i/2)%2, i/4);
+              temp+=r_fine(fine+j)*cell_viscosity_fine(fine+j);
+              viscosity_sum+=cell_viscosity_fine(fine+j);
+            }
+          break;
+        default:
+          abort();
         }
       r(coarse)=temp/viscosity_sum;
     }

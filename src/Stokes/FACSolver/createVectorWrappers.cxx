@@ -40,6 +40,7 @@ void Stokes::FACSolver::createVectorWrappers(int p, int p_rhs,
                  << " is not a cell-double variable.\n");
     }
 #endif
+    d_uv->addComponent(variable, p);
 
     /* Add v */
     vdb.mapIndexToVariable(v, variable);
@@ -78,6 +79,7 @@ void Stokes::FACSolver::createVectorWrappers(int p, int p_rhs,
                  << " is not a cell-double variable.\n");
     }
 #endif
+    d_fv->addComponent(variable, p_rhs);
 
     /* Add v_rhs */
     vdb.mapIndexToVariable(v_rhs, variable);    

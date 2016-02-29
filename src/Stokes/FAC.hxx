@@ -23,25 +23,13 @@
 #include <SAMRAI/appu/VisDerivedDataStrategy.h>
 #include <SAMRAI/appu/VisItDataWriter.h>
 
-namespace Stokes {
-  /*!
-   * @brief Class to solve a sample Stokes equation on a SAMR grid.
-   */
+namespace Stokes
+{
   class FAC:
     public SAMRAI::mesh::StandardTagAndInitStrategy,
     public SAMRAI::appu::VisDerivedDataStrategy
   {
-
   public:
-    /*!
-     * @brief Constructor.
-     *
-     * If you want standard output and logging,
-     * pass in valid pointers for those streams.
-     *
-     * @param object_name Ojbect name
-     * @param database Input database (may be NULL)
-     */
     FAC(const SAMRAI::tbox::Dimension& dim,
         boost::shared_ptr<SAMRAI::tbox::Database> database =
         boost::shared_ptr<SAMRAI::tbox::Database>());
@@ -80,7 +68,7 @@ namespace Stokes {
     //@}
 
     virtual void
-    applyGradientDetector(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
+    applyGradientDetector(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &hierarchy,
                           const int level_number,
                           const double error_data_time,
                           const int tag_index,

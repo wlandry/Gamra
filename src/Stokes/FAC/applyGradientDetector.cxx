@@ -2,7 +2,7 @@
 #include <SAMRAI/geom/CartesianGridGeometry.h>
 
 void Stokes::FAC::applyGradientDetector
-(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy_,
+(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &hierarchy_,
  const int ln,
  const double ,
  const int tag_index,
@@ -15,8 +15,9 @@ void Stokes::FAC::applyGradientDetector
     (SAMRAI::hier::PatchLevel &) * hierarchy.getPatchLevel(ln);
   
   size_t ntag = 0, ntotal = 0;
-  double maxestimate = 0;
-  for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin()); pi!=level.end(); ++pi)
+  double max_curvature = 0;
+  for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
+      pi!=level.end(); ++pi)
     {
       SAMRAI::hier::Patch& patch = **pi;
       boost::shared_ptr<SAMRAI::hier::PatchData>
@@ -27,52 +28,78 @@ void Stokes::FAC::applyGradientDetector
           TBOX_ERROR("Data index "
                      << tag_index << " does not exist for patch.\n");
         }
-      boost::shared_ptr<SAMRAI::pdat::CellData<int> > tag_cell_data_ = 
-        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<int> >(tag_data);
-      if (!tag_cell_data_)
-        {
-          TBOX_ERROR("Data index " << tag_index << " is not cell int data.\n");
-        }
-      boost::shared_ptr<SAMRAI::hier::PatchData> soln_data = patch.getPatchData(p_id);
-      if (!soln_data)
-        {
-          TBOX_ERROR("Data index " << p_id << " does not exist for patch.\n");
-        }
-      boost::shared_ptr<SAMRAI::pdat::CellData<double> > soln_cell_data_ = 
-        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(soln_data);
-      if (!soln_cell_data_)
-        {
-          TBOX_ERROR("Data index " << p_id << " is not cell int data.\n");
-        }
-      SAMRAI::pdat::CellData<double>& soln_cell_data = *soln_cell_data_;
-      SAMRAI::pdat::CellData<int>& tag_cell_data = *tag_cell_data_;
-      SAMRAI::pdat::CellData<double> estimate_data
-        (patch.getBox(),1,SAMRAI::hier::IntVector::getZero(d_dim));
-      computeAdaptionEstimate(estimate_data,soln_cell_data);
-                              
-      tag_cell_data.fill(0);
-      SAMRAI::pdat::CellIterator
-        cend(SAMRAI::pdat::CellGeometry::end(patch.getBox()));
-      for (SAMRAI::pdat::CellIterator
-             ci(SAMRAI::pdat::CellGeometry::begin(patch.getBox()));
-           ci!=cend; ++ci)
-        {
-          const SAMRAI::pdat::CellIndex cell_index(*ci);
-          if (maxestimate < estimate_data(cell_index))
-            maxestimate=estimate_data(cell_index);
+      boost::shared_ptr<SAMRAI::pdat::CellData<int> > tag_cell_ptr =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<int> >
+        (patch.getPatchData(tag_index));
+      SAMRAI::pdat::CellData<int>& tag_cell(*tag_cell_ptr);
 
-          // SAMRAI::tbox::plog << "estimate "
-          //            << cell_index << " "
-          //            << d_adaption_threshold << " "
-          //            << estimate_data(cell_index) << " "
-          //            << std::boolalpha
-          //            << (estimate_data(cell_index) > d_adaption_threshold)
-          //            << " "
-          //            << "\n";
-          if (estimate_data(cell_index) > d_adaption_threshold
-              || ln<min_full_refinement_level)
+      boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
+        boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (patch.getPatchData(v_id));
+      SAMRAI::pdat::SideData<double>& v(*v_ptr);
+
+      boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
+        boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
+        (patch.getPatchGeometry());
+
+      tag_cell.fill(0);
+      const SAMRAI::hier::Box &box(patch.getBox());
+      SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(box));
+      const int dim(d_dim.getValue());
+
+      for(SAMRAI::pdat::CellIterator ci(SAMRAI::pdat::CellGeometry::begin(box));
+          ci!=cend; ++ci)
+        {
+          const SAMRAI::pdat::CellIndex &cell(*ci);
+
+          double curvature(0);
+	  for (Gamra::Dir ix=0; ix<dim; ++ix)
             {
-              tag_cell_data(cell_index) = 1;
+              const SAMRAI::pdat::SideIndex x(cell,ix,
+                                              SAMRAI::pdat::SideIndex::Lower);
+              for (int d=0; d<dim; ++d)
+                {
+                  SAMRAI::hier::Index ip(d_dim,0),
+                    jp(d_dim,0),
+                    kp(d_dim,0);
+                  ip(0)=1;
+                  jp(1)=1;
+                  if (3==dim)
+                    {
+                      kp(2)=1;
+                    }
+                  const SAMRAI::hier::Index unit[]={ip,jp,kp};
+
+                  /* Special treatment near the boundary.  For Dirichlet
+                     boundaries, the ghost point may not be valid. */
+
+                  double curve(0);
+
+                  if(cell[ix]==box.lower(ix)
+                     && geom->getTouchesRegularBoundary(ix,0))
+                    {
+                      curve=v(x+unit[ix]*2) - 2*v(x+unit[ix]) + v(x);
+                    }
+                  else if(cell[ix]==box.upper(ix)
+                          && geom->getTouchesRegularBoundary(ix,1))
+                    {
+                      curve=v(x+unit[ix]) - 2*v(x) + v(x-unit[ix]);
+                    }
+                  else
+                    {
+                      curve=v(x+unit[ix]*2) - v(x+unit[ix])
+                        - v(x) + v(x-unit[ix]);
+                    }
+                  curvature=std::max(curvature,std::abs(curve));
+                }
+            }
+
+          if(max_curvature < curvature)
+            max_curvature=curvature;
+
+          if (curvature > d_adaption_threshold || ln<min_full_refinement_level)
+            {
+              tag_cell(cell) = 1;
               ++ntag;
             }
         }
@@ -80,96 +107,5 @@ void Stokes::FAC::applyGradientDetector
   SAMRAI::tbox::plog << "Adaption threshold is " << d_adaption_threshold << "\n";
   SAMRAI::tbox::plog << "Number of cells tagged on level " << ln << " is "
              << ntag << "/" << ntotal << "\n";
-  SAMRAI::tbox::plog << "Max estimate is " << maxestimate << "\n";
-}
-
-
-void Stokes::FAC::computeAdaptionEstimate
-(SAMRAI::pdat::CellData<double>&,
- const SAMRAI::pdat::CellData<double>&) const
-// (SAMRAI::pdat::CellData<double>& estimate_data,
-//  const SAMRAI::pdat::CellData<double>& soln_cell_data) const
-{
-  TBOX_ERROR("Need to implement computeAdaptionEstimate without MDA_AccessConst");
-
-  // const int* lower = &estimate_data.getBox().lower()[0];
-  // const int* upper = &estimate_data.getBox().upper()[0];
-  // if (d_dim == SAMRAI::tbox::Dimension(2))
-  //   {
-  //     MDA_AccessConst<double, 2, MDA_OrderColMajor<2> > co =
-  //       SAMRAI::pdat::ArrayDataAccess::access<2, double>(soln_cell_data.getArrayData());
-  //     MDA_Access<double, 2, MDA_OrderColMajor<2> > es =
-  //       SAMRAI::pdat::ArrayDataAccess::access<2, double>(estimate_data.getArrayData());
-  //     int i, j;
-  //     double estimate, est0, est1, est2, est3, est4, est5;
-  //     for (j = lower[1]; j <= upper[1]; ++j)
-  //       {
-  //         for (i = lower[0]; i <= upper[0]; ++i)
-  //           {
-  //             est0=SAMRAI::tbox::MathUtilities<double>::Abs(co(i+1,j) + co(i-1,j)
-  //                                                   - 2*co(i,j));
-                                                 
-  //             est1=SAMRAI::tbox::MathUtilities<double>::Abs(co(i,j+1) + co(i,j-1)
-  //                                                   - 2*co(i,j));
-  //             est2=0.5 * SAMRAI::tbox::MathUtilities<double>::Abs(co(i+1,j+1)
-  //                                                         + co(i-1,j-1)
-  //                                                         - 2*co(i,j));
-  //             est3=0.5 * SAMRAI::tbox::MathUtilities<double>::Abs(co(i+1,j-1)
-  //                                                         + co(i-1,j+1)
-  //                                                         - 2*co(i,j));
-  //             est4=SAMRAI::tbox::MathUtilities<double>::Max(est0,est1);
-  //             est5=SAMRAI::tbox::MathUtilities<double>::Max(est2,est3);
-  //             estimate=SAMRAI::tbox::MathUtilities<double>::Max(est4,est5);
-  //             es(i,j)=estimate;
-  //           }
-  //       }
-  //   }
-  // else if (d_dim == SAMRAI::tbox::Dimension(3))
-  //   {
-  //     MDA_AccessConst<double, 3, MDA_OrderColMajor<3> > co =
-  //       SAMRAI::pdat::ArrayDataAccess::access<3, double>(soln_cell_data.getArrayData());
-  //     MDA_Access<double, 3, MDA_OrderColMajor<3> > es =
-  //       SAMRAI::pdat::ArrayDataAccess::access<3, double>(estimate_data.getArrayData());
-  //     int i, j, k;
-  //     double estimate, est0, est1, est2, est3, est4, est5, est6, est7, est8,
-  //       esta, estb, estc, estd, este, estf, estg;
-  //     for (k = lower[2]; k <= upper[2]; ++k)
-  //       for (j = lower[1]; j <= upper[1]; ++j)
-  //         for (i = lower[0]; i <= upper[0]; ++i)
-  //           {
-  //             est0=SAMRAI::tbox::MathUtilities<double>::Abs(co(i+1,j,k) + co(i-1,j,k)
-  //                                                   - 2*co(i,j,k));
-  //             est1=SAMRAI::tbox::MathUtilities<double>::Abs(co(i,j+1,k) + co(i,j-1,k)
-  //                                                   - 2*co(i,j,k));
-  //             est2=SAMRAI::tbox::MathUtilities<double>::Abs(co(i,j,k+1) + co(i,j,k-1)
-  //                                                   - 2*co(i,j,k));
-  //             est3=0.5 * SAMRAI::tbox::MathUtilities<double>::Abs(co(i,j+1,k+1)
-  //                                                         + co(i,j-1,k-1)
-  //                                                         - 2*co(i,j,k));
-  //             est4=0.5 * SAMRAI::tbox::MathUtilities<double>::Abs(co(i,j+1,k-1)
-  //                                                         + co(i,j-1,k+1)
-  //                                                         - 2*co(i,j,k));
-  //             est5=0.5 * SAMRAI::tbox::MathUtilities<double>::Abs(co(i+1,j,k+1)
-  //                                                         + co(i-1,j,k-1)
-  //                                                         - 2*co(i,j,k));
-  //             est6=0.5 * SAMRAI::tbox::MathUtilities<double>::Abs(co(i+1,j,k-1)
-  //                                                         + co(i-1,j,k+1)
-  //                                                         - 2*co(i,j,k));
-  //             est7=0.5 * SAMRAI::tbox::MathUtilities<double>::Abs(co(i+1,j+1,k)
-  //                                                         + co(i-1,j-1,k)
-  //                                                         - 2*co(i,j,k));
-  //             est8=0.5 * SAMRAI::tbox::MathUtilities<double>::Abs(co(i+1,j-1,k)
-  //                                                         + co(i-1,j+1,k)
-  //                                                         - 2*co(i,j,k));
-  //             esta=SAMRAI::tbox::MathUtilities<double>::Max(est0,est1);
-  //             estb=SAMRAI::tbox::MathUtilities<double>::Max(est2,est3);
-  //             estc=SAMRAI::tbox::MathUtilities<double>::Max(est4,est5);
-  //             estd=SAMRAI::tbox::MathUtilities<double>::Max(est6,est7);
-  //             este=SAMRAI::tbox::MathUtilities<double>::Max(esta,estb);
-  //             estf=SAMRAI::tbox::MathUtilities<double>::Max(estc,estd);
-  //             estg=SAMRAI::tbox::MathUtilities<double>::Max(este,estf);
-  //             estimate=SAMRAI::tbox::MathUtilities<double>::Max(estg,est8);
-  //             es(i,j,k)=estimate;
-  //           }
-  //   }
+  SAMRAI::tbox::plog << "Max estimate is " << max_curvature << "\n";
 }
