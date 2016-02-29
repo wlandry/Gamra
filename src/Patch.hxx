@@ -99,8 +99,8 @@ public:
         if(dd==slice)
           { continue; }
 
-        /* Use max(1,ijk-1) rather than (ijk-1) to handle the case
-           when the array is only one element wide */
+        /// Use max(1,ijk-1) rather than (ijk-1) to handle the case
+        /// when the array is only one element wide
         double delta=(xyz_max[d]-xyz_min[d])/std::max(1,ijk[d]-1);
         ix[d]=static_cast<int>((Coord[dd]-xyz_min[d])/delta);
         ix[d]=std::max(0,std::min(ijk[d]-2,ix[d]));
