@@ -32,6 +32,18 @@ void compute_intersections_3D(const FTensor::Tensor1<double,3> &ntt,
                               int intersect_mixed[4],
                               int intersect_corner[4]);
 
+void pack_strain(double* buffer,
+                 const SAMRAI::hier::Patch& patch,
+                 const SAMRAI::hier::Box& region,
+                 const int &depth,
+                 const SAMRAI::tbox::Dimension &d_dim,
+                 const bool &have_faults,
+                 const bool &have_embedded_boundary,
+                 const int &v_id,
+                 const int &dv_diagonal_id,
+                 const int &dv_mixed_id,
+                 const int &level_set_id);
+
 namespace Elastic
 {
   class FAC: public SAMRAI::mesh::StandardTagAndInitStrategy,
@@ -74,7 +86,9 @@ namespace Elastic
                                     int depth, double) const
     {
       if(variable_name=="Strain")
-        { pack_strain(buffer,patch,region,depth); }
+        { pack_strain(buffer,patch,region,depth,d_dim,!faults.empty(),
+                      have_embedded_boundary(),v_id,dv_diagonal_id,dv_mixed_id,
+                      level_set_id); }
       else if(variable_name=="Level Set")
         { pack_level_set(buffer,patch,region); }
       else if(variable_name=="Initial Displacement")
@@ -84,12 +98,6 @@ namespace Elastic
       // Always return true, since every patch has derived data.
       return true;
     }
-
-    void
-    pack_strain(double* buffer,
-                const SAMRAI::hier::Patch& patch,
-                const SAMRAI::hier::Box& region,
-                const int &depth) const;
 
     void
     pack_level_set(double* buffer,

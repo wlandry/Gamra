@@ -1,12 +1,21 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FAC.hxx"
 
-/* Strain correction is stored on the cell centers and edges */
+/// Strain correction is stored on the cell centers and edges
 
-void
-Elastic::FAC::pack_strain(double* buffer,
-                          const SAMRAI::hier::Patch& patch,
-                          const SAMRAI::hier::Box& region,
-                          const int &depth) const
+void pack_strain(double* buffer,
+                 const SAMRAI::hier::Patch& patch,
+                 const SAMRAI::hier::Box& region,
+                 const int &depth,
+                 const SAMRAI::tbox::Dimension &d_dim,
+                 const bool &have_faults,
+                 const bool &have_embedded_boundary,
+                 const int &v_id,
+                 const int &dv_diagonal_id,
+                 const int &dv_mixed_id,
+                 const int &level_set_id)
 {
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr=
     boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
@@ -15,7 +24,7 @@ Elastic::FAC::pack_strain(double* buffer,
 
   boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal;
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed;
-  if(!faults.empty())
+  if(have_faults)
     {
       dv_diagonal=boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
         (patch.getPatchData(dv_diagonal_id));
@@ -24,12 +33,13 @@ Elastic::FAC::pack_strain(double* buffer,
     }
 
   const Gamra::Dir dim=d_dim.getValue();
-  if(have_embedded_boundary())
+  if(have_embedded_boundary)
     {
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
-      if(have_embedded_boundary())
-        level_set_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-          (patch.getPatchData(level_set_id));
+      if(have_embedded_boundary)
+        { level_set_ptr=
+            boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+            (patch.getPatchData(level_set_id)); }
     }
 
   Gamra::Dir ix(Gamra::Dir::from_int(depth/dim)),
@@ -53,8 +63,8 @@ Elastic::FAC::pack_strain(double* buffer,
       if(ix==iy)
         {
           double diff(v(s+ip)-v(s));
-          if(!faults.empty())
-            diff-=(*dv_diagonal)(*icell,ix);
+          if(have_faults)
+            { diff-=(*dv_diagonal)(*icell,ix); }
           *buffer=diff/dx[ix];
         }
       else
@@ -62,11 +72,11 @@ Elastic::FAC::pack_strain(double* buffer,
           const int ix_iy(index_map(ix,iy,dim));
           double diff(- v(s-jp) - v(s+ip-jp) + v(s+jp)  + v(s+ip+jp));
 
-          if(!faults.empty())
-            diff+=(*dv_mixed)(s,ix_iy+1) - (*dv_mixed)(s-jp,ix_iy)
-              + (*dv_mixed)(s+ip,ix_iy+1) - (*dv_mixed)(s+ip-jp,ix_iy)
-              + (*dv_mixed)(s+jp,ix_iy+1) - (*dv_mixed)(s,ix_iy)
-              + (*dv_mixed)(s+ip+jp,ix_iy+1) - (*dv_mixed)(s+ip,ix_iy);
+          if(have_faults)
+            { diff+=(*dv_mixed)(s,ix_iy+1) - (*dv_mixed)(s-jp,ix_iy)
+                + (*dv_mixed)(s+ip,ix_iy+1) - (*dv_mixed)(s+ip-jp,ix_iy)
+                + (*dv_mixed)(s+jp,ix_iy+1) - (*dv_mixed)(s,ix_iy)
+                + (*dv_mixed)(s+ip+jp,ix_iy+1) - (*dv_mixed)(s+ip,ix_iy); }
           *buffer=diff/(4*dx[iy]);
         }
       ++buffer;
