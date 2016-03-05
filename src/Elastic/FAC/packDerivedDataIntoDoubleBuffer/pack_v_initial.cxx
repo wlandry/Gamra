@@ -1,10 +1,15 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FAC.hxx"
 
-void
-Elastic::FAC::pack_v_initial(double* buffer,
-                             const SAMRAI::hier::Patch& patch,
-                             const SAMRAI::hier::Box& region,
-                             const int &depth) const
+void pack_v_initial(double* buffer,
+                    const SAMRAI::hier::Patch& patch,
+                    const SAMRAI::hier::Box& region,
+                    const int &depth,
+                    const SAMRAI::tbox::Dimension &d_dim,
+                    const bool &offset_vector_on_output,
+                    const Input_Expression v_initial[])
 {
   const SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry>

@@ -1,39 +1,25 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Numerical routines for example FAC Elastic solver 
- *
- ************************************************************************/
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FAC.hxx"
 
-#include <SAMRAI/hier/IntVector.h>
-#include <SAMRAI/geom/CartesianGridGeometry.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <SAMRAI/solv/SimpleCellRobinBcCoefs.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/math/HierarchyCellDataOpsReal.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/tbox/Utilities.h>
-#include <SAMRAI/hier/Variable.h>
-#include <SAMRAI/hier/VariableDatabase.h>
-
-/// Write derived data to the given stream.
-
-void
-Elastic::FAC::pack_v_v_rhs(double* buffer,
-                           const SAMRAI::hier::Patch& patch,
-                           const SAMRAI::hier::Box& region,
-                           const std::string& variable_name,
-                           const int &depth) const
+void pack_v_v_rhs(double* buffer,
+                  const SAMRAI::hier::Patch& patch,
+                  const SAMRAI::hier::Box& region,
+                  const std::string& variable_name,
+                  const int &depth,
+                  const SAMRAI::tbox::Dimension &d_dim,
+                  const bool &offset_vector_on_output,
+                  const int &v_id,
+                  const int &v_rhs_id)
 {
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr;
-  if (variable_name == "Displacement") {
-    v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-      (patch.getPatchData(v_id));
-  }
+  if (variable_name == "Displacement")
+    {
+      v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+        (patch.getPatchData(v_id));
+    }
   else if ("Fault Correction + RHS" == variable_name)
     {
       v_ptr = boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
@@ -89,7 +75,6 @@ Elastic::FAC::pack_v_v_rhs(double* buffer,
              icell(SAMRAI::pdat::CellGeometry::begin(region));
            icell!=iend; ++icell)
         {
-
           const SAMRAI::pdat::CellIndex &center(*icell);
           const SAMRAI::pdat::SideIndex
             x(center,0,SAMRAI::pdat::SideIndex::Lower),

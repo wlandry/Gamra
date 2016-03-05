@@ -37,9 +37,11 @@ void pack_strain(double* buffer,
     {
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
       if(have_embedded_boundary)
-        { level_set_ptr=
+        {
+          level_set_ptr=
             boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-            (patch.getPatchData(level_set_id)); }
+            (patch.getPatchData(level_set_id));
+        }
     }
 
   Gamra::Dir ix(Gamra::Dir::from_int(depth/dim)),
