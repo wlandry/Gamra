@@ -1,32 +1,11 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Numerical routines for example FAC Elastic solver 
- *
- ************************************************************************/
-#include "Elastic/FAC.hxx"
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
-#include <SAMRAI/hier/IntVector.h>
-#include <SAMRAI/geom/CartesianGridGeometry.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/tbox/Utilities.h>
-#include <SAMRAI/hier/Variable.h>
-#include <SAMRAI/hier/VariableDatabase.h>
+#include "setup_fault_corrections.hxx"
 
-/*
-*************************************************************************
-* Set up the initial guess and problem parameters                       *
-* and solve the Elastic problem.  We explicitly initialize and          *
-* deallocate the solver state in this example.                          *
-*************************************************************************
-*/
 bool Elastic::FAC::solve()
 {
-
   if (!d_hierarchy)
     { TBOX_ERROR("Elastic::FAC: Cannot solve using an uninitialized "
                  "object.\n"); }
@@ -39,12 +18,12 @@ bool Elastic::FAC::solve()
   if(!faults.empty())
     {
       if(dim==2)
-        add_fault_corrections<SAMRAI::pdat::NodeData<double> >();
+        setup_fault_corrections<SAMRAI::pdat::NodeData<double> >();
       else
-        add_fault_corrections<SAMRAI::pdat::EdgeData<double> >();
+        setup_fault_corrections<SAMRAI::pdat::EdgeData<double> >();
     }
 
-  /* Fill in the initial guess. */
+  /// Fill in the initial guess.
   for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln)
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel>
@@ -85,8 +64,8 @@ bool Elastic::FAC::solve()
 
                       double coord[3];
                       for(Gamra::Dir d=0;d<dim;++d)
-                        coord[d]=geom->getXLower()[d]
-                          + dx[d]*(s[d]-pbox.lower()[d]+offset[d]);
+                        { coord[d]=geom->getXLower()[d]
+                            + dx[d]*(s[d]-pbox.lower()[d]+offset[d]); }
                       v(s)=v_initial[ix].eval(coord);
                     }
                 }

@@ -149,7 +149,7 @@ def build(bld):
                         'src/Elastic/FAC/packDerivedDataIntoDoubleBuffer/pack_v_initial.cxx',
                         'src/Elastic/FAC/resetHierarchyConfiguration.cxx',
                         'src/Elastic/FAC/setupPlotter.cxx',
-                        'src/Elastic/FAC/solve.cxx',
+                        'src/Elastic/FAC/solve/solve.cxx',
                         'src/Elastic/V_Refine/V_Refine.cxx',
                         'src/Elastic/V_Refine/refine.cxx',
                         'src/Elastic/V_Refine/refine_box.cxx',
