@@ -1,27 +1,8 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Weighted averaging operator for side-centered double data on
- *                a Cartesian mesh. 
- *
- ************************************************************************/
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/V_Coarsen_Patch_Strategy.hxx"
-
-#include <float.h>
-#include <math.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <SAMRAI/hier/Index.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/SideVariable.h>
-#include <SAMRAI/tbox/Utilities.h>
-#include "Constants.hxx"
-
-#include <FTensor.hpp>
 
 namespace
 {
@@ -61,51 +42,51 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
  const SAMRAI::hier::Patch &fine_patch,
  const SAMRAI::hier::Box& coarse_box) const
 {
-  /* Numbering of v nodes is
+  /// Numbering of v nodes is
 
-     x--x--x--x--x  Fine
-     0  1  2  3  4
+  ///    x--x--x--x--x  Fine
+  ///    0  1  2  3  4
 
-     x-----x-----x Coarse
-     0     1     2
+  ///    x-----x-----x Coarse
+  ///    0     1     2
 
-     So the i'th coarse point is affected by the i*2-1,
-     i*2, and i*2+1 fine points.  So, for example, i_fine=3
-     affects both i_coarse=1 and i_coarse=2.
+  ///    So the i'th coarse point is affected by the i*2-1,
+  ///    i*2, and i*2+1 fine points.  So, for example, i_fine=3
+  ///    affects both i_coarse=1 and i_coarse=2.
 
-     |---------------------------------------------------------------|
-     |               |               |               |               |
-     f       f       f       f       f       f       f       f       f
-     |               |               |               |               |
-     c               c               c               c               c
-     |               |               |               |               |
-     f       f       f       f       f       f       f       f       f
-     |               |               |               |               |
-     |---------------------------------------------------------------|
-     |               |               |               |               |
-     f       f       f       f       f       f       f       f       f
-     |               |               |               |               |
-     c               c               c               c               c
-     |               |               |               |               |
-     f       f       f       f       f       f       f       f       f
-     |               |               |               |               |
-     |---------------------------------------------------------------|
+  ///    |---------------------------------------------------------------|
+  ///    |               |               |               |               |
+  ///    f       f       f       f       f       f       f       f       f
+  ///    |               |               |               |               |
+  ///    c               c               c               c               c
+  ///    |               |               |               |               |
+  ///    f       f       f       f       f       f       f       f       f
+  ///    |               |               |               |               |
+  ///    |---------------------------------------------------------------|
+  ///    |               |               |               |               |
+  ///    f       f       f       f       f       f       f       f       f
+  ///    |               |               |               |               |
+  ///    c               c               c               c               c
+  ///    |               |               |               |               |
+  ///    f       f       f       f       f       f       f       f       f
+  ///    |               |               |               |               |
+  ///    |---------------------------------------------------------------|
 
-     In 2D, a coarse point depends on six points.  In this
-     case, (i*2,j*2), (i*2,j*2+1), (i*2-1,j*2),
-     (i*2-1,j*2+1), (i*2+1,j*2), (i*2+1,j*2+1).
+  ///    In 2D, a coarse point depends on six points.  In this
+  ///    case, (i*2,j*2), (i*2,j*2+1), (i*2-1,j*2),
+  ///    (i*2-1,j*2+1), (i*2+1,j*2), (i*2+1,j*2+1).
 
-     The coarse/fine boundaries get fixed up later in
-     V_Coarsen_Patch_Strategy::postprocessCoarsen.
-  */
+  ///    The coarse/fine boundaries get fixed up later in
+  ///    V_Coarsen_Patch_Strategy::postprocessCoarsen.
+
   SAMRAI::hier::Index ip(1,0), jp(0,1);
   const SAMRAI::hier::Index unit[]={ip,jp};
 
-  /* From reading CoarsenSchedule::coarsenSourceData in
-     SAMRAI/source/SAMRAI/xfer/CoarsenSchedule.C, it seems that the
-     coarse box is created from the fine box.  So the coarse box is
-     always covered by the fine box, meaning we do not have to do an
-     intersection. */
+  /// From reading CoarsenSchedule::coarsenSourceData in
+  /// SAMRAI/source/SAMRAI/xfer/CoarsenSchedule.C, it seems that the
+  /// coarse box is created from the fine box.  So the coarse box is
+  /// always covered by the fine box, meaning we do not have to do an
+  /// intersection.
 
   SAMRAI::hier::Box big_box(coarse_box);
   big_box.growUpper(SAMRAI::hier::IntVector::getOne(fine_patch.getDim()));
@@ -140,25 +121,25 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
 
                   if(level_set_coarse(coarse)<0)
                     {
-                      /* When restricting the residual, we can not set
-                         points outside to invalid numbers.  The norm
-                         is computed with SAMRAIVectorReal::maxNorm,
-                         which does not know about level sets and
-                         looks at all points on all levels. */
+                      // When restricting the residual, we can not set
+                      //    points outside to invalid numbers.  The norm
+                      //    is computed with SAMRAIVectorReal::maxNorm,
+                      //    which does not know about level sets and
+                      //    looks at all points on all levels.
                       if(!is_residual)
-                        v(coarse)=invalid_value;
+                        { v(coarse)=invalid_value; }
                       else
-                        v(coarse)=0;
+                        { v(coarse)=0; }
                     }
                   else
                     {
                       double plus(0), minus(0);
                       if(level_set_fine(fine)<0)
                         {
-                          /* FIXME: need to correctly interpolate */
+                          // FIXME: need to correctly interpolate
                           minus=0;
                           if(have_faults() && !is_residual)
-                            minus+=(*dv_mixed)(fine,0);
+                            { minus+=(*dv_mixed)(fine,0); }
                         }
                       else
                         {
@@ -167,7 +148,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                             {
                               minus=v_fine(fine);
                               if(have_faults() && !is_residual)
-                                minus+=(*dv_mixed)(fine,0);
+                                { minus+=(*dv_mixed)(fine,0); }
                             }
                           else
                             {
@@ -175,17 +156,17 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                                 + (v_fine(fine+unit[ix])
                                    + v_fine(fine-unit[ix]))/4;
                               if(have_faults() && !is_residual)
-                                minus+=(*dv_mixed)(fine,0)
-                                  + ((*dv_diagonal)(fine_cell-unit[ix],ix)
-                                     - (*dv_diagonal)(fine_cell,ix))/4;
+                                { minus+=(*dv_mixed)(fine,0)
+                                    + ((*dv_diagonal)(fine_cell-unit[ix],ix)
+                                       - (*dv_diagonal)(fine_cell,ix))/4; }
                             }
                         }
                       if(level_set_fine(fine+unit[iy])<0)
                         {
-                          /* FIXME: need to correctly interpolate */
+                          // FIXME: need to correctly interpolate
                           plus=0;
                           if(have_faults() && !is_residual)
-                            plus+=(*dv_mixed)(fine+unit[iy],1);
+                            { plus+=(*dv_mixed)(fine+unit[iy],1); }
                         }
                       else
                         {
@@ -194,7 +175,7 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                             {
                               plus=v_fine(fine+unit[iy]);
                               if(have_faults() && !is_residual)
-                                plus+=(*dv_mixed)(fine+unit[iy],1);
+                                { plus+=(*dv_mixed)(fine+unit[iy],1); }
                             }
                           else
                             {
@@ -202,10 +183,11 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                                 + (v_fine(fine+unit[iy]+unit[ix])
                                    + v_fine(fine+unit[iy]-unit[ix]))/4;
                               if(have_faults() && !is_residual)
-                                plus+=(*dv_mixed)(fine+unit[iy],1)
-                                  + ((*dv_diagonal)(fine_cell+unit[iy]-unit[ix],
-                                                    ix)
-                                     - (*dv_diagonal)(fine_cell+unit[iy],ix))/4;
+                                { plus+=(*dv_mixed)(fine+unit[iy],1)
+                                    + ((*dv_diagonal)
+                                       (fine_cell+unit[iy]-unit[ix],ix)
+                                       - (*dv_diagonal)
+                                       (fine_cell+unit[iy],ix))/4; }
                             }
                         }
                       v(coarse)=(plus+minus)/2;
@@ -240,8 +222,8 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_2D
                       v(coarse)=
                         (v_fine(fine) + v_fine(fine+unit[iy]))/2;
                       if(have_faults() && !is_residual)
-                        v(coarse)+=((*dv_mixed)(fine,0)
-                                    + (*dv_mixed)(fine+unit[iy],1))/2;
+                        { v(coarse)+=((*dv_mixed)(fine,0)
+                                      + (*dv_mixed)(fine+unit[iy],1))/2; }
                     }
                   else
                     {

@@ -1,3 +1,6 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/V_Coarsen_Patch_Strategy.hxx"
 
 // FIXME: It is confusing to coarsen in the patch strategy and not in
@@ -24,7 +27,8 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
     {
       dv_mixed_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
         (fine_patch.getPatchData(dv_mixed_id));
-      dv_diagonal_ptr=boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+      dv_diagonal_ptr=
+        boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
         (fine_patch.getPatchData(dv_diagonal_id));
     }
 
@@ -45,7 +49,8 @@ Elastic::V_Coarsen_Patch_Strategy::postprocessCoarsen
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
         (coarse_patch.getPatchGeometry());
 
-      coarsen_3D(*v,*v_fine,dv_mixed_ptr,dv_diagonal_ptr,*coarse_geom,coarse_box);
+      coarsen_3D(*v,*v_fine,dv_mixed_ptr,dv_diagonal_ptr,*coarse_geom,
+                 coarse_box);
 
       const std::vector<SAMRAI::hier::BoundaryBox>
         &boundaries=coarse_fine[fine_patch.getPatchLevelNumber()]

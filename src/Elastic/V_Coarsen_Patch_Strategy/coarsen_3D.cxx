@@ -1,24 +1,8 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Weighted averaging operator for side-centered double data on
- *                a Cartesian mesh. 
- *
- ************************************************************************/
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/V_Coarsen_Patch_Strategy.hxx"
-
-#include <float.h>
-#include <math.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <SAMRAI/hier/Index.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/pdat/SideVariable.h>
-#include <SAMRAI/tbox/Utilities.h>
-#include "Constants.hxx"
 
 void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
 (SAMRAI::pdat::SideData<double>& v,
@@ -28,64 +12,64 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
  const SAMRAI::geom::CartesianPatchGeometry& coarse_geom,
  const SAMRAI::hier::Box& coarse_box) const
 {
-  /* Numbering of v nodes is
+  /// Numbering of v nodes is
 
-     x--x--x--x--x  Fine
-     0  1  2  3  4
+  ///    x--x--x--x--x  Fine
+  ///    0  1  2  3  4
 
-     x-----x-----x Coarse
-     0     1     2
+  ///    x-----x-----x Coarse
+  ///    0     1     2
 
-     So the i'th coarse point is affected by the i*2-1,
-     i*2, and i*2+1 fine points.  So, for example, i_fine=3
-     affects both i_coarse=1 and i_coarse=2.
+  ///    So the i'th coarse point is affected by the i*2-1,
+  ///    i*2, and i*2+1 fine points.  So, for example, i_fine=3
+  ///    affects both i_coarse=1 and i_coarse=2.
 
-     |---------------------------------------------------------------|
-     |               |               |               |               |
-     f       f       f       f       f       f       f       f       f
-     |               |               |               |               |
-     c               c               c               c               c
-     |               |               |               |               |
-     f       f       f       f       f       f       f       f       f
-     |               |               |               |               |
-     |---------------------------------------------------------------|
-     |               |               |               |               |
-     f       f       f       f       f       f       f       f       f
-     |               |               |               |               |
-     c               c               c               c               c
-     |               |               |               |               |
-     f       f       f       f       f       f       f       f       f
-     |               |               |               |               |
-     |---------------------------------------------------------------|
+  ///    |---------------------------------------------------------------|
+  ///    |               |               |               |               |
+  ///    f       f       f       f       f       f       f       f       f
+  ///    |               |               |               |               |
+  ///    c               c               c               c               c
+  ///    |               |               |               |               |
+  ///    f       f       f       f       f       f       f       f       f
+  ///    |               |               |               |               |
+  ///    |---------------------------------------------------------------|
+  ///    |               |               |               |               |
+  ///    f       f       f       f       f       f       f       f       f
+  ///    |               |               |               |               |
+  ///    c               c               c               c               c
+  ///    |               |               |               |               |
+  ///    f       f       f       f       f       f       f       f       f
+  ///    |               |               |               |               |
+  ///    |---------------------------------------------------------------|
 
-     In 2D, a coarse point depends on six points.  In this
-     case, (i*2,j*2), (i*2,j*2+1), (i*2-1,j*2),
-     (i*2-1,j*2+1), (i*2+1,j*2), (i*2+1,j*2+1).
+  ///    In 2D, a coarse point depends on six points.  In this
+  ///    case, (i*2,j*2), (i*2,j*2+1), (i*2-1,j*2),
+  ///    (i*2-1,j*2+1), (i*2+1,j*2), (i*2+1,j*2+1).
 
 
-          --------------------
-         /                   /|
-        /                   / |
-       /                   /  |
-      /                   /   |
-      -------------------     |
-     |                   |    |
-     |    f        f     |    |
-     |                   |    |
-     |        C          |   /
-     |                   |  /
-     |    f        f     | /
-     |                   |/
-     -------------------
+  ///         --------------------
+  ///        /                   /|
+  ///       /                   / |
+  ///      /                   /  |
+  ///     /                   /   |
+  ///     -------------------     |
+  ///    |                   |    |
+  ///    |    f        f     |    |
+  ///    |                   |    |
+  ///    |        C          |   /
+  ///    |                   |  /
+  ///    |    f        f     | /
+  ///    |                   |/
+  ///    -------------------
 
-     In 3D, a coarse point depend on 12 points
-     (i*2,j*2,k*2), (i*2,j*2+1,k*2), (i*2,j*2,k*2+1), (i*2,j*2+1,k*2+1),
-     (i*2+1,j*2,k*2), (i*2+1,j*2+1,k*2), (i*2+1,j*2,k*2+1), (i*2+1,j*2+1,k*2+1),
-     (i*2-1,j*2,k*2), (i*2-1,j*2+1,k*2), (i*2-1,j*2,k*2+1), (i*2-1,j*2+1,k*2+1)
+  ///    In 3D, a coarse point depend on 12 points
+  ///    (i*2,j*2,k*2), (i*2,j*2+1,k*2), (i*2,j*2,k*2+1), (i*2,j*2+1,k*2+1),
+  ///    (i*2+1,j*2,k*2), (i*2+1,j*2+1,k*2), (i*2+1,j*2,k*2+1), (i*2+1,j*2+1,k*2+1),
+  ///    (i*2-1,j*2,k*2), (i*2-1,j*2+1,k*2), (i*2-1,j*2,k*2+1), (i*2-1,j*2+1,k*2+1)
 
-     The coarse/fine boundaries get fixed up later in
-     V_Coarsen_Patch_Strategy::postprocessCoarsen.
-  */
+  ///    The coarse/fine boundaries get fixed up later in
+  ///    V_Coarsen_Patch_Strategy::postprocessCoarsen.
+
   SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   const SAMRAI::hier::Index unit[]={ip,jp,kp};
   const int dim(3);
@@ -112,9 +96,9 @@ void Elastic::V_Coarsen_Patch_Strategy::coarsen_3D
                     {
                       v(coarse)=coarsen_plane(v_fine,fine,unit[iy],unit[iz]);
                       if(have_faults() && !is_residual)
-                        v(coarse)+=coarsen_plane_correction(*dv_mixed,fine,
-                                                            unit[iy],
-                                                            unit[iz]);
+                        { v(coarse)+=coarsen_plane_correction(*dv_mixed,fine,
+                                                              unit[iy],
+                                                              unit[iz]); }
                     }
                   else
                     {

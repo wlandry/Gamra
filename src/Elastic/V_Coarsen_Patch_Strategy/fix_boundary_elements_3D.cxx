@@ -1,3 +1,6 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/V_Coarsen_Patch_Strategy.hxx"
 
 void
@@ -7,27 +10,27 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
  const boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed,
  const std::vector<SAMRAI::hier::BoundaryBox> &boundaries) const
 {
-  /* Fix up the boundary elements by iterating through the boundary
-     boxes */
+  /// Fix up the boundary elements by iterating through the boundary
+  /// boxes
 
-  /* We only care about faces, not edges or corners, so we only
-     iterate over face boundary boxes. */
+  /// We only care about faces, not edges or corners, so we only
+  /// iterate over face boundary boxes.
 
   SAMRAI::hier::Box gbox(v_fine.getGhostBox());
   SAMRAI::hier::Index ip(1,0,0), jp(0,1,0), kp(0,0,1);
   for(size_t mm=0; mm<boundaries.size(); ++mm)
     {
       SAMRAI::hier::Box bbox=boundaries[mm].getBox();
-      /* location_index tells where, in relation to the box, the boundary is.
-         0: x lower
-         1: x upper
-         2: y lower
-         3: y upper
-         4: z lower
-         5: z upper
+      /// location_index tells where, in relation to the box, the boundary is.
+      ///    0: x lower
+      ///    1: x upper
+      ///    2: y lower
+      ///    3: y upper
+      ///    4: z lower
+      ///    5: z upper
 
-         Therefore, if location_index==3, then we need to set vy on
-         the __lower__ side of that boundary box. */
+      ///    Therefore, if location_index==3, then we need to set vy
+      ///    on the __lower__ side of that boundary box.
          
       int location_index=boundaries[mm].getLocationIndex();
 
@@ -61,8 +64,9 @@ Elastic::V_Coarsen_Patch_Strategy::fix_boundary_elements_3D
                 {
                   v(coarse)=coarsen_plane(v_fine,fine,unit[iy],unit[iz]);
                   if(have_faults())
-                    v(coarse)+=coarsen_plane_correction(*dv_mixed,fine,unit[iy],
-                                                        unit[iz]);
+                    { v(coarse)+=
+                        coarsen_plane_correction(*dv_mixed,fine,unit[iy],
+                                                 unit[iz]); }
                 }
             }
     }
