@@ -94,6 +94,8 @@ namespace Elastic
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id, dv_diagonal_id,
       dv_mixed_id, level_set_id;
 
+    // FIXME: This should be a std::array or std::vector, but we have
+    // to wait for C++11.
     Input_Expression lambda, mu, v_rhs[3], v_initial[3], level_set;
 
     /// Whether to offset the vector when outputing.  This is useful
