@@ -99,8 +99,8 @@ namespace Elastic
      const SAMRAI::hier::Index jp,
      const SAMRAI::hier::Index kp) const
     {
-      /* The numbering here (4,7,5,6) is determined by
-         the numbering used in FAC::add_faults */
+      /// The numbering here (4,7,5,6) is determined by the numbering
+      /// used in FAC::add_faults
       if(have_faults() && !is_residual)
         return (dv_mixed(fine,4) + dv_mixed(fine+jp,7)
                 + dv_mixed(fine+kp,5) + dv_mixed(fine+jp+kp,6))/4;

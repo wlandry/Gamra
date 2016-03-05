@@ -1,11 +1,14 @@
 #pragma once
 
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/pdat/EdgeData.h>
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
 
 /// The derivative of the momentum equation w/respect to velocity. It
 /// is written from the perspective of vx(center_x), but pass in
 /// different values for center etc. to get vy or vx(!center_x).
+
+#include <SAMRAI/pdat/CellData.h>
+#include <SAMRAI/pdat/EdgeData.h>
 
 template<class E_data, class E_index>
 double dRm_dv_2D(SAMRAI::pdat::CellData<double> &cell_moduli,

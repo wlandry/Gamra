@@ -1,3 +1,6 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/V_Refine.hxx"
 
 /// This assumes that the levels are always properly nested, so that
