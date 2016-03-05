@@ -72,10 +72,6 @@ namespace Stokes
                           const bool initial_time,
                           const bool uses_richardson_extrapolation);
 
-    void computeAdaptionEstimate(SAMRAI::pdat::CellData<double>& estimate_data,
-                                 const SAMRAI::pdat::CellData<double>& soln_cell_data)
-    const;
-
     //@{ @name appu::VisDerivedDataStrategy virtuals
 
     virtual bool

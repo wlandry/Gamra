@@ -11,6 +11,27 @@
 #include "Elastic/FACSolver.hxx"
 #include <FTensor.hpp>
 
+void compute_intersections_2D(const FTensor::Tensor1<double,3> &ntt,
+                              const FTensor::Tensor1<double,3> &xyz,
+                              const FTensor::Tensor2<double,3,3> &rot,
+                              const FTensor::Tensor1<double,3> dx[],
+                              const double fault[],
+                              const int &dim,
+                              const int &ix,
+                              int &intersect_diagonal,
+                              int intersect_mixed[2]);
+
+void compute_intersections_3D(const FTensor::Tensor1<double,3> &ntt,
+                              const FTensor::Tensor1<double,3> &xyz,
+                              const FTensor::Tensor2<double,3,3> &rot,
+                              const FTensor::Tensor1<double,3> dx[],
+                              const double fault[],
+                              const int &dim,
+                              const int &ix,
+                              int &intersect_diagonal,
+                              int intersect_mixed[4],
+                              int intersect_corner[4]);
+
 namespace Elastic
 {
   class FAC: public SAMRAI::mesh::StandardTagAndInitStrategy,
@@ -20,54 +41,30 @@ namespace Elastic
     FAC(const SAMRAI::tbox::Dimension& dim, SAMRAI::tbox::Database &database);
     virtual ~FAC() {}
 
-    //@{ @name mesh::StandardTagAndInitStrategy virtuals
-
-    /*!
-     * @brief Allocate and initialize data for a new level
-     * in the patch hierarchy.
-     *
-     * This is where you implement the code for initialize data on
-     * the grid.  All the information needed to initialize the grid
-     * are in the arguments.
-     *
-     * @see mesh::StandardTagAndInitStrategy::initializeLevelData()
-     */
     virtual void
-    initializeLevelData(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>&
-                        hierarchy,
-                        const int level_number,
-                        const double init_data_time,
-                        const bool can_be_refined,
-                        const bool initial_time,
-                        const boost::shared_ptr<SAMRAI::hier::PatchLevel>&
-                        old_level,
-                        const bool allocate_data);
-
-    /*!
-     * @brief Reset any internal hierarchy-dependent information.
-     */
-    virtual void
-    resetHierarchyConfiguration(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>&
-                                new_hierarchy,
-                                int coarsest_level,
-                                int finest_level);
-
-    //@}
+    initializeLevelData
+    (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy,
+     const int level_number,
+     const double init_data_time,
+     const bool can_be_refined,
+     const bool initial_time,
+     const boost::shared_ptr<SAMRAI::hier::PatchLevel>& old_level,
+     const bool allocate_data);
 
     virtual void
-    applyGradientDetector(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy,
-                          const int level_number,
-                          const double error_data_time,
-                          const int tag_index,
-                          const bool initial_time,
-                          const bool uses_richardson_extrapolation);
+    resetHierarchyConfiguration
+    (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& new_hierarchy,
+     int coarsest_level,
+     int finest_level);
 
-    void
-    computeAdaptionEstimate(SAMRAI::pdat::CellData<double>& estimate_data,
-                            const SAMRAI::pdat::CellData<double>& soln_cell_data)
-      const;
-
-    //@{ @name appu::VisDerivedDataStrategy virtuals
+    virtual void
+    applyGradientDetector
+    (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy,
+     const int level_number,
+     const double error_data_time,
+     const int tag_index,
+     const bool initial_time,
+     const bool uses_richardson_extrapolation);
 
     virtual bool
     packDerivedDataIntoDoubleBuffer(double* buffer,
@@ -77,13 +74,13 @@ namespace Elastic
                                     int depth, double) const
     {
       if(variable_name=="Strain")
-        pack_strain(buffer,patch,region,depth);
+        { pack_strain(buffer,patch,region,depth); }
       else if(variable_name=="Level Set")
-        pack_level_set(buffer,patch,region);
+        { pack_level_set(buffer,patch,region); }
       else if(variable_name=="Initial Displacement")
-        pack_v_initial(buffer,patch,region,depth);
+        { pack_v_initial(buffer,patch,region,depth); }
       else
-        pack_v_v_rhs(buffer,patch,region,variable_name,depth);
+        { pack_v_v_rhs(buffer,patch,region,variable_name,depth); }
       // Always return true, since every patch has derived data.
       return true;
     }
@@ -111,38 +108,10 @@ namespace Elastic
                    const SAMRAI::hier::Patch& patch,
                    const SAMRAI::hier::Box& region,
                    const int &depth) const;
-    //@}
-
-    /*!
-     * Set up the linear algebra problem and use a
-     * solv::Elastic::FACSolver object to solve it.
-     * -# Set initial guess
-     * -# Set boundary conditions
-     * -# Specify Elastic equation parameters
-     * -# Call solver
-     */
     bool solve();
 
-#ifdef HAVE_HDF5
-    /*!
-     * @brief Set up external plotter to plot internal
-     * data from this class.
-     *
-     * After calling this function, the external
-     * data writer may be used to write the
-     * viz file for this object.
-     *
-     * The internal hierarchy is used and must be
-     * established before calling this function.
-     * (This is commonly done by building a hierarchy
-     * with the mesh::StandardTagAndInitStrategy virtual
-     * functions implemented by this class.)
-     *
-     * @param viz_writer VisIt writer
-     */
     void
     setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const;
-#endif
 
   private:
     void fix_moduli();
@@ -150,37 +119,11 @@ namespace Elastic
 
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
 
-    //@{
-    /*!
-     * @name Major algorithm objects.
-     */
   public:
     Boundary_Conditions d_boundary_conditions;
   private:
-    /*!
-     * @brief FAC Elastic solver.
-     */
     Elastic::FACSolver d_elastic_fac_solver;
-
-    //@}
-
-    //@{
-
-    /*!
-     * @name Private state variables for solution.
-     */
-
-    /*!
-     * @brief Context owned by this object.
-     */
     boost::shared_ptr<SAMRAI::hier::VariableContext> d_context;
-  
-    /*!
-     * @brief Descriptor indices of internal data.
-     *
-     * These are initialized in the constructor and never change.
-     */
-
     double d_adaption_threshold;
     int min_full_refinement_level;
   public:
@@ -189,115 +132,27 @@ namespace Elastic
 
     Input_Expression lambda, mu, v_rhs[3], v_initial[3], level_set;
 
-    /// Offset the vector when outputing.  This removes interpolation
-    /// errors, especially across faults where there is a jump in
-    /// values
+    /// Whether to offset the vector when outputing.  This is useful
+    /// for convergence tests, because it removes interpolation
+    /// errors.  This is especially important near faults where there
+    /// is a jump in values
     bool offset_vector_on_output;
 
     std::vector<double> faults;
     std::vector<double> refinement_points;
-    //@}
 
     bool have_embedded_boundary() const
     {
       return level_set.is_valid;
     }
 
-    template<class T> void add_faults();
+    template<class T> void add_fault_corrections();
 
-    bool intersect_fault(const int &dim,
-                         const FTensor::Tensor1<double,3> &c0,
-                         const FTensor::Tensor1<double,3> &c1,
-                         const double fault[])
-    {
-      /* FIXME: Need to check whether the intersection happens within
-       * the boundary (level_set>=0) */
-      bool result(true);
-      for(int d=1;d<dim;++d)
-        {
-          double y((c1(d)*c0(0) -  c1(0)*c0(d))/(c0(0) - c1(0)));
-          result=result && ((y<=fault[d-1] && y>0) || (y>=fault[d-1] && y<0));
-        }
-      return result;
-    }
-
-    int intersection(const FTensor::Tensor1<double,3> &ntt,
-                     const FTensor::Tensor1<double,3> &xyz,
-                     const FTensor::Tensor2<double,3,3> &rot,
-                     const FTensor::Tensor1<double,3> &dx,
-                     const double fault[],
-                     const int &dim);
-
-    void compute_intersections_2D(const FTensor::Tensor1<double,3> &ntt,
-                                  const FTensor::Tensor1<double,3> &xyz,
-                                  const FTensor::Tensor2<double,3,3> &rot,
-                                  const FTensor::Tensor1<double,3> dx[],
-                                  const double fault[],
-                                  const int &dim,
-                                  const int &ix,
-                                  int &intersect_diagonal,
-                                  int intersect_mixed[2])
-    {
-      intersect_diagonal=intersection(ntt,xyz,rot,dx[ix],fault,dim);
-
-      FTensor::Tensor1<double,3> dx_2;
-      FTensor::Index<'a',3> a;
-      const int iy((ix+1)%dim);
-      dx_2(a)=dx[iy](a)/2;
-      intersect_mixed[0]=intersection(ntt,xyz,rot,dx_2,fault,dim);
-
-      dx_2(a)=-dx_2(a);
-      intersect_mixed[1]=-intersection(ntt,xyz,rot,dx_2,fault,dim);
-    }
-
-    void compute_intersections_3D(const FTensor::Tensor1<double,3> &ntt,
-                                  const FTensor::Tensor1<double,3> &xyz,
-                                  const FTensor::Tensor2<double,3,3> &rot,
-                                  const FTensor::Tensor1<double,3> dx[],
-                                  const double fault[],
-                                  const int &dim,
-                                  const int &ix,
-                                  int &intersect_diagonal,
-                                  int intersect_mixed[4],
-                                  int intersect_corner[4])
-    {
-      intersect_diagonal=intersection(ntt,xyz,rot,dx[ix],fault,dim);
-
-      FTensor::Tensor1<double,3> dx_2_y, dx_2_z;
-      FTensor::Index<'a',3> a;
-
-      int iy((ix+1)%dim), iz((ix+2)%dim);
-      
-      dx_2_y(a)=dx[iy](a)/2;
-      intersect_mixed[0]=intersection(ntt,xyz,rot,dx_2_y,fault,dim);
-      dx_2_y(a)=-dx_2_y(a);
-      intersect_mixed[1]=intersection(ntt,xyz,rot,dx_2_y,fault,dim);
-
-      dx_2_z(a)=dx[iz](a)/2;
-      intersect_mixed[2]=intersection(ntt,xyz,rot,dx_2_z,fault,dim);
-      dx_2_z(a)=-dx_2_z(a);
-      intersect_mixed[3]=intersection(ntt,xyz,rot,dx_2_z,fault,dim);
-
-      FTensor::Tensor1<double,3> dx_corner;
-      dx_corner(ix)=0;
-      dx_corner(iy)=dx[iy](iy)/2;
-      dx_corner(iz)=dx[iz](iz)/2;
-      intersect_corner[0]=intersection(ntt,xyz,rot,dx_corner,fault,dim);
-      dx_corner(iz)=-dx_corner(iz);
-      intersect_corner[1]=intersection(ntt,xyz,rot,dx_corner,fault,dim);
-
-      dx_corner(iy)=-dx_corner(iy);
-      intersect_corner[2]=intersection(ntt,xyz,rot,dx_corner,fault,dim);
-      dx_corner(iz)=-dx_corner(iz);
-      intersect_corner[3]=intersection(ntt,xyz,rot,dx_corner,fault,dim);
-    }
   };
 }
 
-/* Add corrections due to faults */
-
 template<class T>
-void Elastic::FAC::add_faults()
+void Elastic::FAC::add_fault_corrections()
 {
   const int max_level(d_hierarchy->getFinestLevelNumber());
   const Gamra::Dir dim=d_dim.getValue();
@@ -320,14 +175,12 @@ void Elastic::FAC::add_faults()
              ((*p)->getPatchGeometry()));
           const double *dx=geom->getDx();
 
-          /* v_rhs */
           const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_rhs_ptr
             (boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
              ((*p)->getPatchData(v_rhs_id)));
           SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
 
 
-          /* dv */
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
             ((*p)->getPatchData(dv_diagonal_id));
@@ -339,7 +192,6 @@ void Elastic::FAC::add_faults()
           dv_diagonal.fillAll(0);
           dv_mixed.fillAll(0);
 
-          /* moduli */
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
             ((*p)->getPatchData(cell_moduli_id));
@@ -354,12 +206,11 @@ void Elastic::FAC::add_faults()
           for(Gamra::Dir ix=0;ix<dim;++ix)
             {
               if(geom->getTouchesRegularBoundary(ix,0))
-                gbox.shorten(ix,-1);
+                { gbox.shorten(ix,-1); }
               if(geom->getTouchesRegularBoundary(ix,1))
-                gbox.shorten(ix,1);
+                { gbox.shorten(ix,1); }
             }
 
-          /* Iterate over the faults */
           const int params_per_fault(9);
           for(size_t fault_index=0;fault_index<faults.size();
               fault_index+=params_per_fault)
@@ -417,12 +268,14 @@ void Elastic::FAC::add_faults()
 
                       FTensor::Tensor1<double,3> xyz(0,0,0);
                       for(int d=0;d<dim;++d)
-                        xyz(d)=geom->getXLower()[d]
-                          + dx[d]*(s[d]-pbox.lower()[d]+offset[d]) - center(d);
+                        { xyz(d)=geom->getXLower()[d]
+                            + dx[d]*(s[d]-pbox.lower()[d]+offset[d])
+                            - center(d); }
 
-                      /* Rotate the coordinates into the coordinates of the
-                         fault.  So in those coordinates, if x<0, you are on
-                         the left, and if x>0, you are on the right. */
+                      /// Rotate the coordinates into the coordinates
+                      /// of the fault.  So in those coordinates, if
+                      /// x<0, you are on the left, and if x>0, you
+                      /// are on the right.
                       FTensor::Tensor1<double,3> ntt;
                       ntt(a)=rot(a,b)*xyz(b);
                       if(dim==2)
@@ -432,7 +285,6 @@ void Elastic::FAC::add_faults()
                                                    dim,ix,intersect,
                                                    intersect_mixed);
 
-                          /* d/dx, d/dy, d/dz */
                           if(gbox.contains(s))
                             {
                               SAMRAI::pdat::CellIndex c(s);
@@ -451,7 +303,6 @@ void Elastic::FAC::add_faults()
                                                    intersect_mixed,
                                                    intersect_corner);
 
-                          /* d/dx, d/dy, d/dz */
                           if(gbox.contains(s))
                             {
                               SAMRAI::pdat::CellIndex c(s);

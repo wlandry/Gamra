@@ -1,14 +1,19 @@
 /* Returns whether the line between two grid points separated by dx
    intersects the fault. */
 
-#include "Elastic/FAC.hxx"
+#include <FTensor.hpp>
 
-int Elastic::FAC::intersection(const FTensor::Tensor1<double,3> &ntt,
-                               const FTensor::Tensor1<double,3> &xyz,
-                               const FTensor::Tensor2<double,3,3> &rot,
-                               const FTensor::Tensor1<double,3> &dx,
-                               const double fault[],
-                               const int &dim)
+bool intersect_fault(const int &dim,
+                     const FTensor::Tensor1<double,3> &c0,
+                     const FTensor::Tensor1<double,3> &c1,
+                     const double fault[]);
+
+int intersection(const FTensor::Tensor1<double,3> &ntt,
+                 const FTensor::Tensor1<double,3> &xyz,
+                 const FTensor::Tensor2<double,3,3> &rot,
+                 const FTensor::Tensor1<double,3> &dx,
+                 const double fault[],
+                 const int &dim)
 {
   FTensor::Tensor1<double,3> ntt_dp, ntt_dm;
   FTensor::Index<'a',3> a;

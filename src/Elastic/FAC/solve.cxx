@@ -39,9 +39,9 @@ bool Elastic::FAC::solve()
   if(!faults.empty())
     {
       if(dim==2)
-        add_faults<SAMRAI::pdat::NodeData<double> >();
+        add_fault_corrections<SAMRAI::pdat::NodeData<double> >();
       else
-        add_faults<SAMRAI::pdat::EdgeData<double> >();
+        add_fault_corrections<SAMRAI::pdat::EdgeData<double> >();
     }
 
   /* Fill in the initial guess. */
