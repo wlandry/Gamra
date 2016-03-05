@@ -150,6 +150,7 @@ def build(bld):
                         'src/Elastic/FAC/resetHierarchyConfiguration.cxx',
                         'src/Elastic/FAC/setupPlotter.cxx',
                         'src/Elastic/FAC/solve/solve.cxx',
+                        'src/Elastic/FAC/solve/compute_dv.cxx',
                         'src/Elastic/V_Refine/V_Refine.cxx',
                         'src/Elastic/V_Refine/refine.cxx',
                         'src/Elastic/V_Refine/refine_box.cxx',

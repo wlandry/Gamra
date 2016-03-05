@@ -11,27 +11,6 @@
 #include "Elastic/FACSolver.hxx"
 #include <FTensor.hpp>
 
-void compute_intersections_2D(const FTensor::Tensor1<double,3> &ntt,
-                              const FTensor::Tensor1<double,3> &xyz,
-                              const FTensor::Tensor2<double,3,3> &rot,
-                              const FTensor::Tensor1<double,3> dx[],
-                              const double fault[],
-                              const int &dim,
-                              const int &ix,
-                              int &intersect_diagonal,
-                              int intersect_mixed[2]);
-
-void compute_intersections_3D(const FTensor::Tensor1<double,3> &ntt,
-                              const FTensor::Tensor1<double,3> &xyz,
-                              const FTensor::Tensor2<double,3,3> &rot,
-                              const FTensor::Tensor1<double,3> dx[],
-                              const double fault[],
-                              const int &dim,
-                              const int &ix,
-                              int &intersect_diagonal,
-                              int intersect_mixed[4],
-                              int intersect_corner[4]);
-
 namespace Elastic
 {
   class FAC: public SAMRAI::mesh::StandardTagAndInitStrategy,
