@@ -1,12 +1,11 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "v_level_set_operator_2D.hxx"
-#include "v_operator_2D.hxx"
+#include "../v_level_set_operator_2D.hxx"
+#include "../v_operator_2D.hxx"
 
 #include "Elastic/FACOps.hxx"
 #include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
-#include "Constants.hxx"
 #include "Elastic/dRm_dv.hxx"
 
 void Elastic::FACOps::Gauss_Seidel_red_black_2D
