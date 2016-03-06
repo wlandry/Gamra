@@ -192,75 +192,6 @@ namespace Elastic
                      const SAMRAI::hier::Index pp[3],
                      double &maxres);
 
-    /// The mixed derivative of the stress.  We have to use a template
-    /// because 2D uses Node's for the edge moduli, while 3D uses
-    /// Edge's.  Written as if it is dtau_xy_dy.
-
-    template<class E_data, class E_index>
-    double shear_noncell(const SAMRAI::pdat::SideData<double> &v,
-                         const E_data &edge_moduli,
-                         const SAMRAI::pdat::SideIndex &x,
-                         const SAMRAI::pdat::SideIndex &y,
-                         const E_index &edge,
-                         const SAMRAI::hier::Index &ip,
-                         const SAMRAI::hier::Index &jp,
-                         const double &dx,
-                         const double &dy)
-    {
-      return 
-        edge_moduli(edge+jp,1)*(v(x+jp)-v(x   ))/(dy*dy)
-        -edge_moduli(edge   ,1)*(v(x   )-v(x-jp))/(dy*dy)
-        +edge_moduli(edge+jp,1)*(v(y+jp)-v(y+jp-ip))/(dx*dy) 
-        -edge_moduli(edge   ,1)*(v(y   )-v(y-ip   ))/(dx*dy);
-    }
-
-    /// The action of the velocity operator. It is written from the
-    /// perspective of vx, but pass in different values for cell_x
-    /// etc. to get vy.
-
-    double aligned_terms(const SAMRAI::pdat::SideData<double> &v,
-                         const SAMRAI::pdat::CellData<double> &cell_moduli,
-                         const SAMRAI::pdat::CellIndex &cell,
-                         const SAMRAI::pdat::SideIndex &x,
-                         const SAMRAI::hier::Index &ip,
-                         const double &dx)
-    {
-      return (( v(x+ip)-v(x   ))
-              *(cell_moduli(cell   ,0)+2*cell_moduli(cell   ,1))
-              -(v(x   )-v(x-ip))
-              *(cell_moduli(cell-ip,0)+2*cell_moduli(cell-ip,1)))/(dx*dx);
-    }
-
-    double lame_mixed(const SAMRAI::pdat::SideData<double> &v,
-                      const SAMRAI::pdat::CellData<double> &cell_moduli,
-                      const SAMRAI::pdat::CellIndex &cell,
-                      const SAMRAI::pdat::SideIndex &y,
-                      const SAMRAI::hier::Index &ip,
-                      const SAMRAI::hier::Index &jp,
-                      const double &dx,
-                      const double &dy)
-    {
-      return (+ cell_moduli(cell   ,0)*(v(y+jp   )-v(y   ))/dy
-              - cell_moduli(cell-ip,0)*(v(y+jp-ip)-v(y-ip))/dy)/dx;
-    }
-
-    double v_operator_2D(const SAMRAI::pdat::SideData<double> &v,
-                         const SAMRAI::pdat::CellData<double> &cell_moduli,
-                         const SAMRAI::pdat::NodeData<double> &edge_moduli,
-                         const SAMRAI::pdat::CellIndex &cell,
-                         const SAMRAI::pdat::NodeIndex &edge,
-                         const SAMRAI::pdat::SideIndex &x,
-                         const SAMRAI::pdat::SideIndex &y,
-                         const SAMRAI::hier::Index &ip,
-                         const SAMRAI::hier::Index &jp,
-                         const double &dx,
-                         const double &dy)
-    {
-      return aligned_terms(v,cell_moduli,cell,x,ip,dx)
-        +lame_mixed(v,cell_moduli,cell,y,ip,jp,dx,dy)
-        +shear_noncell(v,edge_moduli,x,y,edge,ip,jp,dx,dy);
-    }
-
     double v_level_set_operator_2D
     (const SAMRAI::pdat::SideData<double> &level_set,
      const SAMRAI::pdat::SideData<double> &v,
@@ -274,29 +205,6 @@ namespace Elastic
      const SAMRAI::hier::Index &jp,
      const double &dx,
      const double &dy);
-
-    double v_operator_3D(const SAMRAI::pdat::SideData<double> &v,
-                         const SAMRAI::pdat::CellData<double> &cell_moduli,
-                         const SAMRAI::pdat::EdgeData<double> &edge_moduli,
-                         const SAMRAI::pdat::CellIndex &cell,
-                         const SAMRAI::pdat::EdgeIndex &edge_y,
-                         const SAMRAI::pdat::EdgeIndex &edge_z,
-                         const SAMRAI::pdat::SideIndex &x,
-                         const SAMRAI::pdat::SideIndex &y,
-                         const SAMRAI::pdat::SideIndex &z,
-                         const SAMRAI::hier::Index &ip,
-                         const SAMRAI::hier::Index &jp,
-                         const SAMRAI::hier::Index &kp,
-                         const double &dx,
-                         const double &dy,
-                         const double &dz)
-    {
-      return aligned_terms(v,cell_moduli,cell,x,ip,dx)
-        +lame_mixed(v,cell_moduli,cell,y,ip,jp,dx,dy)
-        +lame_mixed(v,cell_moduli,cell,z,ip,kp,dx,dz)
-        +shear_noncell(v,edge_moduli,x,y,edge_z,ip,jp,dx,dy)
-        +shear_noncell(v,edge_moduli,x,z,edge_y,ip,kp,dx,dz);
-    }
 
     void refine(int v_dst, int v_src, int v_scr, int dest_ln);
     void coarsen_solution(int v_dst, int v_src, int dest_ln);

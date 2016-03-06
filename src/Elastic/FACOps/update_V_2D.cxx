@@ -5,6 +5,8 @@
 #include "Constants.hxx"
 #include "Elastic/dRm_dv.hxx"
 
+#include "v_operator_2D.hxx"
+
 void Elastic::FACOps::update_V_2D
 (const Gamra::Dir &axis,
  const SAMRAI::hier::Box &pbox,

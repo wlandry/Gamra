@@ -4,6 +4,8 @@
 #include "Elastic/FACOps.hxx"
 #include "Constants.hxx"
 
+#include "../v_operator_3D.hxx"
+
 void Elastic::FACOps::residual_3D
 (SAMRAI::pdat::SideData<double> &v,
  SAMRAI::pdat::CellData<double> &cell_moduli,
