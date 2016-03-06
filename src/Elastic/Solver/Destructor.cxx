@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACSolver.hxx"
+#include "Elastic/Solver.hxx"
 
-Elastic::FACSolver::~FACSolver()
+Elastic::Solver::~Solver()
 {
   deallocateSolverState();
 }

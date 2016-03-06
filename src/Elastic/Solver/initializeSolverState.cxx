@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACSolver.hxx"
+#include "Elastic/Solver.hxx"
 
-void Elastic::FACSolver::initializeSolverState
+void Elastic::Solver::initializeSolverState
 (const int cell_moduli_id,
  const int edge_moduli_id,
  const int dv_diagonal_id,

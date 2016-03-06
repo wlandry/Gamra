@@ -2,7 +2,7 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACSolver.hxx"
+#include "Elastic/Solver.hxx"
 
 /// Do not allow FAC preconditioner and Elastic FAC operators to be
 /// set from database, as that may cause them to be inconsistent with
@@ -10,7 +10,7 @@
 
 /// SAMRAI::tbox::Database::isBool() and friends are not const, so we
 /// can not pass a const database :(
-void Elastic::FACSolver::getFromInput (SAMRAI::tbox::Database &database)
+void Elastic::Solver::getFromInput (SAMRAI::tbox::Database &database)
 {
   if (database.isBool("enable_logging"))
     { operators->logging=database.getBool("enable_logging"); }

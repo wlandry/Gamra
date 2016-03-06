@@ -8,7 +8,7 @@
 #include <SAMRAI/appu/VisDerivedDataStrategy.h>
 #include <SAMRAI/appu/VisItDataWriter.h>
 
-#include "Elastic/FACSolver.hxx"
+#include "Elastic/Solver.hxx"
 #include <FTensor.hpp>
 
 namespace Elastic
@@ -65,7 +65,7 @@ namespace Elastic
   public:
     Boundary_Conditions boundary_conditions;
   private:
-    Elastic::FACSolver d_elastic_fac_solver;
+    Elastic::Solver d_elastic_fac_solver;
     boost::shared_ptr<SAMRAI::hier::VariableContext> context;
     double d_adaption_threshold;
     int min_full_refinement_level;

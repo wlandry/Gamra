@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACSolver.hxx"
+#include "Elastic/Solver.hxx"
 
-Elastic::FACSolver::FACSolver
+Elastic::Solver::Solver
 (const SAMRAI::tbox::Dimension& dim,
  const std::string& object_name,
  boost::shared_ptr<SAMRAI::tbox::Database> database,
@@ -12,7 +12,7 @@ Elastic::FACSolver::FACSolver
   dimension(dim),
   boundary_conditions(bc),
   operators(boost::make_shared<FACOps>(dimension,database,bc)),
-  preconditioner("Elastic::FACSolver::FACPreconditioner",operators,database),
+  preconditioner("Elastic::Solver::FACPreconditioner",operators,database),
   level_min(-1),
   level_max(-1),
   context(SAMRAI::hier::VariableDatabase::getDatabase()

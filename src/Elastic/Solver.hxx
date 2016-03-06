@@ -9,15 +9,15 @@
 
 namespace Elastic
 {
-  class FACSolver
+  class Solver
   {
   public:
-    FACSolver(const SAMRAI::tbox::Dimension& dim,
-              const std::string& object_name,
-              boost::shared_ptr<SAMRAI::tbox::Database> database,
-              Boundary_Conditions &bc);
+    Solver(const SAMRAI::tbox::Dimension& dim,
+           const std::string& object_name,
+           boost::shared_ptr<SAMRAI::tbox::Database> database,
+           Boundary_Conditions &bc);
 
-    ~FACSolver(void);
+    ~Solver(void);
 
     bool solveSystem(const int v, const int v_rhs)
     {
