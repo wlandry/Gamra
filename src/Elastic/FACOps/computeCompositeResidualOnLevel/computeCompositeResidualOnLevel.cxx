@@ -5,6 +5,37 @@
 #include "Elastic/FACOps.hxx"
 #include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 
+namespace Elastic
+{
+  void residual_2D
+  (SAMRAI::pdat::SideData<double> &v,
+   SAMRAI::pdat::CellData<double> &cell_moduli,
+   SAMRAI::pdat::NodeData<double> &edge_moduli,
+   SAMRAI::pdat::SideData<double> &v_rhs,
+   SAMRAI::pdat::SideData<double> &v_resid,
+   const SAMRAI::hier::Box &pbox,
+   const double dxy[]);
+
+  void residual_embedded_2D
+  (SAMRAI::pdat::SideData<double> &v,
+   SAMRAI::pdat::CellData<double> &cell_moduli,
+   SAMRAI::pdat::NodeData<double> &edge_moduli,
+   SAMRAI::pdat::SideData<double> &v_rhs,
+   SAMRAI::pdat::SideData<double> &v_resid,
+   SAMRAI::pdat::SideData<double> &level_set,
+   const SAMRAI::hier::Box &pbox,
+   const double dxy[]);
+
+  void residual_3D
+  (SAMRAI::pdat::SideData<double> &v,
+   SAMRAI::pdat::CellData<double> &cell_moduli,
+   SAMRAI::pdat::EdgeData<double> &edge_moduli,
+   SAMRAI::pdat::SideData<double> &v_rhs,
+   SAMRAI::pdat::SideData<double> &v_resid,
+   const SAMRAI::hier::Box &pbox,
+   const double dxyz[]);
+}
+
 void Elastic::FACOps::computeCompositeResidualOnLevel
 (SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
@@ -41,7 +72,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (solution.getComponentPatchData(0,(*patch)));
+        (solution.getComponentPatchData(0,*patch));
       boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
         (patch->getPatchData(cell_moduli_id));
@@ -61,12 +92,36 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
       switch(d_dim.getValue())
         {
         case 2:
-          residual_2D(*v_ptr,*cell_moduli_ptr,*v_rhs_ptr,
-                      *v_resid_ptr,*patch,pbox,*geom);
+          {
+            boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
+              boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
+              (patch->getPatchData(edge_moduli_id));
+            
+            if(!have_embedded_boundary())
+              {
+                residual_2D(*v_ptr,*cell_moduli_ptr,*edge_moduli_ptr,*v_rhs_ptr,
+                            *v_resid_ptr,pbox,geom->getDx());
+              }
+            else
+              {
+                boost::shared_ptr<SAMRAI::pdat::SideData<double> >
+                  level_set_ptr =
+                  boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+                  (patch->getPatchData(level_set_id));
+                residual_embedded_2D(*v_ptr,*cell_moduli_ptr,*edge_moduli_ptr,
+                                     *v_rhs_ptr,*v_resid_ptr,*level_set_ptr,
+                                     pbox,geom->getDx());
+              }
+          }
           break;
         case 3:
-          residual_3D(*v_ptr,*cell_moduli_ptr,*v_rhs_ptr,
-                      *v_resid_ptr,*patch,pbox,*geom);
+          {
+            boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
+              boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
+              (patch->getPatchData(edge_moduli_id));
+            residual_3D(*v_ptr,*cell_moduli_ptr,*edge_moduli_ptr,*v_rhs_ptr,
+                        *v_resid_ptr,pbox,geom->getDx());
+          }
           break;
         default:
           abort();

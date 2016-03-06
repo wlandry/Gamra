@@ -2,25 +2,25 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "../v_operator_2D.hxx"
+#include "../v_level_set_operator_2D.hxx"
 #include "Constants.hxx"
 
 namespace Elastic
 {
-  void residual_2D
+  void residual_embedded_2D
   (SAMRAI::pdat::SideData<double> &v,
    SAMRAI::pdat::CellData<double> &cell_moduli,
    SAMRAI::pdat::NodeData<double> &edge_moduli,
    SAMRAI::pdat::SideData<double> &v_rhs,
    SAMRAI::pdat::SideData<double> &v_resid,
+   SAMRAI::pdat::SideData<double> &level_set,
    const SAMRAI::hier::Box &pbox,
    const double dxy[])
   {
     const SAMRAI::hier::Index unit[]={SAMRAI::hier::Index(1,0),
                                       SAMRAI::hier::Index(0,1)};
-
     double dx = dxy[0];
     double dy = dxy[1];
-
     SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(pbox));
     for(SAMRAI::pdat::CellIterator
           ci(SAMRAI::pdat::CellGeometry::begin(pbox)); ci!=cend; ++ci)
@@ -41,16 +41,22 @@ namespace Elastic
 
             if(cell[iy]!=pbox.upper(iy))
               {
-                if((cell[ix]==pbox.lower(ix) && v(x-ip)==boundary_value)
-                   || (cell[ix]==pbox.upper(ix) && v(x+ip)==boundary_value))
+                if(level_set(x)<0)
                   {
                     v_resid(x)=0;
                   }
-                else
+                else if(level_set(x)>1)
                   {
                     v_resid(x)=v_rhs(x)
                       - v_operator_2D(v,cell_moduli,edge_moduli,cell,
                                       edge,x,y,ip,jp,dx,dy);
+                  }
+                else
+                  {
+                    v_resid(x)=v_rhs(x)
+                      - v_level_set_operator_2D(level_set,v,cell_moduli,
+                                                edge_moduli,cell,
+                                                edge,x,y,ip,jp,dx,dy);
                   }
               }
           }

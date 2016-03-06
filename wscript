@@ -177,6 +177,7 @@ def build(bld):
                         'src/Elastic/FACOps/v_level_set_operator_2D.cxx',
                         'src/Elastic/FACOps/computeCompositeResidualOnLevel/computeCompositeResidualOnLevel.cxx',
                         'src/Elastic/FACOps/computeCompositeResidualOnLevel/residual_2D.cxx',
+                        'src/Elastic/FACOps/computeCompositeResidualOnLevel/residual_embedded_2D.cxx',
                         'src/Elastic/FACOps/computeCompositeResidualOnLevel/residual_3D.cxx',
                         'src/Elastic/FACOps/computeResidualNorm.cxx',
                         'src/Elastic/FACOps/deallocateOperatorState.cxx',

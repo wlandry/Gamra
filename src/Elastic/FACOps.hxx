@@ -98,24 +98,6 @@ namespace Elastic
      int ln,
      bool error_equation_indicator);
 
-    void residual_2D
-    (SAMRAI::pdat::SideData<double> &v,
-     SAMRAI::pdat::CellData<double> &cell_moduli,
-     SAMRAI::pdat::SideData<double> &v_rhs,
-     SAMRAI::pdat::SideData<double> &v_resid,
-     SAMRAI::hier::Patch &patch,
-     const SAMRAI::hier::Box &pbox,
-     const SAMRAI::geom::CartesianPatchGeometry &geom);
-
-    void residual_3D
-    (SAMRAI::pdat::SideData<double> &v,
-     SAMRAI::pdat::CellData<double> &cell_moduli,
-     SAMRAI::pdat::SideData<double> &v_rhs,
-     SAMRAI::pdat::SideData<double> &v_resid,
-     SAMRAI::hier::Patch &patch,
-     const SAMRAI::hier::Box &pbox,
-     const SAMRAI::geom::CartesianPatchGeometry &geom);
-
     virtual double
     computeResidualNorm(const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
                         int fine_ln,
@@ -191,20 +173,6 @@ namespace Elastic
                      const double &theta_momentum,
                      const SAMRAI::hier::Index pp[3],
                      double &maxres);
-
-    double v_level_set_operator_2D
-    (const SAMRAI::pdat::SideData<double> &level_set,
-     const SAMRAI::pdat::SideData<double> &v,
-     const SAMRAI::pdat::CellData<double> &cell_moduli,
-     const SAMRAI::pdat::NodeData<double> &edge_moduli,
-     const SAMRAI::pdat::CellIndex &cell,
-     const SAMRAI::pdat::NodeIndex &edge,
-     const SAMRAI::pdat::SideIndex &x,
-     const SAMRAI::pdat::SideIndex &y,
-     const SAMRAI::hier::Index &ip,
-     const SAMRAI::hier::Index &jp,
-     const double &dx,
-     const double &dy);
 
     void refine(int v_dst, int v_src, int v_scr, int dest_ln);
     void coarsen_solution(int v_dst, int v_src, int dest_ln);
