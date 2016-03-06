@@ -4,20 +4,19 @@
 
 #include "Elastic/FACOps.hxx"
 
-void Elastic::FACOps::smoothError
+void Elastic::FACOps::smooth
 (SAMRAI::solv::SAMRAIVectorReal<double>& data,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
- int ln,
- int num_sweeps)
+ const int &ln,
+ const int &num_sweeps,
+ const double &tolerance)
 {
   t_smooth_error->start();
 
   if(d_dim.getValue()==2)
-    { Gauss_Seidel_red_black_2D(data,residual,ln,num_sweeps,
-                                d_residual_tolerance_during_smoothing); }
+    { Gauss_Seidel_red_black_2D(data,residual,ln,num_sweeps,tolerance); }
   else if(d_dim.getValue()==3)
-    { Gauss_Seidel_red_black_3D(data,residual,ln,num_sweeps,
-                                d_residual_tolerance_during_smoothing); }
+    { Gauss_Seidel_red_black_3D(data,residual,ln,num_sweeps,tolerance); }
   else
     { TBOX_ERROR(__FILE__ << ": Invalid dimension in Elastic::FACOps."); }
   t_smooth_error->stop();

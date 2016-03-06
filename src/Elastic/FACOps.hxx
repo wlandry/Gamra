@@ -83,8 +83,17 @@ namespace Elastic
     (SAMRAI::solv::SAMRAIVectorReal<double>& error,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
      int ln,
-     int num_sweeps);
+     int num_sweeps)
+    {
+      smooth(error,residual,ln,num_sweeps,0);
+    }
     
+    void smooth(SAMRAI::solv::SAMRAIVectorReal<double>& data,
+                const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
+                const int &ln,
+                const int &num_sweeps,
+                const double &tolerance);
+
     virtual int solveCoarsestLevel
     (SAMRAI::solv::SAMRAIVectorReal<double>& error,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
@@ -140,13 +149,13 @@ namespace Elastic
     void Gauss_Seidel_red_black_2D
     (SAMRAI::solv::SAMRAIVectorReal<double>& error,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-     int ln, int num_sweeps, double residual_tolerance = -1.0);
+     int ln, int num_sweeps, double residual_tolerance);
 
     void Gauss_Seidel_red_black_3D
     (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
      int ln, int num_sweeps,
-     double residual_tolerance = -1.0);
+     double residual_tolerance);
 
     void update_V_2D(const Gamra::Dir &axis,
                      const SAMRAI::hier::Box &pbox,
@@ -190,7 +199,6 @@ namespace Elastic
     d_cf_boundary;
     double d_coarse_solver_tolerance;
     int d_coarse_solver_max_iterations;
-    double d_residual_tolerance_during_smoothing;
     int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id,
       level_set_id;
 
