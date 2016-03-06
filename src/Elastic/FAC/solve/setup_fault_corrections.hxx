@@ -27,13 +27,12 @@ void Elastic::FAC::setup_fault_corrections()
       for(SAMRAI::hier::PatchLevel::Iterator p(level->begin());
           p!=level->end(); ++p)
         {
-          const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_rhs_ptr
+          const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_rhs
             (boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
              ((*p)->getPatchData(v_rhs_id)));
-          SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
 
-          SAMRAI::hier::Box pbox = v_rhs.getBox();
-          SAMRAI::hier::Box gbox = v_rhs.getGhostBox();
+          SAMRAI::hier::Box pbox = v_rhs->getBox();
+          SAMRAI::hier::Box gbox = v_rhs->getGhostBox();
           const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> &geom
             (boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
              ((*p)->getPatchGeometry()));
@@ -46,27 +45,27 @@ void Elastic::FAC::setup_fault_corrections()
             }
           const double *dx=geom->getDx();
 
-          boost::shared_ptr<SAMRAI::pdat::CellData<double> > dv_diagonal_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-            ((*p)->getPatchData(dv_diagonal_id));
-          SAMRAI::pdat::CellData<double> &dv_diagonal(*dv_diagonal_ptr);
-          boost::shared_ptr<SAMRAI::pdat::SideData<double> > dv_mixed_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-            ((*p)->getPatchData(dv_mixed_id));
-          SAMRAI::pdat::SideData<double> &dv_mixed(*dv_mixed_ptr);
+          const boost::shared_ptr<SAMRAI::pdat::CellData<double> >
+            &dv_diagonal_ptr
+            (boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+             ((*p)->getPatchData(dv_diagonal_id)));
+          const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &dv_mixed_ptr
+            (boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
+             ((*p)->getPatchData(dv_mixed_id)));
 
-          compute_dv(faults,dim,dx,geom->getXLower(),gbox,
-                     pbox.lower(),*dv_diagonal_ptr,*dv_mixed_ptr);
+          compute_dv(faults,dim,dx,geom->getXLower(),gbox,pbox.lower(),
+                     *dv_diagonal_ptr,*dv_mixed_ptr);
 
-          boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
-            boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-            ((*p)->getPatchData(cell_moduli_id));
+          const boost::shared_ptr<SAMRAI::pdat::CellData<double> >
+            &cell_moduli_ptr
+            (boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
+             ((*p)->getPatchData(cell_moduli_id)));
 
-          boost::shared_ptr<T> edge_moduli_ptr =
-            boost::dynamic_pointer_cast<T>((*p)->getPatchData(edge_moduli_id));
+          const boost::shared_ptr<T> &edge_moduli_ptr
+            (boost::dynamic_pointer_cast<T>((*p)->getPatchData(edge_moduli_id)));
 
           correct_rhs(d_dim,dim,dx,pbox,*cell_moduli_ptr,*edge_moduli_ptr,
-                      *dv_diagonal_ptr,*dv_mixed_ptr,v_rhs);
+                      *dv_diagonal_ptr,*dv_mixed_ptr,*v_rhs);
         }
     }
 }
