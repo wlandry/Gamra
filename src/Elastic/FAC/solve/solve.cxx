@@ -79,12 +79,12 @@ bool Elastic::FAC::solve()
      v_id,v_rhs_id,hierarchy,0,hierarchy->getFinestLevelNumber());
 
   SAMRAI::tbox::plog << "solving..." << std::endl;
-  bool solver_ret(d_elastic_fac_solver.solveSystem(v_id,v_rhs_id));
+  bool converged(d_elastic_fac_solver.solveSystem(v_id,v_rhs_id));
 
   /// Write out convergence data
   double avg_factor, final_factor;
   d_elastic_fac_solver.getConvergenceFactors(avg_factor, final_factor);
-  SAMRAI::tbox::plog << "\t" << (solver_ret ? "" : "NOT ") << "converged " << "\n"
+  SAMRAI::tbox::plog << "\t" << (converged ? "" : "NOT ") << "converged " << "\n"
              << "	iterations: "
              << d_elastic_fac_solver.getNumberOfIterations() << "\n"
              << "	residual: "<< d_elastic_fac_solver.getResidualNorm()
@@ -95,5 +95,5 @@ bool Elastic::FAC::solve()
 
   d_elastic_fac_solver.deallocateSolverState();
 
-  return solver_ret;
+  return converged;
 }
