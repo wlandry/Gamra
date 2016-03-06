@@ -8,5 +8,5 @@ void Elastic::FAC::resetHierarchyConfiguration
 (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &new_hierarchy,
  int , int )
 {
-  d_hierarchy = new_hierarchy;
+  hierarchy = new_hierarchy;
 }

@@ -60,7 +60,7 @@ namespace Elastic
     void fix_moduli();
     const SAMRAI::tbox::Dimension dimension;
 
-    boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
+    boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy;
 
   public:
     Boundary_Conditions boundary_conditions;

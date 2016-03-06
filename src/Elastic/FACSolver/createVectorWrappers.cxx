@@ -10,27 +10,27 @@ void Elastic::FACSolver::createVectorWrappers(int v, int v_rhs)
     vdb(*SAMRAI::hier::VariableDatabase::getDatabase());
   boost::shared_ptr<SAMRAI::hier::Variable> variable;
 
-  if (!d_uv || d_uv->getComponentDescriptorIndex(0) != v)
+  if (!uv || uv->getComponentDescriptorIndex(0) != v)
     {
-      d_uv.reset();
-      d_uv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
-        ("Elastic::FACSolver::uv", d_hierarchy, level_min, level_max);
+      uv.reset();
+      uv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
+        ("Elastic::FACSolver::uv", hierarchy, level_min, level_max);
       vdb.mapIndexToVariable(v, variable);
       if (!variable)
         { TBOX_ERROR(__FILE__ << ": No variable for patch data index "
                      << v << "\n"); }
-      d_uv->addComponent(variable, v);
+      uv->addComponent(variable, v);
     }
 
-  if (!d_fv || d_fv->getComponentDescriptorIndex(0) != v_rhs)
+  if (!fv || fv->getComponentDescriptorIndex(0) != v_rhs)
     {
-      d_fv.reset();
-      d_fv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
-        ("Elastic::FACSolver::fv", d_hierarchy, level_min, level_max);
+      fv.reset();
+      fv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
+        ("Elastic::FACSolver::fv", hierarchy, level_min, level_max);
       vdb.mapIndexToVariable(v_rhs, variable);    
       if (!variable)
         { TBOX_ERROR(__FILE__ << ": No variable for patch data index "
                      << v_rhs << "\n"); }
-      d_fv->addComponent(variable, v_rhs);
+      fv->addComponent(variable, v_rhs);
     }
 }

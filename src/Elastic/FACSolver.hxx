@@ -22,7 +22,7 @@ namespace Elastic
     bool solveSystem(const int v, const int v_rhs)
     {
       createVectorWrappers(v, v_rhs);
-      return preconditioner.solveSystem(*d_uv, *d_fv);
+      return preconditioner.solveSystem(*uv, *fv);
     }
     void setCoarsestLevelSolverTolerance(double tol)
     {
@@ -73,20 +73,19 @@ namespace Elastic
     /// FACPreconditioner's constructor.
     boost::shared_ptr<FACOps> operators;
     SAMRAI::solv::FACPreconditioner preconditioner;
-    boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
+    boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy;
     int level_min;
     int level_max;
     boost::shared_ptr<SAMRAI::hier::VariableContext> context;
-    boost::shared_ptr<SAMRAI::solv::SAMRAIVectorReal<double> > d_uv;
-    boost::shared_ptr<SAMRAI::solv::SAMRAIVectorReal<double> > d_fv;
-    bool d_solver_is_initialized;
+    boost::shared_ptr<SAMRAI::solv::SAMRAIVectorReal<double> > uv;
+    boost::shared_ptr<SAMRAI::solv::SAMRAIVectorReal<double> > fv;
 
     void getFromInput(SAMRAI::tbox::Database &database);
     void createVectorWrappers(int v, int v_rhs);
     void destroyVectorWrappers()
     {
-      d_uv.reset();
-      d_fv.reset();
+      uv.reset();
+      fv.reset();
     }
     static void initializeStatics();
   };

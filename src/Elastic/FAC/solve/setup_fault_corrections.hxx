@@ -16,13 +16,13 @@ void compute_dv(const std::vector<double> &faults,
 template<class T>
 void Elastic::FAC::setup_fault_corrections()
 {
-  const int max_level(d_hierarchy->getFinestLevelNumber());
+  const int max_level(hierarchy->getFinestLevelNumber());
   const Gamra::Dir dim=dimension.getValue();
 
   for(int l=0; l<=max_level; ++l)
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        level(d_hierarchy->getPatchLevel(l));
+        level(hierarchy->getPatchLevel(l));
       
       for(SAMRAI::hier::PatchLevel::Iterator p(level->begin());
           p!=level->end(); ++p)

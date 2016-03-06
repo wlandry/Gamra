@@ -13,7 +13,7 @@
 
 void Elastic::FAC::fix_moduli()
 {
-  const int ln_max(d_hierarchy->getFinestLevelNumber());
+  const int ln_max(hierarchy->getFinestLevelNumber());
 
   boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
     cell_moduli_coarsen_operator;
@@ -26,7 +26,7 @@ void Elastic::FAC::fix_moduli()
     vdb = SAMRAI::hier::VariableDatabase::getDatabase();
   boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry> geometry =
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianGridGeometry>
-    (d_hierarchy->getGridGeometry());
+    (hierarchy->getGridGeometry());
   boost::shared_ptr<SAMRAI::hier::Variable> variable;
   vdb->mapIndexToVariable(cell_moduli_id, variable);
   cell_moduli_coarsen_operator =
@@ -49,8 +49,8 @@ void Elastic::FAC::fix_moduli()
     {
       cell_moduli_coarsen_schedules[dest_ln] =
         cell_moduli_coarsen_algorithm->
-        createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                       d_hierarchy->getPatchLevel(dest_ln + 1));
+        createSchedule(hierarchy->getPatchLevel(dest_ln),
+                       hierarchy->getPatchLevel(dest_ln + 1));
       if (!cell_moduli_coarsen_schedules[dest_ln])
         { TBOX_ERROR("Elastic::FAC: Cannot create a coarsen schedule for cell "
                      "moduli restriction!\n"); }
@@ -75,10 +75,10 @@ void Elastic::FAC::fix_moduli()
     kp[2]=1;
   SAMRAI::hier::Index unit[]={ip,jp,kp};
 
-  for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln)
+  for (int ln = 0; ln <= hierarchy->getFinestLevelNumber(); ++ln)
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        level = d_hierarchy->getPatchLevel(ln);
+        level = hierarchy->getPatchLevel(ln);
       
       for (SAMRAI::hier::PatchLevel::Iterator i_p(level->begin());
            i_p!=level->end(); ++i_p)
@@ -155,7 +155,7 @@ void Elastic::FAC::fix_moduli()
                              boost::shared_ptr<SAMRAI::hier::RefineOperator>());
 
       boost::shared_ptr<SAMRAI::xfer::RefineSchedule> schedule=
-        refiner.createSchedule(d_hierarchy->getPatchLevel(ln));
+        refiner.createSchedule(hierarchy->getPatchLevel(ln));
         
       schedule->fillData(0.0,false);
     }

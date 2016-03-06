@@ -16,8 +16,7 @@ Elastic::FACSolver::FACSolver
   level_min(-1),
   level_max(-1),
   context(SAMRAI::hier::VariableDatabase::getDatabase()
-          ->getContext(object_name + "::CONTEXT")),
-  d_solver_is_initialized(false)
+          ->getContext(object_name + "::CONTEXT"))
 {
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);

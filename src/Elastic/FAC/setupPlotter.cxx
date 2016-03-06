@@ -6,7 +6,7 @@
 
 void Elastic::FAC::setupPlotter(SAMRAI::appu::VisItDataWriter& plotter) const
 {
-  if (!d_hierarchy)
+  if (!hierarchy)
     {
       TBOX_ERROR("Elastic::FAC: No hierarchy in\n"
                  << " Elastic::FAC::setupPlotter\n"

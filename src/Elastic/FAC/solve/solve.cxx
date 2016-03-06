@@ -6,7 +6,7 @@
 
 bool Elastic::FAC::solve()
 {
-  if (!d_hierarchy)
+  if (!hierarchy)
     { TBOX_ERROR("Elastic::FAC: Cannot solve using an uninitialized "
                  "object.\n"); }
 
@@ -24,10 +24,10 @@ bool Elastic::FAC::solve()
     }
 
   /// Fill in the initial guess.
-  for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln)
+  for (int ln = 0; ln <= hierarchy->getFinestLevelNumber(); ++ln)
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        level = d_hierarchy->getPatchLevel(ln);
+        level = hierarchy->getPatchLevel(ln);
     
       for (SAMRAI::hier::PatchLevel::Iterator ip(level->begin());
            ip!=level->end(); ++ip)
@@ -76,7 +76,7 @@ bool Elastic::FAC::solve()
 
   d_elastic_fac_solver.initializeSolverState
     (cell_moduli_id,edge_moduli_id,dv_diagonal_id,dv_mixed_id,level_set_id,
-     v_id,v_rhs_id,d_hierarchy,0,d_hierarchy->getFinestLevelNumber());
+     v_id,v_rhs_id,hierarchy,0,hierarchy->getFinestLevelNumber());
 
   SAMRAI::tbox::plog << "solving..." << std::endl;
   bool solver_ret(d_elastic_fac_solver.solveSystem(v_id,v_rhs_id));
