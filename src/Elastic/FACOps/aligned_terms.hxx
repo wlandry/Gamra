@@ -3,6 +3,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
+#include <SAMRAI/pdat/SideData.h>
+#include <SAMRAI/pdat/CellData.h>
+
 namespace Elastic
 {
   inline double aligned_terms(const SAMRAI::pdat::SideData<double> &v,

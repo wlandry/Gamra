@@ -7,6 +7,8 @@
 /// because 2D uses Node's for the edge moduli, while 3D uses
 /// Edge's.  Written as if it is dtau_xy_dy.
 
+#include <SAMRAI/pdat/SideData.h>
+
 namespace Elastic
 {
   template<class E_data, class E_index>

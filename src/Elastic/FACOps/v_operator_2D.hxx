@@ -11,6 +11,8 @@
 #include "aligned_terms.hxx"
 #include "shear_noncell.hxx"
 
+#include <SAMRAI/pdat/NodeData.h>
+
 namespace Elastic
 {
   inline double v_operator_2D(const SAMRAI::pdat::SideData<double> &v,
