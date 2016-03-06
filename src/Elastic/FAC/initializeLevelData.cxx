@@ -1,22 +1,17 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Numerical routines for example FAC Elastic solver 
- *
- ************************************************************************/
-#include "Elastic/FAC.hxx"
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include <SAMRAI/geom/CartesianGridGeometry.h>
-#include <FTensor.hpp>
+
+#include "Elastic/FAC.hxx"
 
 /// Initialize data on a level, including allocating memory.  It does
 /// not set the terms due to the faults, since the moduli have to be
 /// fixed first.
 
 void Elastic::FAC::initializeLevelData
-(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& patch_hierarchy,
+(const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &patch_hierarchy,
  const int level_number,
  const double ,
  const bool ,

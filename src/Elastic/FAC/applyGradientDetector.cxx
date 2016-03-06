@@ -1,5 +1,7 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FAC.hxx"
-#include <SAMRAI/geom/CartesianGridGeometry.h>
 
 void Elastic::FAC::applyGradientDetector
 (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy_,
@@ -79,15 +81,16 @@ void Elastic::FAC::applyGradientDetector
                     }
                   const SAMRAI::hier::Index unit[]={ip,jp,kp};
 
-                  /* Special treatment near the boundary.  For Dirichlet
-                     boundaries, the ghost point may not be valid. */
+                  /// Special treatment near the boundary.  For
+                  /// Dirichlet boundaries, the ghost point may not be
+                  /// valid.
 
                   double curve(0);
                   if(have_embedded_boundary())
                     {
                       SAMRAI::pdat::SideData<double> &level_set(*level_set_ptr);
-                      /* FIXME: Need to do the correct interpolation
-                         at the boundary.  For now assume v=0. */
+                      // FIXME: Need to do the correct interpolation
+                      // at the boundary.  For now assume v=0.
                       const double boundary(0);
                       double dv_plus, dv_minus;
                       if(level_set(x)<0)
