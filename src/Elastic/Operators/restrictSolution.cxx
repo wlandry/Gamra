@@ -2,10 +2,10 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 #include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 
-void Elastic::FACOps::restrictSolution
+void Elastic::Operators::restrictSolution
 (const SAMRAI::solv::SAMRAIVectorReal<double>& s,
  SAMRAI::solv::SAMRAIVectorReal<double>& d,
  int dest_ln)

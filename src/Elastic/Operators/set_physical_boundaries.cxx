@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-void Elastic::FACOps::set_physical_boundaries
+void Elastic::Operators::set_physical_boundaries
 (const int &v_id,
  const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
 {

@@ -4,7 +4,7 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "FACOps.hxx"
+#include "Operators.hxx"
 #include "Boundary_Conditions.hxx"
 
 namespace Elastic
@@ -69,9 +69,9 @@ namespace Elastic
   private:
     const SAMRAI::tbox::Dimension dimension;
     Boundary_Conditions &boundary_conditions;
-    /// The FACOps has to be a shared_ptr so that we can pass it to
+    /// The Operators has to be a shared_ptr so that we can pass it to
     /// FACPreconditioner's constructor.
-    boost::shared_ptr<FACOps> operators;
+    boost::shared_ptr<Operators> operators;
     SAMRAI::solv::FACPreconditioner preconditioner;
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy;
     int level_min;

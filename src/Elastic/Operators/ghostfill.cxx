@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-void Elastic::FACOps::ghostfill(int v_id, int dest_ln)
+void Elastic::Operators::ghostfill(int v_id, int dest_ln)
 {
   if (!ghostfill_schedules[dest_ln])
     TBOX_ERROR("Expected schedule not found.");

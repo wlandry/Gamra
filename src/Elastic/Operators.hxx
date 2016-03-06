@@ -16,12 +16,12 @@
 
 namespace Elastic
 {
-  class FACOps: public SAMRAI::solv::FACOperatorStrategy
+  class Operators: public SAMRAI::solv::FACOperatorStrategy
   {
   public:
-    FACOps(const SAMRAI::tbox::Dimension& dim,
-           const boost::shared_ptr<SAMRAI::tbox::Database> &database,
-           const Boundary_Conditions &bc);
+    Operators(const SAMRAI::tbox::Dimension& dim,
+              const boost::shared_ptr<SAMRAI::tbox::Database> &database,
+              const Boundary_Conditions &bc);
     void setCoarsestLevelSolverTolerance(double tol)
     {
       coarse_solver_tolerance = tol;

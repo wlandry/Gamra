@@ -2,7 +2,7 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 #include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 
 namespace Elastic
@@ -36,7 +36,7 @@ namespace Elastic
    const double dxyz[]);
 }
 
-void Elastic::FACOps::computeCompositeResidualOnLevel
+void Elastic::Operators::computeCompositeResidualOnLevel
 (SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& rhs,

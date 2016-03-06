@@ -2,17 +2,17 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
 boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
-Elastic::FACOps::s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
+Elastic::Operators::s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
 SAMRAI::tbox::StartupShutdownManager::Handler
-Elastic::FACOps::s_finalize_handler
-(0, 0, 0, Elastic::FACOps::finalizeCallback,
+Elastic::Operators::s_finalize_handler
+(0, 0, 0, Elastic::Operators::finalizeCallback,
  SAMRAI::tbox::StartupShutdownManager::priorityVariables);
 
-Elastic::FACOps::FACOps
+Elastic::Operators::Operators
 (const SAMRAI::tbox::Dimension& dim,
  const boost::shared_ptr<SAMRAI::tbox::Database> &database,
  const Boundary_Conditions &bc):
@@ -27,7 +27,7 @@ Elastic::FACOps::FACOps
   dv_mixed_id(invalid_id),
   level_set_id(invalid_id),
   context(SAMRAI::hier::VariableDatabase::getDatabase()
-          ->getContext("Elastic::FACOps::PRIVATE_CONTEXT")),
+          ->getContext("Elastic::Operators::PRIVATE_CONTEXT")),
   side_scratch_id(invalid_id),
   v_refine_patch_strategy("refine patch strategy",bc),
   v_coarsen_patch_strategy("coarsen patch strategy",bc),
@@ -35,28 +35,28 @@ Elastic::FACOps::FACOps
   boundary_conditions(bc)
 {
   t_restrict_solution = SAMRAI::tbox::TimerManager::getManager()->
-    getTimer("solv::Elastic::FACOps::restrictSolution()");
+    getTimer("solv::Elastic::Operators::restrictSolution()");
   t_restrict_residual = SAMRAI::tbox::TimerManager::getManager()->
-    getTimer("solv::Elastic::FACOps::restrictResidual()");
+    getTimer("solv::Elastic::Operators::restrictResidual()");
   t_prolong = SAMRAI::tbox::TimerManager::getManager()->
-    getTimer("solv::Elastic::FACOps::prolongErrorAndCorrect()");
+    getTimer("solv::Elastic::Operators::prolongErrorAndCorrect()");
   t_smooth_error = SAMRAI::tbox::TimerManager::getManager()->
-    getTimer("solv::Elastic::FACOps::smoothError()");
+    getTimer("solv::Elastic::Operators::smoothError()");
   t_solve_coarsest = SAMRAI::tbox::TimerManager::getManager()->
-    getTimer("solv::Elastic::FACOps::solveCoarsestLevel()");
+    getTimer("solv::Elastic::Operators::solveCoarsestLevel()");
   t_compute_composite_residual = SAMRAI::tbox::TimerManager::getManager()->
-    getTimer("solv::Elastic::FACOps::computeCompositeResidualOnLevel()");
+    getTimer("solv::Elastic::Operators::computeCompositeResidualOnLevel()");
   t_compute_residual_norm = SAMRAI::tbox::TimerManager::getManager()->
-    getTimer("solv::Elastic::FACOps::computeResidualNorm()");
+    getTimer("solv::Elastic::Operators::computeResidualNorm()");
 
   if (dimension == SAMRAI::tbox::Dimension(1)
       || dimension > SAMRAI::tbox::Dimension(3))
-    { TBOX_ERROR("Elastic::FACOps : DIM == 1 or > 3 not implemented yet.\n"); }
+    { TBOX_ERROR("Elastic::Operators : DIM == 1 or > 3 not implemented yet.\n"); }
 
   if (!s_side_scratch_var[dim.getValue() - 1])
     {
       std::ostringstream ss;
-      ss << "Elastic::FACOps::private_side_scratch" << dim.getValue();
+      ss << "Elastic::Operators::private_side_scratch" << dim.getValue();
       s_side_scratch_var[dim.getValue() - 1] =
         boost::make_shared<SAMRAI::pdat::SideVariable<double> >
         (dim, ss.str(),SAMRAI::hier::IntVector::getOne(dimension));

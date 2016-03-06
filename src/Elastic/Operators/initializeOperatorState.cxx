@@ -6,9 +6,9 @@
 #include <SAMRAI/geom/CartesianGridGeometry.h>
 #include <SAMRAI/xfer/PatchLevelFullFillPattern.h>
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-void Elastic::FACOps::initializeOperatorState
+void Elastic::Operators::initializeOperatorState
 (const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& rhs)
 {

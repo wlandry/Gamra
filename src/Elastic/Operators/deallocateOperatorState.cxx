@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-void Elastic::FACOps::deallocateOperatorState()
+void Elastic::Operators::deallocateOperatorState()
 {
   coarse_fine_boundary.clear();
   level_min = -1;

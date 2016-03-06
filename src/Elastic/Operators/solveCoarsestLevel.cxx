@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-int Elastic::FACOps::solveCoarsestLevel
+int Elastic::Operators::solveCoarsestLevel
 (SAMRAI::solv::SAMRAIVectorReal<double>& data,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int coarsest_ln)

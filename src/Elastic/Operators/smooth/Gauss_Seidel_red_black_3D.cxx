@@ -1,11 +1,11 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 #include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 #include "Constants.hxx"
 
-void Elastic::FACOps::Gauss_Seidel_red_black_3D
+void Elastic::Operators::Gauss_Seidel_red_black_3D
 (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int ln,

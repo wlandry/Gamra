@@ -2,16 +2,16 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-double Elastic::FACOps::computeResidualNorm
+double Elastic::Operators::computeResidualNorm
 (const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int fine_ln,
  int coarse_ln)
 {
   if (coarse_ln != residual.getCoarsestLevelNumber() ||
       fine_ln != residual.getFinestLevelNumber())
-    { TBOX_ERROR("Elastic::FACOps::computeResidualNorm() is not\n"
+    { TBOX_ERROR("Elastic::Operators::computeResidualNorm() is not\n"
                  << "set up to compute residual except on the range of\n"
                  << "levels defining the vector.\n"); }
 

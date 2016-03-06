@@ -11,7 +11,7 @@ Elastic::Solver::Solver
  Boundary_Conditions &bc):
   dimension(dim),
   boundary_conditions(bc),
-  operators(boost::make_shared<FACOps>(dimension,database,bc)),
+  operators(boost::make_shared<Operators>(dimension,database,bc)),
   preconditioner("Elastic::Solver::FACPreconditioner",operators,database),
   level_min(-1),
   level_max(-1),

@@ -4,11 +4,11 @@
 #include "../v_level_set_operator_2D.hxx"
 #include "../v_operator_2D.hxx"
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 #include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 #include "Elastic/dRm_dv.hxx"
 
-void Elastic::FACOps::Gauss_Seidel_red_black_2D
+void Elastic::Operators::Gauss_Seidel_red_black_2D
 (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  int ln,

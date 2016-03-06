@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-void Elastic::FACOps::postprocessOneCycle
+void Elastic::Operators::postprocessOneCycle
 (int fac_cycle_num,
  const SAMRAI::solv::SAMRAIVectorReal<double> &,
  const SAMRAI::solv::SAMRAIVectorReal<double> &)

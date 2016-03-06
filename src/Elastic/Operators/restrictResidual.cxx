@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-void Elastic::FACOps::restrictResidual
+void Elastic::Operators::restrictResidual
 (const SAMRAI::solv::SAMRAIVectorReal<double>& s,
  SAMRAI::solv::SAMRAIVectorReal<double>& d,
  int dest_ln)

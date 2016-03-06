@@ -1,13 +1,13 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 #include "Constants.hxx"
 #include "Elastic/dRm_dv.hxx"
 
 #include "v_operator_2D.hxx"
 
-void Elastic::FACOps::update_V_2D
+void Elastic::Operators::update_V_2D
 (const Gamra::Dir &axis,
  const SAMRAI::hier::Box &pbox,
  const SAMRAI::pdat::CellIndex &cell,

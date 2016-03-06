@@ -3,9 +3,9 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include <SAMRAI/xfer/CoarsenAlgorithm.h>
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-void Elastic::FACOps::coarsen_solution(int v_dst, int v_src, int dest_ln)
+void Elastic::Operators::coarsen_solution(int v_dst, int v_src, int dest_ln)
 {
   if (!coarsen_solution_schedules[dest_ln])
     { TBOX_ERROR("Expected schedule not found."); }

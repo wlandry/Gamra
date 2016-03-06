@@ -2,9 +2,9 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include "Elastic/FACOps.hxx"
+#include "Elastic/Operators.hxx"
 
-void Elastic::FACOps::ghostfill_nocoarse(int v_id, int dest_ln)
+void Elastic::Operators::ghostfill_nocoarse(int v_id, int dest_ln)
 {
   if (!ghostfill_nocoarse_schedules[dest_ln])
     { TBOX_ERROR("Expected side schedule not found."); }
