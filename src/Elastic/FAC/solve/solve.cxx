@@ -10,8 +10,8 @@ bool Elastic::FAC::solve()
     { TBOX_ERROR("Elastic::FAC: Cannot solve using an uninitialized "
                  "object.\n"); }
 
-  d_boundary_conditions.set_extra_ids(edge_moduli_id,dv_diagonal_id,
-                                      dv_mixed_id,level_set_id);
+  boundary_conditions.set_extra_ids(edge_moduli_id,dv_diagonal_id,
+                                    dv_mixed_id,level_set_id);
 
   fix_moduli();
   const int dim(d_dim.getValue());

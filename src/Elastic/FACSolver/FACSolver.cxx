@@ -10,7 +10,7 @@ Elastic::FACSolver::FACSolver
  boost::shared_ptr<SAMRAI::tbox::Database> database,
  Boundary_Conditions &bc):
   d_dim(dim),
-  d_boundary_conditions(bc),
+  boundary_conditions(bc),
   d_fac_ops(boost::make_shared<FACOps>(d_dim,database,bc)),
   d_fac_precond("Elastic::FACSolver::FACPreconditioner",d_fac_ops,database),
   d_ln_min(-1),

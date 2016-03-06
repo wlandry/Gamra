@@ -63,7 +63,7 @@ namespace Elastic
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
 
   public:
-    Boundary_Conditions d_boundary_conditions;
+    Boundary_Conditions boundary_conditions;
   private:
     Elastic::FACSolver d_elastic_fac_solver;
     boost::shared_ptr<SAMRAI::hier::VariableContext> d_context;

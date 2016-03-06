@@ -19,8 +19,8 @@ Elastic::FACOps::FACOps
   d_dim(dim),
   d_ln_min(-1),
   d_ln_max(-1),
-  d_coarse_solver_tolerance(1.e-8),
-  d_coarse_solver_max_iterations(10),
+  coarse_solver_tolerance(1.e-8),
+  coarse_solver_max_iterations(10),
   cell_moduli_id(invalid_id),
   edge_moduli_id(invalid_id),
   dv_diagonal_id(invalid_id),
@@ -32,7 +32,7 @@ Elastic::FACOps::FACOps
   v_refine_patch_strategy("refine patch strategy",bc),
   v_coarsen_patch_strategy("coarsen patch strategy",bc),
   logging(false),
-  d_boundary_conditions(bc)
+  boundary_conditions(bc)
 {
   t_restrict_solution = SAMRAI::tbox::TimerManager::getManager()->
     getTimer("solv::Elastic::FACOps::restrictSolution()");
@@ -69,12 +69,12 @@ Elastic::FACOps::FACOps
 
   if (database)
     {
-      d_coarse_solver_tolerance =
+      coarse_solver_tolerance =
         database->getDoubleWithDefault("coarse_solver_tolerance",
-                                       d_coarse_solver_tolerance);
-      d_coarse_solver_max_iterations =
+                                       coarse_solver_tolerance);
+      coarse_solver_max_iterations =
         database->getIntegerWithDefault("coarse_solver_max_iterations",
-                                        d_coarse_solver_max_iterations);
+                                        coarse_solver_max_iterations);
       logging = database->getBoolWithDefault("enable_logging", logging);
     }
 }

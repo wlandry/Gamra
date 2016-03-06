@@ -14,7 +14,7 @@ namespace Elastic {
     V_Refine_Patch_Strategy(std::string object_name,
                             const Boundary_Conditions &bc):
       SAMRAI::xfer::RefinePatchStrategy(), d_object_name(object_name),
-      d_boundary_conditions(bc) {}
+      boundary_conditions(bc) {}
 
     virtual ~V_Refine_Patch_Strategy() {}
 
@@ -24,8 +24,8 @@ namespace Elastic {
     {
       /// Do not apply normal stress bc's, since those external points
       /// are not used anyway.
-      d_boundary_conditions.set_physical_boundary(patch,data_id,is_residual,
-                                                  false);
+      boundary_conditions.set_physical_boundary(patch,data_id,is_residual,
+                                                false);
     }
     SAMRAI::hier::IntVector getRefineOpStencilWidth
     (const SAMRAI::tbox::Dimension& dim) const
@@ -39,8 +39,8 @@ namespace Elastic {
     {
       /// Do not apply normal stress bc's, since those external points
       /// are not used anyway.
-      d_boundary_conditions.set_physical_boundary(coarse,data_id,is_residual,
-                                                  false);
+      boundary_conditions.set_physical_boundary(coarse,data_id,is_residual,
+                                                false);
     }
 
     virtual void postprocessRefineBoxes(SAMRAI::hier::Patch& ,
@@ -55,7 +55,7 @@ namespace Elastic {
     bool is_residual;
   private:
     std::string d_object_name;
-    const Boundary_Conditions &d_boundary_conditions;
+    const Boundary_Conditions &boundary_conditions;
   };
 
 }

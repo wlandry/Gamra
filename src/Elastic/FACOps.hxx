@@ -24,13 +24,13 @@ namespace Elastic
            const Boundary_Conditions &bc);
     void setCoarsestLevelSolverTolerance(double tol)
     {
-      d_coarse_solver_tolerance = tol;
+      coarse_solver_tolerance = tol;
     }
     void setCoarsestLevelSolverMaxIterations(int max_iterations)
     {
       if (max_iterations < 0)
         { TBOX_ERROR(__FILE__ << "Invalid number of max iterations"); }
-      d_coarse_solver_max_iterations = max_iterations;
+      coarse_solver_max_iterations = max_iterations;
     }
 
     void set_extra_ids(const int &Cell_moduli_id, const int &Edge_moduli_id,
@@ -61,9 +61,9 @@ namespace Elastic
       return level_set_id!=invalid_id;
     }
 
-    void setPreconditioner(const SAMRAI::solv::FACPreconditioner* preconditioner)
+    void setPreconditioner(const SAMRAI::solv::FACPreconditioner* Preconditioner)
     {
-      d_preconditioner = preconditioner;
+      preconditioner = Preconditioner;
     }
     virtual void restrictSolution
     (const SAMRAI::solv::SAMRAIVectorReal<double>& source,
@@ -197,8 +197,8 @@ namespace Elastic
 
     std::vector<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
     d_cf_boundary;
-    double d_coarse_solver_tolerance;
-    int d_coarse_solver_max_iterations;
+    double coarse_solver_tolerance;
+    int coarse_solver_max_iterations;
     int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id,
       level_set_id;
 
@@ -233,8 +233,8 @@ namespace Elastic
   public:
     bool logging;
   private:
-    const SAMRAI::solv::FACPreconditioner* d_preconditioner;
-    const Boundary_Conditions &d_boundary_conditions;
+    const SAMRAI::solv::FACPreconditioner* preconditioner;
+    const Boundary_Conditions &boundary_conditions;
         
     boost::shared_ptr<SAMRAI::tbox::Timer> t_restrict_solution;
     boost::shared_ptr<SAMRAI::tbox::Timer> t_restrict_residual;

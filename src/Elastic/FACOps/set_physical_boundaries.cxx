@@ -12,6 +12,6 @@ void Elastic::FACOps::set_physical_boundaries
        pi!=level->end(); ++pi)
     {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
-      d_boundary_conditions.set_physical_boundary(*patch,v_id,rhs);
+      boundary_conditions.set_physical_boundary(*patch,v_id,rhs);
     }
 }

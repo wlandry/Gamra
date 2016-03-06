@@ -68,7 +68,7 @@ namespace Elastic
     }
   private:
     const SAMRAI::tbox::Dimension d_dim;
-    Boundary_Conditions &d_boundary_conditions;
+    Boundary_Conditions &boundary_conditions;
     /// The FACOps has to be a shared_ptr so that we can pass it to
     /// FACPreconditioner's constructor.
     boost::shared_ptr<FACOps> d_fac_ops;

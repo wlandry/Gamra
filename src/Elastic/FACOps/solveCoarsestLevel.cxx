@@ -11,8 +11,8 @@ int Elastic::FACOps::solveCoarsestLevel
 {
   t_solve_coarsest->start();
 
-  smooth(data, residual, coarsest_ln, d_coarse_solver_max_iterations,
-         d_coarse_solver_tolerance);
+  smooth(data, residual, coarsest_ln, coarse_solver_max_iterations,
+         coarse_solver_tolerance);
   ghostfill_nocoarse(data.getComponentDescriptorIndex(0), coarsest_ln);
   t_solve_coarsest->stop();
   return 0;

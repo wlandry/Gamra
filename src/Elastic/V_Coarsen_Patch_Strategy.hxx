@@ -21,7 +21,7 @@ namespace Elastic
       dv_diagonal_id(invalid_id),
       dv_mixed_id(invalid_id),
       level_set_id(invalid_id),
-      d_boundary_conditions(bc){}
+      boundary_conditions(bc){}
 
     virtual ~V_Coarsen_Patch_Strategy() {}
 
@@ -162,7 +162,7 @@ namespace Elastic
 
     std::string d_object_name;
     int dv_diagonal_id, dv_mixed_id, level_set_id;
-    const Boundary_Conditions& d_boundary_conditions;
+    const Boundary_Conditions& boundary_conditions;
   };
 
 }

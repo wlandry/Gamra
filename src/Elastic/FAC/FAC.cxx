@@ -7,14 +7,14 @@
 Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                   SAMRAI::tbox::Database &database):
   d_dim(dimension),
-  d_boundary_conditions(dimension,"Elastic::FAC::boundary conditions",
-                        *database.getDatabase("boundary_conditions")),
+  boundary_conditions(dimension,"Elastic::FAC::boundary conditions",
+                      *database.getDatabase("boundary_conditions")),
   d_elastic_fac_solver((d_dim),
                        "Elastic::FAC::fac_solver",
                        (database.isDatabase("fac_solver")) ?
                        database.getDatabase("fac_solver"):
                        boost::shared_ptr<SAMRAI::tbox::Database>(),
-                       d_boundary_conditions),
+                       boundary_conditions),
   cell_moduli_id(invalid_id),
   edge_moduli_id(invalid_id),
   v_id(invalid_id),
