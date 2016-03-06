@@ -10,7 +10,6 @@
 #include "Dir.hxx"
 
 void compute_intersections_2D(const FTensor::Tensor1<double,3> &ntt,
-                              const FTensor::Tensor1<double,3> &xyz,
                               const FTensor::Tensor2<double,3,3> &rot,
                               const FTensor::Tensor1<double,3> dx[],
                               const double fault[],
@@ -20,7 +19,6 @@ void compute_intersections_2D(const FTensor::Tensor1<double,3> &ntt,
                               int intersect_mixed[2]);
 
 void compute_intersections_3D(const FTensor::Tensor1<double,3> &ntt,
-                              const FTensor::Tensor1<double,3> &xyz,
                               const FTensor::Tensor2<double,3,3> &rot,
                               const FTensor::Tensor1<double,3> dx[],
                               const double fault[],
@@ -113,9 +111,8 @@ void compute_dv(const std::vector<double> &faults,
               if(dim==2)
                 {
                   int intersect, intersect_mixed[2];
-                  compute_intersections_2D(ntt,xyz,rot,Dx.data(),fault,
-                                           dim,ix,intersect,
-                                           intersect_mixed);
+                  compute_intersections_2D(ntt,rot,Dx.data(),fault,dim,ix,
+                                           intersect,intersect_mixed);
 
                   if(gbox.contains(s))
                     {
@@ -130,9 +127,8 @@ void compute_dv(const std::vector<double> &faults,
                 {
                   int intersect_diagonal, intersect_mixed[4],
                     intersect_corner[4];
-                  compute_intersections_3D(ntt,xyz,rot,Dx.data(),fault,
-                                           dim,ix,intersect_diagonal,
-                                           intersect_mixed,
+                  compute_intersections_3D(ntt,rot,Dx.data(),fault,dim,ix,
+                                           intersect_diagonal,intersect_mixed,
                                            intersect_corner);
 
                   if(gbox.contains(s))

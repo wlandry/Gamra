@@ -6,7 +6,6 @@
 #include <FTensor.hpp>
 
 int intersection(const FTensor::Tensor1<double,3> &ntt,
-                 const FTensor::Tensor1<double,3> &xyz,
                  const FTensor::Tensor2<double,3,3> &rot,
                  const FTensor::Tensor1<double,3> &dx,
                  const double fault[],
