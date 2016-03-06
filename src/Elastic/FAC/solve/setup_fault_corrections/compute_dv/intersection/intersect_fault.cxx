@@ -1,3 +1,6 @@
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include <FTensor.hpp>
 
 bool intersect_fault(const int &dim,
