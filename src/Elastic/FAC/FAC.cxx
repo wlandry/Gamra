@@ -1,25 +1,8 @@
-/*************************************************************************
- *
- * This file is part of the SAMRAI distribution.  For full copyright 
- * information, see COPYRIGHT and COPYING.LESSER. 
- *
- * Copyright:     (c) 1997-2010 Lawrence Livermore National Security, LLC
- * Description:   Numerical routines for example FAC Elastic solver 
- *
- ************************************************************************/
+/// Copyright © 1997-2010 Lawrence Livermore National Security, LLC
+/// Copyright © 2013-2016 California Institute of Technology
+/// Copyright © 2013-2016 Nanyang Technical University
+
 #include "Elastic/FAC.hxx"
-
-#include <SAMRAI/hier/IntVector.h>
-#include <SAMRAI/geom/CartesianGridGeometry.h>
-#include <SAMRAI/geom/CartesianPatchGeometry.h>
-#include <SAMRAI/solv/SimpleCellRobinBcCoefs.h>
-#include <SAMRAI/pdat/CellData.h>
-#include <SAMRAI/math/HierarchyCellDataOpsReal.h>
-#include <SAMRAI/pdat/SideData.h>
-#include <SAMRAI/tbox/Utilities.h>
-#include <SAMRAI/hier/Variable.h>
-#include <SAMRAI/hier/VariableDatabase.h>
-
 
 Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                   SAMRAI::tbox::Database &database):
@@ -100,11 +83,11 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                                         SAMRAI::hier::IntVector::getOne(d_dim));
     }
   if(database.keyExists("refinement_points"))
-    refinement_points=database.getDoubleVector("refinement_points");
+    { refinement_points=database.getDoubleVector("refinement_points"); }
   if(refinement_points.size()%3!=0)
-    TBOX_ERROR("The number of points in refinement_points must be "
-               "divisible by 3.  Read "
-               << refinement_points.size() << " points");
+    { TBOX_ERROR("The number of points in refinement_points must be "
+                 "divisible by 3.  Read "
+                 << refinement_points.size() << " points"); }
 
   if(have_embedded_boundary())
     {
@@ -147,8 +130,9 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
     v_rhs_ptr(new SAMRAI::pdat::SideVariable<double>
               (d_dim,"Elastic::FAC:v right hand side",
                SAMRAI::hier::IntVector::getOne(d_dim)));
-  v_rhs_id = vdb->registerVariableAndContext(v_rhs_ptr,d_context,
-                                             SAMRAI::hier::IntVector::getOne(d_dim));
+  v_rhs_id =
+    vdb->registerVariableAndContext(v_rhs_ptr,d_context,
+                                    SAMRAI::hier::IntVector::getOne(d_dim));
 
   d_adaption_threshold=database.getDoubleWithDefault("adaption_threshold",
                                                       1.0e-15);
