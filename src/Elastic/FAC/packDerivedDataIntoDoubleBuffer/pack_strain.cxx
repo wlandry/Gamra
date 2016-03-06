@@ -9,7 +9,7 @@ void pack_strain(double* buffer,
                  const SAMRAI::hier::Patch& patch,
                  const SAMRAI::hier::Box& region,
                  const int &depth,
-                 const SAMRAI::tbox::Dimension &d_dim,
+                 const SAMRAI::tbox::Dimension &dimension,
                  const bool &have_faults,
                  const bool &have_embedded_boundary,
                  const int &v_id,
@@ -32,7 +32,7 @@ void pack_strain(double* buffer,
         (patch.getPatchData(dv_mixed_id));
     }
 
-  const Gamra::Dir dim=d_dim.getValue();
+  const Gamra::Dir dim=dimension.getValue();
   if(have_embedded_boundary)
     {
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
@@ -46,7 +46,7 @@ void pack_strain(double* buffer,
 
   Gamra::Dir ix(Gamra::Dir::from_int(depth/dim)),
     iy(Gamra::Dir::from_int(depth%dim));
-  const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(d_dim));
+  const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(dimension));
   SAMRAI::hier::Index ip(zero), jp(zero);
   ip[ix]=1;
   jp[iy]=1;

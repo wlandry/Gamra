@@ -17,21 +17,21 @@ void Elastic::FACOps::prolongErrorAndCorrect
 
   // FIXME: Is there a way to do this without having to allocate a
   // scratch space?
-  fine_level.allocatePatchData(d_side_scratch_id);
+  fine_level.allocatePatchData(side_scratch_id);
 
-  v_refine_patch_strategy.data_id=d_side_scratch_id;
+  v_refine_patch_strategy.data_id=side_scratch_id;
   v_refine_patch_strategy.is_residual=true;
   /// FIXME: Get rid of this global variable
   Coarse_Fine_Boundary_Refine::is_residual=true;
-  refine(d_side_scratch_id, s.getComponentDescriptorIndex(0),
-         d_side_scratch_id, dest_ln);
+  refine(side_scratch_id, s.getComponentDescriptorIndex(0),
+         side_scratch_id, dest_ln);
   {
     SAMRAI::math::HierarchySideDataOpsReal<double>
       hierarchy_math_ops(s.getPatchHierarchy(), dest_ln, dest_ln);
     const int v_dst = d.getComponentDescriptorIndex(0);
-    hierarchy_math_ops.add(v_dst, v_dst, d_side_scratch_id);
+    hierarchy_math_ops.add(v_dst, v_dst, side_scratch_id);
   }
-  fine_level.deallocatePatchData(d_side_scratch_id);
+  fine_level.deallocatePatchData(side_scratch_id);
 
   t_prolong->stop();
 }

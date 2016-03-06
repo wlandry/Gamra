@@ -17,23 +17,23 @@ void Elastic::FACSolver::initializeSolverState
  const int fine_level)
 {
   TBOX_ASSERT(hierarchy);
-  TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(d_dim, *hierarchy);
+  TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(dimension, *hierarchy);
 
   if (v_id < 0 || v_rhs_id < 0)
     { TBOX_ERROR(__FILE__ << ": Bad patch data id.\n"); }
   d_hierarchy = hierarchy;
 
-  d_ln_min = (coarse_level == -1 ? 0 : coarse_level);
-  d_ln_max = (fine_level == -1 ? d_hierarchy->getFinestLevelNumber()
+  level_min = (coarse_level == -1 ? 0 : coarse_level);
+  level_max = (fine_level == -1 ? d_hierarchy->getFinestLevelNumber()
               : fine_level);
 
-  if (d_ln_min < 0 || d_ln_max < 0 || d_ln_min > d_ln_max)
+  if (level_min < 0 || level_max < 0 || level_min > level_max)
     { TBOX_ERROR(__FILE__ << ": Bad range of levels in\n"
                  << "inititialization.\n"); }
 
-  d_fac_ops->set_extra_ids(cell_moduli_id,edge_moduli_id,dv_diagonal_id,
+  operators->set_extra_ids(cell_moduli_id,edge_moduli_id,dv_diagonal_id,
                            dv_mixed_id,level_set_id);
   createVectorWrappers(v_id, v_rhs_id);
-  d_fac_precond.initializeSolverState(*d_uv, *d_fv);
+  preconditioner.initializeSolverState(*d_uv, *d_fv);
   d_solver_is_initialized = true;
 }

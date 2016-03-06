@@ -6,7 +6,7 @@
 #include "Elastic/FAC.hxx"
 
 template<class T>
-void correct_rhs(const SAMRAI::tbox::Dimension &d_dim,
+void correct_rhs(const SAMRAI::tbox::Dimension &dimension,
                  const Gamra::Dir &dim, const double *dx,
                  const SAMRAI::hier::Box &pbox,
                  const SAMRAI::pdat::CellData<double> &cell_moduli,
@@ -15,7 +15,7 @@ void correct_rhs(const SAMRAI::tbox::Dimension &d_dim,
                  const SAMRAI::pdat::SideData<double> &dv_mixed,
                  SAMRAI::pdat::SideData<double> &v_rhs)
 {
-  const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(d_dim));
+  const SAMRAI::hier::Index zero(SAMRAI::hier::Index::getZeroIndex(dimension));
   SAMRAI::hier::Index unit[]={zero,zero,zero};
   for(int i=0;i<dim;++i)
     unit[i][i]=1;

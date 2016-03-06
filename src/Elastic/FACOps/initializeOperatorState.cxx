@@ -18,34 +18,37 @@ void Elastic::FACOps::initializeOperatorState
   SAMRAI::hier::VariableDatabase*
     vdb = SAMRAI::hier::VariableDatabase::getDatabase();
 
-  d_ln_min = solution.getCoarsestLevelNumber();
-  d_ln_max = solution.getFinestLevelNumber();
+  level_min = solution.getCoarsestLevelNumber();
+  level_max = solution.getFinestLevelNumber();
   const int v_id(solution.getComponentDescriptorIndex(0)),
     v_rhs_id(rhs.getComponentDescriptorIndex(0));
 
   /// Initialize the coarse-fine boundary description for the hierarchy.
-  d_cf_boundary.resize(hierarchy->getNumberOfLevels());
+  coarse_fine_boundary.resize(hierarchy->getNumberOfLevels());
 
-  SAMRAI::hier::IntVector max_gcw(d_dim, 1);
-  for (int ln = d_ln_min; ln <= d_ln_max; ++ln)
-    { d_cf_boundary[ln] = boost::make_shared<SAMRAI::hier::CoarseFineBoundary >
-        (*hierarchy, ln, max_gcw); }
+  SAMRAI::hier::IntVector max_gcw(dimension, 1);
+  for (int ln = level_min; ln <= level_max; ++ln)
+    {
+      coarse_fine_boundary[ln]
+        = boost::make_shared<SAMRAI::hier::CoarseFineBoundary >
+        (*hierarchy, ln, max_gcw);
+    }
 
-  v_coarsen_patch_strategy.coarse_fine=d_cf_boundary;
+  v_coarsen_patch_strategy.coarse_fine=coarse_fine_boundary;
   /// Get the transfer operators.
   boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry> geometry =
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianGridGeometry>
     (hierarchy->getGridGeometry());
   boost::shared_ptr<SAMRAI::hier::Variable> variable;
 
-  vdb->mapIndexToVariable(d_side_scratch_id, variable);
+  vdb->mapIndexToVariable(side_scratch_id, variable);
   refine_operator =
     geometry->lookupRefineOperator(variable,"V_REFINE");
   if (!refine_operator)
     { TBOX_ERROR(__FILE__
                  << ": Cannot find v prolongation refine operator"); }
 
-  vdb->mapIndexToVariable(d_side_scratch_id, variable);
+  vdb->mapIndexToVariable(side_scratch_id, variable);
   ghostfill_operator = 
     geometry->lookupRefineOperator(variable, "COARSE_FINE_BOUNDARY_REFINE");
   if (!ghostfill_operator)
@@ -56,17 +59,17 @@ void Elastic::FACOps::initializeOperatorState
   /// to delete the old schedules first because we have deallocated
   /// the solver state above.
 
-  refine_schedules.resize(d_ln_max + 1);
-  ghostfill_schedules.resize(d_ln_max + 1);
-  ghostfill_nocoarse_schedules.resize(d_ln_max + 1);
-  coarsen_solution_schedules.resize(d_ln_max + 1);
-  coarsen_resid_schedules.resize(d_ln_max + 1);
+  refine_schedules.resize(level_max + 1);
+  ghostfill_schedules.resize(level_max + 1);
+  ghostfill_nocoarse_schedules.resize(level_max + 1);
+  coarsen_solution_schedules.resize(level_max + 1);
+  coarsen_resid_schedules.resize(level_max + 1);
 
   SAMRAI::xfer::RefineAlgorithm refine_algorithm,
     ghostfill_algorithm, ghostfill_nocoarse_algorithm;
     
-  SAMRAI::xfer::CoarsenAlgorithm coarsen_solution_algorithm(d_dim),
-    coarsen_resid_algorithm(d_dim);
+  SAMRAI::xfer::CoarsenAlgorithm coarsen_solution_algorithm(dimension),
+    coarsen_resid_algorithm(dimension);
 
   /// This is a little confusing.  The only real purpose here is to
   /// create a communication schedule.  That communication schedule is
@@ -75,7 +78,7 @@ void Elastic::FACOps::initializeOperatorState
   /// are not all that important, because a different refineAlgorithm
   /// will be used then.
 
-  refine_algorithm.registerRefine(d_side_scratch_id,v_id,d_side_scratch_id,
+  refine_algorithm.registerRefine(side_scratch_id,v_id,side_scratch_id,
                                   refine_operator);
   coarsen_solution_algorithm.registerCoarsen(v_id,v_id,
                                              coarsen_solution_operator);
@@ -115,7 +118,7 @@ void Elastic::FACOps::initializeOperatorState
                    boost::shared_ptr<SAMRAI::hier::RefineOperator>());
 
   /// Refinement and ghost fill operators
-  for (int dest_ln = d_ln_min + 1; dest_ln <= d_ln_max; ++dest_ln)
+  for (int dest_ln = level_min + 1; dest_ln <= level_max; ++dest_ln)
     {
       boost::shared_ptr<SAMRAI::xfer::PatchLevelFullFillPattern>
         fill_pattern
@@ -147,7 +150,7 @@ void Elastic::FACOps::initializeOperatorState
     }
 
   /// Coarsening operators
-  for (int dest_ln = d_ln_min; dest_ln < d_ln_max; ++dest_ln)
+  for (int dest_ln = level_min; dest_ln < level_max; ++dest_ln)
     {
       coarsen_solution_schedules[dest_ln] =
         coarsen_solution_algorithm.
@@ -169,10 +172,10 @@ void Elastic::FACOps::initializeOperatorState
     }
 
   /// Ordinary ghost fill operator on the coarsest level
-  ghostfill_nocoarse_schedules[d_ln_min] =
+  ghostfill_nocoarse_schedules[level_min] =
     ghostfill_nocoarse_algorithm.
-    createSchedule(hierarchy->getPatchLevel(d_ln_min));
-  if (!ghostfill_nocoarse_schedules[d_ln_min])
+    createSchedule(hierarchy->getPatchLevel(level_min));
+  if (!ghostfill_nocoarse_schedules[level_min])
     { TBOX_ERROR(__FILE__ << ": Cannot create a refine schedule for v "
                  "ghost filling on bottom level!\n"); }
 }

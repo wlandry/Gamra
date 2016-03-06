@@ -6,9 +6,9 @@
 
 void Elastic::FACOps::deallocateOperatorState()
 {
-  d_cf_boundary.clear();
-  d_ln_min = -1;
-  d_ln_max = -1;
+  coarse_fine_boundary.clear();
+  level_min = -1;
+  level_max = -1;
 
   refine_schedules.clear();
   coarsen_solution_schedules.clear();

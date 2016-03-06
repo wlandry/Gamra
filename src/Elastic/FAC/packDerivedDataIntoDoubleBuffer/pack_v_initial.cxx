@@ -7,7 +7,7 @@ void pack_v_initial(double* buffer,
                     const SAMRAI::hier::Patch& patch,
                     const SAMRAI::hier::Box& region,
                     const int &depth,
-                    const SAMRAI::tbox::Dimension &d_dim,
+                    const SAMRAI::tbox::Dimension &dimension,
                     const bool &offset_vector_on_output,
                     const Input_Expression v_initial[])
 {
@@ -31,7 +31,7 @@ void pack_v_initial(double* buffer,
       const SAMRAI::pdat::CellIndex &center(*icell);
 	
       double coord[3];
-      for(int d=0;d<d_dim.getValue();++d)
+      for(int d=0;d<dimension.getValue();++d)
         coord[d]=geom->getXLower()[d]
           + dx[d]*(center[d]-pbox.lower()[d]+offset[d]);
 

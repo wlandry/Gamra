@@ -9,7 +9,7 @@ void pack_v_v_rhs(double* buffer,
                   const SAMRAI::hier::Box& region,
                   const std::string& variable_name,
                   const int &depth,
-                  const SAMRAI::tbox::Dimension &d_dim,
+                  const SAMRAI::tbox::Dimension &dimension,
                   const bool &offset_vector_on_output,
                   const int &v_id,
                   const int &v_rhs_id)
@@ -32,7 +32,7 @@ void pack_v_v_rhs(double* buffer,
     }
 
   SAMRAI::pdat::SideData<double>& v = *v_ptr;
-  if(d_dim.getValue()==2)
+  if(dimension.getValue()==2)
     {
       const SAMRAI::hier::Index ip(1,0), jp(0,1);
 

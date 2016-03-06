@@ -27,7 +27,7 @@ void Elastic::FAC::initializeLevelData
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel> level =
     hierarchy->getPatchLevel(level_number);
-  const int dim=d_dim.getValue();
+  const int dim=dimension.getValue();
 
   if(allocate_data)
     {

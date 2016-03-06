@@ -8,10 +8,10 @@ void Elastic::FACSolver::deallocateSolverState()
 {
   if (d_hierarchy)
     {
-      d_fac_precond.deallocateSolverState();
+      preconditioner.deallocateSolverState();
       d_hierarchy.reset();
-      d_ln_min = -1;
-      d_ln_max = -1;
+      level_min = -1;
+      level_max = -1;
       d_solver_is_initialized = false;
       destroyVectorWrappers();
     }

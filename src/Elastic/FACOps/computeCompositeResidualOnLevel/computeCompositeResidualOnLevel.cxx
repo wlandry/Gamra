@@ -59,7 +59,7 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
   v_refine_patch_strategy.is_residual=error_equation_indicator;
   Coarse_Fine_Boundary_Refine::is_residual=error_equation_indicator;
 
-  if (ln > d_ln_min)
+  if (ln > level_min)
     { ghostfill(v_id, ln); }
   else
     { ghostfill_nocoarse(v_id, ln); }
@@ -84,12 +84,12 @@ void Elastic::FACOps::computeCompositeResidualOnLevel
         (residual.getComponentPatchData(0,*patch));
 
       SAMRAI::hier::Box pbox=patch->getBox();
-      pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
+      pbox.growUpper(SAMRAI::hier::IntVector::getOne(dimension));
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
         (patch->getPatchGeometry());
 
-      switch(d_dim.getValue())
+      switch(dimension.getValue())
         {
         case 2:
           {

@@ -9,20 +9,20 @@ Elastic::FACSolver::FACSolver
  const std::string& object_name,
  boost::shared_ptr<SAMRAI::tbox::Database> database,
  Boundary_Conditions &bc):
-  d_dim(dim),
+  dimension(dim),
   boundary_conditions(bc),
-  d_fac_ops(boost::make_shared<FACOps>(d_dim,database,bc)),
-  d_fac_precond("Elastic::FACSolver::FACPreconditioner",d_fac_ops,database),
-  d_ln_min(-1),
-  d_ln_max(-1),
-  d_context(SAMRAI::hier::VariableDatabase::getDatabase()
-            ->getContext(object_name + "::CONTEXT")),
+  operators(boost::make_shared<FACOps>(dimension,database,bc)),
+  preconditioner("Elastic::FACSolver::FACPreconditioner",operators,database),
+  level_min(-1),
+  level_max(-1),
+  context(SAMRAI::hier::VariableDatabase::getDatabase()
+          ->getContext(object_name + "::CONTEXT")),
   d_solver_is_initialized(false)
 {
   setCoarsestLevelSolverTolerance(1e-8);
   setCoarsestLevelSolverMaxIterations(10);
 
-  d_fac_ops->setPreconditioner(&d_fac_precond);
+  operators->setPreconditioner(&preconditioner);
   if (database)
     { getFromInput(*database); }
 }

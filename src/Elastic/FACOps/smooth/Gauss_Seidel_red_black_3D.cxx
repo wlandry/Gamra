@@ -36,7 +36,7 @@ void Elastic::FACOps::Gauss_Seidel_red_black_3D
         for(int rb=0;rb<2;++rb)
           {
             ghostfill_nocoarse(v_id,ln);
-            if (ln > d_ln_min)
+            if (ln > level_min)
               { ghostfill(v_id, ln); }
             set_physical_boundaries(v_id,level,true);
 
@@ -102,7 +102,7 @@ void Elastic::FACOps::Gauss_Seidel_red_black_3D
     }
 
   ghostfill_nocoarse(v_id,ln);
-  if (ln > d_ln_min)
+  if (ln > level_min)
     { ghostfill(v_id, ln); }
   set_physical_boundaries(v_id,level,true);
 }

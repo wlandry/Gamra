@@ -17,7 +17,7 @@ template<class T>
 void Elastic::FAC::setup_fault_corrections()
 {
   const int max_level(d_hierarchy->getFinestLevelNumber());
-  const Gamra::Dir dim=d_dim.getValue();
+  const Gamra::Dir dim=dimension.getValue();
 
   for(int l=0; l<=max_level; ++l)
     {
@@ -64,7 +64,7 @@ void Elastic::FAC::setup_fault_corrections()
           const boost::shared_ptr<T> &edge_moduli_ptr
             (boost::dynamic_pointer_cast<T>((*p)->getPatchData(edge_moduli_id)));
 
-          correct_rhs(d_dim,dim,dx,pbox,*cell_moduli_ptr,*edge_moduli_ptr,
+          correct_rhs(dimension,dim,dx,pbox,*cell_moduli_ptr,*edge_moduli_ptr,
                       *dv_diagonal_ptr,*dv_mixed_ptr,*v_rhs);
         }
     }

@@ -14,7 +14,7 @@ void Elastic::FACSolver::createVectorWrappers(int v, int v_rhs)
     {
       d_uv.reset();
       d_uv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
-        ("Elastic::FACSolver::uv", d_hierarchy, d_ln_min, d_ln_max);
+        ("Elastic::FACSolver::uv", d_hierarchy, level_min, level_max);
       vdb.mapIndexToVariable(v, variable);
       if (!variable)
         { TBOX_ERROR(__FILE__ << ": No variable for patch data index "
@@ -26,7 +26,7 @@ void Elastic::FACSolver::createVectorWrappers(int v, int v_rhs)
     {
       d_fv.reset();
       d_fv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
-        ("Elastic::FACSolver::fv", d_hierarchy, d_ln_min, d_ln_max);
+        ("Elastic::FACSolver::fv", d_hierarchy, level_min, level_max);
       vdb.mapIndexToVariable(v_rhs, variable);    
       if (!variable)
         { TBOX_ERROR(__FILE__ << ": No variable for patch data index "

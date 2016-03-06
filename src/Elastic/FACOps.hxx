@@ -191,12 +191,12 @@ namespace Elastic
 
     static void finalizeCallback();
 
-    const SAMRAI::tbox::Dimension d_dim;
-    int d_ln_min;
-    int d_ln_max;
+    const SAMRAI::tbox::Dimension dimension;
+    int level_min;
+    int level_max;
 
     std::vector<boost::shared_ptr<SAMRAI::hier::CoarseFineBoundary> >
-    d_cf_boundary;
+    coarse_fine_boundary;
     double coarse_solver_tolerance;
     int coarse_solver_max_iterations;
     int cell_moduli_id, edge_moduli_id, dv_diagonal_id, dv_mixed_id,
@@ -205,9 +205,9 @@ namespace Elastic
     static boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     s_side_scratch_var[SAMRAI::MAX_DIM_VAL];
 
-    boost::shared_ptr<SAMRAI::hier::VariableContext> d_context;
+    boost::shared_ptr<SAMRAI::hier::VariableContext> context;
 
-    int d_side_scratch_id;
+    int side_scratch_id;
     boost::shared_ptr<SAMRAI::hier::RefineOperator> refine_operator;
     std::vector<boost::shared_ptr<SAMRAI::xfer::RefineSchedule> >
     refine_schedules;

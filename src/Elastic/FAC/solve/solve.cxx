@@ -14,7 +14,7 @@ bool Elastic::FAC::solve()
                                     dv_mixed_id,level_set_id);
 
   fix_moduli();
-  const int dim(d_dim.getValue());
+  const int dim(dimension.getValue());
   if(!faults.empty())
     {
       if(dim==2)

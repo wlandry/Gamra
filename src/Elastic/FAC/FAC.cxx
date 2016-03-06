@@ -6,10 +6,10 @@
 
 Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
                   SAMRAI::tbox::Database &database):
-  d_dim(dimension),
+  dimension(dimension),
   boundary_conditions(dimension,"Elastic::FAC::boundary conditions",
                       *database.getDatabase("boundary_conditions")),
-  d_elastic_fac_solver((d_dim),
+  d_elastic_fac_solver((dimension),
                        "Elastic::FAC::fac_solver",
                        (database.isDatabase("fac_solver")) ?
                        database.getDatabase("fac_solver"):
@@ -28,7 +28,7 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
   offset_vector_on_output(database.getBoolWithDefault
                           ("offset_vector_on_output",false))
 {
-  const int dim(d_dim.getValue());
+  const int dim(dimension.getValue());
 
   std::string xyz("xyz");
   for(int d=0; d<dim; ++d)
@@ -43,7 +43,7 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
     SAMRAI::hier::VariableDatabase::getDatabase();
 
   /// Get a unique context for variables owned by this object.
-  d_context = vdb->getContext("Elastic::FAC:Context");
+  context = vdb->getContext("Elastic::FAC:Context");
 
   /// Register variables with SAMRAI::hier::VariableDatabase and get
   /// the descriptor indices for those variables.  Ghost cells width
@@ -52,15 +52,12 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
   int depth=2;
   boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
     cell_moduli_ptr(new SAMRAI::pdat::CellVariable<double>
-                    (d_dim,"Elastic::FAC:cell_moduli",depth));
-  cell_moduli_id =
-    vdb->registerVariableAndContext(cell_moduli_ptr, d_context,
-                                    SAMRAI::hier::IntVector::getOne(d_dim));
+                    (dimension,"Elastic::FAC:cell_moduli",depth));
+  cell_moduli_id = vdb->registerVariableAndContext
+    (cell_moduli_ptr,context,SAMRAI::hier::IntVector::getOne(dimension));
 
   if(database.keyExists("faults"))
-    {
-      faults=database.getDoubleVector("faults");
-    }
+    { faults=database.getDoubleVector("faults"); }
   if(faults.size()%9!=0)
     TBOX_ERROR("The number of points in faults must be "
                "divisible by 9.  Read "
@@ -69,18 +66,17 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
     {
       boost::shared_ptr<SAMRAI::pdat::CellVariable<double> >
         dv_diagonal_ptr(new SAMRAI::pdat::CellVariable<double>
-                        (d_dim,"Elastic::FAC:dv_diagonal",dim));
-      dv_diagonal_id =
-        vdb->registerVariableAndContext(dv_diagonal_ptr, d_context,
-                                        SAMRAI::hier::IntVector::getOne(d_dim));
+                        (dimension,"Elastic::FAC:dv_diagonal",dim));
+      dv_diagonal_id = vdb->registerVariableAndContext
+        (dv_diagonal_ptr,context,SAMRAI::hier::IntVector::getOne(dimension));
 
       boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
         dv_mixed_ptr(new SAMRAI::pdat::SideVariable<double>
-                     (d_dim,"Elastic::FAC:dv_mixed",
-                      SAMRAI::hier::IntVector::getOne(d_dim),dim==2 ? 2 : 8));
-      dv_mixed_id =
-        vdb->registerVariableAndContext(dv_mixed_ptr,d_context,
-                                        SAMRAI::hier::IntVector::getOne(d_dim));
+                     (dimension,"Elastic::FAC:dv_mixed",
+                      SAMRAI::hier::IntVector::getOne(dimension),
+                      dim==2 ? 2 : 8));
+      dv_mixed_id = vdb->registerVariableAndContext
+        (dv_mixed_ptr,context,SAMRAI::hier::IntVector::getOne(dimension));
     }
   if(database.keyExists("refinement_points"))
     { refinement_points=database.getDoubleVector("refinement_points"); }
@@ -93,46 +89,43 @@ Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
     {
       boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
         level_set_ptr(new SAMRAI::pdat::SideVariable<double>
-                      (d_dim,"Elastic::FAC:level_set",
-                       SAMRAI::hier::IntVector::getOne(d_dim),depth));
-      level_set_id =
-        vdb->registerVariableAndContext(level_set_ptr,d_context,
-                                        SAMRAI::hier::IntVector::getOne(d_dim));
+                      (dimension,"Elastic::FAC:level_set",
+                       SAMRAI::hier::IntVector::getOne(dimension),depth));
+      level_set_id = vdb->registerVariableAndContext
+        (level_set_ptr,context,SAMRAI::hier::IntVector::getOne(dimension));
     }
 
   if(dim==2)
     {
       boost::shared_ptr<SAMRAI::pdat::NodeVariable<double> >
         edge_moduli_ptr(new SAMRAI::pdat::NodeVariable<double>
-                        (d_dim,"Elastic::FAC:edge_moduli",depth));
-      edge_moduli_id =
-        vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
-                                        SAMRAI::hier::IntVector::getOne(d_dim));
+                        (dimension,"Elastic::FAC:edge_moduli",depth));
+      edge_moduli_id = vdb->registerVariableAndContext
+        (edge_moduli_ptr,context,SAMRAI::hier::IntVector::getOne(dimension));
     }
   else if(dim==3)
     {
       boost::shared_ptr<SAMRAI::pdat::EdgeVariable<double> >
         edge_moduli_ptr(new SAMRAI::pdat::EdgeVariable<double>
-                        (d_dim,"Elastic::FAC:edge_moduli",depth));
-      edge_moduli_id =
-        vdb->registerVariableAndContext(edge_moduli_ptr,d_context,
-                                        SAMRAI::hier::IntVector::getOne(d_dim));
+                        (dimension,"Elastic::FAC:edge_moduli",depth));
+      edge_moduli_id = vdb->registerVariableAndContext
+        (edge_moduli_ptr,context,SAMRAI::hier::IntVector::getOne(dimension));
     }
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_ptr(new SAMRAI::pdat::SideVariable<double>
-          (d_dim, "Elastic::FAC:v",
-           SAMRAI::hier::IntVector::getOne(d_dim), 1));
-  v_id = vdb->registerVariableAndContext(v_ptr, d_context,
-                                         SAMRAI::hier::IntVector::getOne(d_dim));
+          (dimension, "Elastic::FAC:v",
+           SAMRAI::hier::IntVector::getOne(dimension), 1));
+  v_id = vdb->registerVariableAndContext
+    (v_ptr,context,SAMRAI::hier::IntVector::getOne(dimension));
 
   boost::shared_ptr<SAMRAI::pdat::SideVariable<double> >
     v_rhs_ptr(new SAMRAI::pdat::SideVariable<double>
-              (d_dim,"Elastic::FAC:v right hand side",
-               SAMRAI::hier::IntVector::getOne(d_dim)));
+              (dimension,"Elastic::FAC:v right hand side",
+               SAMRAI::hier::IntVector::getOne(dimension)));
   v_rhs_id =
-    vdb->registerVariableAndContext(v_rhs_ptr,d_context,
-                                    SAMRAI::hier::IntVector::getOne(d_dim));
+    vdb->registerVariableAndContext(v_rhs_ptr,context,
+                                    SAMRAI::hier::IntVector::getOne(dimension));
 
   d_adaption_threshold=database.getDoubleWithDefault("adaption_threshold",
                                                       1.0e-15);

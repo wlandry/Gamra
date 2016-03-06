@@ -36,7 +36,7 @@ void Elastic::FAC::fix_moduli()
     { TBOX_ERROR("Elastic::FAC: Cannot find cell moduli coarsening operator"); }
 
   cell_moduli_coarsen_algorithm =
-    boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(d_dim);
+    boost::make_shared<SAMRAI::xfer::CoarsenAlgorithm >(dimension);
   cell_moduli_coarsen_algorithm->
     registerCoarsen(cell_moduli_id,cell_moduli_id,
                     cell_moduli_coarsen_operator);
@@ -67,11 +67,11 @@ void Elastic::FAC::fix_moduli()
 
   /// Compute edge_moduli by averaging the cell moduli.
 
-  SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(d_dim)),
+  SAMRAI::hier::Index ip(SAMRAI::hier::Index::getZeroIndex(dimension)),
     jp(ip), kp(ip);
   ip[0]=1;
   jp[1]=1;
-  if(d_dim.getValue()>2)
+  if(dimension.getValue()>2)
     kp[2]=1;
   SAMRAI::hier::Index unit[]={ip,jp,kp};
 
@@ -88,7 +88,7 @@ void Elastic::FAC::fix_moduli()
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
             (patch->getPatchData(cell_moduli_id));
           SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
-          if(2==d_dim.getValue())
+          if(2==dimension.getValue())
             {
               boost::shared_ptr<SAMRAI::pdat::NodeData<double> >
                 edge_moduli_ptr =

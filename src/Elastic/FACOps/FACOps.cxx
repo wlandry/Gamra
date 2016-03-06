@@ -16,9 +16,9 @@ Elastic::FACOps::FACOps
 (const SAMRAI::tbox::Dimension& dim,
  const boost::shared_ptr<SAMRAI::tbox::Database> &database,
  const Boundary_Conditions &bc):
-  d_dim(dim),
-  d_ln_min(-1),
-  d_ln_max(-1),
+  dimension(dim),
+  level_min(-1),
+  level_max(-1),
   coarse_solver_tolerance(1.e-8),
   coarse_solver_max_iterations(10),
   cell_moduli_id(invalid_id),
@@ -26,9 +26,9 @@ Elastic::FACOps::FACOps
   dv_diagonal_id(invalid_id),
   dv_mixed_id(invalid_id),
   level_set_id(invalid_id),
-  d_context(SAMRAI::hier::VariableDatabase::getDatabase()
-            ->getContext("Elastic::FACOps::PRIVATE_CONTEXT")),
-  d_side_scratch_id(invalid_id),
+  context(SAMRAI::hier::VariableDatabase::getDatabase()
+          ->getContext("Elastic::FACOps::PRIVATE_CONTEXT")),
+  side_scratch_id(invalid_id),
   v_refine_patch_strategy("refine patch strategy",bc),
   v_coarsen_patch_strategy("coarsen patch strategy",bc),
   logging(false),
@@ -49,8 +49,8 @@ Elastic::FACOps::FACOps
   t_compute_residual_norm = SAMRAI::tbox::TimerManager::getManager()->
     getTimer("solv::Elastic::FACOps::computeResidualNorm()");
 
-  if (d_dim == SAMRAI::tbox::Dimension(1)
-      || d_dim > SAMRAI::tbox::Dimension(3))
+  if (dimension == SAMRAI::tbox::Dimension(1)
+      || dimension > SAMRAI::tbox::Dimension(3))
     { TBOX_ERROR("Elastic::FACOps : DIM == 1 or > 3 not implemented yet.\n"); }
 
   if (!s_side_scratch_var[dim.getValue() - 1])
@@ -59,13 +59,13 @@ Elastic::FACOps::FACOps
       ss << "Elastic::FACOps::private_side_scratch" << dim.getValue();
       s_side_scratch_var[dim.getValue() - 1] =
         boost::make_shared<SAMRAI::pdat::SideVariable<double> >
-        (dim, ss.str(),SAMRAI::hier::IntVector::getOne(d_dim));
+        (dim, ss.str(),SAMRAI::hier::IntVector::getOne(dimension));
     }
 
-  d_side_scratch_id = SAMRAI::hier::VariableDatabase::getDatabase()->
+  side_scratch_id = SAMRAI::hier::VariableDatabase::getDatabase()->
     registerVariableAndContext(s_side_scratch_var[dim.getValue() - 1],
-                               d_context,
-                               SAMRAI::hier::IntVector::getOne(d_dim));
+                               context,
+                               SAMRAI::hier::IntVector::getOne(dimension));
 
   if (database)
     {

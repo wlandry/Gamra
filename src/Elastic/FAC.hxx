@@ -58,7 +58,7 @@ namespace Elastic
 
   private:
     void fix_moduli();
-    const SAMRAI::tbox::Dimension d_dim;
+    const SAMRAI::tbox::Dimension dimension;
 
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
 
@@ -66,7 +66,7 @@ namespace Elastic
     Boundary_Conditions boundary_conditions;
   private:
     Elastic::FACSolver d_elastic_fac_solver;
-    boost::shared_ptr<SAMRAI::hier::VariableContext> d_context;
+    boost::shared_ptr<SAMRAI::hier::VariableContext> context;
     double d_adaption_threshold;
     int min_full_refinement_level;
   public:

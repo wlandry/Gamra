@@ -7,7 +7,7 @@
 void pack_level_set(double* buffer,
                     const SAMRAI::hier::Patch& patch,
                     const SAMRAI::hier::Box& region,
-                    const SAMRAI::tbox::Dimension &d_dim,
+                    const SAMRAI::tbox::Dimension &dimension,
                     const int &level_set_id)
 {
   boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr;
@@ -15,7 +15,7 @@ void pack_level_set(double* buffer,
     (patch.getPatchData(level_set_id));
 
   SAMRAI::pdat::SideData<double>& level_set = *level_set_ptr;
-  if(d_dim.getValue()==2)
+  if(dimension.getValue()==2)
     {
       const SAMRAI::hier::Index ip(1,0), jp(0,1);
 

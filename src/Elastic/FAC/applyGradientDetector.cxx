@@ -57,7 +57,7 @@ void Elastic::FAC::applyGradientDetector
       tag_cell.fill(0);
       const SAMRAI::hier::Box &box(patch.getBox());
       SAMRAI::pdat::CellIterator cend(SAMRAI::pdat::CellGeometry::end(box));
-      const int dim(d_dim.getValue());
+      const int dim(dimension.getValue());
       for(SAMRAI::pdat::CellIterator ci(SAMRAI::pdat::CellGeometry::begin(box));
           ci!=cend; ++ci)
         {
@@ -70,9 +70,9 @@ void Elastic::FAC::applyGradientDetector
                                               SAMRAI::pdat::SideIndex::Lower);
               for (int d=0; d<dim; ++d)
                 {
-                  SAMRAI::hier::Index ip(d_dim,0),
-                    jp(d_dim,0),
-                    kp(d_dim,0);
+                  SAMRAI::hier::Index ip(dimension,0),
+                    jp(dimension,0),
+                    kp(dimension,0);
                   ip(0)=1;
                   jp(1)=1;
                   if (3==dim)
@@ -175,7 +175,7 @@ void Elastic::FAC::applyGradientDetector
         }
       for(size_t i=0;i<refinement_points.size();i+=3)
         {
-          SAMRAI::pdat::CellIndex cell(d_dim);
+          SAMRAI::pdat::CellIndex cell(dimension);
           for(int d=0;d<dim;++d)
             cell[d]=static_cast<int>((refinement_points[i+d]
                                       - geom->getXLower()[d])/geom->getDx()[d]
