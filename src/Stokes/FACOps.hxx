@@ -329,38 +329,38 @@ namespace Stokes {
     restrictSolution(
                      const SAMRAI::solv::SAMRAIVectorReal<double>& source,
                      SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-                     int dest_ln);
+                     int dest_level);
     virtual void
     restrictResidual(
                      const SAMRAI::solv::SAMRAIVectorReal<double>& source,
                      SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-                     int dest_ln);
+                     int dest_level);
 
     virtual void
     prolongErrorAndCorrect(
                            const SAMRAI::solv::SAMRAIVectorReal<double>& source,
                            SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-                           int dest_ln);
+                           int dest_level);
 
     virtual void
     smoothError(
                 SAMRAI::solv::SAMRAIVectorReal<double>& error,
                 const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                int ln,
+                int level,
                 int num_sweeps);
 
     virtual int
     solveCoarsestLevel(
                        SAMRAI::solv::SAMRAIVectorReal<double>& error,
                        const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                       int coarsest_ln);
+                       int coarsest_level);
 
     virtual void
     computeCompositeResidualOnLevel(
                                     SAMRAI::solv::SAMRAIVectorReal<double>& residual,
                                     const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
                                     const SAMRAI::solv::SAMRAIVectorReal<double>& rhs,
-                                    int ln,
+                                    int level,
                                     bool error_equation_indicator);
 
     void residual_2D
@@ -390,8 +390,8 @@ namespace Stokes {
     virtual double
     computeResidualNorm(
                         const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                        int fine_ln,
-                        int coarse_ln);
+                        int fine_level,
+                        int coarse_level);
 
     virtual void
     initializeOperatorState(
@@ -429,28 +429,11 @@ namespace Stokes {
     //@}
 
   private:
-    //@{
-    /*!
-     * @name Private workhorse functions.
-     */
-
-    /*!
-     * @brief Red-black Gauss-Seidel error smoothing on a level.
-     *
-     * Smoothes on the residual equation @f$ Ae=r @f$ on a level.
-     *
-     * @param error error vector
-     * @param residual residual vector
-     * @param ln level number
-     * @param num_sweeps number of sweeps
-     * @param residual_tolerance the maximum residual considered to be
-     *        converged
-     */
     void
     smooth_Tackley_2D(
                       SAMRAI::solv::SAMRAIVectorReal<double>& error,
                       const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                      int ln,
+                      int level,
                       int num_sweeps,
                       double residual_tolerance = -1.0);
 
@@ -458,7 +441,7 @@ namespace Stokes {
     smooth_Tackley_3D(
                       SAMRAI::solv::SAMRAIVectorReal<double>& error,
                       const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                      int ln,
+                      int level,
                       int num_sweeps,
                       double residual_tolerance = -1.0);
 
@@ -466,7 +449,7 @@ namespace Stokes {
     smooth_Gerya(
                  SAMRAI::solv::SAMRAIVectorReal<double>& error,
                  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                 int ln,
+                 int level,
                  int num_sweeps,
                  double residual_tolerance = -1.0);
 
@@ -581,21 +564,8 @@ namespace Stokes {
     solveCoarsestLevel_HYPRE(
                              SAMRAI::solv::SAMRAIVectorReal<double>& error,
                              const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                             int ln);
+                             int level);
 
-    /*!
-     * @brief AMR-unaware function to red or black smoothing on a single patch,
-     * for variable diffusion coefficient and variable scalar field.
-     *
-     * @param patch patch
-     * @param flux_data side-centered flux data
-     * @param rhs_data cell-centered rhs data
-     * @param scalar_field_data
-     *        cell-centered scalar field data
-     * @param soln_data cell-centered solution data
-     * @param red_or_black red-black switch.  Set to 'r' or 'b'.
-     * @param p_maxres max residual output.  Set to NULL to avoid computing.
-     */
     void
     redOrBlackSmoothingOnPatch(
                                const SAMRAI::hier::Patch& patch,
@@ -661,7 +631,7 @@ namespace Stokes {
     void
     xeqScheduleProlongation(int p_dst, int p_src, int p_scr,
                             int v_dst, int v_src, int v_scr,
-                            int dest_ln);
+                            int dest_level);
 
     /*!
      * @brief Execute schedule for restricting solution to the specified
@@ -673,7 +643,7 @@ namespace Stokes {
      */
     void
     xeqScheduleURestriction(int p_dst, int p_src, int v_dst, int v_src,
-                            int dest_ln);
+                            int dest_level);
 
     /*!
      * @brief Execute schedule for restricting residual to the specified
@@ -685,7 +655,7 @@ namespace Stokes {
      */
     void
     xeqScheduleRRestriction(int p_dst, int p_src, int v_dst, int v_src,
-                            int dest_ln);
+                            int dest_level);
 
     /*!
      * @brief Execute schedule for filling ghosts on the specified
@@ -697,7 +667,7 @@ namespace Stokes {
      * and physical bc.
      */
     void
-    xeqScheduleGhostFill(int p_id, int v_id, int dest_ln);
+    xeqScheduleGhostFill(int p_id, int v_id, int dest_level);
 
     /*!
      * @brief Execute schedule for filling ghosts on the specified
@@ -714,7 +684,7 @@ namespace Stokes {
      * and physical bc.
      */
     void
-    xeqScheduleGhostFillNoCoarse(int p_id, int v_id, int dest_ln);
+    xeqScheduleGhostFillNoCoarse(int p_id, int v_id, int dest_level);
 
     //@}
 
@@ -748,12 +718,12 @@ namespace Stokes {
     /*!
      * @brief Coarsest level for solve.
      */
-    int d_ln_min;
+    int d_level_min;
 
     /*!
      * @brief Finest level for solve.
      */
-    int d_ln_max;
+    int d_level_max;
 
     /*!
      * @brief Description of coarse-fine boundaries.
@@ -767,8 +737,8 @@ namespace Stokes {
      *
      * This array is initialized in initializeOperatorState() and
      * deallocated in deallocateOperatorState().  When allocated,
-     * it is allocated for the index range [0,d_ln_max], though
-     * the range [0,d_ln_min-1] is not used.  This is okay because
+     * it is allocated for the index range [0,d_level_max], though
+     * the range [0,d_level_min-1] is not used.  This is okay because
      * SAMRAI::hier::CoarseFineBoundary is a light object before
      * it is set for a level.
      */

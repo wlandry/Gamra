@@ -50,10 +50,10 @@ void Elastic::FAC::initializeLevelData
         }
     }
   /// Initialize data in all patches in the level.
-  SAMRAI::hier::PatchLevel::Iterator p_i(level->begin());
-  for (; p_i!=level->end(); ++p_i)
+  for (SAMRAI::hier::PatchLevel::Iterator p(level->begin()); p!=level->end();
+       ++p)
     {
-      boost::shared_ptr<SAMRAI::hier::Patch> patch = *p_i;
+      boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
       if (!patch)
         { TBOX_ERROR("Elastic::FAC: Cannot find patch.  Null patch pointer."); }
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =

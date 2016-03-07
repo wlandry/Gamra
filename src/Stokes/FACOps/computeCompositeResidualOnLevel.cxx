@@ -4,7 +4,7 @@ void Stokes::FACOps::computeCompositeResidualOnLevel
 (SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& rhs,
- int ln,
+ int level,
  bool error_equation_indicator) {
 
   t_compute_composite_residual->start();
@@ -17,7 +17,7 @@ void Stokes::FACOps::computeCompositeResidualOnLevel
                "internal hierarchy.");
   }
 #endif
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
+  boost::shared_ptr<SAMRAI::hier::PatchLevel> patch_level = d_hierarchy->getPatchLevel(level);
 
   /*
    * Set up the bc helper so that when we use a refine schedule
@@ -52,20 +52,20 @@ void Stokes::FACOps::computeCompositeResidualOnLevel
 
   /* S1. Fill solution ghost data. */
 
-  set_physical_boundaries(p_id,v_id,ln,error_equation_indicator);
-  if (ln > d_ln_min) {
+  set_physical_boundaries(p_id,v_id,level,error_equation_indicator);
+  if (level > d_level_min) {
     /* Fill from current, next coarser level and physical boundary */
-    xeqScheduleGhostFill(p_id, v_id, ln);
+    xeqScheduleGhostFill(p_id, v_id, level);
   } else {
     /* Fill from current and physical boundary */
-    xeqScheduleGhostFillNoCoarse(p_id, v_id, ln);
+    xeqScheduleGhostFillNoCoarse(p_id, v_id, level);
   }
 
   /*
    * S4. Compute residual on patches in level.
    */
 
-  for (SAMRAI::hier::PatchLevel::Iterator p(level->begin()); p!=level->end(); ++p) {
+  for (SAMRAI::hier::PatchLevel::Iterator p(patch_level->begin()); p!=patch_level->end(); ++p) {
     boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >

@@ -182,8 +182,8 @@ namespace Stokes {
                 const int v,
                 const int v_rhs,
                 boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
-                int coarse_ln = -1,
-                int fine_ln = -1);
+                int coarse_level = -1,
+                int fine_level = -1);
 
     /*!
      * @brief Solve Stokes's equation using the current solver state
@@ -559,8 +559,8 @@ namespace Stokes {
     SAMRAI::solv::SimpleCellRobinBcCoefs d_simple_bc;
 
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> d_hierarchy;
-    int d_ln_min;
-    int d_ln_max;
+    int d_level_min;
+    int d_level_max;
 
     /*!
      * @brief Context for all internally maintained data.

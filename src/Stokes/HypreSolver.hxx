@@ -123,7 +123,7 @@ namespace Stokes {
     void
     initializeSolverState(
                           boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
-                          int ln = 0);
+                          int level = 0);
 
     /*!
      * @brief Reset to an uninitialized state.

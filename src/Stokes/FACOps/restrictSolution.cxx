@@ -49,7 +49,7 @@
 void Stokes::FACOps::restrictSolution
 (const SAMRAI::solv::SAMRAIVectorReal<double>& s,
  SAMRAI::solv::SAMRAIVectorReal<double>& d,
- int dest_ln)
+ int dest_level)
 {
   t_restrict_solution->start();
 
@@ -60,20 +60,20 @@ void Stokes::FACOps::restrictSolution
 
   /* Need to do a sync because the coarsening for v uses ghost zones. */
   v_coarsen_patch_strategy.setSourceDataId(v_src);
-  xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_ln+1);
+  xeqScheduleGhostFillNoCoarse(invalid_id,v_src,dest_level+1);
 
-  xeqScheduleURestriction(p_dst,p_src,v_dst,v_src,dest_ln);
+  xeqScheduleURestriction(p_dst,p_src,v_dst,v_src,dest_level);
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(dest_ln);
-  set_physical_boundaries(p_dst,v_dst,level,false);
+  boost::shared_ptr<SAMRAI::hier::PatchLevel> patch_level = d_hierarchy->getPatchLevel(dest_level);
+  set_physical_boundaries(p_dst,v_dst,patch_level,false);
   // v_refine_patch_strategy.setHomogeneousBc(false);
   p_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(0));
   v_refine_patch_strategy.setTargetDataId(d.getComponentDescriptorIndex(1));
 
-  if (dest_ln == d_ln_min) {
-    xeqScheduleGhostFillNoCoarse(p_dst,v_dst,dest_ln);
+  if (dest_level == d_level_min) {
+    xeqScheduleGhostFillNoCoarse(p_dst,v_dst,dest_level);
   } else {
-    xeqScheduleGhostFill(p_dst,v_dst,dest_ln);
+    xeqScheduleGhostFill(p_dst,v_dst,dest_level);
   }
 
   t_restrict_solution->stop();

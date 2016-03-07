@@ -32,14 +32,14 @@ bool Stokes::FAC::solve()
   if (!d_hierarchy)
     { TBOX_ERROR("Stokes::FAC: Cannot solve using an uninitialized object.\n"); }
 
-  int ln;
+  int level;
   /*
    * Fill in the initial guess.
    */
-  for (ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln) {
-    boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
-    SAMRAI::hier::PatchLevel::Iterator ip(level->begin());
-    SAMRAI::hier::PatchLevel::Iterator iend(level->end());
+  for (level = 0; level <= d_hierarchy->getFinestLevelNumber(); ++level) {
+    boost::shared_ptr<SAMRAI::hier::PatchLevel> patch_level = d_hierarchy->getPatchLevel(level);
+    SAMRAI::hier::PatchLevel::Iterator ip(patch_level->begin());
+    SAMRAI::hier::PatchLevel::Iterator iend(patch_level->end());
     for ( ; ip!=iend; ++ip) {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *ip;
       boost::shared_ptr<SAMRAI::pdat::CellData<double> > p =
@@ -135,7 +135,7 @@ bool Stokes::FAC::solve()
         (patch->getPatchData(v_id));
       v->fill(0.0);
     }
-    d_stokes_fac_solver.set_physical_boundaries(p_id,v_id,level,false);
+    d_stokes_fac_solver.set_physical_boundaries(p_id,v_id,patch_level,false);
   }
 
   fix_viscosity();

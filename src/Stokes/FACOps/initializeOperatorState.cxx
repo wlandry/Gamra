@@ -25,12 +25,12 @@ void Stokes::FACOps::initializeOperatorState
  const SAMRAI::solv::SAMRAIVectorReal<double>& rhs)
 {
   deallocateOperatorState();
-  int ln;
+  int level;
   SAMRAI::hier::VariableDatabase* vdb = SAMRAI::hier::VariableDatabase::getDatabase();
 
   d_hierarchy = solution.getPatchHierarchy();
-  d_ln_min = solution.getCoarsestLevelNumber();
-  d_ln_max = solution.getFinestLevelNumber();
+  d_level_min = solution.getCoarsestLevelNumber();
+  d_level_max = solution.getFinestLevelNumber();
 
 #ifdef DEBUG_CHECK_ASSERTIONS
 
@@ -99,11 +99,11 @@ void Stokes::FACOps::initializeOperatorState
                  << ": Solution variable is not cell-centered double\n");
     }
   }
-  for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
+  for (level = d_level_min; level <= d_level_max; ++level) {
     boost::shared_ptr<SAMRAI::hier::PatchLevel> level_ptr =
-      d_hierarchy->getPatchLevel(ln);
-    SAMRAI::hier::PatchLevel& level = *level_ptr;
-    for (SAMRAI::hier::PatchLevel::Iterator p(level.begin()); p!=level.end(); ++p) {
+      d_hierarchy->getPatchLevel(level);
+    SAMRAI::hier::PatchLevel& patch_level = *level_ptr;
+    for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin()); p!=patch_level.end(); ++p) {
       SAMRAI::hier::Patch& patch = **p;
       boost::shared_ptr<SAMRAI::hier::PatchData> fd =
         patch.getPatchData(rhs.getComponentDescriptorIndex(0));
@@ -154,8 +154,8 @@ void Stokes::FACOps::initializeOperatorState
    * Solution and rhs must have some similar properties.
    */
   if (rhs.getPatchHierarchy() != d_hierarchy
-      || rhs.getCoarsestLevelNumber() != d_ln_min
-      || rhs.getFinestLevelNumber() != d_ln_max) {
+      || rhs.getCoarsestLevelNumber() != d_level_min
+      || rhs.getFinestLevelNumber() != d_level_max) {
     TBOX_ERROR(d_object_name << ": solution and rhs do not have\n"
                << "the same set of patch levels.\n");
   }
@@ -169,15 +169,15 @@ void Stokes::FACOps::initializeOperatorState
   d_cf_boundary.resize(d_hierarchy->getNumberOfLevels());
 
   SAMRAI::hier::IntVector max_gcw(d_dim, 1);
-  for (ln = d_ln_min; ln <= d_ln_max; ++ln) {
-    d_cf_boundary[ln] = boost::make_shared<SAMRAI::hier::CoarseFineBoundary>
-      (*d_hierarchy,ln,max_gcw);
+  for (level = d_level_min; level <= d_level_max; ++level) {
+    d_cf_boundary[level] = boost::make_shared<SAMRAI::hier::CoarseFineBoundary>
+      (*d_hierarchy,level,max_gcw);
   }
 
   v_coarsen_patch_strategy.coarse_fine=d_cf_boundary;
 // #ifdef HAVE_HYPRE
 //   if (d_coarse_solver_choice == "hypre") {
-//     d_hypre_solver.initializeSolverState(d_hierarchy, d_ln_min);
+//     d_hypre_solver.initializeSolverState(d_hierarchy, d_level_min);
 //     /*
 //      * Share the boundary condition object with the hypre solver
 //      * to make sure that boundary condition settings are consistent
@@ -271,16 +271,16 @@ void Stokes::FACOps::initializeOperatorState
    * There is no need to delete the old schedules first
    * because we have deallocated the solver state above.
    */
-  p_prolongation_refine_schedules.resize(d_ln_max + 1);
-  v_prolongation_refine_schedules.resize(d_ln_max + 1);
-  p_ghostfill_refine_schedules.resize(d_ln_max + 1);
-  v_ghostfill_refine_schedules.resize(d_ln_max + 1);
-  p_nocoarse_refine_schedules.resize(d_ln_max + 1);
-  v_nocoarse_refine_schedules.resize(d_ln_max + 1);
-  p_urestriction_coarsen_schedules.resize(d_ln_max + 1);
-  p_rrestriction_coarsen_schedules.resize(d_ln_max + 1);
-  v_urestriction_coarsen_schedules.resize(d_ln_max + 1);
-  v_rrestriction_coarsen_schedules.resize(d_ln_max + 1);
+  p_prolongation_refine_schedules.resize(d_level_max + 1);
+  v_prolongation_refine_schedules.resize(d_level_max + 1);
+  p_ghostfill_refine_schedules.resize(d_level_max + 1);
+  v_ghostfill_refine_schedules.resize(d_level_max + 1);
+  p_nocoarse_refine_schedules.resize(d_level_max + 1);
+  v_nocoarse_refine_schedules.resize(d_level_max + 1);
+  p_urestriction_coarsen_schedules.resize(d_level_max + 1);
+  p_rrestriction_coarsen_schedules.resize(d_level_max + 1);
+  v_urestriction_coarsen_schedules.resize(d_level_max + 1);
+  v_rrestriction_coarsen_schedules.resize(d_level_max + 1);
 
   SAMRAI::xfer::RefineAlgorithm p_prolongation_refine_algorithm,
     v_prolongation_refine_algorithm,
@@ -348,121 +348,121 @@ void Stokes::FACOps::initializeOperatorState
                    boost::shared_ptr<SAMRAI::hier::RefineOperator>());
 
   /* Refinement and ghost fill operators */
-  for (int dest_ln = d_ln_min + 1; dest_ln <= d_ln_max; ++dest_ln) {
+  for (int dest_level = d_level_min + 1; dest_level <= d_level_max; ++dest_level) {
 
     boost::shared_ptr<SAMRAI::xfer::PatchLevelFullFillPattern>
       fill_pattern(new SAMRAI::xfer::PatchLevelFullFillPattern());
-    p_prolongation_refine_schedules[dest_ln] =
+    p_prolongation_refine_schedules[dest_level] =
       p_prolongation_refine_algorithm.
       createSchedule(fill_pattern,
-                     d_hierarchy->getPatchLevel(dest_ln),
+                     d_hierarchy->getPatchLevel(dest_level),
                      boost::shared_ptr<SAMRAI::hier::PatchLevel>(),
-                     dest_ln - 1,
+                     dest_level - 1,
                      d_hierarchy);
-    if (!p_prolongation_refine_schedules[dest_ln]) {
+    if (!p_prolongation_refine_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for p prolongation!\n");
     }
-    v_prolongation_refine_schedules[dest_ln] =
+    v_prolongation_refine_schedules[dest_level] =
       v_prolongation_refine_algorithm.
       createSchedule(fill_pattern,
-                     d_hierarchy->getPatchLevel(dest_ln),
+                     d_hierarchy->getPatchLevel(dest_level),
                      boost::shared_ptr<SAMRAI::hier::PatchLevel>(),
-                     dest_ln - 1,
+                     dest_level - 1,
                      d_hierarchy);
-    if (!v_prolongation_refine_schedules[dest_ln]) {
+    if (!v_prolongation_refine_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for v prolongation!\n");
     }
-    p_ghostfill_refine_schedules[dest_ln] =
+    p_ghostfill_refine_schedules[dest_level] =
       p_ghostfill_refine_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     dest_ln - 1,
+      createSchedule(d_hierarchy->getPatchLevel(dest_level),
+                     dest_level - 1,
                      d_hierarchy,
                      &p_refine_patch_strategy);
-    if (!p_ghostfill_refine_schedules[dest_ln]) {
+    if (!p_ghostfill_refine_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
     }
-    v_ghostfill_refine_schedules[dest_ln] =
+    v_ghostfill_refine_schedules[dest_level] =
       v_ghostfill_refine_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     dest_ln - 1,
+      createSchedule(d_hierarchy->getPatchLevel(dest_level),
+                     dest_level - 1,
                      d_hierarchy,
                      &v_refine_patch_strategy);
-    if (!v_ghostfill_refine_schedules[dest_ln]) {
+    if (!v_ghostfill_refine_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling!\n");
     }
-    p_nocoarse_refine_schedules[dest_ln] =
+    p_nocoarse_refine_schedules[dest_level] =
       p_nocoarse_refine_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln));
-    if (!p_nocoarse_refine_schedules[dest_ln]) {
+      createSchedule(d_hierarchy->getPatchLevel(dest_level));
+    if (!p_nocoarse_refine_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling on bottom level!\n");
     }
-    v_nocoarse_refine_schedules[dest_ln] =
+    v_nocoarse_refine_schedules[dest_level] =
       v_nocoarse_refine_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln));
-    if (!v_nocoarse_refine_schedules[dest_ln]) {
+      createSchedule(d_hierarchy->getPatchLevel(dest_level));
+    if (!v_nocoarse_refine_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a refine schedule for ghost filling on bottom level!\n");
     }
   }
 
   /* Coarsening operators */
-  for (int dest_ln = d_ln_min; dest_ln < d_ln_max; ++dest_ln) {
-    p_urestriction_coarsen_schedules[dest_ln] =
+  for (int dest_level = d_level_min; dest_level < d_level_max; ++dest_level) {
+    p_urestriction_coarsen_schedules[dest_level] =
       p_urestriction_coarsen_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1));
-    if (!p_urestriction_coarsen_schedules[dest_ln]) {
+      createSchedule(d_hierarchy->getPatchLevel(dest_level),
+                     d_hierarchy->getPatchLevel(dest_level + 1));
+    if (!p_urestriction_coarsen_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a coarsen schedule for U p restriction!\n");
     }
-    p_rrestriction_coarsen_schedules[dest_ln] =
+    p_rrestriction_coarsen_schedules[dest_level] =
       p_rrestriction_coarsen_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1));
-    if (!p_rrestriction_coarsen_schedules[dest_ln]) {
+      createSchedule(d_hierarchy->getPatchLevel(dest_level),
+                     d_hierarchy->getPatchLevel(dest_level + 1));
+    if (!p_rrestriction_coarsen_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a coarsen schedule for R p restriction!\n");
     }
 
-    v_urestriction_coarsen_schedules[dest_ln] =
+    v_urestriction_coarsen_schedules[dest_level] =
       v_urestriction_coarsen_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1),
+      createSchedule(d_hierarchy->getPatchLevel(dest_level),
+                     d_hierarchy->getPatchLevel(dest_level + 1),
                      &v_coarsen_patch_strategy);
-    if (!v_urestriction_coarsen_schedules[dest_ln]) {
+    if (!v_urestriction_coarsen_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a coarsen schedule for U v restriction!\n");
     }
-    v_rrestriction_coarsen_schedules[dest_ln] =
+    v_rrestriction_coarsen_schedules[dest_level] =
       v_rrestriction_coarsen_algorithm.
-      createSchedule(d_hierarchy->getPatchLevel(dest_ln),
-                     d_hierarchy->getPatchLevel(dest_ln + 1),
+      createSchedule(d_hierarchy->getPatchLevel(dest_level),
+                     d_hierarchy->getPatchLevel(dest_level + 1),
                      &v_coarsen_patch_strategy);
-    if (!v_rrestriction_coarsen_schedules[dest_ln]) {
+    if (!v_rrestriction_coarsen_schedules[dest_level]) {
       TBOX_ERROR(d_object_name
                  << ": Cannot create a coarsen schedule for R v restriction!\n");
     }
   }
 
   /* Ordinary ghost fill operator on the coarsest level */
-  p_nocoarse_refine_schedules[d_ln_min] =
+  p_nocoarse_refine_schedules[d_level_min] =
     p_nocoarse_refine_algorithm.
-    createSchedule(d_hierarchy->getPatchLevel(d_ln_min));
-  if (!p_nocoarse_refine_schedules[d_ln_min]) {
+    createSchedule(d_hierarchy->getPatchLevel(d_level_min));
+  if (!p_nocoarse_refine_schedules[d_level_min]) {
     TBOX_ERROR(
                d_object_name
                <<
                ": Cannot create a refine schedule for p ghost filling on bottom level!\n");
   }
-  v_nocoarse_refine_schedules[d_ln_min] =
+  v_nocoarse_refine_schedules[d_level_min] =
     v_nocoarse_refine_algorithm.
-    createSchedule(d_hierarchy->getPatchLevel(d_ln_min));
-  if (!v_nocoarse_refine_schedules[d_ln_min]) {
+    createSchedule(d_hierarchy->getPatchLevel(d_level_min));
+  if (!v_nocoarse_refine_schedules[d_level_min]) {
     TBOX_ERROR(
                d_object_name
                <<

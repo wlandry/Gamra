@@ -68,12 +68,12 @@ void Stokes::FAC::fix_viscosity()
     kp[2]=1;
   SAMRAI::hier::Index pp[]={ip,jp,kp};
 
-  for (int ln = 0; ln <= d_hierarchy->getFinestLevelNumber(); ++ln)
+  for (int level = 0; level <= d_hierarchy->getFinestLevelNumber(); ++level)
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        level = d_hierarchy->getPatchLevel(ln);
-      SAMRAI::hier::PatchLevel::Iterator i_p(level->begin());
-      for ( ; i_p!=level->end(); ++i_p)
+        patch_level = d_hierarchy->getPatchLevel(level);
+      SAMRAI::hier::PatchLevel::Iterator i_p(patch_level->begin());
+      for ( ; i_p!=patch_level->end(); ++i_p)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *i_p;
           boost::shared_ptr<SAMRAI::pdat::CellData<double> >cell_viscosity_ptr =
@@ -140,7 +140,7 @@ void Stokes::FAC::fix_viscosity()
                              boost::shared_ptr<SAMRAI::hier::RefineOperator>());
 
       boost::shared_ptr<SAMRAI::xfer::RefineSchedule> schedule=
-        refiner.createSchedule(d_hierarchy->getPatchLevel(ln));
+        refiner.createSchedule(d_hierarchy->getPatchLevel(level));
         
       schedule->fillData(0.0,false);
     }

@@ -54,8 +54,8 @@ void Stokes::FACOps::deallocateOperatorState()
     d_hypre_solver.deallocateSolverState();
 #endif
     d_hierarchy.reset();
-    d_ln_min = -1;
-    d_ln_max = -1;
+    d_level_min = -1;
+    d_level_max = -1;
 
     p_prolongation_refine_schedules.clear();
     v_prolongation_refine_schedules.clear();

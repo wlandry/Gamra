@@ -383,7 +383,7 @@ void Stokes::HypreSolver::getFromInput(
 
 void Stokes::HypreSolver::initializeSolverState(
                                                 boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy,
-                                                int ln)
+                                                int level)
 {
   TBOX_ASSERT(hierarchy);
   TBOX_ASSERT_DIM_OBJDIM_EQUALITY1(d_dim, *hierarchy);
@@ -391,7 +391,7 @@ void Stokes::HypreSolver::initializeSolverState(
   deallocateSolverState();
 
   d_hierarchy = hierarchy;
-  d_ln = ln;
+  d_level = level;
 
   SAMRAI::hier::IntVector max_gcw(d_dim, 1);
   d_cf_boundary = boost::make_shared<SAMRAI::hier::CoarseFineBoundary >

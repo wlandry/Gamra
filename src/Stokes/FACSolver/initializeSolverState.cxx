@@ -65,17 +65,17 @@ void Stokes::FACSolver::initializeSolverState
 #endif
   d_hierarchy = hierarchy;
 
-  d_ln_min = coarse_level;
-  d_ln_max = fine_level;
-  if (d_ln_min == -1) {
-    d_ln_min = 0;
+  d_level_min = coarse_level;
+  d_level_max = fine_level;
+  if (d_level_min == -1) {
+    d_level_min = 0;
   }
-  if (d_ln_max == -1) {
-    d_ln_max = d_hierarchy->getFinestLevelNumber();
+  if (d_level_max == -1) {
+    d_level_max = d_hierarchy->getFinestLevelNumber();
   }
 
 #ifdef DEBUG_CHECK_ASSERTIONS
-  if (d_ln_min < 0 || d_ln_max < 0 || d_ln_min > d_ln_max) {
+  if (d_level_min < 0 || d_level_max < 0 || d_level_min > d_level_max) {
     TBOX_ERROR(d_object_name << ": Bad range of levels in\n"
                << "inititialization.\n");
   }
@@ -83,8 +83,8 @@ void Stokes::FACSolver::initializeSolverState
 
   if (d_bc_object == &d_simple_bc) {
     d_simple_bc.setHierarchy(d_hierarchy,
-                             d_ln_min,
-                             d_ln_max);
+                             d_level_min,
+                             d_level_max);
   }
 
   d_fac_ops->set_viscosity_dp_id(cell_viscosity,edge_viscosity,dp);

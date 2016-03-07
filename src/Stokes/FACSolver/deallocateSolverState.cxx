@@ -21,8 +21,8 @@ void Stokes::FACSolver::deallocateSolverState()
     {
       d_fac_precond.deallocateSolverState();
       d_hierarchy.reset();
-      d_ln_min = -1;
-      d_ln_max = -1;
+      d_level_min = -1;
+      d_level_max = -1;
       d_solver_is_initialized = false;
       destroyVectorWrappers();
     }

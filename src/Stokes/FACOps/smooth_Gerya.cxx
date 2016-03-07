@@ -12,7 +12,7 @@
 void Stokes::FACOps::smooth_Gerya
 (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
- int ln,
+ int level,
  int num_sweeps,
  double residual_tolerance)
 {
@@ -29,7 +29,7 @@ void Stokes::FACOps::smooth_Gerya
                  "internal hierarchy.");
     }
 #endif
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(ln);
+  boost::shared_ptr<SAMRAI::hier::PatchLevel> patch_level = d_hierarchy->getPatchLevel(level);
 
   /* Only need to sync the rhs once. This sync is needed because
      calculating a new pressure update requires computing in the ghost
@@ -37,16 +37,16 @@ void Stokes::FACOps::smooth_Gerya
      correct. */
   p_refine_patch_strategy.setTargetDataId(p_id);
   v_refine_patch_strategy.setTargetDataId(v_id);
-  set_physical_boundaries(p_id,v_id,level,true);
-  xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,ln);
+  set_physical_boundaries(p_id,v_id,patch_level,true);
+  xeqScheduleGhostFillNoCoarse(p_rhs_id,v_rhs_id,level);
 
-  if (ln > d_ln_min) {
+  if (level > d_level_min) {
     /*
      * Perform a one-time transfer of data from coarser level,
      * to fill ghost boundaries that will not change through
      * the smoothing loop.
      */
-    xeqScheduleGhostFill(p_id, v_id, ln);
+    xeqScheduleGhostFill(p_id, v_id, level);
   }
 
   double theta_momentum=1.2;
@@ -65,15 +65,15 @@ void Stokes::FACOps::smooth_Gerya
    */
   const SAMRAI::hier::Index ip(1,0), jp(0,1);
   bool converged = false;
-  for (int sweep=0; sweep < num_sweeps*(1<<(d_ln_max-ln)) && !converged;
+  for (int sweep=0; sweep < num_sweeps*(1<<(d_level_max-level)) && !converged;
        ++sweep)
     {
       maxres=0;
       for(int rb=0;rb<2;++rb)
         {
-          xeqScheduleGhostFillNoCoarse(p_id,v_id,ln);
-          for (SAMRAI::hier::PatchLevel::Iterator patch_iter(level->begin());
-               patch_iter!=level->end(); ++patch_iter)
+          xeqScheduleGhostFillNoCoarse(p_id,v_id,level);
+          for (SAMRAI::hier::PatchLevel::Iterator patch_iter(patch_level->begin());
+               patch_iter!=patch_level->end(); ++patch_iter)
             {
               boost::shared_ptr<SAMRAI::hier::Patch> patch = *patch_iter;
 
@@ -165,7 +165,7 @@ void Stokes::FACOps::smooth_Gerya
                     }
                 }
             }
-          set_physical_boundaries(p_id,v_id,level,true);
+          set_physical_boundaries(p_id,v_id,patch_level,true);
         }
       // if (residual_tolerance >= 0.0) {
         /*
@@ -184,7 +184,7 @@ void Stokes::FACOps::smooth_Gerya
         if (d_enable_logging)
           SAMRAI::tbox::plog
             // << d_object_name << "\n"
-            << "Gerya " << ln << " " << sweep << " : " << maxres << "\n";
+            << "Gerya " << level << " " << sweep << " : " << maxres << "\n";
       // }
     }
 }

@@ -3,7 +3,7 @@
 
 void Stokes::FAC::applyGradientDetector
 (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &hierarchy_,
- const int ln,
+ const int level,
  const double ,
  const int tag_index,
  const bool ,
@@ -11,13 +11,13 @@ void Stokes::FAC::applyGradientDetector
 {
   const boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy__ = hierarchy_;
   SAMRAI::hier::PatchHierarchy& hierarchy = *hierarchy__;
-  SAMRAI::hier::PatchLevel& level =
-    (SAMRAI::hier::PatchLevel &) * hierarchy.getPatchLevel(ln);
+  SAMRAI::hier::PatchLevel& patch_level =
+    (SAMRAI::hier::PatchLevel &) * hierarchy.getPatchLevel(level);
   
   size_t ntag = 0, ntotal = 0;
   double max_curvature = 0;
-  for(SAMRAI::hier::PatchLevel::Iterator p(level.begin());
-      p!=level.end(); ++p)
+  for(SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
+      p!=patch_level.end(); ++p)
     {
       SAMRAI::hier::Patch& patch = **p;
       boost::shared_ptr<SAMRAI::hier::PatchData>
@@ -97,7 +97,8 @@ void Stokes::FAC::applyGradientDetector
           if(max_curvature < curvature)
             max_curvature=curvature;
 
-          if (curvature > d_adaption_threshold || ln<min_full_refinement_level)
+          if (curvature > d_adaption_threshold
+              || level<min_full_refinement_level)
             {
               tag_cell(cell) = 1;
               ++ntag;
@@ -105,7 +106,7 @@ void Stokes::FAC::applyGradientDetector
         }
     }
   SAMRAI::tbox::plog << "Adaption threshold is " << d_adaption_threshold << "\n";
-  SAMRAI::tbox::plog << "Number of cells tagged on level " << ln << " is "
+  SAMRAI::tbox::plog << "Number of cells tagged on level " << level << " is "
              << ntag << "/" << ntotal << "\n";
   SAMRAI::tbox::plog << "Max estimate is " << max_curvature << "\n";
 }

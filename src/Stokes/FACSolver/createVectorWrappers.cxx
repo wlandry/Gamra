@@ -24,7 +24,7 @@ void Stokes::FACSolver::createVectorWrappers(int p, int p_rhs,
   if (!d_uv || d_uv->getComponentDescriptorIndex(0) != p) {
     d_uv.reset();
     d_uv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
-      (d_object_name + "::uv", d_hierarchy, d_ln_min, d_ln_max);
+      (d_object_name + "::uv", d_hierarchy, d_level_min, d_level_max);
     /* Add p */
     vdb.mapIndexToVariable(p, variable);
 #ifdef DEBUG_CHECK_ASSERTIONS
@@ -63,7 +63,7 @@ void Stokes::FACSolver::createVectorWrappers(int p, int p_rhs,
   if (!d_fv || d_fv->getComponentDescriptorIndex(0) != p_rhs) {
     d_fv.reset();
     d_fv = boost::make_shared<SAMRAI::solv::SAMRAIVectorReal<double> >
-      (d_object_name + "::fv", d_hierarchy, d_ln_min, d_ln_max);
+      (d_object_name + "::fv", d_hierarchy, d_level_min, d_level_max);
     /* Add p_rhs */
     vdb.mapIndexToVariable(p_rhs, variable);
 #ifdef DEBUG_CHECK_ASSERTIONS
