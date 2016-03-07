@@ -24,10 +24,10 @@ void Elastic::FAC::applyGradientDetector
   
   size_t ntag = 0, ntotal = 0;
   double max_curvature(0);
-  for(SAMRAI::hier::PatchLevel::Iterator pi(patch_level.begin());
-      pi!=patch_level.end(); ++pi)
+  for(SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
+      p!=patch_level.end(); ++p)
     {
-      SAMRAI::hier::Patch& patch = **pi;
+      SAMRAI::hier::Patch& patch = **p;
       ntotal += patch.getBox().numberCells().getProduct();
       boost::shared_ptr<SAMRAI::pdat::CellData<int> > tag_cell_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<int> >

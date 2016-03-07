@@ -74,10 +74,10 @@ void Stokes::FACOps::smooth_Tackley_2D
       for(int rb=0;rb<2;++rb)
         {
           xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
-          for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-               pi!=level->end(); ++pi)
+          for (SAMRAI::hier::PatchLevel::Iterator patch_iter(level->begin());
+               patch_iter!=level->end(); ++patch_iter)
             {
-              boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+              boost::shared_ptr<SAMRAI::hier::Patch> patch = *patch_iter;
 
               boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
@@ -135,10 +135,10 @@ void Stokes::FACOps::smooth_Tackley_2D
       for(int rb=0;rb<2;++rb)
         {
           xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
-          for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-               pi!=level->end(); ++pi)
+          for (SAMRAI::hier::PatchLevel::Iterator patch_iter(level->begin());
+               patch_iter!=level->end(); ++patch_iter)
             {
-              boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+              boost::shared_ptr<SAMRAI::hier::Patch> patch = *patch_iter;
 
               boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
@@ -197,9 +197,10 @@ void Stokes::FACOps::smooth_Tackley_2D
          the pressure. */
       xeqScheduleGhostFillNoCoarse(invalid_id,v_id,ln);
 
-      for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin()); pi!=level->end(); ++pi)
+      for (SAMRAI::hier::PatchLevel::Iterator patch_iter(level->begin());
+           patch_iter!=level->end(); ++patch_iter)
         {
-          boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+          boost::shared_ptr<SAMRAI::hier::Patch> patch = *patch_iter;
 
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
@@ -265,10 +266,10 @@ void Stokes::FACOps::smooth_Tackley_2D
       /* fix v sweep */
       xeqScheduleGhostFillNoCoarse(dp_id,invalid_id,ln);
 
-      for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-           pi!=level->end(); ++pi)
+      for (SAMRAI::hier::PatchLevel::Iterator p(level->begin());
+           p!=level->end(); ++p)
         {
-          boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+          boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
 
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > dp_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >

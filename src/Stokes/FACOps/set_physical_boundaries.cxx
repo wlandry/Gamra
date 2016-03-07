@@ -47,10 +47,10 @@ void Stokes::FACOps::set_physical_boundaries
 (const int &p_id, const int &v_id,
  boost::shared_ptr<SAMRAI::hier::PatchLevel> &level, const bool &rhs)
 {
-  for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-       pi!=level->end(); ++pi)
+  for (SAMRAI::hier::PatchLevel::Iterator p(level->begin());
+       p!=level->end(); ++p)
     {
-      boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+      boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
       Stokes_set_boundary(*patch,p_id,v_id,rhs);
     }
 }

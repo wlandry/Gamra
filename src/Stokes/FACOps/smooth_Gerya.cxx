@@ -72,10 +72,10 @@ void Stokes::FACOps::smooth_Gerya
       for(int rb=0;rb<2;++rb)
         {
           xeqScheduleGhostFillNoCoarse(p_id,v_id,ln);
-          for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-               pi!=level->end(); ++pi)
+          for (SAMRAI::hier::PatchLevel::Iterator patch_iter(level->begin());
+               patch_iter!=level->end(); ++patch_iter)
             {
-              boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+              boost::shared_ptr<SAMRAI::hier::Patch> patch = *patch_iter;
 
               boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >

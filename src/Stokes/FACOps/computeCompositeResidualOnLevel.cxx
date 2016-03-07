@@ -65,8 +65,8 @@ void Stokes::FACOps::computeCompositeResidualOnLevel
    * S4. Compute residual on patches in level.
    */
 
-  for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin()); pi!=level->end(); ++pi) {
-    boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+  for (SAMRAI::hier::PatchLevel::Iterator p(level->begin()); p!=level->end(); ++p) {
+    boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
       (solution.getComponentPatchData(0, *patch));

@@ -49,10 +49,10 @@ void Stokes::FAC::initializeLevelData
   /*
    * Initialize data in all patches in the level.
    */
-  SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-  for (; pi!=level->end(); ++pi) {
+  SAMRAI::hier::PatchLevel::Iterator p(level->begin());
+  for (; p!=level->end(); ++p) {
 
-    boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+    boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
     if (!patch)
       { TBOX_ERROR("Stokes::FAC: Cannot find patch.  Null patch pointer."); }
     boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =

@@ -39,10 +39,10 @@ void Elastic::Operators::Gauss_Seidel_red_black_3D
               { ghostfill(v_id, level); }
             set_physical_boundaries(v_id,patch_level,true);
 
-            for (SAMRAI::hier::PatchLevel::Iterator pi(patch_level.begin());
-                 pi!=patch_level.end(); ++pi)
+            for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
+                 p!=patch_level.end(); ++p)
               {
-                boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
+                boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
 
                 boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
                   boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >

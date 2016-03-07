@@ -16,10 +16,10 @@ void Stokes::FAC::applyGradientDetector
   
   size_t ntag = 0, ntotal = 0;
   double max_curvature = 0;
-  for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
-      pi!=level.end(); ++pi)
+  for(SAMRAI::hier::PatchLevel::Iterator p(level.begin());
+      p!=level.end(); ++p)
     {
-      SAMRAI::hier::Patch& patch = **pi;
+      SAMRAI::hier::Patch& patch = **p;
       boost::shared_ptr<SAMRAI::hier::PatchData>
         tag_data = patch.getPatchData(tag_index);
       ntotal += patch.getBox().numberCells().getProduct();

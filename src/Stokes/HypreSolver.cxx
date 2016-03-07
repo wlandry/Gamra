@@ -761,10 +761,10 @@ void Stokes::HypreSolver::setMatrixCoefficients()
    */
   boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
   const SAMRAI::hier::IntVector no_ghosts(d_dim, 0);
-  for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-       pi!=level->end(); ++pi) {
+  for (SAMRAI::hier::PatchLevel::Iterator p(level->begin());
+       p!=level->end(); ++p) {
 
-    SAMRAI::hier::Patch& patch = **pi;
+    SAMRAI::hier::Patch& patch = **p;
 
     boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> pg =
       patch.getPatchGeometry();
@@ -894,9 +894,9 @@ void Stokes::HypreSolver::setMatrixCoefficients()
       SAMRAI::tbox::Array<SAMRAI::hier::BoundaryBox> surface_boxes;
 
       if (d_dim == SAMRAI::tbox::Dimension(2)) {
-        surface_boxes = d_cf_boundary->getEdgeBoundaries(pi->getGlobalId());
+        surface_boxes = d_cf_boundary->getEdgeBoundaries(p->getGlobalId());
       } else if (d_dim == SAMRAI::tbox::Dimension(3)) {
-        surface_boxes = d_cf_boundary->getFaceBoundaries(pi->getGlobalId());
+        surface_boxes = d_cf_boundary->getFaceBoundaries(p->getGlobalId());
       }
 
       const int n_bdry_boxes = surface_boxes.getSize();
