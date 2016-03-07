@@ -71,10 +71,10 @@ namespace Elastic
 
     void set_physical_boundaries
     (const int &v_id,
-     boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
+     const SAMRAI::hier::PatchLevel &patch_level,
      const bool &homogeneous)
     {
-      operators->set_physical_boundaries(v_id,level,homogeneous);
+      operators->set_physical_boundaries(v_id,patch_level,homogeneous);
     }
   private:
     const SAMRAI::tbox::Dimension dimension;

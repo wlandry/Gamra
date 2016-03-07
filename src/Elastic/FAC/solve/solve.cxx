@@ -36,13 +36,13 @@ bool Elastic::FAC::solve()
   /// Fill in the initial guess.
   for (int level = 0; level <= hierarchy->getFinestLevelNumber(); ++level)
     {
-      boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        patch_level = hierarchy->getPatchLevel(level);
+      const SAMRAI::hier::PatchLevel &patch_level =
+        *hierarchy->getPatchLevel(level);
     
-      for (SAMRAI::hier::PatchLevel::Iterator ip(patch_level->begin());
-           ip!=patch_level->end(); ++ip)
+      for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
+           p!=patch_level.end(); ++p)
         {
-          const boost::shared_ptr<SAMRAI::hier::Patch> patch(*ip);
+          const boost::shared_ptr<SAMRAI::hier::Patch> patch(*p);
 
           const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_ptr
             (boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >

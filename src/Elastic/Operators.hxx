@@ -133,18 +133,16 @@ namespace Elastic
                                  const SAMRAI::hier::PatchHierarchy &hierarchy,
                                  const int &level, const bool &rhs)
     {
-      set_physical_boundaries(v_id,hierarchy.getPatchLevel(level),rhs);
+      set_physical_boundaries(v_id,*(hierarchy.getPatchLevel(level)),rhs);
     }
-    void set_physical_boundaries
-    (const int &v_id,
-     const boost::shared_ptr<SAMRAI::hier::PatchLevel> &patch_level)
+    void set_physical_boundaries(const int &v_id,
+                                 const SAMRAI::hier::PatchLevel &patch_level)
     {
       set_physical_boundaries(v_id,patch_level,true);
     }
-    void set_physical_boundaries
-    (const int &v_id, 
-     const boost::shared_ptr<SAMRAI::hier::PatchLevel> &patch_level,
-     const bool &rhs);
+    void set_physical_boundaries(const int &v_id, 
+                                 const SAMRAI::hier::PatchLevel &patch_level,
+                                 const bool &rhs);
   private:
     void Gauss_Seidel_red_black_2D
     (SAMRAI::solv::SAMRAIVectorReal<double>& error,

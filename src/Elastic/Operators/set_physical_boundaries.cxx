@@ -6,12 +6,9 @@
 
 void Elastic::Operators::set_physical_boundaries
 (const int &v_id,
- const boost::shared_ptr<SAMRAI::hier::PatchLevel> &patch_level, const bool &rhs)
+ const SAMRAI::hier::PatchLevel &patch_level, const bool &rhs)
 {
-  for (SAMRAI::hier::PatchLevel::Iterator pi(patch_level->begin());
-       pi!=patch_level->end(); ++pi)
-    {
-      boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
-      boundary_conditions.set_physical_boundary(*patch,v_id,rhs);
-    }
+  for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
+       p!=patch_level.end(); ++p)
+    { boundary_conditions.set_physical_boundary(**p,v_id,rhs); }
 }

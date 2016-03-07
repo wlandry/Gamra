@@ -15,9 +15,8 @@ void Elastic::Operators::Gauss_Seidel_red_black_3D
   const int v_id(solution.getComponentDescriptorIndex(0)),
     v_rhs_id(residual.getComponentDescriptorIndex(0));
 
-  const SAMRAI::hier::PatchHierarchy &hierarchy=*residual.getPatchHierarchy();
-  boost::shared_ptr<SAMRAI::hier::PatchLevel>
-    patch_level = hierarchy.getPatchLevel(level);
+  const SAMRAI::hier::PatchHierarchy &hierarchy = *residual.getPatchHierarchy();
+  const SAMRAI::hier::PatchLevel &patch_level = *hierarchy.getPatchLevel(level);
 
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=true;
@@ -40,8 +39,8 @@ void Elastic::Operators::Gauss_Seidel_red_black_3D
               { ghostfill(v_id, level); }
             set_physical_boundaries(v_id,patch_level,true);
 
-            for (SAMRAI::hier::PatchLevel::Iterator pi(patch_level->begin());
-                 pi!=patch_level->end(); ++pi)
+            for (SAMRAI::hier::PatchLevel::Iterator pi(patch_level.begin());
+                 pi!=patch_level.end(); ++pi)
               {
                 boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
