@@ -74,17 +74,17 @@ void Stokes::FAC::fix_viscosity()
       for (SAMRAI::hier::PatchLevel::Iterator patch_iter(patch_level.begin());
            patch_iter!=patch_level.end(); ++patch_iter)
         {
-          boost::shared_ptr<SAMRAI::hier::Patch> patch = *patch_iter;
+          SAMRAI::hier::Patch &patch = **patch_iter;
           boost::shared_ptr<SAMRAI::pdat::CellData<double> >cell_viscosity_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-            (patch->getPatchData(cell_viscosity_id));
+            (patch.getPatchData(cell_viscosity_id));
           SAMRAI::pdat::CellData<double> &cell_viscosity(*cell_viscosity_ptr);
           if(d_dim.getValue()==2)
             {
               boost::shared_ptr<SAMRAI::pdat::NodeData<double> >
                 edge_viscosity_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-                (patch->getPatchData(edge_viscosity_id));
+                (patch.getPatchData(edge_viscosity_id));
               SAMRAI::pdat::NodeData<double>
                 &edge_viscosity(*edge_viscosity_ptr);
 
@@ -106,13 +106,13 @@ void Stokes::FAC::fix_viscosity()
               boost::shared_ptr<SAMRAI::pdat::EdgeData<double> >
                 edge_viscosity_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-                (patch->getPatchData(edge_viscosity_id));
+                (patch.getPatchData(edge_viscosity_id));
               SAMRAI::pdat::EdgeData<double>
                 &edge_viscosity(*edge_viscosity_ptr);
               for(Gamra::Dir axis=0;axis<3;++axis)
                 {
                   const int axis2((axis+1)%3), axis3((axis+2)%3);
-                  SAMRAI::hier::Box pbox=patch->getBox();
+                  SAMRAI::hier::Box pbox=patch.getBox();
                   pbox.grow(axis,edge_viscosity.getGhostCellWidth()[axis]);
                   
                   SAMRAI::pdat::EdgeIterator

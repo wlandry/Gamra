@@ -1248,14 +1248,14 @@ int Stokes::HypreSolver::solveSystem(
 
   for (SAMRAI::hier::PatchLevel::Iterator p(level.begin());
        p!=level.end(); ++p) {
-    boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
+    SAMRAI::hier::Patch &patch = **p;
 
-    const SAMRAI::hier::Box box = patch->getBox();
+    const SAMRAI::hier::Box box = patch.getBox();
 
     /*
      * Set up variable data needed to prepare linear system solver.
      */
-    boost::shared_ptr<SAMRAI::pdat::CellData<double> > u_data_ = patch->getPatchData(u);
+    boost::shared_ptr<SAMRAI::pdat::CellData<double> > u_data_ = patch.getPatchData(u);
 #ifdef DEBUG_CHECK_ASSERTIONS
     TBOX_ASSERT(u_data_);
 #endif
@@ -1269,17 +1269,17 @@ int Stokes::HypreSolver::solveSystem(
      * zero, so we skip it.
      */
     copyToHypre(d_linear_sol, u_data, d_soln_depth, box);
-    rhs_data.copy(*(patch->getPatchData(f)));
+    rhs_data.copy(*(patch.getPatchData(f)));
     if (!homogeneous_bc) {
       /*
        * Add g*A*k0(a) from physical and coarse-fine boundaries to rhs.
        */
       add_gAk0_toRhs(*patch,
-                     patch->getPatchGeometry()->getCodimensionBoundaries(1),
+                     patch.getPatchGeometry()->getCodimensionBoundaries(1),
                      d_physical_bc_coef_strategy,
                      rhs_data);
       add_gAk0_toRhs(*patch,
-                     d_cf_boundary->getBoundaries(patch->getGlobalId(), 1),
+                     d_cf_boundary->getBoundaries(patch.getGlobalId(), 1),
                      &d_cf_bc_coef,
                      rhs_data);
     }
@@ -1348,13 +1348,13 @@ int Stokes::HypreSolver::solveSystem(
    */
   for (SAMRAI::hier::PatchLevel::Iterator ip(level.begin());
        ip!=level.end(); ++ip) {
-    boost::shared_ptr<SAMRAI::hier::Patch> patch = *ip;
-    boost::shared_ptr<SAMRAI::pdat::CellData<double> > u_data_ = patch->getPatchData(u);
+    SAMRAI::hier::Patch &patch = **ip;
+    boost::shared_ptr<SAMRAI::pdat::CellData<double> > u_data_ = patch.getPatchData(u);
     SAMRAI::pdat::CellData<double>& u_data = *u_data_;
     copyFromHypre(u_data,
                   d_soln_depth,
                   d_linear_sol,
-                  patch->getBox());
+                  patch.getBox());
   }
 
   t_solve_system->stop();

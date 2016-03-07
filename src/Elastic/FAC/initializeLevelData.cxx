@@ -52,18 +52,16 @@ void Elastic::FAC::initializeLevelData
   for (SAMRAI::hier::PatchLevel::Iterator p(level.begin()); p!=level.end();
        ++p)
     {
-      boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
-      if (!patch)
-        { TBOX_ERROR("Elastic::FAC: Cannot find patch.  Null patch pointer."); }
+      SAMRAI::hier::Patch &patch = **p;
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-        (patch->getPatchGeometry());
+        (patch.getPatchGeometry());
       const double *dx=geom->getDx();
 
       /// cell moduli
       boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli =
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-        (patch->getPatchData(cell_moduli_id));
+        (patch.getPatchData(cell_moduli_id));
 
       SAMRAI::hier::Box cell_moduli_box = cell_moduli->getBox();
 
@@ -86,7 +84,7 @@ void Elastic::FAC::initializeLevelData
       /// v_rhs
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_data =
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (patch->getPatchData(v_rhs_id));
+        (patch.getPatchData(v_rhs_id));
 
       for(Gamra::Dir ix=0; ix<dim; ++ix)
         {
@@ -115,7 +113,7 @@ void Elastic::FAC::initializeLevelData
         {
           boost::shared_ptr<SAMRAI::pdat::SideData<double> > level_set_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-            (patch->getPatchData(level_set_id));
+            (patch.getPatchData(level_set_id));
           SAMRAI::hier::Box level_set_box = level_set_ptr->getBox();
 
           double dx_max(0);

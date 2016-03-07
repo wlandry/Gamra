@@ -87,17 +87,17 @@ void Elastic::FAC::fix_moduli()
       for (SAMRAI::hier::PatchLevel::Iterator i_p(patch_level.begin());
            i_p!=patch_level.end(); ++i_p)
         {
-          boost::shared_ptr<SAMRAI::hier::Patch> patch = *i_p;
+          SAMRAI::hier::Patch &patch = **i_p;
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-            (patch->getPatchData(cell_moduli_id));
+            (patch.getPatchData(cell_moduli_id));
           SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
           if(2==dimension.getValue())
             {
               boost::shared_ptr<SAMRAI::pdat::NodeData<double> >
                 edge_moduli_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-                (patch->getPatchData(edge_moduli_id));
+                (patch.getPatchData(edge_moduli_id));
               SAMRAI::pdat::NodeData<double> &edge_moduli(*edge_moduli_ptr);
 
               SAMRAI::pdat::NodeIterator
@@ -121,12 +121,12 @@ void Elastic::FAC::fix_moduli()
               boost::shared_ptr<SAMRAI::pdat::EdgeData<double> >
                 edge_moduli_ptr =
                 boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-                (patch->getPatchData(edge_moduli_id));
+                (patch.getPatchData(edge_moduli_id));
               SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
               for(Gamra::Dir axis=0;axis<3;++axis)
                 {
                   const int axis2((axis+1)%3), axis3((axis+2)%3);
-                  SAMRAI::hier::Box pbox=patch->getBox();
+                  SAMRAI::hier::Box pbox=patch.getBox();
                   /// Grow in axis direction only, because the
                   /// cell_moduli neighbors are not available on the
                   /// corners

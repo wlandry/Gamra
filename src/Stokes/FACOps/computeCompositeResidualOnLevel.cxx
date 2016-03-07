@@ -67,44 +67,44 @@ void Stokes::FACOps::computeCompositeResidualOnLevel
 
   for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
        p!=patch_level.end(); ++p) {
-    boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
+    SAMRAI::hier::Patch &patch = **p;
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-      (solution.getComponentPatchData(0, *patch));
+      (solution.getComponentPatchData(0, patch));
     boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-      (solution.getComponentPatchData(1, *patch));
+      (solution.getComponentPatchData(1, patch));
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_viscosity_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-      (patch->getPatchData(cell_viscosity_id));
+      (patch.getPatchData(cell_viscosity_id));
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_rhs_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-      (rhs.getComponentPatchData(0, *patch));
+      (rhs.getComponentPatchData(0, patch));
     boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-      (rhs.getComponentPatchData(1, *patch));
+      (rhs.getComponentPatchData(1, patch));
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_resid_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-      (residual.getComponentPatchData(0, *patch));
+      (residual.getComponentPatchData(0, patch));
     boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_resid_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-      (residual.getComponentPatchData(1, *patch));
+      (residual.getComponentPatchData(1, patch));
 
-    SAMRAI::hier::Box pbox=patch->getBox();
+    SAMRAI::hier::Box pbox=patch.getBox();
     pbox.growUpper(SAMRAI::hier::IntVector::getOne(d_dim));
     boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
       boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-      (patch->getPatchGeometry());
+      (patch.getPatchGeometry());
 
     switch(d_dim.getValue())
       {
       case 2:
         residual_2D(*p_ptr,*v_ptr,*cell_viscosity_ptr,*p_rhs_ptr,*v_rhs_ptr,
-                    *p_resid_ptr,*v_resid_ptr,*patch,pbox,*geom);
+                    *p_resid_ptr,*v_resid_ptr,patch,pbox,*geom);
         break;
       case 3:
         residual_3D(*p_ptr,*v_ptr,*cell_viscosity_ptr,*p_rhs_ptr,*v_rhs_ptr,
-                    *p_resid_ptr,*v_resid_ptr,*patch,pbox,*geom);
+                    *p_resid_ptr,*v_resid_ptr,patch,pbox,*geom);
         break;
       default:
         abort();

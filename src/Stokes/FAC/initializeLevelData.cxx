@@ -48,16 +48,14 @@ void Stokes::FAC::initializeLevelData
   for (SAMRAI::hier::PatchLevel::Iterator p(level.begin());
        p!=level.end(); ++p) {
 
-    boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
-    if (!patch)
-      { TBOX_ERROR("Stokes::FAC: Cannot find patch.  Null patch pointer."); }
+    SAMRAI::hier::Patch &patch = **p;
     boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
-      boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>(patch->getPatchGeometry());
+      boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>(patch.getPatchGeometry());
     const double *dx=geom->getDx();
 
     /* Initialize cell viscosity */
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_viscosity =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch->getPatchData(cell_viscosity_id));
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch.getPatchData(cell_viscosity_id));
 
     SAMRAI::hier::Box cell_visc_box = cell_viscosity->getBox();
     SAMRAI::pdat::CellIterator
@@ -86,16 +84,16 @@ void Stokes::FAC::initializeLevelData
 
     /* I do not think this is actually necessary. */
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > dp_data =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch->getPatchData(dp_id));
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch.getPatchData(dp_id));
     dp_data->fill(0.0);
 
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_rhs_data =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch->getPatchData(p_rhs_id));
+      boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >(patch.getPatchData(p_rhs_id));
     p_rhs_data->fill(0.0);
 
     /* v_rhs */
     boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_data =
-      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >(patch->getPatchData(v_rhs_id));
+      boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >(patch.getPatchData(v_rhs_id));
 
     if(v_rhs.empty())
       {

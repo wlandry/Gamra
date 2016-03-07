@@ -42,33 +42,33 @@ void Elastic::Operators::Gauss_Seidel_red_black_3D
             for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
                  p!=patch_level.end(); ++p)
               {
-                boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
+                SAMRAI::hier::Patch &patch = **p;
 
                 boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
                   boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                  (patch->getPatchData(v_id));
+                  (patch.getPatchData(v_id));
                 SAMRAI::pdat::SideData<double> &v(*v_ptr);
                 boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
                   boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                  (patch->getPatchData(v_rhs_id));
+                  (patch.getPatchData(v_rhs_id));
                 SAMRAI::pdat::SideData<double> &v_rhs(*v_rhs_ptr);
                 
                 boost::shared_ptr<SAMRAI::pdat::CellData<double> >
                   cell_moduli_ptr =
                   boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-                  (patch->getPatchData(cell_moduli_id));
+                  (patch.getPatchData(cell_moduli_id));
                 SAMRAI::pdat::CellData<double> &cell_moduli(*cell_moduli_ptr);
                 boost::shared_ptr<SAMRAI::pdat::EdgeData<double> >
                   edge_moduli_ptr =
                   boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-                  (patch->getPatchData(edge_moduli_id));
+                  (patch.getPatchData(edge_moduli_id));
                 SAMRAI::pdat::EdgeData<double> &edge_moduli(*edge_moduli_ptr);
 
-                SAMRAI::hier::Box pbox=patch->getBox();
+                SAMRAI::hier::Box pbox=patch.getBox();
                 boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
                   boost::dynamic_pointer_cast
                   <SAMRAI::geom::CartesianPatchGeometry>
-                  (patch->getPatchGeometry());
+                  (patch.getPatchGeometry());
                 const double *Dx = geom->getDx();
 
                 for(int k=pbox.lower(2); k<=pbox.upper(2)+pp[ix][2]; ++k)

@@ -42,18 +42,18 @@ bool Elastic::FAC::solve()
       for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
            p!=patch_level.end(); ++p)
         {
-          const boost::shared_ptr<SAMRAI::hier::Patch> patch(*p);
+          const SAMRAI::hier::Patch &patch(**p);
 
           const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_ptr
             (boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-             (patch->getPatchData(v_id)));
+             (patch.getPatchData(v_id)));
           SAMRAI::pdat::SideData<double> &v(*v_ptr);
           v.fill(0.0);
 
           const boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry>
             &geom(boost::dynamic_pointer_cast
                   <SAMRAI::geom::CartesianPatchGeometry>
-                  (patch->getPatchGeometry()));
+                  (patch.getPatchGeometry()));
           const SAMRAI::hier::Box &pbox(v.getBox());
           const SAMRAI::hier::Box &gbox(v.getGhostBox());
           const double *dx=geom->getDx();

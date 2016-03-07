@@ -41,14 +41,14 @@ bool Stokes::FAC::solve()
     SAMRAI::hier::PatchLevel::Iterator ip(patch_level->begin());
     SAMRAI::hier::PatchLevel::Iterator iend(patch_level->end());
     for ( ; ip!=iend; ++ip) {
-      boost::shared_ptr<SAMRAI::hier::Patch> patch = *ip;
+      SAMRAI::hier::Patch &patch = **ip;
       boost::shared_ptr<SAMRAI::pdat::CellData<double> > p =
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-        (patch->getPatchData(p_id));
+        (patch.getPatchData(p_id));
 
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-        (patch->getPatchGeometry());
+        (patch.getPatchGeometry());
 
       if(p_initial.empty())
         {
@@ -132,7 +132,7 @@ bool Stokes::FAC::solve()
 
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v =
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (patch->getPatchData(v_id));
+        (patch.getPatchData(v_id));
       v->fill(0.0);
     }
     d_stokes_fac_solver.set_physical_boundaries(p_id,v_id,patch_level,false);

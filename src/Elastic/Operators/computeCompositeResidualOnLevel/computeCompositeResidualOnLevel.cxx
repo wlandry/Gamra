@@ -68,25 +68,25 @@ void Elastic::Operators::computeCompositeResidualOnLevel
   for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
        p!=patch_level.end(); ++p)
     {
-      boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
+      SAMRAI::hier::Patch &patch = **p;
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (solution.getComponentPatchData(0,*patch));
+        (solution.getComponentPatchData(0,patch));
       boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
-        (patch->getPatchData(cell_moduli_id));
+        (patch.getPatchData(cell_moduli_id));
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_rhs_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (rhs.getComponentPatchData(0,*patch));
+        (rhs.getComponentPatchData(0,patch));
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_resid_ptr =
         boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-        (residual.getComponentPatchData(0,*patch));
+        (residual.getComponentPatchData(0,patch));
 
-      SAMRAI::hier::Box pbox=patch->getBox();
+      SAMRAI::hier::Box pbox=patch.getBox();
       pbox.growUpper(SAMRAI::hier::IntVector::getOne(dimension));
       boost::shared_ptr<SAMRAI::geom::CartesianPatchGeometry> geom =
         boost::dynamic_pointer_cast<SAMRAI::geom::CartesianPatchGeometry>
-        (patch->getPatchGeometry());
+        (patch.getPatchGeometry());
 
       switch(dimension.getValue())
         {
@@ -94,7 +94,7 @@ void Elastic::Operators::computeCompositeResidualOnLevel
           {
             boost::shared_ptr<SAMRAI::pdat::NodeData<double> > edge_moduli_ptr =
               boost::dynamic_pointer_cast<SAMRAI::pdat::NodeData<double> >
-              (patch->getPatchData(edge_moduli_id));
+              (patch.getPatchData(edge_moduli_id));
             
             if(!have_embedded_boundary())
               {
@@ -106,7 +106,7 @@ void Elastic::Operators::computeCompositeResidualOnLevel
                 boost::shared_ptr<SAMRAI::pdat::SideData<double> >
                   level_set_ptr =
                   boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >
-                  (patch->getPatchData(level_set_id));
+                  (patch.getPatchData(level_set_id));
                 residual_embedded_2D(*v_ptr,*cell_moduli_ptr,*edge_moduli_ptr,
                                      *v_rhs_ptr,*v_resid_ptr,*level_set_ptr,
                                      pbox,geom->getDx());
@@ -117,7 +117,7 @@ void Elastic::Operators::computeCompositeResidualOnLevel
           {
             boost::shared_ptr<SAMRAI::pdat::EdgeData<double> > edge_moduli_ptr =
               boost::dynamic_pointer_cast<SAMRAI::pdat::EdgeData<double> >
-              (patch->getPatchData(edge_moduli_id));
+              (patch.getPatchData(edge_moduli_id));
             residual_3D(*v_ptr,*cell_moduli_ptr,*edge_moduli_ptr,*v_rhs_ptr,
                         *v_resid_ptr,pbox,geom->getDx());
           }
