@@ -29,28 +29,27 @@ void Elastic::FAC::initializeLevelData
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianGridGeometry>
     (hierarchy->getGridGeometry());
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level =
-    hierarchy->getPatchLevel(level_number);
+  SAMRAI::hier::PatchLevel &level = *hierarchy->getPatchLevel(level_number);
   const int dim=dimension.getValue();
 
   if(allocate_data)
     {
-      level->allocatePatchData(cell_moduli_id);
-      level->allocatePatchData(edge_moduli_id);
-      level->allocatePatchData(v_id);
-      level->allocatePatchData(v_rhs_id);
+      level.allocatePatchData(cell_moduli_id);
+      level.allocatePatchData(edge_moduli_id);
+      level.allocatePatchData(v_id);
+      level.allocatePatchData(v_rhs_id);
       if(!faults.empty())
         {
-          level->allocatePatchData(dv_diagonal_id);
-          level->allocatePatchData(dv_mixed_id);
+          level.allocatePatchData(dv_diagonal_id);
+          level.allocatePatchData(dv_mixed_id);
         }
       if(have_embedded_boundary())
         {
-          level->allocatePatchData(level_set_id);
+          level.allocatePatchData(level_set_id);
         }
     }
   /// Initialize data in all patches in the level.
-  for (SAMRAI::hier::PatchLevel::Iterator p(level->begin()); p!=level->end();
+  for (SAMRAI::hier::PatchLevel::Iterator p(level.begin()); p!=level.end();
        ++p)
     {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;

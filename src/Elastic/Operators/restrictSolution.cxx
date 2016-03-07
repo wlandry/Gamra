@@ -21,8 +21,6 @@ void Elastic::Operators::restrictSolution
   ghostfill_nocoarse(v_src,dest_level+1);
   coarsen_solution(v_dst,v_src,dest_level);
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel>
-    level = s.getPatchHierarchy()->getPatchLevel(dest_level);
   v_refine_patch_strategy.is_residual=false;
   v_refine_patch_strategy.data_id=d.getComponentDescriptorIndex(0);
   Coarse_Fine_Boundary_Refine::is_residual=false;

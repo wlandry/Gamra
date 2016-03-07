@@ -25,11 +25,9 @@ void Elastic::FAC::setup_fault_corrections()
 
   for(int l=0; l<=max_level; ++l)
     {
-      boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        level(hierarchy->getPatchLevel(l));
-      
-      for(SAMRAI::hier::PatchLevel::Iterator p(level->begin());
-          p!=level->end(); ++p)
+      SAMRAI::hier::PatchLevel &patch_level(*hierarchy->getPatchLevel(l));
+      for(SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
+          p!=patch_level.end(); ++p)
         {
           const boost::shared_ptr<SAMRAI::pdat::SideData<double> > &v_rhs
             (boost::dynamic_pointer_cast<SAMRAI::pdat::SideData<double> >

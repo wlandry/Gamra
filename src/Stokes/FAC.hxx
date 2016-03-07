@@ -51,7 +51,7 @@ namespace Stokes
                         const double init_data_time,
                         const bool can_be_refined,
                         const bool initial_time,
-                          const boost::shared_ptr<SAMRAI::hier::PatchLevel>& old_level,
+                        const boost::shared_ptr<SAMRAI::hier::PatchLevel>& old_level,
                         const bool allocate_data);
 
     /*!

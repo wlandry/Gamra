@@ -62,8 +62,6 @@ void Stokes::FACOps::prolongErrorAndCorrect
   }
 #endif
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> coarse_level =
-    d_hierarchy->getPatchLevel(dest_ln - 1);
   boost::shared_ptr<SAMRAI::hier::PatchLevel> fine_level =
     d_hierarchy->getPatchLevel(dest_ln);
 

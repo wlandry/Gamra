@@ -70,12 +70,11 @@ void Stokes::FAC::fix_viscosity()
 
   for (int level = 0; level <= d_hierarchy->getFinestLevelNumber(); ++level)
     {
-      boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        patch_level = d_hierarchy->getPatchLevel(level);
-      SAMRAI::hier::PatchLevel::Iterator i_p(patch_level->begin());
-      for ( ; i_p!=patch_level->end(); ++i_p)
+      SAMRAI::hier::PatchLevel &patch_level = *d_hierarchy->getPatchLevel(level);
+      for (SAMRAI::hier::PatchLevel::Iterator patch_iter(patch_level.begin());
+           patch_iter!=patch_level.end(); ++patch_iter)
         {
-          boost::shared_ptr<SAMRAI::hier::Patch> patch = *i_p;
+          boost::shared_ptr<SAMRAI::hier::Patch> patch = *patch_iter;
           boost::shared_ptr<SAMRAI::pdat::CellData<double> >cell_viscosity_ptr =
             boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >
             (patch->getPatchData(cell_viscosity_id));

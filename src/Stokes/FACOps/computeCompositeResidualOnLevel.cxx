@@ -17,7 +17,7 @@ void Stokes::FACOps::computeCompositeResidualOnLevel
                "internal hierarchy.");
   }
 #endif
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> patch_level = d_hierarchy->getPatchLevel(level);
+  SAMRAI::hier::PatchLevel &patch_level = *d_hierarchy->getPatchLevel(level);
 
   /*
    * Set up the bc helper so that when we use a refine schedule
@@ -65,7 +65,8 @@ void Stokes::FACOps::computeCompositeResidualOnLevel
    * S4. Compute residual on patches in level.
    */
 
-  for (SAMRAI::hier::PatchLevel::Iterator p(patch_level->begin()); p!=patch_level->end(); ++p) {
+  for (SAMRAI::hier::PatchLevel::Iterator p(patch_level.begin());
+       p!=patch_level.end(); ++p) {
     boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
     boost::shared_ptr<SAMRAI::pdat::CellData<double> > p_ptr =
       boost::dynamic_pointer_cast<SAMRAI::pdat::CellData<double> >

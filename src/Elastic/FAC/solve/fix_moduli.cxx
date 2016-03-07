@@ -82,11 +82,10 @@ void Elastic::FAC::fix_moduli()
 
   for (int level = 0; level <= hierarchy->getFinestLevelNumber(); ++level)
     {
-      boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        patch_level = hierarchy->getPatchLevel(level);
+      SAMRAI::hier::PatchLevel &patch_level = *hierarchy->getPatchLevel(level);
       
-      for (SAMRAI::hier::PatchLevel::Iterator i_p(patch_level->begin());
-           i_p!=patch_level->end(); ++i_p)
+      for (SAMRAI::hier::PatchLevel::Iterator i_p(patch_level.begin());
+           i_p!=patch_level.end(); ++i_p)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *i_p;
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =

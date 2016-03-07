@@ -31,26 +31,22 @@ void Stokes::FAC::initializeLevelData
   boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry> grid_geom =
     boost::dynamic_pointer_cast<SAMRAI::geom::CartesianGridGeometry>(hierarchy->getGridGeometry());
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level =
-    hierarchy->getPatchLevel(level_number);
+  SAMRAI::hier::PatchLevel &level(*hierarchy->getPatchLevel(level_number));
   const int dim=d_dim.getValue();
 
   if (allocate_data) {
-    level->allocatePatchData(p_id);
-    level->allocatePatchData(cell_viscosity_id);
-    level->allocatePatchData(edge_viscosity_id);
-    level->allocatePatchData(dp_id);
-    level->allocatePatchData(p_rhs_id);
-    level->allocatePatchData(p_exact_id);
-    level->allocatePatchData(v_id);
-    level->allocatePatchData(v_rhs_id);
+    level.allocatePatchData(p_id);
+    level.allocatePatchData(cell_viscosity_id);
+    level.allocatePatchData(edge_viscosity_id);
+    level.allocatePatchData(dp_id);
+    level.allocatePatchData(p_rhs_id);
+    level.allocatePatchData(p_exact_id);
+    level.allocatePatchData(v_id);
+    level.allocatePatchData(v_rhs_id);
   }
 
-  /*
-   * Initialize data in all patches in the level.
-   */
-  SAMRAI::hier::PatchLevel::Iterator p(level->begin());
-  for (; p!=level->end(); ++p) {
+  for (SAMRAI::hier::PatchLevel::Iterator p(level.begin());
+       p!=level.end(); ++p) {
 
     boost::shared_ptr<SAMRAI::hier::Patch> patch = *p;
     if (!patch)

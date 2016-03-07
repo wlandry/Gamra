@@ -402,8 +402,8 @@ void Stokes::HypreSolver::initializeSolverState(
   d_number_iterations = -1;
   d_relative_residual_norm = -1.0;
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
-  level->allocatePatchData(d_Ak0_id);
+  SAMRAI::hier::PatchLevel &level = *d_hierarchy->getPatchLevel(d_ln);
+  level.allocatePatchData(d_Ak0_id);
   allocateHypreData();
 }
 
@@ -418,8 +418,8 @@ void Stokes::HypreSolver::deallocateSolverState()
   if (!d_hierarchy) return;
 
   d_cf_boundary->clear();
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
-  level->deallocatePatchData(d_Ak0_id);
+  SAMRAI::hier::PatchLevel &level = *d_hierarchy->getPatchLevel(d_ln);
+  level.deallocatePatchData(d_Ak0_id);
   deallocateHypreData();
   d_hierarchy.reset();
   d_ln = -1;
@@ -441,10 +441,10 @@ void Stokes::HypreSolver::allocateHypreData()
    * Set up the grid data - only set grid data for local boxes
    */
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
+  SAMRAI::hier::PatchLevel &level = *d_hierarchy->getPatchLevel(d_ln);
   boost::shared_ptr<SAMRAI::geom::CartesianGridGeometry> grid_geometry =
     d_hierarchy->getGridGeometry();
-  const SAMRAI::hier::IntVector ratio = level->getRatioToLevelZero();
+  const SAMRAI::hier::IntVector ratio = level.getRatioToLevelZero();
   SAMRAI::hier::IntVector periodic_shift =
     grid_geometry->getPeriodicShift(ratio);
 
@@ -467,7 +467,7 @@ void Stokes::HypreSolver::allocateHypreData()
 
 #ifdef DEBUG_CHECK_ASSERTIONS
   if (is_periodic) {
-    const SAMRAI::hier::BoxContainer& level_domain = level->getPhysicalDomain();
+    const SAMRAI::hier::BoxContainer& level_domain = level.getPhysicalDomain();
     SAMRAI::hier::Box domain_bound(level_domain[0]);
     for (int i = 1; i < level_domain.size(); ++i) {
       domain_bound.lower().min(level_domain[i].lower());
@@ -612,8 +612,8 @@ Stokes::HypreSolver::~HypreSolver()
   deallocateHypreData();
 
   if (d_hierarchy) {
-    boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(0);
-    level->deallocatePatchData(d_Ak0_id);
+    SAMRAI::hier::PatchLevel &level = *d_hierarchy->getPatchLevel(0);
+    level.deallocatePatchData(d_Ak0_id);
   }
   SAMRAI::hier::VariableDatabase* vdb =
     SAMRAI::hier::VariableDatabase::getDatabase();
@@ -759,10 +759,10 @@ void Stokes::HypreSolver::setMatrixCoefficients()
   /*
    * Loop over patches and set matrix entries for each patch.
    */
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
+  SAMRAI::hier::PatchLevel &level = *d_hierarchy->getPatchLevel(d_ln);
   const SAMRAI::hier::IntVector no_ghosts(d_dim, 0);
-  for (SAMRAI::hier::PatchLevel::Iterator p(level->begin());
-       p!=level->end(); ++p) {
+  for (SAMRAI::hier::PatchLevel::Iterator p(level.begin());
+       p!=level.end(); ++p) {
 
     SAMRAI::hier::Patch& patch = **p;
 
@@ -1210,14 +1210,14 @@ int Stokes::HypreSolver::solveSystem(
 
   t_solve_system->start();
 
-  boost::shared_ptr<SAMRAI::hier::PatchLevel> level = d_hierarchy->getPatchLevel(d_ln);
+  SAMRAI::hier::PatchLevel &level = *d_hierarchy->getPatchLevel(d_ln);
 #ifdef DEBUG_CHECK_ASSERTIONS
   TBOX_ASSERT(u >= 0);
   TBOX_ASSERT(
-              u < level->getPatchDescriptor()->getMaxNumberRegisteredComponents());
+              u < level.getPatchDescriptor()->getMaxNumberRegisteredComponents());
   TBOX_ASSERT(f >= 0);
   TBOX_ASSERT(
-              f < level->getPatchDescriptor()->getMaxNumberRegisteredComponents());
+              f < level.getPatchDescriptor()->getMaxNumberRegisteredComponents());
 #endif
 
   if (d_physical_bc_coef_strategy == &d_physical_bc_simple_case) {
