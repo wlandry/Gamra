@@ -22,8 +22,8 @@ Elastic::Solver::Solver
   dimension(dim),
   boundary_conditions(bc),
   operators(boost::make_shared<Operators>(dimension,database,bc)),
-  hierarchy(Hierarchy),
   preconditioner("Elastic::Solver::FACPreconditioner",operators,database),
+  hierarchy(Hierarchy),
   level_min(coarse_level == -1 ? 0 : coarse_level),
   level_max(fine_level == -1 ? hierarchy->getFinestLevelNumber()
             : fine_level),

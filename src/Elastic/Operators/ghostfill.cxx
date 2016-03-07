@@ -4,9 +4,9 @@
 
 #include "Elastic/Operators.hxx"
 
-void Elastic::Operators::ghostfill(int v_id, int dest_ln)
+void Elastic::Operators::ghostfill(int v_id, int dest_level)
 {
-  if (!ghostfill_schedules[dest_ln])
+  if (!ghostfill_schedules[dest_level])
     TBOX_ERROR("Expected schedule not found.");
   SAMRAI::xfer::RefineAlgorithm refiner;
 
@@ -23,7 +23,7 @@ void Elastic::Operators::ghostfill(int v_id, int dest_ln)
       refiner.registerRefine(level_set_id,level_set_id,level_set_id,
                              boost::shared_ptr<SAMRAI::hier::RefineOperator>());
     }
-  refiner.resetSchedule(ghostfill_schedules[dest_ln]);
-  ghostfill_schedules[dest_ln]->fillData(0.0,false);
+  refiner.resetSchedule(ghostfill_schedules[dest_level]);
+  ghostfill_schedules[dest_level]->fillData(0.0,false);
 }
 

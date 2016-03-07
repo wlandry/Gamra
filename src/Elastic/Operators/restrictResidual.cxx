@@ -7,7 +7,7 @@
 void Elastic::Operators::restrictResidual
 (const SAMRAI::solv::SAMRAIVectorReal<double>& s,
  SAMRAI::solv::SAMRAIVectorReal<double>& d,
- int dest_ln)
+ int dest_level)
 {
   t_restrict_residual->start();
 
@@ -17,9 +17,9 @@ void Elastic::Operators::restrictResidual
   /// Need to do a sync because the coarsening for v uses ghost zones
   v_coarsen_patch_strategy.data_id=v_src;
   v_coarsen_patch_strategy.is_residual=true;
-  ghostfill_nocoarse(v_src,dest_ln+1);
+  ghostfill_nocoarse(v_src,dest_level+1);
 
-  coarsen_resid(v_dst,v_src,dest_ln);
+  coarsen_resid(v_dst,v_src,dest_level);
 
   t_restrict_residual->stop();
 }

@@ -11,7 +11,7 @@
 void Elastic::Operators::Gauss_Seidel_red_black_2D
 (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
- int ln,
+ int level,
  int num_sweeps,
  double residual_tolerance)
 {
@@ -20,15 +20,15 @@ void Elastic::Operators::Gauss_Seidel_red_black_2D
 
   const SAMRAI::hier::PatchHierarchy &hierarchy=*residual.getPatchHierarchy();
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
-    level = hierarchy.getPatchLevel(ln);
+    patch_level = hierarchy.getPatchLevel(level);
 
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=true;
   Coarse_Fine_Boundary_Refine::is_residual=true;
-  ghostfill_nocoarse(v_rhs_id,ln);
+  ghostfill_nocoarse(v_rhs_id,level);
 
-  if (ln > level_min)
-    { ghostfill(v_id, ln); }
+  if (level > level_min)
+    { ghostfill(v_id, level); }
 
   double theta_momentum=1.0;
 
@@ -46,12 +46,12 @@ void Elastic::Operators::Gauss_Seidel_red_black_2D
           const SAMRAI::hier::Index ip(unit[ix]), jp(unit[iy]);
           for(int rb=0;rb<2;++rb)
             {
-              ghostfill_nocoarse(v_id,ln);
-              if (ln > level_min)
-                { ghostfill(v_id, ln); }
-              set_physical_boundaries(v_id,level,true);
-              for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-                   pi!=level->end(); ++pi)
+              ghostfill_nocoarse(v_id,level);
+              if (level > level_min)
+                { ghostfill(v_id, level); }
+              set_physical_boundaries(v_id,patch_level,true);
+              for (SAMRAI::hier::PatchLevel::Iterator pi(patch_level->begin());
+                   pi!=patch_level->end(); ++pi)
                 {
                   boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
 
@@ -165,9 +165,9 @@ void Elastic::Operators::Gauss_Seidel_red_black_2D
         }
     }
 
-  ghostfill_nocoarse(v_id,ln);
-  if (ln > level_min)
-    { ghostfill(v_id, ln); }
-  set_physical_boundaries(v_id,level,true);
+  ghostfill_nocoarse(v_id,level);
+  if (level > level_min)
+    { ghostfill(v_id, level); }
+  set_physical_boundaries(v_id,patch_level,true);
 }
 

@@ -18,14 +18,14 @@
 
 void Elastic::FAC::fix_moduli()
 {
-  const int ln_max(hierarchy->getFinestLevelNumber());
+  const int level_max(hierarchy->getFinestLevelNumber());
 
   boost::shared_ptr<SAMRAI::hier::CoarsenOperator>
     cell_moduli_coarsen_operator;
   boost::shared_ptr<SAMRAI::xfer::CoarsenAlgorithm>
     cell_moduli_coarsen_algorithm;
   std::vector<boost::shared_ptr<SAMRAI::xfer::CoarsenSchedule> >
-    cell_moduli_coarsen_schedules (ln_max + 1);
+    cell_moduli_coarsen_schedules (level_max + 1);
 
   SAMRAI::hier::VariableDatabase*
     vdb = SAMRAI::hier::VariableDatabase::getDatabase();
@@ -50,22 +50,22 @@ void Elastic::FAC::fix_moduli()
       registerCoarsen(level_set_id,level_set_id,
                       boost::shared_ptr<SAMRAI::hier::CoarsenOperator>());
 
-  for (int dest_ln = 0; dest_ln < ln_max; ++dest_ln)
+  for (int dest_level = 0; dest_level < level_max; ++dest_level)
     {
-      cell_moduli_coarsen_schedules[dest_ln] =
+      cell_moduli_coarsen_schedules[dest_level] =
         cell_moduli_coarsen_algorithm->
-        createSchedule(hierarchy->getPatchLevel(dest_ln),
-                       hierarchy->getPatchLevel(dest_ln + 1));
-      if (!cell_moduli_coarsen_schedules[dest_ln])
+        createSchedule(hierarchy->getPatchLevel(dest_level),
+                       hierarchy->getPatchLevel(dest_level + 1));
+      if (!cell_moduli_coarsen_schedules[dest_level])
         { TBOX_ERROR("Elastic::FAC: Cannot create a coarsen schedule for cell "
                      "moduli restriction!\n"); }
     }
 
-  for(int dest_ln=ln_max-1; dest_ln>=0; --dest_ln)
+  for(int dest_level=level_max-1; dest_level>=0; --dest_level)
     {
       cell_moduli_coarsen_algorithm->
-        resetSchedule(cell_moduli_coarsen_schedules[dest_ln]);
-      cell_moduli_coarsen_schedules[dest_ln]->coarsenData();
+        resetSchedule(cell_moduli_coarsen_schedules[dest_level]);
+      cell_moduli_coarsen_schedules[dest_level]->coarsenData();
     }
 
   cell_moduli_coarsen_algorithm.reset();
@@ -80,13 +80,13 @@ void Elastic::FAC::fix_moduli()
     kp[2]=1;
   SAMRAI::hier::Index unit[]={ip,jp,kp};
 
-  for (int ln = 0; ln <= hierarchy->getFinestLevelNumber(); ++ln)
+  for (int level = 0; level <= hierarchy->getFinestLevelNumber(); ++level)
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        level = hierarchy->getPatchLevel(ln);
+        patch_level = hierarchy->getPatchLevel(level);
       
-      for (SAMRAI::hier::PatchLevel::Iterator i_p(level->begin());
-           i_p!=level->end(); ++i_p)
+      for (SAMRAI::hier::PatchLevel::Iterator i_p(patch_level->begin());
+           i_p!=patch_level->end(); ++i_p)
         {
           boost::shared_ptr<SAMRAI::hier::Patch> patch = *i_p;
           boost::shared_ptr<SAMRAI::pdat::CellData<double> > cell_moduli_ptr =
@@ -160,7 +160,7 @@ void Elastic::FAC::fix_moduli()
                              boost::shared_ptr<SAMRAI::hier::RefineOperator>());
 
       boost::shared_ptr<SAMRAI::xfer::RefineSchedule> schedule=
-        refiner.createSchedule(hierarchy->getPatchLevel(ln));
+        refiner.createSchedule(hierarchy->getPatchLevel(level));
         
       schedule->fillData(0.0,false);
     }

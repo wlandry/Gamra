@@ -7,13 +7,13 @@
 int Elastic::Operators::solveCoarsestLevel
 (SAMRAI::solv::SAMRAIVectorReal<double>& data,
  const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
- int coarsest_ln)
+ int coarsest_level)
 {
   t_solve_coarsest->start();
 
-  smooth(data, residual, coarsest_ln, coarse_solver_max_iterations,
+  smooth(data, residual, coarsest_level, coarse_solver_max_iterations,
          coarse_solver_tolerance);
-  ghostfill_nocoarse(data.getComponentDescriptorIndex(0), coarsest_ln);
+  ghostfill_nocoarse(data.getComponentDescriptorIndex(0), coarsest_level);
   t_solve_coarsest->stop();
   return 0;
 }

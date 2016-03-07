@@ -10,7 +10,7 @@
 
 void Elastic::FAC::applyGradientDetector
 (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy_,
- const int ln,
+ const int level,
  const double ,
  const int tag_index,
  const bool ,
@@ -19,13 +19,13 @@ void Elastic::FAC::applyGradientDetector
   const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>
     hierarchy__ = hierarchy_;
   SAMRAI::hier::PatchHierarchy& hierarchy = *hierarchy__;
-  SAMRAI::hier::PatchLevel& level =
-    (SAMRAI::hier::PatchLevel &) * hierarchy.getPatchLevel(ln);
+  SAMRAI::hier::PatchLevel& patch_level =
+    (SAMRAI::hier::PatchLevel &) * hierarchy.getPatchLevel(level);
   
   size_t ntag = 0, ntotal = 0;
   double max_curvature(0);
-  for(SAMRAI::hier::PatchLevel::Iterator pi(level.begin());
-      pi!=level.end(); ++pi)
+  for(SAMRAI::hier::PatchLevel::Iterator pi(patch_level.begin());
+      pi!=patch_level.end(); ++pi)
     {
       SAMRAI::hier::Patch& patch = **pi;
       ntotal += patch.getBox().numberCells().getProduct();
@@ -75,8 +75,7 @@ void Elastic::FAC::applyGradientDetector
                                               SAMRAI::pdat::SideIndex::Lower);
               for (int d=0; d<dim; ++d)
                 {
-                  SAMRAI::hier::Index ip(dimension,0),
-                    jp(dimension,0),
+                  SAMRAI::hier::Index ip(dimension,0), jp(dimension,0),
                     kp(dimension,0);
                   ip(0)=1;
                   jp(1)=1;
@@ -120,12 +119,12 @@ void Elastic::FAC::applyGradientDetector
                           dv_minus=v(x) - (level_set(x-unit[ix])<0 ? boundary
                                            : v(x-unit[ix]));
                           if(!faults.empty())
-                            dv_minus-=(*dv_diagonal_ptr)(cell-unit[ix],ix);
+                            { dv_minus-=(*dv_diagonal_ptr)(cell-unit[ix],ix); }
                           if(level_set(x+unit[ix])<0)
                             {
                               dv_plus=boundary-v(x);
                               if(!faults.empty())
-                                dv_plus-=(*dv_diagonal_ptr)(cell,ix);
+                                { dv_plus-=(*dv_diagonal_ptr)(cell,ix); }
                             }
                           else
                             {
@@ -133,7 +132,9 @@ void Elastic::FAC::applyGradientDetector
                                        : v(x+unit[ix]*2))
                                 - v(x+unit[ix]);
                               if(!faults.empty())
-                                dv_plus-=(*dv_diagonal_ptr)(cell+unit[ix],ix);
+                                {
+                                  dv_plus-=(*dv_diagonal_ptr)(cell+unit[ix],ix);
+                                }
                             }
                         }
                       curve=dv_plus-dv_minus;
@@ -170,9 +171,10 @@ void Elastic::FAC::applyGradientDetector
             }
 
           if(max_curvature < curvature)
-            max_curvature=curvature;
+            { max_curvature=curvature; }
 
-          if (curvature > d_adaption_threshold || ln<min_full_refinement_level)
+          if (curvature > d_adaption_threshold
+              || level<min_full_refinement_level)
             {
               tag_cell(cell) = 1;
               ++ntag;
@@ -194,7 +196,7 @@ void Elastic::FAC::applyGradientDetector
         }
     }
   SAMRAI::tbox::plog << "Adaption threshold is " << d_adaption_threshold << "\n";
-  SAMRAI::tbox::plog << "Number of cells tagged on level " << ln << " is "
+  SAMRAI::tbox::plog << "Number of cells tagged on level " << level << " is "
              << ntag << "/" << ntotal << "\n";
   SAMRAI::tbox::plog << "Max estimate is " << max_curvature << "\n";
 }

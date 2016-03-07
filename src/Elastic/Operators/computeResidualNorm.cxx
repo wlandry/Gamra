@@ -6,11 +6,11 @@
 
 double Elastic::Operators::computeResidualNorm
 (const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
- int fine_ln,
- int coarse_ln)
+ int fine_level,
+ int coarse_level)
 {
-  if (coarse_ln != residual.getCoarsestLevelNumber() ||
-      fine_ln != residual.getFinestLevelNumber())
+  if (coarse_level != residual.getCoarsestLevelNumber() ||
+      fine_level != residual.getFinestLevelNumber())
     { TBOX_ERROR("Elastic::Operators::computeResidualNorm() is not\n"
                  << "set up to compute residual except on the range of\n"
                  << "levels defining the vector.\n"); }

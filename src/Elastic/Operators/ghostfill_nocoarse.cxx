@@ -4,13 +4,13 @@
 
 #include "Elastic/Operators.hxx"
 
-void Elastic::Operators::ghostfill_nocoarse(int v_id, int dest_ln)
+void Elastic::Operators::ghostfill_nocoarse(int v_id, int dest_level)
 {
-  if (!ghostfill_nocoarse_schedules[dest_ln])
+  if (!ghostfill_nocoarse_schedules[dest_level])
     { TBOX_ERROR("Expected side schedule not found."); }
   SAMRAI::xfer::RefineAlgorithm refiner;
   refiner.registerRefine(v_id,v_id,v_id,
                          boost::shared_ptr<SAMRAI::hier::RefineOperator>());
-  refiner.resetSchedule(ghostfill_nocoarse_schedules[dest_ln]);
-  ghostfill_nocoarse_schedules[dest_ln]->fillData(0.0,false);
+  refiner.resetSchedule(ghostfill_nocoarse_schedules[dest_level]);
+  ghostfill_nocoarse_schedules[dest_level]->fillData(0.0,false);
 }

@@ -27,11 +27,11 @@ void Elastic::Operators::initializeOperatorState
   coarse_fine_boundary.resize(hierarchy->getNumberOfLevels());
 
   SAMRAI::hier::IntVector max_gcw(dimension, 1);
-  for (int ln = level_min; ln <= level_max; ++ln)
+  for (int level = level_min; level <= level_max; ++level)
     {
-      coarse_fine_boundary[ln]
+      coarse_fine_boundary[level]
         = boost::make_shared<SAMRAI::hier::CoarseFineBoundary >
-        (*hierarchy, ln, max_gcw);
+        (*hierarchy, level, max_gcw);
     }
 
   v_coarsen_patch_strategy.coarse_fine=coarse_fine_boundary;
@@ -118,55 +118,55 @@ void Elastic::Operators::initializeOperatorState
                    boost::shared_ptr<SAMRAI::hier::RefineOperator>());
 
   /// Refinement and ghost fill operators
-  for (int dest_ln = level_min + 1; dest_ln <= level_max; ++dest_ln)
+  for (int dest_level = level_min + 1; dest_level <= level_max; ++dest_level)
     {
       boost::shared_ptr<SAMRAI::xfer::PatchLevelFullFillPattern>
         fill_pattern
         (boost::make_shared<SAMRAI::xfer::PatchLevelFullFillPattern>());
 
-      refine_schedules[dest_ln] =
+      refine_schedules[dest_level] =
         refine_algorithm.
-        createSchedule(fill_pattern,hierarchy->getPatchLevel(dest_ln),
+        createSchedule(fill_pattern,hierarchy->getPatchLevel(dest_level),
                        boost::shared_ptr<SAMRAI::hier::PatchLevel>(),
-                       dest_ln - 1,hierarchy);
-      if (!refine_schedules[dest_ln])
+                       dest_level - 1,hierarchy);
+      if (!refine_schedules[dest_level])
         { TBOX_ERROR(__FILE__
                      << ": Cannot create a refine schedule for refining!\n"); }
 
-      ghostfill_schedules[dest_ln] = ghostfill_algorithm.
-        createSchedule(hierarchy->getPatchLevel(dest_ln),
-                       dest_ln - 1,hierarchy,
+      ghostfill_schedules[dest_level] = ghostfill_algorithm.
+        createSchedule(hierarchy->getPatchLevel(dest_level),
+                       dest_level - 1,hierarchy,
                        &v_refine_patch_strategy);
-      if (!ghostfill_schedules[dest_ln])
+      if (!ghostfill_schedules[dest_level])
         { TBOX_ERROR(__FILE__
                      << ": Cannot create a refine schedule for "
                      "ghost filling!\n"); }
 
-      ghostfill_nocoarse_schedules[dest_ln] = ghostfill_nocoarse_algorithm.
-        createSchedule(hierarchy->getPatchLevel(dest_ln));
-      if (!ghostfill_nocoarse_schedules[dest_ln])
+      ghostfill_nocoarse_schedules[dest_level] = ghostfill_nocoarse_algorithm.
+        createSchedule(hierarchy->getPatchLevel(dest_level));
+      if (!ghostfill_nocoarse_schedules[dest_level])
         { TBOX_ERROR(__FILE__ << ": Cannot create a refine schedule for "
                      "ghost filling on bottom level!\n"); }
     }
 
   /// Coarsening operators
-  for (int dest_ln = level_min; dest_ln < level_max; ++dest_ln)
+  for (int dest_level = level_min; dest_level < level_max; ++dest_level)
     {
-      coarsen_solution_schedules[dest_ln] =
+      coarsen_solution_schedules[dest_level] =
         coarsen_solution_algorithm.
-        createSchedule(hierarchy->getPatchLevel(dest_ln),
-                       hierarchy->getPatchLevel(dest_ln + 1),
+        createSchedule(hierarchy->getPatchLevel(dest_level),
+                       hierarchy->getPatchLevel(dest_level + 1),
                        &v_coarsen_patch_strategy);
-      if (!coarsen_solution_schedules[dest_ln])
+      if (!coarsen_solution_schedules[dest_level])
         TBOX_ERROR(__FILE__ << ": Cannot create a coarsen schedule for "
                    "U v restriction!\n");
 
-      coarsen_resid_schedules[dest_ln] =
+      coarsen_resid_schedules[dest_level] =
         coarsen_resid_algorithm.
-        createSchedule(hierarchy->getPatchLevel(dest_ln),
-                       hierarchy->getPatchLevel(dest_ln + 1),
+        createSchedule(hierarchy->getPatchLevel(dest_level),
+                       hierarchy->getPatchLevel(dest_level + 1),
                        &v_coarsen_patch_strategy);
-      if (!coarsen_resid_schedules[dest_ln])
+      if (!coarsen_resid_schedules[dest_level])
         TBOX_ERROR(__FILE__ << ": Cannot create a coarsen schedule for "
                    "R v restriction!\n");
     }

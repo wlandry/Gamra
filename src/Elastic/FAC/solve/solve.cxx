@@ -34,13 +34,13 @@ bool Elastic::FAC::solve()
                 hierarchy->getFinestLevelNumber());
   
   /// Fill in the initial guess.
-  for (int ln = 0; ln <= hierarchy->getFinestLevelNumber(); ++ln)
+  for (int level = 0; level <= hierarchy->getFinestLevelNumber(); ++level)
     {
       boost::shared_ptr<SAMRAI::hier::PatchLevel>
-        level = hierarchy->getPatchLevel(ln);
+        patch_level = hierarchy->getPatchLevel(level);
     
-      for (SAMRAI::hier::PatchLevel::Iterator ip(level->begin());
-           ip!=level->end(); ++ip)
+      for (SAMRAI::hier::PatchLevel::Iterator ip(patch_level->begin());
+           ip!=patch_level->end(); ++ip)
         {
           const boost::shared_ptr<SAMRAI::hier::Patch> patch(*ip);
 
@@ -81,7 +81,7 @@ bool Elastic::FAC::solve()
                 }
             }
         }
-    solver.set_physical_boundaries(v_id,level,false);
+    solver.set_physical_boundaries(v_id,patch_level,false);
   }
 
   SAMRAI::tbox::plog << "solving..." << std::endl;

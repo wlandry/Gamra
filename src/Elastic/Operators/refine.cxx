@@ -4,9 +4,9 @@
 
 #include "Elastic/Operators.hxx"
 
-void Elastic::Operators::refine (int v_dst, int v_src, int v_scr, int dest_ln)
+void Elastic::Operators::refine (int v_dst, int v_src, int v_scr, int dest_level)
 {
-  if (!refine_schedules[dest_ln])
+  if (!refine_schedules[dest_level])
     { TBOX_ERROR("Expected schedule not found."); }
   SAMRAI::xfer::RefineAlgorithm refiner;
   refiner.registerRefine(v_dst, v_src, v_scr, refine_operator);
@@ -15,6 +15,6 @@ void Elastic::Operators::refine (int v_dst, int v_src, int v_scr, int dest_ln)
       refiner.registerRefine(level_set_id,level_set_id,level_set_id,
                              boost::shared_ptr<SAMRAI::hier::RefineOperator>());
     }
-  refiner.resetSchedule(refine_schedules[dest_ln]);
-  refine_schedules[dest_ln]->fillData(0.0,false);
+  refiner.resetSchedule(refine_schedules[dest_level]);
+  refine_schedules[dest_level]->fillData(0.0,false);
 }

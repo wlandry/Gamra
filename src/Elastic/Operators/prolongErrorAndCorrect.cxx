@@ -8,12 +8,12 @@
 void Elastic::Operators::prolongErrorAndCorrect
 (const SAMRAI::solv::SAMRAIVectorReal<double>& s,
  SAMRAI::solv::SAMRAIVectorReal<double>& d,
- int dest_ln)
+ int dest_level)
 {
   t_prolong->start();
 
   SAMRAI::hier::PatchLevel &fine_level =
-    *(s.getPatchHierarchy()->getPatchLevel(dest_ln));
+    *(s.getPatchHierarchy()->getPatchLevel(dest_level));
 
   // FIXME: Is there a way to do this without having to allocate a
   // scratch space?
@@ -24,10 +24,10 @@ void Elastic::Operators::prolongErrorAndCorrect
   /// FIXME: Get rid of this global variable
   Coarse_Fine_Boundary_Refine::is_residual=true;
   refine(side_scratch_id, s.getComponentDescriptorIndex(0),
-         side_scratch_id, dest_ln);
+         side_scratch_id, dest_level);
   {
     SAMRAI::math::HierarchySideDataOpsReal<double>
-      hierarchy_math_ops(s.getPatchHierarchy(), dest_ln, dest_ln);
+      hierarchy_math_ops(s.getPatchHierarchy(), dest_level, dest_level);
     const int v_dst = d.getComponentDescriptorIndex(0);
     hierarchy_math_ops.add(v_dst, v_dst, side_scratch_id);
   }

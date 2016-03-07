@@ -68,49 +68,49 @@ namespace Elastic
     virtual void restrictSolution
     (const SAMRAI::solv::SAMRAIVectorReal<double>& source,
      SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-     int dest_ln);
+     int dest_level);
     virtual void restrictResidual
     (const SAMRAI::solv::SAMRAIVectorReal<double>& source,
      SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-     int dest_ln);
+     int dest_level);
 
     virtual void prolongErrorAndCorrect
     (const SAMRAI::solv::SAMRAIVectorReal<double>& source,
      SAMRAI::solv::SAMRAIVectorReal<double>& dest,
-     int dest_ln);
+     int dest_level);
 
     virtual void smoothError
     (SAMRAI::solv::SAMRAIVectorReal<double>& error,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-     int ln,
+     int level,
      int num_sweeps)
     {
-      smooth(error,residual,ln,num_sweeps,0);
+      smooth(error,residual,level,num_sweeps,0);
     }
     
     void smooth(SAMRAI::solv::SAMRAIVectorReal<double>& data,
                 const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                const int &ln,
+                const int &level,
                 const int &num_sweeps,
                 const double &tolerance);
 
     virtual int solveCoarsestLevel
     (SAMRAI::solv::SAMRAIVectorReal<double>& error,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-     int coarsest_ln);
+     int coarsest_level);
 
     virtual void
     computeCompositeResidualOnLevel
     (SAMRAI::solv::SAMRAIVectorReal<double>& residual,
      const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
      const SAMRAI::solv::SAMRAIVectorReal<double>& rhs,
-     int ln,
+     int level,
      bool error_equation_indicator);
 
     virtual double
     computeResidualNorm(const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-                        int fine_ln,
-                        int coarse_ln);
+                        int fine_level,
+                        int coarse_level);
 
     virtual void initializeOperatorState
     (const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
@@ -125,36 +125,36 @@ namespace Elastic
 
     void set_physical_boundaries(const int &v_id,
                                  const SAMRAI::hier::PatchHierarchy &hierarchy,
-                                 const int &l)
+                                 const int &level)
     {
-      set_physical_boundaries(v_id,hierarchy,l,true);
+      set_physical_boundaries(v_id,hierarchy,level,true);
     }
     void set_physical_boundaries(const int &v_id,
                                  const SAMRAI::hier::PatchHierarchy &hierarchy,
-                                 const int &l, const bool &rhs)
+                                 const int &level, const bool &rhs)
     {
-      set_physical_boundaries(v_id,hierarchy.getPatchLevel(l),rhs);
+      set_physical_boundaries(v_id,hierarchy.getPatchLevel(level),rhs);
     }
     void set_physical_boundaries
     (const int &v_id,
-     const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level)
+     const boost::shared_ptr<SAMRAI::hier::PatchLevel> &patch_level)
     {
-      set_physical_boundaries(v_id,level,true);
+      set_physical_boundaries(v_id,patch_level,true);
     }
     void set_physical_boundaries
     (const int &v_id, 
-     const boost::shared_ptr<SAMRAI::hier::PatchLevel> &level,
+     const boost::shared_ptr<SAMRAI::hier::PatchLevel> &patch_level,
      const bool &rhs);
   private:
     void Gauss_Seidel_red_black_2D
     (SAMRAI::solv::SAMRAIVectorReal<double>& error,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-     int ln, int num_sweeps, double residual_tolerance);
+     int level, int num_sweeps, double residual_tolerance);
 
     void Gauss_Seidel_red_black_3D
     (SAMRAI::solv::SAMRAIVectorReal<double>& solution,
      const SAMRAI::solv::SAMRAIVectorReal<double>& residual,
-     int ln, int num_sweeps,
+     int level, int num_sweeps,
      double residual_tolerance);
 
     void update_V_2D(const Gamra::Dir &axis,
@@ -183,11 +183,11 @@ namespace Elastic
                      const SAMRAI::hier::Index pp[3],
                      double &maxres);
 
-    void refine(int v_dst, int v_src, int v_scr, int dest_ln);
-    void coarsen_solution(int v_dst, int v_src, int dest_ln);
-    void coarsen_resid(int v_dst, int v_src, int dest_ln);
-    void ghostfill(int v_id, int dest_ln);
-    void ghostfill_nocoarse(int v_id, int dest_ln);
+    void refine(int v_dst, int v_src, int v_scr, int dest_level);
+    void coarsen_solution(int v_dst, int v_src, int dest_level);
+    void coarsen_resid(int v_dst, int v_src, int dest_level);
+    void ghostfill(int v_id, int dest_level);
+    void ghostfill_nocoarse(int v_id, int dest_level);
 
     static void finalizeCallback();
 

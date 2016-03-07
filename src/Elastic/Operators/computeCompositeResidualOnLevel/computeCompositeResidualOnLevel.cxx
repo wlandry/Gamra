@@ -40,7 +40,7 @@ void Elastic::Operators::computeCompositeResidualOnLevel
 (SAMRAI::solv::SAMRAIVectorReal<double>& residual,
  const SAMRAI::solv::SAMRAIVectorReal<double>& solution,
  const SAMRAI::solv::SAMRAIVectorReal<double>& rhs,
- int ln,
+ int level,
  bool error_equation_indicator)
 {
   t_compute_composite_residual->start();
@@ -52,22 +52,22 @@ void Elastic::Operators::computeCompositeResidualOnLevel
   const SAMRAI::hier::PatchHierarchy &hierarchy=*residual.getPatchHierarchy();
 
   boost::shared_ptr<SAMRAI::hier::PatchLevel>
-    level = hierarchy.getPatchLevel(ln);
+    patch_level = hierarchy.getPatchLevel(level);
 
   const int v_id = solution.getComponentDescriptorIndex(0);
   v_refine_patch_strategy.data_id=v_id;
   v_refine_patch_strategy.is_residual=error_equation_indicator;
   Coarse_Fine_Boundary_Refine::is_residual=error_equation_indicator;
 
-  if (ln > level_min)
-    { ghostfill(v_id, ln); }
+  if (level > level_min)
+    { ghostfill(v_id, level); }
   else
-    { ghostfill_nocoarse(v_id, ln); }
+    { ghostfill_nocoarse(v_id, level); }
 
-  set_physical_boundaries(v_id,hierarchy,ln,error_equation_indicator);
+  set_physical_boundaries(v_id,hierarchy,level,error_equation_indicator);
 
-  for (SAMRAI::hier::PatchLevel::Iterator pi(level->begin());
-       pi!=level->end(); ++pi)
+  for (SAMRAI::hier::PatchLevel::Iterator pi(patch_level->begin());
+       pi!=patch_level->end(); ++pi)
     {
       boost::shared_ptr<SAMRAI::hier::Patch> patch = *pi;
       boost::shared_ptr<SAMRAI::pdat::SideData<double> > v_ptr =
