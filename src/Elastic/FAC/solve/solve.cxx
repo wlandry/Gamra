@@ -3,15 +3,13 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "setup_fault_corrections.hxx"
+#include "Elastic/Solver.hxx"
 
 bool Elastic::FAC::solve()
 {
   if (!hierarchy)
     { TBOX_ERROR("Elastic::FAC: Cannot solve using an uninitialized "
                  "object.\n"); }
-
-  boundary_conditions.set_extra_ids(edge_moduli_id,dv_diagonal_id,
-                                    dv_mixed_id,level_set_id);
 
   fix_moduli();
   const int dim(dimension.getValue());
@@ -23,6 +21,18 @@ bool Elastic::FAC::solve()
         setup_fault_corrections<SAMRAI::pdat::EdgeData<double> >();
     }
 
+  Boundary_Conditions boundary_conditions
+    (dimension, "Elastic::FAC::boundary conditions",
+     *database.getDatabase("boundary_conditions"));
+  boundary_conditions.set_extra_ids(edge_moduli_id,dv_diagonal_id,
+                                    dv_mixed_id,level_set_id);
+
+  Solver solver(dimension,"Elastic::FAC::fac_solver",
+                database.getDatabase("fac_solver"),boundary_conditions,
+                cell_moduli_id,edge_moduli_id,dv_diagonal_id,dv_mixed_id,
+                level_set_id, v_id,v_rhs_id,hierarchy,0,
+                hierarchy->getFinestLevelNumber());
+  
   /// Fill in the initial guess.
   for (int ln = 0; ln <= hierarchy->getFinestLevelNumber(); ++ln)
     {
@@ -71,29 +81,25 @@ bool Elastic::FAC::solve()
                 }
             }
         }
-    d_elastic_fac_solver.set_physical_boundaries(v_id,level,false);
+    solver.set_physical_boundaries(v_id,level,false);
   }
 
-  d_elastic_fac_solver.initializeSolverState
-    (cell_moduli_id,edge_moduli_id,dv_diagonal_id,dv_mixed_id,level_set_id,
-     v_id,v_rhs_id,hierarchy,0,hierarchy->getFinestLevelNumber());
-
   SAMRAI::tbox::plog << "solving..." << std::endl;
-  bool converged(d_elastic_fac_solver.solveSystem(v_id,v_rhs_id));
+  bool converged(solver.solveSystem(v_id,v_rhs_id));
 
   /// Write out convergence data
   double avg_factor, final_factor;
-  d_elastic_fac_solver.getConvergenceFactors(avg_factor, final_factor);
+  solver.getConvergenceFactors(avg_factor, final_factor);
   SAMRAI::tbox::plog << "\t" << (converged ? "" : "NOT ") << "converged " << "\n"
              << "	iterations: "
-             << d_elastic_fac_solver.getNumberOfIterations() << "\n"
-             << "	residual: "<< d_elastic_fac_solver.getResidualNorm()
+             << solver.getNumberOfIterations() << "\n"
+             << "	residual: "<< solver.getResidualNorm()
              << "\n"
              << "	average convergence: "<< avg_factor << "\n"
              << "	final convergence: "<< final_factor << "\n"
              << std::flush;
 
-  d_elastic_fac_solver.deallocateSolverState();
+  solver.deallocateSolverState();
 
   return converged;
 }

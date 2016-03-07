@@ -15,7 +15,17 @@ namespace Elastic
     Solver(const SAMRAI::tbox::Dimension& dim,
            const std::string& object_name,
            boost::shared_ptr<SAMRAI::tbox::Database> database,
-           Boundary_Conditions &bc);
+           Boundary_Conditions &bc,
+           const int cell_moduli_id,
+           const int edge_moduli_id,
+           const int dv_diagonal_id,
+           const int dv_mixed_id, 
+           const int level_set_id,
+           const int v_id,
+           const int v_rhs_id,
+           boost::shared_ptr<SAMRAI::hier::PatchHierarchy> &Hierarchy,
+           const int coarse_level,
+           const int fine_level);
 
     ~Solver(void);
 

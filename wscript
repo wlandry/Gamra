@@ -204,7 +204,6 @@ def build(bld):
                         'src/Elastic/Solver/createVectorWrappers.cxx',
                         'src/Elastic/Solver/deallocateSolverState.cxx',
                         'src/Elastic/Solver/getFromInput.cxx',
-                        'src/Elastic/Solver/initializeSolverState.cxx',
                         'src/Stokes/FAC/FAC.cxx',
                         'src/Stokes/FAC/fix_viscosity.cxx',
                         'src/Stokes/FAC/applyGradientDetector.cxx',

@@ -17,6 +17,8 @@
 #include "Stokes/V_Coarsen.hxx"
 #include "Stokes/Resid_Coarsen.hxx"
 #include "Elastic/FAC.hxx"
+#include "Elastic/V_Refine.hxx"
+#include "Elastic/Coarse_Fine_Boundary_Refine.hxx"
 
 #include "solve_system.hxx"
 

@@ -4,11 +4,12 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
+#include "Input_Expression.hxx"
+
 #include <SAMRAI/mesh/StandardTagAndInitStrategy.h>
 #include <SAMRAI/appu/VisDerivedDataStrategy.h>
 #include <SAMRAI/appu/VisItDataWriter.h>
 
-#include "Elastic/Solver.hxx"
 #include <FTensor.hpp>
 
 namespace Elastic
@@ -58,21 +59,18 @@ namespace Elastic
 
   private:
     void fix_moduli();
+    SAMRAI::tbox::Database &database;
     const SAMRAI::tbox::Dimension dimension;
 
     boost::shared_ptr<SAMRAI::hier::PatchHierarchy> hierarchy;
 
-  public:
-    Boundary_Conditions boundary_conditions;
   private:
-    Elastic::Solver d_elastic_fac_solver;
     boost::shared_ptr<SAMRAI::hier::VariableContext> context;
     double d_adaption_threshold;
     int min_full_refinement_level;
   public:
     int cell_moduli_id, edge_moduli_id, v_id, v_rhs_id, dv_diagonal_id,
       dv_mixed_id, level_set_id;
-
     // FIXME: This should be a std::array or std::vector, but we have
     // to wait for C++11.
     Input_Expression lambda, mu, v_rhs[3], v_initial[3], level_set;

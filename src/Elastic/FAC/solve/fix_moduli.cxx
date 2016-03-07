@@ -1,11 +1,16 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
+#include "Elastic/FAC.hxx"
+#include "Constants.hxx"
+
+#include <SAMRAI/pdat/CellData.h>
+#include <SAMRAI/pdat/SideData.h>
+#include <SAMRAI/pdat/NodeData.h>
+#include <SAMRAI/pdat/EdgeData.h>
 #include <SAMRAI/xfer/CoarsenAlgorithm.h>
 #include <SAMRAI/geom/CartesianGridGeometry.h>
 #include <SAMRAI/pdat/NodeGeometry.h>
-
-#include "Elastic/FAC.hxx"
 
 /// Fix the moduli on the coarse grids by coarsening from the finer
 /// grids geometrically averaging the cell moduli to get the edge

@@ -2,6 +2,11 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/FAC.hxx"
+#include "Constants.hxx"
+
+#include <SAMRAI/pdat/CellData.h>
+#include <SAMRAI/pdat/SideData.h>
+#include <SAMRAI/geom/CartesianPatchGeometry.h>
 
 void Elastic::FAC::applyGradientDetector
 (const boost::shared_ptr<SAMRAI::hier::PatchHierarchy>& hierarchy_,

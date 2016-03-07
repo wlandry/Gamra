@@ -2,9 +2,13 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
-#include <SAMRAI/geom/CartesianGridGeometry.h>
-
 #include "Elastic/FAC.hxx"
+#include "Constants.hxx"
+
+#include <SAMRAI/pdat/CellData.h>
+#include <SAMRAI/pdat/SideData.h>
+#include <SAMRAI/geom/CartesianPatchGeometry.h>
+#include <SAMRAI/geom/CartesianGridGeometry.h>
 
 /// Initialize data on a level, including allocating memory.  It does
 /// not set the terms due to the faults, since the moduli have to be

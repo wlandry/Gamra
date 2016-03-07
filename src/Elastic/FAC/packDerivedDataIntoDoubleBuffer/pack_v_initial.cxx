@@ -2,6 +2,11 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/FAC.hxx"
+#include "Constants.hxx"
+
+#include <SAMRAI/pdat/CellData.h>
+#include <SAMRAI/pdat/SideData.h>
+#include <SAMRAI/geom/CartesianPatchGeometry.h>
 
 void pack_v_initial(double* buffer,
                     const SAMRAI::hier::Patch& patch,

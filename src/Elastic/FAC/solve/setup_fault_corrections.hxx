@@ -5,6 +5,10 @@
 
 #include "setup_fault_corrections/correct_rhs.hxx"
 
+#include <SAMRAI/pdat/CellData.h>
+#include <SAMRAI/pdat/SideData.h>
+#include <SAMRAI/geom/CartesianPatchGeometry.h>
+
 void compute_dv(const std::vector<double> &faults,
                 const Gamra::Dir &dim, const double *dx,
                 const double *geom_xlower,

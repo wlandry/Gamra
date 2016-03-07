@@ -2,19 +2,18 @@
 /// Copyright © 2013-2016 California Institute of Technology
 /// Copyright © 2013-2016 Nanyang Technical University
 
+#include "Constants.hxx"
 #include "Elastic/FAC.hxx"
 
+#include <SAMRAI/pdat/CellVariable.h>
+#include <SAMRAI/pdat/SideVariable.h>
+#include <SAMRAI/pdat/NodeVariable.h>
+#include <SAMRAI/pdat/EdgeVariable.h>
+
 Elastic::FAC::FAC(const SAMRAI::tbox::Dimension& dimension,
-                  SAMRAI::tbox::Database &database):
+                  SAMRAI::tbox::Database &Database):
+  database(Database),
   dimension(dimension),
-  boundary_conditions(dimension,"Elastic::FAC::boundary conditions",
-                      *database.getDatabase("boundary_conditions")),
-  d_elastic_fac_solver((dimension),
-                       "Elastic::FAC::fac_solver",
-                       (database.isDatabase("fac_solver")) ?
-                       database.getDatabase("fac_solver"):
-                       boost::shared_ptr<SAMRAI::tbox::Database>(),
-                       boundary_conditions),
   cell_moduli_id(invalid_id),
   edge_moduli_id(invalid_id),
   v_id(invalid_id),

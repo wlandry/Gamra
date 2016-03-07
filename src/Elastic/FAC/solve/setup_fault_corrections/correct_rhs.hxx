@@ -4,6 +4,11 @@
 /// Copyright © 2013-2016 Nanyang Technical University
 
 #include "Elastic/FAC.hxx"
+#include "Constants.hxx"
+#include "edge_node_eval.hxx"
+
+#include <SAMRAI/pdat/CellData.h>
+#include <SAMRAI/pdat/SideData.h>
 
 template<class T>
 void correct_rhs(const SAMRAI::tbox::Dimension &dimension,
